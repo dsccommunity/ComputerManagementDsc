@@ -1,6 +1,6 @@
-{{AppVeyor build status badge for master branch}}
+[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xcomputermanagement/branch/master)
 
-#{{ModuleName}}
+# xComputerManagement
 
 {{Description}}
 
