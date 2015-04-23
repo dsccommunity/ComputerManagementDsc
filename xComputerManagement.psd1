@@ -1,9 +1,9 @@
 @{
 # Version number of this module.
-ModuleVersion = '1.2'
+ModuleVersion = '1.2.2'
 
 # ID used to uniquely identify this module
-GUID = '41c83857-b8c6-43a2-8568-1b155cddcb85'
+GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
 
 # Author of this module
 Author = 'Microsoft Corporation'
@@ -12,10 +12,12 @@ Author = 'Microsoft Corporation'
 CompanyName = 'Microsoft Corporation'
 
 # Copyright statement for this module
-Copyright = '(c) 2013 Microsoft Corporation. All rights reserved.'
+Copyright = '(c) 2014 Microsoft Corporation. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Module with DSC Resources for Computer Management area'
+Description = 'The xComputerManagement module is originally part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit. This version has been modified for use in Azure. This module contains the xComputer and xDisk resources. These DSC Resources allow you to perform computer management tasks, like joining a domain or initializing disks.
+
+All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '4.0'
@@ -29,3 +31,4 @@ FunctionsToExport = '*'
 # Cmdlets to export from this module
 CmdletsToExport = '*'
 }
+
