@@ -44,19 +44,20 @@ xComputer resource has following properties:
 * Credential: Credential to be used to join or leave domain
 
 ## Versions
-### 1.0.0.0
 
-Initial release with the following resources
-* xComputer
+### 1.2.2
+
+Added types to Get/Set/Test definitions to allow xResourceDesigner validation to succeed
 
 ### 1.2
 
 Added functionality to enable moving computer from one domain to another
 Modified Test-DscConfiguration logics when testing domain join
 
-### 1.2.2
+### 1.0.0.0
 
-Added types to Get/Set/Test definitions to allow xResourceDesigner validation to succeed
+Initial release with the following resources
+* xComputer
 
 
 ## Examples
