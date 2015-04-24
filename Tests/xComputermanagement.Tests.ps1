@@ -13,6 +13,7 @@ InModuleScope MSFT_xComputer {
         $NotComputerName  = if($env:COMPUTERNAME -ne 'othername'){'othername'}else{'name'}
     
         Context Test-TargetResource {
+            Mock Get-WMIObject {[PSCustomObject]@{DomainName = 'ContosoLtd'}} -ParameterFilter {$Class -eq 'Win32_NTDomain'}
             It 'Throws if both DomainName and WorkGroupName are specified' {
                 {Test-TargetResource -Name $Env:ComputerName -DomainName 'contoso.com' -WorkGroupName 'workgroup'} | Should Throw
             }
@@ -25,7 +26,7 @@ InModuleScope MSFT_xComputer {
             }
             It 'Should return True if Workgroup name is same as specified' {
                 Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Workgroup';Workgroup='Workgroup';PartOfDomain=$false}}
-                Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'workgroup' -Verbose | Should Be $true
+                Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'workgroup' | Should Be $true
             }
             It 'Should return True if ComputerName and Domain name is same as specified' {
                 Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
@@ -37,7 +38,6 @@ InModuleScope MSFT_xComputer {
             }
             It 'Should return True if current Domain flat name (Netbios) is specified' {
                 Mock Get-WMIObject {[PSCustomObject]@{Domain = 'contoso.com';Workgroup='contoso.com';PartOfDomain=$true}}
-                Mock Get-WMIObject {[PSCustomObject]@{DomainName = 'ContosoLtd'}} -ParameterFilter {$Class -eq 'Win32_NTDomain'}
                 Test-TargetResource -Name $Env:ComputerName -DomainName 'contosoltd' -Credential $Credential | Should Be $true
             }
             It 'Should return False if Domain name is not same as specified' {
@@ -60,7 +60,7 @@ InModuleScope MSFT_xComputer {
             }
             It 'Should return False if ComputerName is in Domain and Workgroup is specified' {
                 Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
-                Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'Contoso' -Credential $Credential | Should Be $false
+                Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'Contoso' -Credential $Credential -UnjoinCredential $Credential | Should Be $false
             }
         }
         Context Get-TargetResource {
