@@ -220,6 +220,8 @@ function Test-TargetResource
         Write-Verbose -Message "Checking if workgroup name is $WorkGroupName"
         return ($WorkGroupName -eq (gwmi WIN32_ComputerSystem).WorkGroup)
     }
+
+    return $true
 }
 
 function ValidateDomainOrWorkGroup($DomainName, $WorkGroupName)
