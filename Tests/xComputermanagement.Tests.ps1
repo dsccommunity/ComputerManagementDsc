@@ -38,6 +38,22 @@ InModuleScope MSFT_xComputer {
                 Mock GetComputerDomain {''}
                 Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'workgroup' | Should Be $true
             }
+            It 'Should return True if ComputerName is same and no Domain or Workgroup specified' {
+                Mock Get-WmiObject {[PSCustomObject]@{Domain = 'Workgroup';Workgroup='Workgroup';PartOfDomain=$false}}
+                Mock GetComputerDomain {''}
+                Test-TargetResource -Name $Env:ComputerName | Should Be $true
+                Mock Get-WmiObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
+                Mock GetComputerDomain {'contoso.com'}
+                Test-TargetResource -Name $Env:ComputerName | Should Be $true
+            }
+            It 'Should return False if ComputerName is not same and no Domain or Workgroup specified' {
+                Mock Get-WmiObject {[PSCustomObject]@{Domain = 'Workgroup';Workgroup='Workgroup';PartOfDomain=$false}}
+                Mock GetComputerDomain {''}
+                Test-TargetResource -Name $NotComputerName | Should Be $false
+                Mock Get-WmiObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
+                Mock GetComputerDomain {'contoso.com'}
+                Test-TargetResource -Name $NotComputerName | Should Be $false
+            }
             It 'Should return False if Domain name is not same as specified' {
                 Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
                 Mock GetComputerDomain {'contoso.com'}
@@ -66,6 +82,7 @@ InModuleScope MSFT_xComputer {
                 Mock GetComputerDomain {'contoso.com'}
                 Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'Contoso' -Credential $Credential -UnjoinCredential $Credential | Should Be $false
             }
+            
         }
         Context Get-TargetResource {
             It 'should not throw' {
