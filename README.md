@@ -45,6 +45,13 @@ xComputer resource has following properties:
 
 ## Versions
 
+
+### 1.3.0
+
+* xComputer
+    * Fixed issue with Test-TargetResource when not specifying Domain or Workgroup name
+    * Added tests
+
 ### 1.2.2
 
 Added types to Get/Set/Test definitions to allow xResourceDesigner validation to succeed
