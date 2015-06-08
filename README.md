@@ -49,7 +49,7 @@ xComputer resource has following properties:
 ### 1.3.0
 
 * xComputer
-    * Fix issue with Test-TargetResource when not specifying Domain or Workgroup name
+    * Fixed issue with Test-TargetResource when not specifying Domain or Workgroup name
     * Added tests
 
 ### 1.2.2
