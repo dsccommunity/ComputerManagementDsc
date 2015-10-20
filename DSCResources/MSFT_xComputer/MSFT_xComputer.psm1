@@ -13,6 +13,8 @@ function Get-TargetResource
 
         [string] $DomainName,
 
+        [string] $JoinOU,
+
         [PSCredential] $Credential,
 
         [PSCredential] $UnjoinCredential,
@@ -26,6 +28,8 @@ function Get-TargetResource
     $returnValue = @{
         Name = $env:COMPUTERNAME
         DomainName = GetComputerDomain
+        JoinOU = $JoinOU
+        CurrentOU = GetComputerOU
         Credential = [ciminstance]$convertToCimCredential
         UnjoinCredential = [ciminstance]$convertToCimUnjoinCredential
         WorkGroupName= (gwmi WIN32_ComputerSystem).WorkGroup
@@ -42,6 +46,8 @@ function Set-TargetResource
         [string] $Name,
     
         [string] $DomainName,
+
+        [string] $JoinOU,
         
         [PSCredential] $Credential,
 
@@ -73,7 +79,12 @@ function Set-TargetResource
                     }
                     else
                     {
-                        Add-Computer -DomainName $DomainName -Credential $Credential -NewName $Name -Force
+                        if ($JoinOU) {
+                            Add-Computer -DomainName $DomainName -Credential $Credential -NewName $Name -OUPath $JoinOU -Force
+                        }
+                        else {
+                            Add-Computer -DomainName $DomainName -Credential $Credential -NewName $Name -Force
+                        }
                     }
                     Write-Verbose -Message "Renamed computer to '$($Name)' and added to the domain '$($DomainName)."
                 }
@@ -86,7 +97,12 @@ function Set-TargetResource
                     }
                     else
                     {
-                        Add-Computer -DomainName $DomainName -Credential $Credential -Force
+                        if ($JoinOU) {
+                            Add-Computer -DomainName $DomainName -Credential $Credential -OUPath $JoinOU -Force
+                        }
+                        else {
+                            Add-Computer -DomainName $DomainName -Credential $Credential -Force
+                        }
                     }
                     Write-Verbose -Message "Added computer to domain '$($DomainName)."
                 }
@@ -182,6 +198,8 @@ function Test-TargetResource
     (
         [parameter(Mandatory)]
         [string] $Name,
+
+        [string] $JoinOU,
         
         [PSCredential]$Credential,
 
@@ -247,5 +265,18 @@ function GetComputerDomain
     }
 }
 
-Export-ModuleMember -Function *-TargetResource
+function GetComputerOU
+{
+    $ou = $null
 
+    if (GetComputerDomain)
+    {
+        $dn = $null
+        $dn = ([adsisearcher]"(&(objectCategory=computer)(objectClass=computer)(cn=$env:COMPUTERNAME))").FindOne().Properties.distinguishedname
+        $ou = $dn -replace '^(CN=.*?(?<=,))', ''
+    }
+
+    return $ou
+}
+
+Export-ModuleMember -Function *-TargetResource
