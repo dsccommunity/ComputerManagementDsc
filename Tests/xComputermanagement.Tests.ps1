@@ -139,6 +139,14 @@ InModuleScope MSFT_xComputer {
                 Assert-MockCalled -CommandName Add-Computer -Exactly 1 -Scope It -ParameterFilter {$DomainName -and $NewName}
                 Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It -ParameterFilter {$WorkGroupName}
             }
+            It 'Changes ComputerName and changes Workgroup to Domain with specified OU' {
+                Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso';Workgroup='Contoso';PartOfDomain=$false}}
+                Mock GetComputerDomain {''}
+                Set-TargetResource -Name $NotComputerName -DomainName 'Contoso.com' -JoinOU 'OU=Computers,DC=contoso,DC=com' -Credential $Credential | Should BeNullOrEmpty
+                Assert-MockCalled -CommandName Rename-Computer -Exactly 0 -Scope It
+                Assert-MockCalled -CommandName Add-Computer -Exactly 1 -Scope It -ParameterFilter {$DomainName -and $NewName}
+                Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It -ParameterFilter {$WorkGroupName}
+            }
             It 'Changes ComputerName and changes Workgroup to new Workgroup' {
                 Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso';Workgroup='Contoso';PartOfDomain=$false}}
                 Mock GetComputerDomain {''}
