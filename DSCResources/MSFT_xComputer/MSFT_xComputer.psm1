@@ -29,7 +29,7 @@ function Get-TargetResource
         Name = $env:COMPUTERNAME
         DomainName = GetComputerDomain
         JoinOU = $JoinOU
-        CurrentOU = GetComputerOU
+        CurrentOU = Get-ComputerOU
         Credential = [ciminstance]$convertToCimCredential
         UnjoinCredential = [ciminstance]$convertToCimUnjoinCredential
         WorkGroupName= (gwmi WIN32_ComputerSystem).WorkGroup
@@ -265,7 +265,7 @@ function GetComputerDomain
     }
 }
 
-function GetComputerOU
+function Get-ComputerOU
 {
     $ou = $null
 
