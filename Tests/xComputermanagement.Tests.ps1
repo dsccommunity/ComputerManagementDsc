@@ -88,7 +88,7 @@ InModuleScope MSFT_xComputer {
             It 'should not throw' {
                 {Get-TargetResource -Name $env:COMPUTERNAME} | Should Not Throw
             }
-            It 'Should return a hashtable containing Name,DomainName, Credential, UnjoinCredential and WorkGroupName' {
+            It 'Should return a hashtable containing Name,DomainName, JoinOU, CurrentOU, Credential, UnjoinCredential and WorkGroupName' {
                 $Result = Get-TargetResource -Name $env:COMPUTERNAME
                 $Result.GetType().Fullname | Should Be 'System.Collections.Hashtable'
                 $Result.Keys | Should Be @('Name','DomainName', 'JoinOU', 'CurrentOU', 'Credential','UnjoinCredential','WorkGroupName')
