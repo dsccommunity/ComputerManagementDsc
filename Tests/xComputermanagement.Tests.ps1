@@ -91,7 +91,7 @@ InModuleScope MSFT_xComputer {
             It 'Should return a hashtable containing Name,DomainName, Credential, UnjoinCredential and WorkGroupName' {
                 $Result = Get-TargetResource -Name $env:COMPUTERNAME
                 $Result.GetType().Fullname | Should Be 'System.Collections.Hashtable'
-                $Result.Keys | Should Be @('Name','DomainName','Credential','UnjoinCredential','WorkGroupName')
+                $Result.Keys | Should Be @('Name','DomainName', 'JoinOU', 'CurrentOU', 'Credential','UnjoinCredential','WorkGroupName')
             }
         }
         Context Set-TargetResource {
