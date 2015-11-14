@@ -82,6 +82,12 @@ InModuleScope MSFT_xComputer {
                 Mock GetComputerDomain {'contoso.com'}
                 Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'Contoso' -Credential $Credential -UnjoinCredential $Credential | Should Be $false
             }
+            It 'Throws if name is to long' {
+                {Test-TargetResource -Name "ThisNameIsTooLong"} | Should Throw
+            }
+            It 'Throws if name contains illigal characters' {
+                {Test-TargetResource -Name "ThisIsBad<>"} | Should Throw
+            }
             
         }
         Context Get-TargetResource {
@@ -92,6 +98,12 @@ InModuleScope MSFT_xComputer {
                 $Result = Get-TargetResource -Name $env:COMPUTERNAME
                 $Result.GetType().Fullname | Should Be 'System.Collections.Hashtable'
                 $Result.Keys | Should Be @('Name','DomainName','Credential','UnjoinCredential','WorkGroupName')
+            }
+            It 'Throws if name is to long' {
+                {Get-TargetResource -Name "ThisNameIsTooLong"} | Should Throw
+            }
+            It 'Throws if name contains illigal characters' {
+                {Get-TargetResource -Name "ThisIsBad<>"} | Should Throw
             }
         }
         Context Set-TargetResource {
@@ -170,6 +182,12 @@ InModuleScope MSFT_xComputer {
                 Set-TargetResource -Name $NotComputerName | Should BeNullOrEmpty
                 Assert-MockCalled -CommandName Rename-Computer -Exactly 1 -Scope It
                 Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It
+            }
+            It 'Throws if name is to long' {
+                {Set-TargetResource -Name "ThisNameIsTooLong"} | Should Throw
+            }
+            It 'Throws if name contains illigal characters' {
+                {Set-TargetResource -Name "ThisIsBad<>"} | Should Throw
             }
         }
     }

@@ -9,6 +9,8 @@ function Get-TargetResource
     param
     (
         [parameter(Mandatory)]
+        [ValidateLength(1,15)]
+        [ValidateScript({$_ -inotmatch'[\/\\:*?"<>|]' })]
         [string] $Name,
 
         [string] $DomainName,
@@ -39,6 +41,8 @@ function Set-TargetResource
     param
     (
         [parameter(Mandatory)]
+        [ValidateLength(1,15)]
+        [ValidateScript({$_ -inotmatch'[\/\\:*?"<>|]' })]
         [string] $Name,
     
         [string] $DomainName,
@@ -181,6 +185,8 @@ function Test-TargetResource
     param
     (
         [parameter(Mandatory)]
+        [ValidateLength(1,15)]
+        [ValidateScript({$_ -inotmatch'[\/\\:*?"<>|]' })]
         [string] $Name,
         
         [PSCredential]$Credential,
@@ -191,6 +197,8 @@ function Test-TargetResource
 
         [string] $WorkGroupName
     )
+
+    Write-Verbose -Message "Validate desired Name is a valid name"
     
     Write-Verbose -Message "Checking if computer name is $Name"
     if ($Name -ne $env:COMPUTERNAME) {return $false}
