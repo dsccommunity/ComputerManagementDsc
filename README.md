@@ -40,8 +40,10 @@ xComputer resource has following properties:
 
 * Name: The desired computer name
 * DomainName: The name of the domain to join
+* JoinOU: The distinguished name of the organizational unit that the computer account will be created in
 * WorkGroupName: The name of the workgroup
 * Credential: Credential to be used to join or leave domain
+* CurrentOU: A read-only property that specifies the organizational unit that the computer account is currently in
 
 ## Versions
 

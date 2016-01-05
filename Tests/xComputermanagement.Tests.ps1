@@ -88,10 +88,10 @@ InModuleScope MSFT_xComputer {
             It 'should not throw' {
                 {Get-TargetResource -Name $env:COMPUTERNAME} | Should Not Throw
             }
-            It 'Should return a hashtable containing Name,DomainName, Credential, UnjoinCredential and WorkGroupName' {
+            It 'Should return a hashtable containing Name, DomainName, JoinOU, CurrentOU, Credential, UnjoinCredential and WorkGroupName' {
                 $Result = Get-TargetResource -Name $env:COMPUTERNAME
                 $Result.GetType().Fullname | Should Be 'System.Collections.Hashtable'
-                $Result.Keys | Should Be @('Name','DomainName','Credential','UnjoinCredential','WorkGroupName')
+                $Result.Keys | Should Be @('Name', 'DomainName', 'JoinOU', 'CurrentOU', 'Credential', 'UnjoinCredential', 'WorkGroupName')
             }
         }
         Context Set-TargetResource {
@@ -115,6 +115,14 @@ InModuleScope MSFT_xComputer {
                 Assert-MockCalled -CommandName Add-Computer -Exactly 1 -Scope It -ParameterFilter {$DomainName -and $NewName}
                 Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It -ParameterFilter {$WorkGroupName}
             }
+            It 'Changes ComputerName and changes Domain to new Domain with specified OU' {
+                Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
+                Mock GetComputerDomain {'contoso.com'}
+                Set-TargetResource -Name $NotComputerName -DomainName 'adventure-works.com' -JoinOU 'OU=Computers,DC=contoso,DC=com' -Credential $Credential -UnjoinCredential $Credential | Should BeNullOrEmpty
+                Assert-MockCalled -CommandName Rename-Computer -Exactly 0 -Scope It
+                Assert-MockCalled -CommandName Add-Computer -Exactly 1 -Scope It -ParameterFilter {$DomainName -and $NewName}
+                Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It -ParameterFilter {$WorkGroupName}
+            }
             It 'Changes ComputerName and changes Domain to Workgroup' {
                 Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
                 Mock GetComputerDomain {'contoso.com'}
@@ -131,6 +139,14 @@ InModuleScope MSFT_xComputer {
                 Assert-MockCalled -CommandName Add-Computer -Exactly 1 -Scope It -ParameterFilter {$DomainName -and $NewName}
                 Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It -ParameterFilter {$WorkGroupName}
             }
+            It 'Changes ComputerName and changes Workgroup to Domain with specified OU' {
+                Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso';Workgroup='Contoso';PartOfDomain=$false}}
+                Mock GetComputerDomain {''}
+                Set-TargetResource -Name $NotComputerName -DomainName 'Contoso.com' -JoinOU 'OU=Computers,DC=contoso,DC=com' -Credential $Credential | Should BeNullOrEmpty
+                Assert-MockCalled -CommandName Rename-Computer -Exactly 0 -Scope It
+                Assert-MockCalled -CommandName Add-Computer -Exactly 1 -Scope It -ParameterFilter {$DomainName -and $NewName}
+                Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It -ParameterFilter {$WorkGroupName}
+            }
             It 'Changes ComputerName and changes Workgroup to new Workgroup' {
                 Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso';Workgroup='Contoso';PartOfDomain=$false}}
                 Mock GetComputerDomain {''}
@@ -143,6 +159,15 @@ InModuleScope MSFT_xComputer {
                 Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
                 Mock GetComputerDomain {'contoso.com'}
                 Set-TargetResource -Name $Env:ComputerName -DomainName 'adventure-works.com' -Credential $Credential -UnjoinCredential $Credential | Should BeNullOrEmpty
+                Assert-MockCalled -CommandName Rename-Computer -Exactly 0 -Scope It
+                Assert-MockCalled -CommandName Add-Computer -Exactly 1 -Scope It -ParameterFilter {$DomainName}
+                Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It -ParameterFilter {$NewName}
+                Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It -ParameterFilter {$WorkGroupName}
+            }
+            It 'Changes only the Domain to new Domain with specified OU' {
+                Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
+                Mock GetComputerDomain {'contoso.com'}
+                Set-TargetResource -Name $Env:ComputerName -DomainName 'adventure-works.com' -JoinOU 'OU=Computers,DC=contoso,DC=com' -Credential $Credential -UnjoinCredential $Credential | Should BeNullOrEmpty
                 Assert-MockCalled -CommandName Rename-Computer -Exactly 0 -Scope It
                 Assert-MockCalled -CommandName Add-Computer -Exactly 1 -Scope It -ParameterFilter {$DomainName}
                 Assert-MockCalled -CommandName Add-Computer -Exactly 0 -Scope It -ParameterFilter {$NewName}
