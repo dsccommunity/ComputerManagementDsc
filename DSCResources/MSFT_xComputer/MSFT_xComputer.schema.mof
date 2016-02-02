@@ -3,6 +3,8 @@ class MSFT_xComputer : OMI_BaseResource
 {
     [key] string Name;
     [write] string DomainName;
+    [write] string JoinOU;
+    [read] string CurrentOU;
     [write,EmbeddedInstance("MSFT_Credential")] String Credential;
     [write,EmbeddedInstance("MSFT_Credential")] String UnjoinCredential;
     [write] string WorkGroupName;

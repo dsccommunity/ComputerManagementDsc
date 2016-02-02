@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '1.3.0'
+ModuleVersion = '1.4.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -30,5 +30,29 @@ FunctionsToExport = '*'
 
 # Cmdlets to export from this module
 CmdletsToExport = '*'
+
+# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
+PrivateData = @{
+
+    PSData = @{
+
+        # Tags applied to this module. These help with module discovery in online galleries.
+        Tags = @('DesiredStateConfiguration', 'DSC', 'DSCResourceKit', 'DSCResource')
+
+        # A URL to the license for this module.
+        LicenseUri = 'https://github.com/PowerShell/xComputerManagement/blob/master/LICENSE'
+
+        # A URL to the main website for this project.
+        ProjectUri = 'https://github.com/PowerShell/xComputerManagement'
+
+        # A URL to an icon representing this module.
+        # IconUri = ''
+
+        # ReleaseNotes of this module
+        # ReleaseNotes = ''
+
+    } # End of PSData hashtable
+
+} # End of PrivateData hashtable
 }
 
