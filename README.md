@@ -47,7 +47,6 @@ xComputer resource has following properties:
 
 ## Versions
 
-
 ### 1.3.0
 
 * xComputer
