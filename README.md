@@ -48,6 +48,8 @@ xComputer resource has following properties:
 ## Versions
 
 ### Unreleased
+
+### 1.4.0.0
 * Adding Name parameter validation
 
 ### 1.3.0
