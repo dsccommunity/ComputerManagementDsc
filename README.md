@@ -50,7 +50,9 @@ xComputer resource has following properties:
 ### Unreleased
 
 ### 1.4.0.0
-* Adding Name parameter validation
+* Added validation to the Name parameter
+* Added the JoinOU parameter which allows you to specify the organizational unit that the computer account will be created in
+* Added the CurrentOU read-only property that shows the organizational unit that the computer account is currently in
 
 ### 1.3.0
 
