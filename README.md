@@ -48,6 +48,8 @@ xComputer resource has following properties:
 ## Versions
 
 ### Unreleased
+* Update Unit tests to use the standard folder structure and test templates.
+* Added .gitignore to prevent commit of DSCResource.Tests.
 
 ### 1.4.0.0
 * Added validation to the Name parameter
