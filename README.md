@@ -49,8 +49,14 @@ xComputer resource has following properties:
 
 ### Unreleased
 
+### 1.5.0.0
+* Update Unit tests to use the standard folder structure and test templates.
+* Added .gitignore to prevent commit of DSCResource.Tests.
+
 ### 1.4.0.0
-* Adding Name parameter validation
+* Added validation to the Name parameter
+* Added the JoinOU parameter which allows you to specify the organizational unit that the computer account will be created in
+* Added the CurrentOU read-only property that shows the organizational unit that the computer account is currently in
 
 ### 1.3.0
 
