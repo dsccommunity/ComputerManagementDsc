@@ -58,6 +58,7 @@ xOfflineDomainJoin resource is a [Single Instance](https://msdn.microsoft.com/en
 * Added the following resources:
     * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
 * xComputer: Changed credential generation code in tests to avoid triggering PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
+             Renamed unit test file to match the name of Resource file.
 
 ### 1.5.0.0
 * Update Unit tests to use the standard folder structure and test templates.
