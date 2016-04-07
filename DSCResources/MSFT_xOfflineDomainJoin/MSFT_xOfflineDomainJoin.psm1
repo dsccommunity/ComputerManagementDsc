@@ -171,10 +171,33 @@ function Join-Domain {
             -f $RequestFile `
         ) -join '' )
 
-    & djoin.exe @('/REQUESTODJ','/LOADFILE',$RequestFile,'/WINDOWSPATH',$ENV:SystemRoot)
-    
-    # Notify DSC that a reboot is required.
-    $global:DSCMachineStatus = 1
+    $Result = & djoin.exe @(
+        '/REQUESTODJ'
+        '/LOADFILE'
+        $RequestFile
+        '/WINDOWSPATH'
+        $ENV:SystemRoot
+        '/LOCALOS')
+    if ($LASTEXITCODE -eq 0)
+    {
+       # Notify DSC that a reboot is required.
+        $global:DSCMachineStatus = 1
+    }
+    else
+    {
+        Write-Verbose -Message $Result
+
+        $errorId = 'DjoinError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::ObjectNotFound
+        $errorMessage = $($LocalizedData.DjoinError) `
+            -f $LASTEXITCODE
+        $exception = New-Object -TypeName System.ArgumentException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    } # if
 
     Write-Verbose -Message ( @(
         "$($MyInvocation.MyCommand): "
