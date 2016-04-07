@@ -125,6 +125,39 @@ try
                 }
             }
         }
+
+        Describe "$($Global:DSCResourceName)\Join-Domain" {
+            Mock djoin.exe -MockWith { $Global:LASTEXITCODE = 0; return "OK" }
+
+            Context 'Domain Join successful' {
+                It 'should not throw' {
+                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should Not Throw
+                }
+                It 'Should do call all the mocks' {
+                    Assert-MockCalled djoin.exe -Times 1
+                }
+            }
+
+            Mock djoin.exe -MockWith { $Global:LASTEXITCODE = 99; return "ERROR" }
+
+            Context 'Domain Join successful' {
+                $errorId = 'DjoinError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::ObjectNotFound
+                $errorMessage = $($LocalizedData.DjoinError) `
+                    -f 99
+                $exception = New-Object -TypeName System.ArgumentException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                It 'should not throw' {
+                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should Throw $errorRecord
+                }
+                It 'Should do call all the mocks' {
+                    Assert-MockCalled djoin.exe -Times 1
+                }
+            }
+        }
     } #end InModuleScope $DSCResourceName
     #endregion
 }
