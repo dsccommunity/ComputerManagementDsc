@@ -171,7 +171,7 @@ function Join-Domain {
             -f $RequestFile `
         ) -join '' )
 
-    & djoin.exe /REQUESTODJ /LOADFILE $RequestFile
+    & djoin.exe @('/REQUESTODJ','/LOADFILE',$RequestFile,'/WINDOWSPATH',$ENV:SystemRoot)
     
     # Notify DSC that a reboot is required.
     $global:DSCMachineStatus = 1
