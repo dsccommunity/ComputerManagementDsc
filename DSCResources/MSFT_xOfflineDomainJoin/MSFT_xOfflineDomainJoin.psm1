@@ -172,6 +172,9 @@ function Join-Domain {
         ) -join '' )
 
     & djoin.exe /REQUESTODJ /LOADFILE $RequestFile
+    
+    # Notify DSC that a reboot is required.
+    $global:DSCMachineStatus = 1
 
     Write-Verbose -Message ( @(
         "$($MyInvocation.MyCommand): "
