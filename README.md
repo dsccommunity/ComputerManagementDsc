@@ -32,10 +32,11 @@ To easily use PowerShell 4.0 on older operating systems, install WMF 4.0.
 Please read the installation instructions that are present on both the download page and the release notes for WMF 4.0
 
 ## Description
-The xComputerManagement module contains the xComputer DSC Resource.
-This DSC Resource allows you to configure a computer by changing its name and modifying its domain or workgroup.
+The xComputerManagement module contains the following resources:
+* xComputer - allows you to configure a computer by changing its name and modifying its domain or workgroup.
+* xOfflineDomainJoin - allows you to join computers to an AD Domain using an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx) request file.
 
-## Details
+## xComputer
 xComputer resource has following properties:
 
 * Name: The desired computer name
@@ -45,9 +46,19 @@ xComputer resource has following properties:
 * Credential: Credential to be used to join or leave domain
 * CurrentOU: A read-only property that specifies the organizational unit that the computer account is currently in
 
+## xOfflineDomainJoin
+xOfflineDomainJoin resource is a [Single Instance](https://msdn.microsoft.com/en-us/powershell/dsc/singleinstance) resource that can only be used once in a configuration and has following properties:
+
+* IsSingleInstance: Must be set to 'Yes'. Required.
+* RequestFile: The full path to the Offline Domain Join request file. Required.
+
 ## Versions
 
 ### Unreleased
+* Added the following resources:
+    * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
+* xComputer: Changed credential generation code in tests to avoid triggering PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
+             Renamed unit test file to match the name of Resource file.
 
 ### 1.5.0.0
 * Update Unit tests to use the standard folder structure and test templates.
@@ -295,6 +306,33 @@ $ConfigData = @{
  
 Sample_xComputer_DomainToWorkgroup -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -WorkGroup <workgroupName> 
 ****************************#> 
+```
+
+### Join a Domain using an ODJ Request File
+This example will join the computer to a domain using the ODJ request file C:\ODJ\ODJRequest.txt.
+
+```powershell
+configuration Sample_xOfflineDomainJoin
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xComputerManagement
+
+    Node $NodeName
+    {
+        xOfflineDomainJoin ODJ
+        {
+          RequestFile = 'C:\ODJ\ODJRequest.txt'
+          IsSingleInstance = 'Yes'
+        }
+    }
+}
+
+Sample_xOfflineDomainJoin
+Start-DscConfiguration -Path Sample_xOfflineDomainJoin -Wait -Verbose -Force
 ```
 
 ## Contributing

@@ -27,8 +27,8 @@ try
     InModuleScope $Global:DSCResourceName {
 
         Describe $Global:DSCResourceName {
-            
-            $SecPassword = ConvertTo-SecureString -String 'password' -AsPlainText -Force
+            # A real password isn't needed here - use this next line to avoid triggering PSSA rule
+            $SecPassword = New-Object -Type SecureString
             $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER',$SecPassword
             $NotComputerName  = if($env:COMPUTERNAME -ne 'othername'){'othername'}else{'name'}
         
