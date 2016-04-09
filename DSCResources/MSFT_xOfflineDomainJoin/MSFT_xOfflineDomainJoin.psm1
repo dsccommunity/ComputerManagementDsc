@@ -136,7 +136,7 @@ function Test-TargetResource
         # Domain is already joined.
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DomainAlreadyJoinedhMessage) `
+            $($LocalizedData.DomainAlreadyJoinedMessage) `
                 -f $CurrentDomainName `
             ) -join '' )
     }
