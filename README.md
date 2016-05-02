@@ -52,11 +52,29 @@ xOfflineDomainJoin resource is a [Single Instance](https://msdn.microsoft.com/en
 * IsSingleInstance: Must be set to 'Yes'. Required.
 * RequestFile: The full path to the Offline Domain Join request file. Required.
 
+## xScheduledTask
+xScheduledTask resource is used to define basic recurring scheduled tasks on the local computer. 
+Tasks are created to run indefinitly based on the schedule defined.
+xScheduledTask has the following properties:
+
+ * TaskName: The name of the task
+ * TaskPath: The path to the task - defaults to '\'
+ * ActionExecutable: The path to the .exe for this task
+ * ActionArguments: The arguments to pass the executable
+ * ActionWorkingPath: The working path to specify for the executable
+ * ScheduleType: How frequently should this task be executed? Minutes, Hourly or Daily
+ * RepeatInterval: How many units (minutes, hours, days) between each run of this task?
+ * StartTime: The time of day this task should start at - defaults to '12:00 AM'
+ * Ensure: Present if the task should exist, false if it should be removed
+ * ExecuteAsCredential: The credential this task should execute as. If not specified defaults to running as 'NT AUTHORITY\SYSTEM'
+ 
+
 ## Versions
 
 ### Unreleased
 * Added the following resources:
     * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
+    * MSFT_xScheduledTask resource to control scheduled tasks on the local server
 * MSFT_xOfflineDomainJoin: Corrected localizedData.DomainAlreadyJoinedhMessage name.
 * xComputer: Changed credential generation code in tests to avoid triggering PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
              Renamed unit test file to match the name of Resource file.
@@ -158,6 +176,7 @@ configuration Sample_xComputer_WorkgroupToDomain
         } 
     } 
 } 
+
  
 <#**************************** 
 To save the credential in plain-text in the mof file, use the following configuration data 
@@ -335,6 +354,38 @@ configuration Sample_xOfflineDomainJoin
 Sample_xOfflineDomainJoin
 Start-DscConfiguration -Path Sample_xOfflineDomainJoin -Wait -Verbose -Force
 ```
+
+### Run a PowerShell script every 15 minutes on a server
+This example will create a scheduled task that will call PowerShell.exe every 15 minutes to run a script saved locally.
+The script will be called as the local system account
+
+```powershell
+configuration Sample_xScheduledTask
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xComputerManagement
+
+    Node $NodeName
+    {
+        xScheduledTask MaintenanceScriptExample
+        {
+          TaskName = "Custom maintenance tasks"
+          ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+          ActionArguments = "-File `"C:\scripts\my custom script.ps1`""
+          ScheduleType = "Minutes"
+          RepeatInterval = 15
+        }
+    }
+}
+
+Sample_xScheduledTask
+Start-DscConfiguration -Path Sample_xScheduledTask -Wait -Verbose -Force
+```
+
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
