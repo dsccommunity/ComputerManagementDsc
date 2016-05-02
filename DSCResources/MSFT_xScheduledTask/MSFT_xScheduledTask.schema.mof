@@ -2,7 +2,7 @@
 class MSFT_xScheduledTask : OMI_BaseResource
 {
     [Key, Description("The name of the task")] string TaskName;
-    [Write, Description("The path to the task - defaults to '\\'")] string TaskPath;
+    [Write, Description("The path to the task - defaults to the root directory")] string TaskPath;
     [Required, Description("The path to the .exe for this task")] string ActionExecutable;
     [Write, Description("The arguments to pass the executable")] string ActionArguments;
     [Write, Description("The working path to specify for the executable")] string ActionWorkingPath;
