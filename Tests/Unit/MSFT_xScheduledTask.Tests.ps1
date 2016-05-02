@@ -278,7 +278,7 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$(($testParams.RepeatInterval) + 3)D"
+                            Interval = "P$(($testParams.RepeatInterval) + 1)D"
                         }
                     })
                     Principal = @{
@@ -317,7 +317,7 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)D"
+                            Interval = "P$($testParams.RepeatInterval)D"
                         }
                     })
                     Principal = @{
