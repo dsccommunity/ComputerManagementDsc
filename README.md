@@ -58,15 +58,15 @@ Tasks are created to run indefinitly based on the schedule defined.
 xScheduledTask has the following properties:
 
  * TaskName: The name of the task
- * TaskPath: The path to the task - defaults to '\'
+ * TaskPath: The path to the task - optional, defaults to '\'
  * ActionExecutable: The path to the .exe for this task
- * ActionArguments: The arguments to pass the executable
- * ActionWorkingPath: The working path to specify for the executable
+ * ActionArguments: The arguments to pass the executable - optional
+ * ActionWorkingPath: The working path to specify for the executable - optional
  * ScheduleType: How frequently should this task be executed? Minutes, Hourly or Daily
  * RepeatInterval: How many units (minutes, hours, days) between each run of this task?
- * StartTime: The time of day this task should start at - defaults to '12:00 AM'
- * Ensure: Present if the task should exist, false if it should be removed
- * ExecuteAsCredential: The credential this task should execute as. If not specified defaults to running as 'NT AUTHORITY\SYSTEM'
+ * StartTime: The time of day this task should start at - optional, defaults to '12:00 AM'
+ * Ensure: Present if the task should exist, false if it should be removed - optional, defaults to 'Ensure'
+ * ExecuteAsCredential: The credential this task should execute as - Optional, defaults to running as 'NT AUTHORITY\SYSTEM'
  
 
 ## Versions
