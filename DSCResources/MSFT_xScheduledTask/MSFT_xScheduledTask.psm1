@@ -165,20 +165,22 @@ function Test-TargetResource
     
     $currentValues = Get-TargetResource @PSBoundParameters
     if ($Ensure -ne $currentValues.Ensure) { return $false }
-    if ($TaskPath -ne $currentValues.TaskPath) { return $false }
-    if ($ActionExecutable -ne $currentValues.ActionExecutable) { return $false }
-    if (($PSBoundParameters.ContainsKey("ActionArguments") -eq $true) -and ($ActionArguments -ne $currentValues.ActionArguments)) { return $false }
-    if (($PSBoundParameters.ContainsKey("ActionWorkingPath") -eq $true) -and ($ActionWorkingPath -ne $currentValues.ActionWorkingPath)) { return $false }
-    if ($ScheduleType -ne $currentValues.ScheduleType) { return $false }
-    if ($RepeatInterval -ne $currentValues.RepeatInterval) { return $false }
-    
-    if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) {
-        if ($ExecuteAsCredential.UserName.Contains('\') -eq $true) {
-            $localUser = $ExecuteAsCredential.UserName.Split('\')[1]    
-        } else {
-            $localUser = $ExecuteAsCredential.UserName
+    if ($Ensure -eq "Present") {
+        if ($TaskPath -ne $currentValues.TaskPath) { return $false }
+        if ($ActionExecutable -ne $currentValues.ActionExecutable) { return $false }
+        if (($PSBoundParameters.ContainsKey("ActionArguments") -eq $true) -and ($ActionArguments -ne $currentValues.ActionArguments)) { return $false }
+        if (($PSBoundParameters.ContainsKey("ActionWorkingPath") -eq $true) -and ($ActionWorkingPath -ne $currentValues.ActionWorkingPath)) { return $false }
+        if ($ScheduleType -ne $currentValues.ScheduleType) { return $false }
+        if ($RepeatInterval -ne $currentValues.RepeatInterval) { return $false }
+        
+        if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) {
+            if ($ExecuteAsCredential.UserName.Contains('\') -eq $true) {
+                $localUser = $ExecuteAsCredential.UserName.Split('\')[1]    
+            } else {
+                $localUser = $ExecuteAsCredential.UserName
+            }
+            if ($localUser -ne $currentValues.ExecuteAsCredential) { return $false }
         }
-        if ($localUser -ne $currentValues.ExecuteAsCredential) { return $false }
     }
     
     return $true
