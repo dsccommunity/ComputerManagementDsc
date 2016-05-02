@@ -340,6 +340,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
+                    ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ("DEMO\RightUser", (ConvertTo-SecureString "ExamplePassword" -AsPlainText -Force))
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -355,7 +356,7 @@ try
                         }
                     })
                     Principal = @{
-                        UserId = "Brian"
+                        UserId = "WrongUser"
                     }
                 } }
                 
