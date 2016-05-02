@@ -103,7 +103,7 @@ function Set-TargetResource
                 $repeatAt = New-TimeSpan -Days $RepeatInterval
             }
         }
-        $trigger = New-ScheduledTaskTrigger -Once -At $startTime -RepetitionInterval $repeatAt
+        $trigger = New-ScheduledTaskTrigger -Once -At $startTime -RepetitionInterval $repeatAt -RepetitionDuration ([TimeSpan]::MaxValue)
         
         if ($currentValues.Ensure -eq "Absent") {
             Write-Verbose "Creating new scheduled task `"$TaskName`""
