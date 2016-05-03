@@ -92,7 +92,7 @@ try
             }
         }
         
-        ontext "A host doesn't exist and it shouldn't" {
+        Context "A host doesn't exist and it shouldn't" {
             $CurrentConfig = "xHostFileEntry_AlreadyGone"
             $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
