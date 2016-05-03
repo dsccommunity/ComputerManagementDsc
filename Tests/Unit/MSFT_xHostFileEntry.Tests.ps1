@@ -35,13 +35,15 @@ try
                     IPAddress = "192.168.0.156"
                 }
                 
-                Mock Get-Content return @(
-                    "# A mocked example of a host file - this line is a comment",
-                    "",
-                    "127.0.0.1       localhost",
-                    "127.0.0.1  www.anotherexample.com",
-                    ""
-                )
+                Mock Get-Content { 
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        ""
+                    )
+                }
                 
                 It "should return absent from the get method" {
                     (Get-TargetResource @testParams).Ensure | Should Be "Absent" 
@@ -63,14 +65,16 @@ try
                     IPAddress = "192.168.0.156"
                 }
                 
-                Mock Get-Content return @(
-                    "# A mocked example of a host file - this line is a comment",
-                    "",
-                    "127.0.0.1       localhost",
-                    "127.0.0.1  www.anotherexample.com",
-                    "127.0.0.1         $($testParams.HostName)",
-                    ""
-                )
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        "127.0.0.1         $($testParams.HostName)",
+                        ""
+                    )
+                }
                 
                 It "should return present from the get method" {
                     (Get-TargetResource @testParams).Ensure | Should Be "Present" 
@@ -92,14 +96,16 @@ try
                     IPAddress = "192.168.0.156"
                 }
                 
-                Mock Get-Content return @(
-                    "# A mocked example of a host file - this line is a comment",
-                    "",
-                    "127.0.0.1       localhost",
-                    "127.0.0.1  www.anotherexample.com",
-                    "$($testParams.IPAddress)         $($testParams.HostName)",
-                    ""
-                )
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        "$($testParams.IPAddress)         $($testParams.HostName)",
+                        ""
+                    )
+                }
                 
                 It "should return present from the get method" {
                     (Get-TargetResource @testParams).Ensure | Should Be "Present"
@@ -116,14 +122,16 @@ try
                     Ensure = "Absent"
                 }
                 
-                Mock Get-Content return @(
-                    "# A mocked example of a host file - this line is a comment",
-                    "",
-                    "127.0.0.1       localhost",
-                    "127.0.0.1  www.anotherexample.com",
-                    "127.0.0.1         $($testParams.HostName)",
-                    ""
-                )
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        "127.0.0.1         $($testParams.HostName)",
+                        ""
+                    )
+                }
                 
                 It "should return present from the get method" {
                     (Get-TargetResource @testParams).Ensure | Should Be "Present"
@@ -145,13 +153,15 @@ try
                     Ensure = "Absent"
                 }
                 
-                Mock Get-Content return @(
-                    "# A mocked example of a host file - this line is a comment",
-                    "",
-                    "127.0.0.1       localhost",
-                    "127.0.0.1  www.anotherexample.com",
-                    ""
-                )
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        ""
+                    )
+                }
                 
                 It "should return absent from the get method" {
                     (Get-TargetResource @testParams).Ensure | Should Be "Absent"
