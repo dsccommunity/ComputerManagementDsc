@@ -1,5 +1,5 @@
 ﻿$Global:DSCModuleName      = 'xComputerManagement'
-$Global:DSCResourceName    = 'MSFT_xComputer'
+$Global:DSCResourceName    = 'MSFT_xHostFileEntry'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
