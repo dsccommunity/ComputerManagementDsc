@@ -1,4 +1,4 @@
-$Global:DSCModuleName      = 'xScheduledTask'
+$Global:DSCModuleName      = 'xComputerManagement'
 $Global:DSCResourceName    = 'MSFT_xScheduledTask'
 
 #region HEADER
