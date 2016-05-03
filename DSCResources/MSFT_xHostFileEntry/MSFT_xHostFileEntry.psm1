@@ -12,6 +12,7 @@ function Get-TargetResource
         
         [Parameter(Mandatory = $false)]
         [System.String]
+        [ValidateSet("Present","Absent")]
         $Ensure = "Present"
     )
     $hosts = Get-Content "$env:windir\System32\drivers\etc\hosts"
@@ -58,6 +59,7 @@ function Set-TargetResource
         
         [Parameter(Mandatory = $false)]
         [System.String]
+        [ValidateSet("Present","Absent")]
         $Ensure = "Present"
     )
     
@@ -107,6 +109,7 @@ function Test-TargetResource
         
         [Parameter(Mandatory = $false)]
         [System.String]
+        [ValidateSet("Present","Absent")]
         $Ensure = "Present"
     )
     
