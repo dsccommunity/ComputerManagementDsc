@@ -20,35 +20,28 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Global:DSCResourceName).config.ps1"
+    . $ConfigFile
+    
     #region Pester Tests
-    Describe $Global:DSCResourceName {
+    Describe $"$($Global:DSCResourceName)_Integration" {
         
         Context "A host entry doesn't exist, and should" {
-            
-            Configuration xHostFileEntry_Add {
-                Import-DscResource -ModuleName xComputerManagement
-                node localhost {
-                    xHostFileEntry TestAdd {
-                        HostName = "www.contoso.com"
-                        IPAddress = "192.168.0.156"
-                    }
-                }
-            }
-            
+            $CurrentConfig = "xHostFileEntry_Add"
             It "should compile a MOF file without error" {
                 {
-                    xHostFileEntry_Add -OutputPath (Join-Path $TestEnvironment.WorkingFolder "xHostFileEntry_Add")
+                    xHostFileEntry_Add -OutputPath (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
                 } | Should Not Throw
             }
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path (Join-Path $TestEnvironment.WorkingFolder "xHostFileEntry_Add") -ComputerName localhost -Wait -Verbose -Force
+                    Start-DscConfiguration -Path (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig) -ComputerName localhost -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                Test-DscConfiguration -ComputerName localhost -Path (Join-Path $TestEnvironment.WorkingFolder "xHostFileEntry_Add") | Should Be $true
+                Test-DscConfiguration -ComputerName localhost -Path (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig) | Should Be $true
             }
             
             It "should return Get-DscConfiguration without error" {
