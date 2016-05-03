@@ -52,11 +52,19 @@ xOfflineDomainJoin resource is a [Single Instance](https://msdn.microsoft.com/en
 * IsSingleInstance: Must be set to 'Yes'. Required.
 * RequestFile: The full path to the Offline Domain Join request file. Required.
 
+## xHostFileEntry
+xHostFileEntry is used to manage individual entries in the local machines host file.
+
+* HostName: The host name to validate (e.g. www.contoso.com)
+* IPAddress: The IP address the entry should be set to - optional if Ensure is set to absent
+* Ensure: "Present" ensures the entry exists, "Absent" ensures that the entry doesn't exist - optional, defaults to "Present"
+
 ## Versions
 
 ### Unreleased
 * Added the following resources:
     * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
+    * MSFT_xHostFileEntry resource to managed host entries on the local machine
 * MSFT_xOfflineDomainJoin: Corrected localizedData.DomainAlreadyJoinedhMessage name.
 * xComputer: Changed credential generation code in tests to avoid triggering PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
              Renamed unit test file to match the name of Resource file.
@@ -335,6 +343,61 @@ configuration Sample_xOfflineDomainJoin
 Sample_xOfflineDomainJoin
 Start-DscConfiguration -Path Sample_xOfflineDomainJoin -Wait -Verbose -Force
 ```
+
+### Add a new host file entry
+This example will add a new host file entry to the local machine.
+
+```powershell
+configuration Sample_xHostFileEntryAdd
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xComputerManagement
+
+    Node $NodeName
+    {
+        xHostFileEntry Contoso
+        {
+          HostName = "www.contoso.com"
+          IPAddress = "127.0.0.1"
+        }
+    }
+}
+
+Sample_xHostFileEntryAdd
+Start-DscConfiguration -Path Sample_xHostFileEntryAdd -Wait -Verbose -Force
+```
+
+### Remove a host file entry
+This example will remove a host file entry from the local machine.
+
+```powershell
+configuration Sample_xHostFileEntryRemove
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xComputerManagement
+
+    Node $NodeName
+    {
+        xHostFileEntry Contoso
+        {
+          HostName = "www.contoso.com"
+          Ensure = "Absent"
+        }
+    }
+}
+
+Sample_xHostFileEntryRemove
+Start-DscConfiguration -Path Sample_xHostFileEntryRemove -Wait -Verbose -Force
+```
+
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
