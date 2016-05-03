@@ -26,7 +26,7 @@ try
     Describe $Global:DSCResourceName {
         
         Context "No scheduled task exists, but it should" {
-            CurrentConfig = "xScheduledTask_Add"
+            $CurrentConfig = "xScheduledTask_Add"
             $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
@@ -48,7 +48,7 @@ try
         }
         
         Context "A scheduled task with minutes based repetition exists, but has the wrong settings" {
-            CurrentConfig = "xScheduledTask_Edit1"
+            $CurrentConfig = "xScheduledTask_Edit1"
             $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
@@ -70,7 +70,7 @@ try
         }
         
         Context "A scheduled task with hourly based repetition exists, but has the wrong settings" {
-            CurrentConfig = "xScheduledTask_Edit2"
+            $CurrentConfig = "xScheduledTask_Edit2"
             $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
@@ -92,7 +92,7 @@ try
         }
         
         Context "A scheduled task with daily based repetition exists, but has the wrong settings" {
-            CurrentConfig = "xScheduledTask_Edit3"
+            $CurrentConfig = "xScheduledTask_Edit3"
             $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
@@ -114,7 +114,7 @@ try
         }
         
         Context "A scheduled task exists and is configured with the wrong working directory" {
-            CurrentConfig = "xScheduledTask_Edit4"
+            $CurrentConfig = "xScheduledTask_Edit4"
             $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
@@ -136,7 +136,7 @@ try
         }
         
         Context "A scheduled task exists and is configured with the wrong executable arguments" {
-            CurrentConfig = "xScheduledTask_Edit5"
+            $CurrentConfig = "xScheduledTask_Edit5"
             $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
@@ -158,7 +158,7 @@ try
         }
         
         Context "A scheduled task exists, but it shouldn't" {
-            CurrentConfig = "xScheduledTask_Remove"
+            $CurrentConfig = "xScheduledTask_Remove"
             $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
