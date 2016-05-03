@@ -28,25 +28,32 @@ try
         
         Context "A host entry doesn't exist, and should" {
             $CurrentConfig = "xHostFileEntry_Add"
+            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            
             It "should compile a MOF file without error" {
                 {
-                    xHostFileEntry_Add -OutputPath (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+                    xHostFileEntry_Add -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig) -ComputerName localhost -Wait -Verbose -Force
+                    Start-DscConfiguration -Path $ConfigDir -ComputerName "localhost" -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                Test-DscConfiguration -ComputerName localhost -Path (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig) | Should Be $true
+                (Test-DscConfiguration -ComputerName "localhost" -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
             }
             
             It "should return Get-DscConfiguration without error" {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
+        }
+        
+        AfterEach {
+            Remove-DscConfigurationDocument -Stage Current, Pending, Previous -Force -Confirm:$false
         }
     }
     #endregion
