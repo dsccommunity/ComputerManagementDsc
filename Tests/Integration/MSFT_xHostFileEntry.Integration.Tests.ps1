@@ -26,6 +26,7 @@ try
         Context "A host entry doesn't exist, and should" {
             
             Configuration xHostFileEntry_Add {
+                Import-DscResource -ModuleName xComputerManagement
                 node localhost {
                     xHostFileEntry TestAdd {
                         HostName = "www.contoso.com"
