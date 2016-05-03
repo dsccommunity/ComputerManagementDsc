@@ -21,44 +21,40 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Pester Tests
-
-    InModuleScope $Global:DSCResourceName {
-
-        Describe $Global:DSCResourceName {
+    Describe $Global:DSCResourceName {
+        
+        Context "A host entry doesn't exist, and should" {
             
-            Context "A host entry doesn't exist, and should" {
-                
-                Configuration xHostFileEntry_Add {
-                    node localhost {
-                        xHostFileEntry TestAdd {
-                            HostName = "www.contoso.com"
-                            IPAddress = "192.168.0.156"
-                        }
+            Configuration xHostFileEntry_Add {
+                node localhost {
+                    xHostFileEntry TestAdd {
+                        HostName = "www.contoso.com"
+                        IPAddress = "192.168.0.156"
                     }
                 }
-                
-                It "should compile a MOF file without error" {
-                    {
-                        xHostFileEntry_Add -OutputPath (Join-Path $TestEnvironment.WorkingFolder "xHostFileEntry_Add")
-                    } | Should Not Throw
-                }
-                
-                It "should apply the MOF correctly" {
-                    {
-                        Start-DscConfiguration -Path (Join-Path $TestEnvironment.WorkingFolder "xHostFileEntry_Add") -ComputerName localhost -Wait -Verbose -Force
-                    } | Should Not Throw
-                }
-                
-                It "should return a compliant state after being applied" {
-                    Test-DscConfiguration -ComputerName localhost -Path (Join-Path $TestEnvironment.WorkingFolder "xHostFileEntry_Add") | Should Be $true
-                }
-                
-                It "should return Get-DscConfiguration without error" {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
-                }
+            }
+            
+            It "should compile a MOF file without error" {
+                {
+                    xHostFileEntry_Add -OutputPath (Join-Path $TestEnvironment.WorkingFolder "xHostFileEntry_Add")
+                } | Should Not Throw
+            }
+            
+            It "should apply the MOF correctly" {
+                {
+                    Start-DscConfiguration -Path (Join-Path $TestEnvironment.WorkingFolder "xHostFileEntry_Add") -ComputerName localhost -Wait -Verbose -Force
+                } | Should Not Throw
+            }
+            
+            It "should return a compliant state after being applied" {
+                Test-DscConfiguration -ComputerName localhost -Path (Join-Path $TestEnvironment.WorkingFolder "xHostFileEntry_Add") | Should Be $true
+            }
+            
+            It "should return Get-DscConfiguration without error" {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
         }
-    } #end InModuleScope $DSCResourceName
+    }
     #endregion
 }
 finally
