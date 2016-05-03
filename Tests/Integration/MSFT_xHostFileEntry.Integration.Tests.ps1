@@ -39,12 +39,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -ComputerName "localhost" -Wait -Verbose -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ComputerName "localhost" -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
             }
             
             It "should return Get-DscConfiguration without error" {
@@ -53,7 +53,7 @@ try
         }
         
         AfterEach {
-            Remove-DscConfigurationDocument -Stage Current, Pending, Previous -Force -Confirm:$false
+            Remove-DscConfigurationDocument -Stage Current, Pending, Previous -Force -Confirm:$false -WarningAction SilentlyContinue
         }
     }
     #endregion
