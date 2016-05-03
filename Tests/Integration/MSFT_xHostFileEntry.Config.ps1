@@ -30,3 +30,14 @@ Configuration xHostFileEntry_Remove {
         }    
     }
 }
+
+Configuration xHostFileEntry_AlreadyGone {
+    Import-DscResource -ModuleName xComputerManagement
+    
+    node "localhost" {
+        xHostFileEntry TestAdd {
+            HostName = "www.notreallyawebsiteatall.com"
+            Ensure = "Absent"
+        }    
+    }
+}
