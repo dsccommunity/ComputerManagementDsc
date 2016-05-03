@@ -2,7 +2,7 @@
 #      environment configuration  # 
 #---------------------------------# 
 version: 1.5.{build}.0
-image: WMF5
+image: WMF 5
 install: 
   - cinst -y pester
   - git clone https://github.com/PowerShell/DscResource.Tests
