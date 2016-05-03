@@ -1,3 +1,6 @@
+# Ignoring this because we need to generate a stub credential to use in unit tests
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")] 
+    
 $Global:DSCModuleName      = 'xComputerManagement'
 $Global:DSCResourceName    = 'MSFT_xScheduledTask'
 
