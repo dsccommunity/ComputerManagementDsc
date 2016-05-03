@@ -1,4 +1,4 @@
-$Global:DSCModuleName      = 'xComputerManagement'
+$Global:DSCModuleName      = 'xHostFileEntry'
 $Global:DSCResourceName    = 'MSFT_xHostFileEntry'
 
 #region HEADER
