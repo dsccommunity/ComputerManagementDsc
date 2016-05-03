@@ -19,6 +19,9 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Global:DSCResourceName).config.ps1"
+    . $ConfigFile
+    
     #region Pester Tests
     Describe $Global:DSCResourceName {
         
@@ -174,6 +177,10 @@ try
             It "should return a compliant state after being applied" {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
             }
+        }
+        
+        AfterEach {
+            Remove-DscConfigurationDocument -Stage Current, Pending, Previous -Force -Confirm:$false -WarningAction SilentlyContinue
         }
     }
     #endregion
