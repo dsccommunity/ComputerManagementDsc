@@ -9,3 +9,24 @@ Configuration xHostFileEntry_Add {
     }
 }
 
+Configuration xHostFileEntry_Edit {
+    Import-DscResource -ModuleName xComputerManagement
+    
+    node "localhost" {
+        xHostFileEntry TestAdd {
+            HostName = "www.contoso.com"
+            IPAddress = "192.168.0.155"
+        }    
+    }
+}
+
+Configuration xHostFileEntry_Remove {
+    Import-DscResource -ModuleName xComputerManagement
+    
+    node "localhost" {
+        xHostFileEntry TestAdd {
+            HostName = "www.contoso.com"
+            Ensure = "Absent"
+        }    
+    }
+}
