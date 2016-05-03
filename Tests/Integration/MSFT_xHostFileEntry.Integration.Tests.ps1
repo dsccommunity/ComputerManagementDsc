@@ -39,16 +39,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -ComputerName "localhost" -Path $ConfigDir -Wait -Verbose -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ComputerName "localhost" -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
-            }
-            
-            It "should return Get-DscConfiguration without error" {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
             }
         }
         
