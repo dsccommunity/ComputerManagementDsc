@@ -187,9 +187,17 @@ function Set-TargetResource
                 $repeatAt = New-TimeSpan -Days $RepeatInterval
             }
         }
-        $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
-                                            -RepetitionInterval $repeatAt `
-                                            -RepetitionDuration ([TimeSpan]::MaxValue)
+        try
+        {
+            $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
+                                                -RepetitionInterval $repeatAt 
+        }
+        catch
+        {
+            $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
+                                                -RepetitionInterval $repeatAt `
+                                                -RepetitionDuration ([TimeSpan]::MaxValue)
+        }
         
         if ($currentValues.Ensure -eq "Absent") 
         {
