@@ -1,3 +1,7 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")]
+param(
+)
+
 $Global:DSCModuleName      = 'xComputerManagement'
 $Global:DSCResourceName    = 'MSFT_xScheduledTask'
 
@@ -332,15 +336,12 @@ try
             }
             
             Context "A scheduled task exists and is configured with the wrong execution account" {
-                # Ignoring this because we need to generate a stub credential to use in unit tests
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")]
-                $credential =  New-Object System.Management.Automation.PSCredential ("DEMO\RightUser", (ConvertTo-SecureString "ExamplePassword" -AsPlainText -Force))
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
-                    ExecuteAsCredential = $credential
+                    ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ("DEMO\RightUser", (ConvertTo-SecureString "ExamplePassword" -AsPlainText -Force))
                 }
                 
                 Mock Get-ScheduledTask { return @{

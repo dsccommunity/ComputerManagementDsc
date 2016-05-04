@@ -62,6 +62,8 @@ function Get-TargetResource
         $repetition = $trigger.Repetition
         $returnScheduleType = "Unknown"
         $returnInveral = 0
+        Write-Verbose -Message "Duration: '$($repetition.Duration)'"
+        Write-Verbose -Message "Interval: '$($repetition.Interval)'"
         if ($repetition.Duration -eq $null -and $repetition.Interval -eq $null) 
         {
             $returnScheduleType = "Daily"
