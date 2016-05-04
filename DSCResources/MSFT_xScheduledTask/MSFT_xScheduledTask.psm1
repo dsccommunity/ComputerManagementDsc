@@ -245,6 +245,7 @@ function Set-TargetResource
     
     if ($Ensure -eq "Absent") 
     {
+        Write-Verbose -Message "Removing scheduled task `"$TaskName`""
         Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
     }
 }
@@ -305,28 +306,34 @@ function Test-TargetResource
     {
         if ($TaskPath -ne $currentValues.TaskPath) 
         { 
+            Write-Verbose -Message "TaskPath does not match desired state. Current value: $($currentValues.TaskPath) - Desired Value: $TaskPath"
             return $false 
         }
         if ($ActionExecutable -ne $currentValues.ActionExecutable) 
         { 
+            Write-Verbose -Message "ActionExecutable does not match desired state. Current value: $($currentValues.ActionExecutable) - Desired Value: $ActionExecutable"
             return $false 
         }
         if (($PSBoundParameters.ContainsKey("ActionArguments") -eq $true) `
             -and ($ActionArguments -ne $currentValues.ActionArguments)) 
         { 
+            Write-Verbose -Message "ActionArguments does not match desired state. Current value: $($currentValues.ActionArguments) - Desired Value: $ActionArguments"
             return $false 
         }
         if (($PSBoundParameters.ContainsKey("ActionWorkingPath") -eq $true) `
             -and ($ActionWorkingPath -ne $currentValues.ActionWorkingPath)) 
         { 
+            Write-Verbose -Message "ActionWorkingPath does not match desired state. Current value: $($currentValues.ActionWorkingPath) - Desired Value: $ActionWorkingPath"
             return $false 
         }
         if ($ScheduleType -ne $currentValues.ScheduleType) 
         { 
+            Write-Verbose -Message "ScheduleType does not match desired state. Current value: $($currentValues.ScheduleType) - Desired Value: $ScheduleType"
             return $false 
         }
         if ($RepeatInterval -ne $currentValues.RepeatInterval) 
         { 
+            Write-Verbose -Message "RepeatInterval does not match desired state. Current value: $($currentValues.RepeatInterval) - Desired Value: $RepeatInterval"
             return $false 
         }
         
@@ -342,6 +349,7 @@ function Test-TargetResource
             }
             if ($localUser -ne $currentValues.ExecuteAsCredential) 
             { 
+                Write-Verbose -Message "ExecuteAsCredential does not match desired state. Current value: $($currentValues.ExecuteAsCredential) - Desired Value: $localUser"
                 return $false 
             }
         }
