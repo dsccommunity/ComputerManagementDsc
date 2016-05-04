@@ -68,7 +68,6 @@ function Get-TargetResource
         {
             $timespan = [Timespan]::Parse(($repetition.Interval -replace "P" -replace "DT", ":" -replace "H", ":" -replace "M", ":" -replace "S"))
             
-            $timespan = New-TimeSpan -Days 1
             if ($timespan.Days -ge 1) 
             {
                 $returnScheduleType = "Daily"
