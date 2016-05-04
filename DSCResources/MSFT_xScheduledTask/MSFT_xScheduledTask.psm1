@@ -62,39 +62,63 @@ function Get-TargetResource
         $repetition = $trigger.Repetition
         $returnScheduleType = "Unknown"
         $returnInveral = 0
-        Write-Verbose -Message "Duration: '$($repetition.Duration)'"
-        Write-Verbose -Message "Interval: '$($repetition.Interval)'"
-        if ($repetition.Duration -eq $null -and $repetition.Interval -eq $null) 
+        
+        # Check for full formatting 
+        if ($repetition.Interval -like "P*DT*H*M*S") 
         {
-            $returnScheduleType = "Daily"
-            $returnInveral = $trigger.DaysInterval
-        }
-        if ($repetition.Duration -eq $null -and $repetition.Interval -like "P*D") 
-        {
-            $returnScheduleType = "Daily"
-            [System.Uint32]$returnInveral = $repetition.Interval -replace "P" -replace "D"
-        }
-        if (($repetition.Duration -eq "P1D" -or $repetition.Duration -eq $null) `
-                -and $repetition.Interval -like "PT*H") 
-        {
-            $returnScheduleType = "Hourly"
-            [System.Uint32]$returnInveral = $repetition.Interval -replace "PT" -replace "H"
-        }
-        if (($repetition.Duration -eq "P1D" -or $repetition.Duration -eq $null) `
-                -and $repetition.Interval -like "PT*M") 
-        {
-            $returnScheduleType = "Minutes"
-            if ($repetition.Interval.Contains('H')) 
+            $timespan = [Timespan]::Parse(($repetition.Interval -replace "P" -replace "DT", ":" -replace "H", ":" -replace "M", ":" -replace "S"))
+            
+            $timespan = New-TimeSpan -Days 1
+            if ($timespan.Days -ge 1) 
             {
-                $timeToParse = ($repetition.Interval -replace "PT" -replace "H",":" -replace "M")
-                [System.Uint32]$returnInveral = [TimeSpan]::Parse($timeToParse).TotalMinutes
-            } 
-            else 
+                $returnScheduleType = "Daily"
+                $returnInveral = $timespan.TotalDays
+            }
+            elseif ($timespan.Hours -ge 1 -and $timespan.Minutes -eq 0) 
             {
-                [System.Uint32]$returnInveral = $repetition.Interval -replace "PT" -replace "M"
+                $returnScheduleType = "Hourly"
+                $returnInveral = $timespan.TotalHours
+            }
+            elseif ($timespan.Minutes -ge 1) 
+            {
+                $returnScheduleType = "Minutes"
+                $returnInveral = $timespan.TotalMinutes
+            }
+        } 
+        else 
+        {
+            if ($repetition.Duration -eq $null -and $repetition.Interval -eq $null) 
+            {
+                $returnScheduleType = "Daily"
+                $returnInveral = $trigger.DaysInterval
+            }
+            if ($repetition.Duration -eq $null -and $repetition.Interval -like "P*D") 
+            {
+                $returnScheduleType = "Daily"
+                [System.Uint32]$returnInveral = $repetition.Interval -replace "P" -replace "D"
+            }
+            if (($repetition.Duration -eq "P1D" -or $repetition.Duration -eq $null) `
+                    -and $repetition.Interval -like "PT*H") 
+            {
+                $returnScheduleType = "Hourly"
+                [System.Uint32]$returnInveral = $repetition.Interval -replace "PT" -replace "H"
+            }
+            if (($repetition.Duration -eq "P1D" -or $repetition.Duration -eq $null) `
+                    -and $repetition.Interval -like "PT*M") 
+            {
+                $returnScheduleType = "Minutes"
+                if ($repetition.Interval.Contains('H')) 
+                {
+                    $timeToParse = ($repetition.Interval -replace "PT" -replace "H",":" -replace "M")
+                    [System.Uint32]$returnInveral = [TimeSpan]::Parse($timeToParse).TotalMinutes
+                } 
+                else 
+                {
+                    [System.Uint32]$returnInveral = $repetition.Interval -replace "PT" -replace "M"
+                }
             }
         }
-
+        
         return @{
             TaskName = $TaskName
             TaskPath = $TaskPath
