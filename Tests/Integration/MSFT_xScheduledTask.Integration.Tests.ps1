@@ -43,7 +43,7 @@ try
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         
@@ -65,7 +65,7 @@ try
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         
@@ -87,7 +87,7 @@ try
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         
@@ -109,7 +109,7 @@ try
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         
@@ -131,7 +131,7 @@ try
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         
@@ -153,7 +153,7 @@ try
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         
