@@ -364,15 +364,7 @@ function Test-TargetResource
         
         if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) 
         {
-            if ($ExecuteAsCredential.UserName.Contains('\') -eq $true) 
-            {
-                $localUser = $ExecuteAsCredential.UserName.Split('\')[1]    
-            } 
-            else 
-            {
-                $localUser = $ExecuteAsCredential.UserName
-            }
-            if ($localUser -ne $currentValues.ExecuteAsCredential) 
+            if ($ExecuteAsCredential.UserName -ne $currentValues.ExecuteAsCredential) 
             { 
                 Write-Verbose -Message "ExecuteAsCredential does not match desired state. Current value: $($currentValues.ExecuteAsCredential) - Desired Value: $localUser"
                 return $false 
