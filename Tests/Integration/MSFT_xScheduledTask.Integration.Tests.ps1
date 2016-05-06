@@ -1,3 +1,4 @@
+#Requires -Version 5.0
 $Global:DSCModuleName      = 'xComputerManagement'
 $Global:DSCResourceName    = 'MSFT_xScheduledTask'
 
