@@ -1,0 +1,14 @@
+[ClassVersion("1.0.0.0"), FriendlyName("xScheduledTask")]
+class MSFT_xScheduledTask : OMI_BaseResource
+{
+    [Key, Description("The name of the task")] string TaskName;
+    [Write, Description("The path to the task - defaults to the root directory")] string TaskPath;
+    [Required, Description("The path to the .exe for this task")] string ActionExecutable;
+    [Write, Description("The arguments to pass the executable")] string ActionArguments;
+    [Write, Description("The working path to specify for the executable")] string ActionWorkingPath;
+    [Required, Description("How frequently should this task be executed? Minutes, Hourly or Daily"), ValueMap{"Minutes", "Hourly", "Daily"}, Values{"Minutes", "Hourly", "Daily"}] string ScheduleType;
+    [Required, Description("How many units (minutes, hours, days) between each run of this task?")] Uint32 RepeatInterval;
+    [Write, Description("The time of day this task should start at - defaults to 12:00 AM")] string StartTime;
+    [Write, Description("Present if the task should exist, false if it should be removed"), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
+    [Write, Description("The credential this task should execute as. If not specified defaults to running as the local system account"), EmbeddedInstance("MSFT_Credential")] string ExecuteAsCredential;
+};
