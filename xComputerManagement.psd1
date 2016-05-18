@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '1.5.0.0'
+ModuleVersion = '1.6.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,7 +49,14 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
+        ReleaseNotes = '* Added the following resources:
+    * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
+    * MSFT_xScheduledTask resource to control scheduled tasks on the local server
+* MSFT_xOfflineDomainJoin: Corrected localizedData.DomainAlreadyJoinedhMessage name.
+* xComputer: Changed credential generation code in tests to avoid triggering PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
+             Renamed unit test file to match the name of Resource file.
+
+'
 
     } # End of PSData hashtable
 

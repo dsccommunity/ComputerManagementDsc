@@ -32,10 +32,11 @@ To easily use PowerShell 4.0 on older operating systems, install WMF 4.0.
 Please read the installation instructions that are present on both the download page and the release notes for WMF 4.0
 
 ## Description
-The xComputerManagement module contains the xComputer DSC Resource.
-This DSC Resource allows you to configure a computer by changing its name and modifying its domain or workgroup.
+The xComputerManagement module contains the following resources:
+* xComputer - allows you to configure a computer by changing its name and modifying its domain or workgroup.
+* xOfflineDomainJoin - allows you to join computers to an AD Domain using an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx) request file.
 
-## Details
+## xComputer
 xComputer resource has following properties:
 
 * Name: The desired computer name
@@ -45,9 +46,40 @@ xComputer resource has following properties:
 * Credential: Credential to be used to join or leave domain
 * CurrentOU: A read-only property that specifies the organizational unit that the computer account is currently in
 
+## xOfflineDomainJoin
+xOfflineDomainJoin resource is a [Single Instance](https://msdn.microsoft.com/en-us/powershell/dsc/singleinstance) resource that can only be used once in a configuration and has following properties:
+
+* IsSingleInstance: Must be set to 'Yes'. Required.
+* RequestFile: The full path to the Offline Domain Join request file. Required.
+
+## xScheduledTask
+xScheduledTask resource is used to define basic recurring scheduled tasks on the local computer. 
+Tasks are created to run indefinitly based on the schedule defined.
+xScheduledTask has the following properties:
+
+ * TaskName: The name of the task
+ * TaskPath: The path to the task - optional, defaults to '\'
+ * ActionExecutable: The path to the .exe for this task
+ * ActionArguments: The arguments to pass the executable - optional
+ * ActionWorkingPath: The working path to specify for the executable - optional
+ * ScheduleType: How frequently should this task be executed? Minutes, Hourly or Daily
+ * RepeatInterval: How many units (minutes, hours, days) between each run of this task?
+ * StartTime: The time of day this task should start at - optional, defaults to '12:00 AM'
+ * Ensure: Present if the task should exist, false if it should be removed - optional, defaults to 'Ensure'
+ * ExecuteAsCredential: The credential this task should execute as - Optional, defaults to running as 'NT AUTHORITY\SYSTEM'
+ 
+
 ## Versions
 
 ### Unreleased
+
+### 1.6.0.0
+* Added the following resources:
+    * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
+    * MSFT_xScheduledTask resource to control scheduled tasks on the local server
+* MSFT_xOfflineDomainJoin: Corrected localizedData.DomainAlreadyJoinedhMessage name.
+* xComputer: Changed credential generation code in tests to avoid triggering PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
+             Renamed unit test file to match the name of Resource file.
 
 ### 1.5.0.0
 * Update Unit tests to use the standard folder structure and test templates.
@@ -146,6 +178,7 @@ configuration Sample_xComputer_WorkgroupToDomain
         } 
     } 
 } 
+
  
 <#**************************** 
 To save the credential in plain-text in the mof file, use the following configuration data 
@@ -296,6 +329,65 @@ $ConfigData = @{
 Sample_xComputer_DomainToWorkgroup -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -WorkGroup <workgroupName> 
 ****************************#> 
 ```
+
+### Join a Domain using an ODJ Request File
+This example will join the computer to a domain using the ODJ request file C:\ODJ\ODJRequest.txt.
+
+```powershell
+configuration Sample_xOfflineDomainJoin
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xComputerManagement
+
+    Node $NodeName
+    {
+        xOfflineDomainJoin ODJ
+        {
+          RequestFile = 'C:\ODJ\ODJRequest.txt'
+          IsSingleInstance = 'Yes'
+        }
+    }
+}
+
+Sample_xOfflineDomainJoin
+Start-DscConfiguration -Path Sample_xOfflineDomainJoin -Wait -Verbose -Force
+```
+
+### Run a PowerShell script every 15 minutes on a server
+This example will create a scheduled task that will call PowerShell.exe every 15 minutes to run a script saved locally.
+The script will be called as the local system account
+
+```powershell
+configuration Sample_xScheduledTask
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xComputerManagement
+
+    Node $NodeName
+    {
+        xScheduledTask MaintenanceScriptExample
+        {
+          TaskName = "Custom maintenance tasks"
+          ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+          ActionArguments = "-File `"C:\scripts\my custom script.ps1`""
+          ScheduleType = "Minutes"
+          RepeatInterval = 15
+        }
+    }
+}
+
+Sample_xScheduledTask
+Start-DscConfiguration -Path Sample_xScheduledTask -Wait -Verbose -Force
+```
+
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
