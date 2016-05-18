@@ -1,7 +1,7 @@
 #---------------------------------# 
 #      environment configuration  # 
 #---------------------------------# 
-version: 1.5.{build}.0
+version: 1.6.{build}.0
 image: WMF 5
 install: 
   - cinst -y pester
@@ -40,7 +40,7 @@ deploy_script:
       # Creating project artifact
       $stagingDirectory = (Resolve-Path ..).Path
       $manifest = Join-Path $pwd "xComputerManagement.psd1"
-      (Get-Content $manifest -Raw).Replace("1.5.0.0", $env:APPVEYOR_BUILD_VERSION) | Out-File $manifest
+      (Get-Content $manifest -Raw).Replace("1.6.0.0", $env:APPVEYOR_BUILD_VERSION) | Out-File $manifest
       $zipFilePath = Join-Path $stagingDirectory "$(Split-Path $pwd -Leaf).zip"
       Add-Type -assemblyname System.IO.Compression.FileSystem
       [System.IO.Compression.ZipFile]::CreateFromDirectory($pwd, $zipFilePath)

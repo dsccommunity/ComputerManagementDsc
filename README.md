@@ -72,6 +72,8 @@ xScheduledTask has the following properties:
 ## Versions
 
 ### Unreleased
+
+### 1.6.0.0
 * Added the following resources:
     * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
     * MSFT_xScheduledTask resource to control scheduled tasks on the local server
