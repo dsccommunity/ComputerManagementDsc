@@ -41,6 +41,11 @@ function Get-TargetResource
         $Ensure = "Present",
         
         [Parameter(Mandatory=$false)]
+        [System.Boolean]
+        [ValidateSet("True","False")]
+        $Enable,
+        
+        [Parameter(Mandatory=$false)]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential
     )
@@ -128,6 +133,7 @@ function Get-TargetResource
             ScheduleType = $returnScheduleType
             RepeatInterval = $returnInveral
             ExecuteAsCredential = $task.Principal.UserId
+            Settings = $task.Settings
         }
     }
 }
@@ -174,6 +180,11 @@ function Set-TargetResource
         $Ensure = "Present",
         
         [Parameter(Mandatory=$false)]
+        [System.Boolean]
+        [ValidateSet("True","False")]
+        $Enable,
+        
+        [Parameter(Mandatory=$false)]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential
     )
@@ -194,6 +205,15 @@ function Set-TargetResource
             $actionArgs.Add("WorkingDirectory", $ActionWorkingPath)
         }
         $action = New-ScheduledTaskAction @actionArgs
+        
+        $settingArgs = @{}
+            
+        if ($PSBoundParameters.ContainsKey("Enable"))
+        {
+            $settingArgs.Add("Disable", (-not $Enable))
+        }
+        
+        $setting = New-ScheduledTaskSettingsSet @settingArgs
         
         $date = (Get-Date).Date
         $startTime = [DateTime]::Parse("$($date.ToShortDateString()) $StartTime")
@@ -228,7 +248,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message "Creating new scheduled task `"$TaskName`""
 
-            $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger            
+            $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
             $registerArgs = @{
                 TaskName = $TaskName
                 TaskPath = $TaskPath
@@ -253,7 +273,8 @@ function Set-TargetResource
                 TaskName = $TaskName
                 TaskPath = $TaskPath
                 Action= $action
-                Trigger = $trigger 
+                Trigger = $trigger
+                Settings = $setting
             }
             if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) 
             {
@@ -318,6 +339,11 @@ function Test-TargetResource
         $Ensure = "Present",
         
         [Parameter(Mandatory=$false)]
+        [System.Boolean]
+        [ValidateSet("True","False")]
+        $Enable,
+        
+        [Parameter(Mandatory=$false)]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential
     )
@@ -368,6 +394,15 @@ function Test-TargetResource
             { 
                 Write-Verbose -Message "ExecuteAsCredential does not match desired state. Current value: $($currentValues.ExecuteAsCredential) - Desired Value: $localUser"
                 return $false 
+            }
+        }
+        
+        if ($PSBoundParameters.ContainsKey("Enable") -eq $true)
+        {
+            if ($Enable -ne ($currentValues.Settings.Enabled))
+            {
+                Write-Verbose -Message "Enable does not match desired state. Current value: $($currentValues.Settings.Enabled) - Desired Vale: $Enable"
+                return $false
             }
         }
     }
