@@ -42,7 +42,6 @@ function Get-TargetResource
         
         [Parameter(Mandatory=$false)]
         [System.Boolean]
-        [ValidateSet("True","False")]
         $Enable,
         
         [Parameter(Mandatory=$false)]
@@ -181,7 +180,6 @@ function Set-TargetResource
         
         [Parameter(Mandatory=$false)]
         [System.Boolean]
-        [ValidateSet("True","False")]
         $Enable,
         
         [Parameter(Mandatory=$false)]
@@ -340,7 +338,6 @@ function Test-TargetResource
         
         [Parameter(Mandatory=$false)]
         [System.Boolean]
-        [ValidateSet("True","False")]
         $Enable,
         
         [Parameter(Mandatory=$false)]
