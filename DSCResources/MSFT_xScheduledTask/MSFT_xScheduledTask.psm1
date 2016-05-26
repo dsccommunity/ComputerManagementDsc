@@ -396,9 +396,9 @@ function Test-TargetResource
         
         if ($PSBoundParameters.ContainsKey("Enable") -eq $true)
         {
-            if ($Enable -ne ($currentValues.Settings.Enabled))
+            if ($Enable -ne ($currentValues.Enable))
             {
-                Write-Verbose -Message "Enable does not match desired state. Current value: $($currentValues.Settings.Enabled) - Desired Vale: $Enable"
+                Write-Verbose -Message "Enable does not match desired state. Current value: $($currentValues.Enabled) - Desired Vale: $Enable"
                 return $false
             }
         }
