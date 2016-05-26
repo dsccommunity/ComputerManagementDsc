@@ -132,7 +132,7 @@ function Get-TargetResource
             ScheduleType = $returnScheduleType
             RepeatInterval = $returnInveral
             ExecuteAsCredential = $task.Principal.UserId
-            Settings = $task.Settings
+            Enable = $task.Settings.Enabled
         }
     }
 }
