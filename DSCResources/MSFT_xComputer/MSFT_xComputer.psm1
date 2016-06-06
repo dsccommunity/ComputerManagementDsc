@@ -61,6 +61,11 @@ function Set-TargetResource
     )
 
     ValidateDomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
+    
+    if ($Name -eq 'localhost')
+    {
+        $Name = $env:COMPUTERNAME
+    }
 
     if ($Credential)
     {
@@ -215,11 +220,11 @@ function Test-TargetResource
 
         [string] $WorkGroupName
     )
-
+    
     Write-Verbose -Message "Validate desired Name is a valid name"
     
-    Write-Verbose -Message "Checking if computer name is $Name"
-    if ($Name -ne $env:COMPUTERNAME) {return $false}
+    Write-Verbose -Message "Checking if computer name is correct"
+    if (($Name -ne 'localhost') -and ($Name -ne $env:COMPUTERNAME)) {return $false}
 
     ValidateDomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
 
