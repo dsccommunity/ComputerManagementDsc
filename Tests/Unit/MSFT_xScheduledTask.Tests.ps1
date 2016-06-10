@@ -457,8 +457,213 @@ try
                 }
             }
             
+            Context "A scheduled task is enabled and should be disabled" {
+                $testParams = @{
+                    TaskName = "Test task"
+                    ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+                    ScheduleType = "Minutes"
+                    RepeatInterval = 15
+                    Enable = $false
+                }
+                
+                Mock Get-ScheduledTask { return @{
+                    Name = $testParams.TaskName
+                    Path = $testParams.TaskPath
+                    Actions = @(@{
+                        Execute = $testParams.ActionExecutable
+                        Arguments = $testParams.Arguments
+                    })
+                    Triggers = @(@{
+                        Repetition = @{
+                            Duration = $null
+                            Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                    })
+                    Settings = @(@{
+                        Enabled = $true
+                    })
+                    Principal = @{
+                        UserId = "SYSTEM"
+                    }
+                    } }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return false from the test method" {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+                
+                It "should update the scheduled task in the set method" {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled Set-ScheduledTask
+                }
+            
+            }
+            
+            Context "A scheduled task is enabled and has the correct settings" {
+                $testParams = @{
+                    TaskName = "Test task"
+                    ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+                    ScheduleType = "Minutes"
+                    RepeatInterval = 15
+                    Enable = $true
+                }
+                
+                Mock Get-ScheduledTask { return @{
+                    Name = $testParams.TaskName
+                    Path = $testParams.TaskPath
+                    Actions = @(@{
+                        Execute = $testParams.ActionExecutable
+                        Arguments = $testParams.Arguments
+                    })
+                    Triggers = @(@{
+                        Repetition = @{
+                            Duration = $null
+                            Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                    })
+                    Settings = @(@{
+                        Enabled = $true
+                    })
+                    Principal = @{
+                        UserId = "SYSTEM"
+                    }
+                } }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return false from the test method" {
+                    Test-TargetResource @testParams | Should Be $true
+                }
+            }
+            
+            Context "A scheduled task is disabled and has the correct settings" {
+                $testParams = @{
+                    TaskName = "Test task"
+                    ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+                    ScheduleType = "Minutes"
+                    RepeatInterval = 15
+                    Enable = $false
+                }
+                
+                Mock Get-ScheduledTask { return @{
+                    Name = $testParams.TaskName
+                    Path = $testParams.TaskPath
+                    Actions = @(@{
+                        Execute = $testParams.ActionExecutable
+                        Arguments = $testParams.Arguments
+                    })
+                    Triggers = @(@{
+                        Repetition = @{
+                            Duration = $null
+                            Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                    })
+                    Settings = @(@{
+                        Enabled = $false
+                    })
+                    Principal = @{
+                        UserId = "SYSTEM"
+                    }
+                } }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return true from the test method" {
+                    Test-TargetResource @testParams | Should Be $true
+                }
+            }
+            
+            Context "A scheduled task is disabled but should be enabled" {
+                $testParams = @{
+                    TaskName = "Test task"
+                    ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+                    ScheduleType = "Minutes"
+                    RepeatInterval = 15
+                    Enable = $true
+                }
+                
+                Mock Get-ScheduledTask { return @{
+                    Name = $testParams.TaskName
+                    Path = $testParams.TaskPath
+                    Actions = @(@{
+                        Execute = $testParams.ActionExecutable
+                        Arguments = $testParams.Arguments
+                    })
+                    Triggers = @(@{
+                        Repetition = @{
+                            Duration = $null
+                            Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                    })
+                    Settings = @(@{
+                        Enabled = $false
+                    })
+                    Principal = @{
+                        UserId = "SYSTEM"
+                    }
+                } }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return false from the test method" {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+                
+                It "should update the scheduled task in the set method" {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled Set-ScheduledTask
+                }
+            }
+            
+            Context "A Scheduled task exists, is disabled, and the optional parameter enable is not specified" -Fixture {
+                $testParams = @{
+                    TaskName = "Test task"
+                    ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+                    ScheduleType = "Minutes"
+                    RepeatInterval = 15
+                }
+                
+                Mock Get-ScheduledTask { return @{
+                    Name = $testParams.TaskName
+                    Path = $testParams.TaskPath
+                    Actions = @(@{
+                        Execute = $testParams.ActionExecutable
+                        Arguments = $testParams.Arguments
+                    })
+                    Triggers = @(@{
+                        Repetition = @{
+                            Duration = $null
+                            Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                    })
+                    Settings = @(@{
+                        Enabled = $false
+                    })
+                    Principal = @{
+                        UserId = "SYSTEM"
+                    }
+                } }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "Should return true from the test method" {
+                    Test-TargetResource @testParams | Should Be $true
+                }
+            }
+            
         }
-    } 
+    }
     #endregion
 }
 finally

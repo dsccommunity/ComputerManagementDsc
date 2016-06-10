@@ -180,6 +180,50 @@ try
             }
         }
         
+        Context "A scheduled task exists, and should be enabled" {
+            $CurrentConfig = "xScheduledTask_Enable"
+            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            
+            It "should compile a MOF file without error" {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should Not Throw
+            }
+            
+            It "should apply the MOF correctly" {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should Not Throw
+            }
+            
+            It "should return a compliant state after being applied" {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+            }
+        }
+        
+        Context "A scheduled task exists, and should be disabled" {
+            $CurrentConfig = "xScheduledTask_Disable"
+            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            
+            It "should compile a MOF file without error" {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should Not Throw
+            }
+            
+            It "should apply the MOF correctly" {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should Not Throw
+            }
+            
+            It "should return a compliant state after being applied" {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+            }
+        }
+        
         AfterEach {
             Remove-DscConfigurationDocument -Stage Current, Pending, Previous -Force -Confirm:$false -WarningAction SilentlyContinue
         }

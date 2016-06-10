@@ -72,6 +72,7 @@ xScheduledTask has the following properties:
 ## Versions
 
 ### Unreleased
+*Added support for enabling or disabling scheduled tasks
 * The Name parameter resolves to $env:COMPUTERNAME when the value is localhost
 
 ### 1.6.0.0
