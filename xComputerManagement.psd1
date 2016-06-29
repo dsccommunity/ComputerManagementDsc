@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '1.6.0.0'
+ModuleVersion = '1.7.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,7 +49,10 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* Added the following resources:
+        ReleaseNotes = '*Added support for enabling or disabling scheduled tasks
+* The Name parameter resolves to $env:COMPUTERNAME when the value is localhost
+
+'
     * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
     * MSFT_xScheduledTask resource to control scheduled tasks on the local server
 * MSFT_xOfflineDomainJoin: Corrected localizedData.DomainAlreadyJoinedhMessage name.

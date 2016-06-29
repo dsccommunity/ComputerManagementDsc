@@ -99,3 +99,35 @@ Configuration xScheduledTask_Remove
         } 
     }
 }
+
+Configuration xScheduledTask_Enable
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node "localhost" {
+        xScheduledTask xScheduledTask_Remove {
+            TaskName = "Test task"
+            TaskPath = "\xComputerManagement\"
+            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            ScheduleType = "Minutes"
+            RepeatInterval = 15
+            Enable = $true
+            Ensure="Present"
+        } 
+    }
+}
+
+Configuration xScheduledTask_Disable
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node "localhost" {
+        xScheduledTask xScheduledTask_Remove {
+            TaskName = "Test task"
+            TaskPath = "\xComputerManagement\"
+            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            ScheduleType = "Minutes"
+            RepeatInterval = 15
+            Enable = $false
+            Ensure="Present"
+        } 
+    }
+}

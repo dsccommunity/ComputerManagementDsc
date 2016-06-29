@@ -9,7 +9,10 @@ This DSC Resource allows you to rename a computer and add it to a domain or work
 All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service.
 The ""x" in xComputerManagement stands for experimental, which means that these resources will be fix forward and monitored by the module owner(s).
 
-Please leave comments, feature requests, and bug reports in the Q & A tab for this module.
+Please leave comments, feature requests, and bug reports in the Issues tab for this module.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 If you would like to modify xComputerManagement module, feel free.
 When modifying, please update the module name, resource friendly name, and MOF class name (instructions below).
@@ -72,6 +75,10 @@ xScheduledTask has the following properties:
 ## Versions
 
 ### Unreleased
+
+### 1.7.0.0
+*Added support for enabling or disabling scheduled tasks
+* The Name parameter resolves to $env:COMPUTERNAME when the value is localhost
 
 ### 1.6.0.0
 * Added the following resources:
