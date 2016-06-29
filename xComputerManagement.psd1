@@ -49,16 +49,8 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '*Added support for enabling or disabling scheduled tasks
+        ReleaseNotes = '* Added support for enabling or disabling scheduled tasks
 * The Name parameter resolves to $env:COMPUTERNAME when the value is localhost
-
-'
-    * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
-    * MSFT_xScheduledTask resource to control scheduled tasks on the local server
-* MSFT_xOfflineDomainJoin: Corrected localizedData.DomainAlreadyJoinedhMessage name.
-* xComputer: Changed credential generation code in tests to avoid triggering PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
-             Renamed unit test file to match the name of Resource file.
-
 '
 
     } # End of PSData hashtable
