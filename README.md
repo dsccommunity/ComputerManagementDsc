@@ -100,7 +100,6 @@ xScheduledTask has the following properties:
 * Added the CurrentOU read-only property that shows the organizational unit that the computer account is currently in
 
 ### 1.3.0
-
 * xComputer
     * Fixed issue with Test-TargetResource when not specifying Domain or Workgroup name
     * Added tests
