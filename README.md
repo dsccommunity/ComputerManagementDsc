@@ -56,7 +56,7 @@ xOfflineDomainJoin resource is a [Single Instance](https://msdn.microsoft.com/en
 * RequestFile: The full path to the Offline Domain Join request file. Required.
 
 ## xScheduledTask
-xScheduledTask resource is used to define basic recurring scheduled tasks on the local computer. 
+xScheduledTask resource is used to define basic recurring scheduled tasks on the local computer.
 Tasks are created to run indefinitly based on the schedule defined.
 xScheduledTask has the following properties:
 
@@ -70,11 +70,13 @@ xScheduledTask has the following properties:
  * StartTime: The time of day this task should start at - optional, defaults to '12:00 AM'
  * Ensure: Present if the task should exist, false if it should be removed - optional, defaults to 'Ensure'
  * ExecuteAsCredential: The credential this task should execute as - Optional, defaults to running as 'NT AUTHORITY\SYSTEM'
- 
+
 
 ## Versions
 
 ### Unreleased
+* Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
+* Changed AppVeyor.yml to use default image
 
 ### 1.7.0.0
 * Added support for enabling or disabling scheduled tasks
@@ -98,7 +100,6 @@ xScheduledTask has the following properties:
 * Added the CurrentOU read-only property that shows the organizational unit that the computer account is currently in
 
 ### 1.3.0
-
 * xComputer
     * Fixed issue with Test-TargetResource when not specifying Domain or Workgroup name
     * Added tests
@@ -124,31 +125,31 @@ Initial release with the following resources
 This configuration will set a machine name and changes the workgroup it is in.
 
 ```powershell
-configuration Sample_xComputer_ChangeNameAndWorkGroup 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName ='localhost', 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName, 
-         
-        [Parameter(Mandatory)] 
-        [string]$WorkGroupName 
-    ) 
-      
-    #Import the required DSC Resources  
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer NewNameAndWorkgroup 
-        { 
-            Name          = $MachineName 
-            WorkGroupName = $WorkGroupName 
-        } 
-    } 
-}  
+configuration Sample_xComputer_ChangeNameAndWorkGroup
+{
+    param
+    (
+        [string[]]$NodeName ='localhost',
+
+        [Parameter(Mandatory)]
+        [string]$MachineName,
+
+        [Parameter(Mandatory)]
+        [string]$WorkGroupName
+    )
+
+    #Import the required DSC Resources
+    Import-DscResource -Module xComputerManagement
+
+    Node $NodeName
+    {
+        xComputer NewNameAndWorkgroup
+        {
+            Name          = $MachineName
+            WorkGroupName = $WorkGroupName
+        }
+    }
+}
 ```
 
 ### Switch from a Workgroup to a Domain
@@ -156,53 +157,53 @@ This configuration sets the machine name and joins a domain.
 Note: this requires a credential.
 
 ```powershell
-configuration Sample_xComputer_WorkgroupToDomain 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName="localhost", 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName, 
- 
-        [Parameter(Mandatory)] 
-        [string]$Domain, 
- 
-        [Parameter(Mandatory)] 
-        [pscredential]$Credential 
-    ) 
- 
-    #Import the required DSC Resources 
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer JoinDomain 
-        { 
-            Name          = $MachineName  
-            DomainName    = $Domain 
-            Credential    = $Credential  # Credential to join to domain 
-        } 
-    } 
-} 
+configuration Sample_xComputer_WorkgroupToDomain
+{
+    param
+    (
+        [string[]]$NodeName="localhost",
 
- 
-<#**************************** 
-To save the credential in plain-text in the mof file, use the following configuration data 
- 
-$ConfigData = @{   
-                 AllNodes = @(        
-                              @{     
-                                 NodeName = "localhost" 
+        [Parameter(Mandatory)]
+        [string]$MachineName,
+
+        [Parameter(Mandatory)]
+        [string]$Domain,
+
+        [Parameter(Mandatory)]
+        [pscredential]$Credential
+    )
+
+    #Import the required DSC Resources
+    Import-DscResource -Module xComputerManagement
+
+    Node $NodeName
+    {
+        xComputer JoinDomain
+        {
+            Name          = $MachineName
+            DomainName    = $Domain
+            Credential    = $Credential  # Credential to join to domain
+        }
+    }
+}
+
+
+<#****************************
+To save the credential in plain-text in the mof file, use the following configuration data
+
+$ConfigData = @{
+                 AllNodes = @(
+                              @{
+                                 NodeName = "localhost"
                                  # Allows credential to be saved in plain-text in the the *.mof instance document.
-                            
-                                 PSDscAllowPlainTextPassword = $true 
-                              } 
-                            )  
-              } 
- 
-Sample_xComputer_WorkgroupToDomain -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -Domain <domainName> 
-****************************#> 
+
+                                 PSDscAllowPlainTextPassword = $true
+                              }
+                            )
+              }
+
+Sample_xComputer_WorkgroupToDomain -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -Domain <domainName>
+****************************#>
 ```
 
 ### Change the Name while staying on the Domain
@@ -211,77 +212,77 @@ This example will change the machines name while remaining on the domain.
 Note: this requires a credential.
 
 ```powershell
-function Sample_xComputer_ChangeNameInDomain 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName="localhost", 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName, 
- 
-        [Parameter(Mandatory)] 
-        [pscredential]$Credential 
-    ) 
- 
-    #Import the required DSC Resources  
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer NewName 
-        { 
-            Name          = $MachineName 
-            Credential    = $Credential # Domain credential 
-        } 
-    } 
-} 
- 
-<#**************************** 
-To save the credential in plain-text in the mof file, use the following configuration data 
- 
-$ConfigData = @{   
-                AllNodes = @(        
-                             @{     
-                                NodeName = "localhost"; 
- 
+function Sample_xComputer_ChangeNameInDomain
+{
+    param
+    (
+        [string[]]$NodeName="localhost",
+
+        [Parameter(Mandatory)]
+        [string]$MachineName,
+
+        [Parameter(Mandatory)]
+        [pscredential]$Credential
+    )
+
+    #Import the required DSC Resources
+    Import-DscResource -Module xComputerManagement
+
+    Node $NodeName
+    {
+        xComputer NewName
+        {
+            Name          = $MachineName
+            Credential    = $Credential # Domain credential
+        }
+    }
+}
+
+<#****************************
+To save the credential in plain-text in the mof file, use the following configuration data
+
+$ConfigData = @{
+                AllNodes = @(
+                             @{
+                                NodeName = "localhost";
+
                                 # Allows credential to be saved in plain-text in the the *.mof instance document.
-                            
-                                PSDscAllowPlainTextPassword = $true; 
-                          } 
-                 )       
-            }     
- 
-Sample_xComputer_ChangeNameInDomain -ConfigurationData $ConfigData -MachineName <machineName>  -Credential (Get-Credential) 
- 
-*****************************#> 
+
+                                PSDscAllowPlainTextPassword = $true;
+                          }
+                 )
+            }
+
+Sample_xComputer_ChangeNameInDomain -ConfigurationData $ConfigData -MachineName <machineName>  -Credential (Get-Credential)
+
+*****************************#>
 ```
 
 ### Change the Name while staying on the Workgroup
 This example will change the machines name while remaining on the workgroup.
 
 ```powershell
-function Sample_xComputer_ChangeNameInWorkgroup 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName="localhost", 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName 
-    ) 
- 
-    #Import the required DSC Resources      
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer NewName 
-        { 
-            Name = $MachineName 
-        } 
-    } 
-}  
+function Sample_xComputer_ChangeNameInWorkgroup
+{
+    param
+    (
+        [string[]]$NodeName="localhost",
+
+        [Parameter(Mandatory)]
+        [string]$MachineName
+    )
+
+    #Import the required DSC Resources
+    Import-DscResource -Module xComputerManagement
+
+    Node $NodeName
+    {
+        xComputer NewName
+        {
+            Name = $MachineName
+        }
+    }
+}
 ```
 
 ### Switch from a Domain to a Workgroup
@@ -289,52 +290,52 @@ This example switches the computer from a domain to a workgroup.
 Note: this requires a credential.
 
 ```powershell
-function  Sample_xComputer_DomainToWorkgroup 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName="localhost", 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName, 
- 
-        [Parameter(Mandatory)] 
-        [string]$WorkGroup, 
- 
-        [Parameter(Mandatory)] 
-        [pscredential]$Credential 
-    ) 
- 
-    #Import the required DSC Resources      
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer JoinWorkgroup 
-        { 
-            Name          = $MachineName 
-            WorkGroupName = $WorkGroup 
-            Credential    = $Credential # Credential to unjoin from domain 
-        } 
-    } 
-} 
- 
-<#**************************** 
-To save the credential in plain-text in the mof file, use the following configuration data 
- 
-$ConfigData = @{   
-                AllNodes = @(        
-                             @{     
-                                NodeName = "localhost"; 
+function  Sample_xComputer_DomainToWorkgroup
+{
+    param
+    (
+        [string[]]$NodeName="localhost",
+
+        [Parameter(Mandatory)]
+        [string]$MachineName,
+
+        [Parameter(Mandatory)]
+        [string]$WorkGroup,
+
+        [Parameter(Mandatory)]
+        [pscredential]$Credential
+    )
+
+    #Import the required DSC Resources
+    Import-DscResource -Module xComputerManagement
+
+    Node $NodeName
+    {
+        xComputer JoinWorkgroup
+        {
+            Name          = $MachineName
+            WorkGroupName = $WorkGroup
+            Credential    = $Credential # Credential to unjoin from domain
+        }
+    }
+}
+
+<#****************************
+To save the credential in plain-text in the mof file, use the following configuration data
+
+$ConfigData = @{
+                AllNodes = @(
+                             @{
+                                NodeName = "localhost";
                                 # Allows credential to be saved in plain-text in the the *.mof instance document.
-                            
-                                PSDscAllowPlainTextPassword = $true; 
-                              } 
-                           )       
-                } 
- 
-Sample_xComputer_DomainToWorkgroup -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -WorkGroup <workgroupName> 
-****************************#> 
+
+                                PSDscAllowPlainTextPassword = $true;
+                              }
+                           )
+                }
+
+Sample_xComputer_DomainToWorkgroup -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -WorkGroup <workgroupName>
+****************************#>
 ```
 
 ### Join a Domain using an ODJ Request File
