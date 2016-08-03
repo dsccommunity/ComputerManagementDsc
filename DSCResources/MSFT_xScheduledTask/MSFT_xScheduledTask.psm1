@@ -100,6 +100,11 @@ function Get-TargetResource
                 $returnScheduleType = "Daily"
                 [System.Uint32]$returnInveral = $repetition.Interval -replace "P" -replace "D"
             }
+            if ($repetition.Duration -eq $null -and $repetition.Interval -like "P*D*") 
+            {
+                $returnScheduleType = "Daily"
+                [System.Uint32]$returnInveral = $repetition.Interval.Substring(0, $repetition.Interval.IndexOf('D')) -replace "P"
+            }
             if (($repetition.Duration -eq "P1D" -or $repetition.Duration -eq $null) `
                     -and $repetition.Interval -like "PT*H") 
             {
