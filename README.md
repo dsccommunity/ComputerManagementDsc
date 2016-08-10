@@ -75,8 +75,11 @@ xScheduledTask has the following properties:
 ## Versions
 
 ### Unreleased
+
+### 1.8.0.0
 * Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
 * Changed AppVeyor.yml to use default image
+* xScheduledTask: Fixed bug with different OS versions returning repeat interval differently
 
 ### 1.7.0.0
 * Added support for enabling or disabling scheduled tasks

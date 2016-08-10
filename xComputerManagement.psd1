@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '1.7.0.0'
+ModuleVersion = '1.8.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,12 +49,14 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* Added support for enabling or disabling scheduled tasks
-* The Name parameter resolves to $env:COMPUTERNAME when the value is localhost
+        ReleaseNotes = '* Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
+* Changed AppVeyor.yml to use default image
+* xScheduledTask: Fixed bug with different OS versions returning repeat interval differently
 '
 
     } # End of PSData hashtable
 
 } # End of PrivateData hashtable
 }
+
 
