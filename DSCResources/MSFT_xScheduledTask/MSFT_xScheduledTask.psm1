@@ -50,7 +50,7 @@ function Get-TargetResource
     )
     $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
     
-	
+    
     if ($null -eq $task) 
     {
         return @{
@@ -93,20 +93,20 @@ function Get-TargetResource
         {
             if ($repetition.Duration -eq $null -and $repetition.Interval -eq $null) 
             {
-				$taskexport = Export-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
-				if((([xml]$taskexport).Task.Triggers.ChildNodes | Where-object {$_.Name -eq "LogonTrigger"} | Measure-Object).Count -gt 0)
-				{
-					$returnScheduleType = "OnLogon"
-				}
-				elseif((([xml]$taskexport).Task.Triggers.ChildNodes | Where-object {$_.Name -eq "BootTrigger"} | Measure-Object).Count -gt 0)
-				{
-					$returnScheduleType = "Startup"
-				}
-				else
-				{				
-					$returnScheduleType = "Daily"
-					$returnInveral = $trigger.DaysInterval
-				}
+                $taskexport = Export-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
+                if((([xml]$taskexport).Task.Triggers.ChildNodes | Where-object {$_.Name -eq "LogonTrigger"} | Measure-Object).Count -gt 0)
+                {
+                    $returnScheduleType = "OnLogon"
+                }
+                elseif((([xml]$taskexport).Task.Triggers.ChildNodes | Where-object {$_.Name -eq "BootTrigger"} | Measure-Object).Count -gt 0)
+                {
+                    $returnScheduleType = "Startup"
+                }
+                else
+                {                
+                    $returnScheduleType = "Daily"
+                    $returnInveral = $trigger.DaysInterval
+                }
             }
             if ($repetition.Duration -eq $null -and $repetition.Interval -like "P*D") 
             {
@@ -233,44 +233,44 @@ function Set-TargetResource
         
         $date = (Get-Date).Date
         $startTime = [DateTime]::Parse("$($date.ToShortDateString()) $StartTime")
-		switch ($ScheduleType) 
-		{
-			"Minutes" 
-			{ 
-				$repeatAt = New-TimeSpan -Minutes $RepeatInterval
-			}
-			"Hourly" 
-			{ 
-				$repeatAt = New-TimeSpan -Hours $RepeatInterval
-			}
-			"Daily" 
-			{ 
-				$repeatAt = New-TimeSpan -Days $RepeatInterval
-			}
-			"Startup"
-			{
-				$trigger = New-ScheduledTaskTrigger -AtStartup
-			}
-			"OnLogon"
-			{
-				$trigger = New-ScheduledTaskTrigger -AtLogOn
-			}
-		}
-		
-		if($ScheduleType -ne "Startup" -and $ScheduleType -ne "OnLogon")
-		{
-			try
-			{
-				$trigger = New-ScheduledTaskTrigger -Once -At $startTime `
-													-RepetitionInterval $repeatAt 
-			}
-			catch
-			{
-				$trigger = New-ScheduledTaskTrigger -Once -At $startTime `
-													-RepetitionInterval $repeatAt `
-													-RepetitionDuration ([TimeSpan]::MaxValue)
-			}
-		}
+        switch ($ScheduleType) 
+        {
+            "Minutes" 
+            { 
+                $repeatAt = New-TimeSpan -Minutes $RepeatInterval
+            }
+            "Hourly" 
+            { 
+                $repeatAt = New-TimeSpan -Hours $RepeatInterval
+            }
+            "Daily" 
+            { 
+                $repeatAt = New-TimeSpan -Days $RepeatInterval
+            }
+            "Startup"
+            {
+                $trigger = New-ScheduledTaskTrigger -AtStartup
+            }
+            "OnLogon"
+            {
+                $trigger = New-ScheduledTaskTrigger -AtLogOn
+            }
+        }
+        
+        if($ScheduleType -ne "Startup" -and $ScheduleType -ne "OnLogon")
+        {
+            try
+            {
+                $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
+                                                    -RepetitionInterval $repeatAt 
+            }
+            catch
+            {
+                $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
+                                                    -RepetitionInterval $repeatAt `
+                                                    -RepetitionDuration ([TimeSpan]::MaxValue)
+            }
+        }
 
         
         if ($currentValues.Ensure -eq "Absent") 
@@ -437,3 +437,4 @@ function Test-TargetResource
     
     return $true
 }
+
