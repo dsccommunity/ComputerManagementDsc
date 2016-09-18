@@ -71,10 +71,17 @@ xScheduledTask has the following properties:
  * Ensure: Present if the task should exist, false if it should be removed - optional, defaults to 'Ensure'
  * ExecuteAsCredential: The credential this task should execute as - Optional, defaults to running as 'NT AUTHORITY\SYSTEM'
 
+## xPowerPlan
+xPowerPlan resource has following properties:
+
+* Ensure: Use value 'Present' if the plan name should be activated. Use value 'Absent' to active the default plan for the operating system (hard-coded to plan 'Balanced').
+* Name: The name och the plan to activate. Default value is 'High performance'.
 
 ## Versions
 
 ### Unreleased
+* Added resources
+  - xPowerPlan
 
 ### 1.8.0.0
 * Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
