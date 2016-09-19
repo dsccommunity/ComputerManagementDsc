@@ -7,7 +7,7 @@ class MSFT_xScheduledTask : OMI_BaseResource
     [Write, Description("The arguments to pass the executable")] string ActionArguments;
     [Write, Description("The working path to specify for the executable")] string ActionWorkingPath;
     [Required, Description("How frequently should this task be executed? Minutes, Hourly, Daily, Startup or OnLogon"), ValueMap{"Minutes", "Hourly", "Daily", "Startup", "OnLogon"}, Values{"Minutes", "Hourly", "Daily", "Startup", "OnLogon"}] string ScheduleType;
-    [Required, Description("How many units (minutes, hours, days) between each run of this task?")] Uint32 RepeatInterval;
+    [Write, Description("How many units (minutes, hours, days) between each run of this task?")] Uint32 RepeatInterval;
     [Write, Description("The time of day this task should start at - defaults to 12:00 AM")] string StartTime;
     [Write, Description("Present if the task should exist, false if it should be removed"), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
     [Write, Description("True if the task should be enabled, false if it should be disabled")] boolean Enable;

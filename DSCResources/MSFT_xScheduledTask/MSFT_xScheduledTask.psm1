@@ -27,7 +27,7 @@ function Get-TargetResource
         [System.String]
         [ValidateSet("Minutes", "Hourly", "Daily", "Startup", "OnLogon")] $ScheduleType,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [System.UInt32]
         $RepeatInterval,
         
@@ -183,7 +183,7 @@ function Set-TargetResource
         [System.String]
         [ValidateSet("Minutes", "Hourly", "Daily", "Startup", "OnLogon")] $ScheduleType,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [System.UInt32]
         $RepeatInterval,
         
@@ -354,7 +354,7 @@ function Test-TargetResource
         [System.String]
         [ValidateSet("Minutes", "Hourly", "Daily", "Startup", "OnLogon")] $ScheduleType,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [System.UInt32]
         $RepeatInterval,
         
