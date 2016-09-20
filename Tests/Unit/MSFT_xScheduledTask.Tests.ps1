@@ -189,6 +189,68 @@ try
                 }
             }
             
+            Context "A scheduled task with minutes based repetition exists and has the wrong settings" {
+                $testParams = @{
+                    TaskName = "Test task"
+                    ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+                    ScheduleType = "Startup"
+                }
+                
+                Mock Get-ScheduledTask { return @{
+                    Name = $testParams.TaskName
+                    Path = $testParams.TaskPath
+                    Actions = @(@{
+                        Execute = $testParams.ActionExecutable
+                    })
+                    Triggers = @(@{
+                        Repetition = @{
+                            Duration = $null
+                            Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                    })
+                    Principal = @{
+                        UserId = "SYSTEM"
+                    }
+                } }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return false from the test method" {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+            }
+			
+			Context "A scheduled task with Startup based repetition exists and has the wrong settings" {
+                $testParams = @{
+                    TaskName = "Test task"
+                    ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+                    ScheduleType = "Startup"
+                }
+                
+                Mock Get-ScheduledTask { return @{
+                    Name = $testParams.TaskName
+                    Path = $testParams.TaskPath
+                    Actions = @(@{
+                        Execute = $testParams.ActionExecutable
+                    })
+                    ScheduleType = "Startup"
+                    Principal = @{
+                        UserId = "SYSTEM"
+                    }
+                } }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return false from the test method" {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+            }
+			
+			
             Context "A scheduled task with hourly based repetition exists, but has the wrong settings" {
                 $testParams = @{
                     TaskName = "Test task"
