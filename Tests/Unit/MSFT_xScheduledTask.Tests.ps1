@@ -221,8 +221,8 @@ try
                     Test-TargetResource @testParams | Should Be $false
                 }
             }
-			
-			Context "A scheduled task with Startup based repetition exists and has the wrong settings" {
+            
+            Context "A scheduled task with Startup based repetition exists and has the wrong settings" {
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
@@ -249,8 +249,8 @@ try
                     Test-TargetResource @testParams | Should Be $false
                 }
             }
-			
-			
+            
+            
             Context "A scheduled task with hourly based repetition exists, but has the wrong settings" {
                 $testParams = @{
                     TaskName = "Test task"
