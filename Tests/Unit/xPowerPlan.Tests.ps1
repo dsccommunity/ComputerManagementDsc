@@ -21,17 +21,10 @@ $TestEnvironment = Initialize-TestEnvironment `
 #endregion HEADER
 
 function Invoke-TestSetup {
-
-    # TODO: Optional init code goes here...
-    
 }
 
 function Invoke-TestCleanup {
-
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    
-    # TODO: Other Optional Cleanup Code Goes Here...
-    
 }
 
 # Begin Testing
@@ -63,6 +56,27 @@ try
                 $result.Name | Should Be $planName
             }
         }
+
+        Context 'When the system is in the desired present state (using default parameter value)' {
+            BeforeEach {
+                Mock -CommandName Get-CimInstance -MockWith {
+                    return New-Object Object | 
+                        Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
+                } -ModuleName $script:DSCResourceName -Verifiable
+
+                $ensureState = 'Present'
+
+                $testParameters = @{
+                    Ensure = $ensureState
+                }
+            }
+
+            It 'Should return the same values as passed as parameters' {
+                $result = Get-TargetResource @testParameters
+                $result.Ensure | Should Be $ensureState
+                $result.Name | Should Be 'High performance'
+            }
+        }        
 
         Context 'When the system is in the desired absent state' {
             BeforeEach {

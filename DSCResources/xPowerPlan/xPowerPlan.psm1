@@ -1,3 +1,7 @@
+$script:presentStateDefaultPlanName = 'High performance'
+# Absent state is hard-coded to plan name 'Balanced' because that is the default plan after OS installation
+$script:absentStateDefaultPlanName = 'Balanced'
+
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -10,15 +14,14 @@ function Get-TargetResource
         $Ensure,
 
         [System.String]
-        $Name = 'High performance'
+        $Name = $script:presentStateDefaultPlanName
     )
 
     try
     {
         if ($Ensure -eq 'Absent' )
         {
-            # Hard-coded to plan name 'Balanced' because that is the default plan after OS installation
-            $Name = 'Balanced' 
+            $Name = $script:absentStateDefaultPlanName 
         }
         
         $plan = Get-CimInstance -Name root\cimv2\power -Class Win32_PowerPlan -Filter "ElementName = '$Name'"
@@ -26,12 +29,13 @@ function Get-TargetResource
         {
             if( $plan.IsActive )
             {
-                Write-Verbose "$Name is the active plan"
+                Write-Verbose "The power plan '$Name' is the active plan"
                 $activePlanName = $Name
             }
             else
             {
-                Write-Verbose "$Name is the not active plan"
+                Write-Verbose "The power plan '$Name' is not the active plan"
+                $activePlanName = $null
             }
         }
         else
@@ -44,12 +48,10 @@ function Get-TargetResource
         throw $_
     }
 
-    $returnValue = @{
+    return @{
         Ensure = $Ensure
         Name = $activePlanName
     }
-    
-    $returnValue
 }
 
 function Set-TargetResource
@@ -63,27 +65,25 @@ function Set-TargetResource
         $Ensure,
 
         [System.String]
-        $Name = 'High performance'
+        $Name = $script:presentStateDefaultPlanName
     )
 
-    try
+    if ($Ensure -eq 'Absent' )
     {
+        $Name = $script:absentStateDefaultPlanName
+    }
 
-        if ($Ensure -eq 'Absent' )
-        {
-            # Hard-coded to plan name 'Balanced' because that is the default plan after OS installation
-            $Name = 'Balanced' 
-        }
-
-        if ($PSCmdlet.ShouldProcess($Name, 'Activating power plan'))
+    if ($PSCmdlet.ShouldProcess($Name, 'Activating power plan'))
+    {
+        try
         {
             $plan = Get-CimInstance -Name root\cimv2\power -Class Win32_PowerPlan -Filter "ElementName = '$Name'" 
             Invoke-CimMethod -InputObject $plan -MethodName Activate
         }
-    }
-    catch
-    {
-        throw $_
+        catch
+        {
+            Throw "Unable to set the power plan $Name to the active plan. Error message: $($_.Exception.Message)" 
+        }
     }
 }
 
@@ -99,7 +99,7 @@ function Test-TargetResource
         $Ensure,
 
         [System.String]
-        $Name = 'High performance'
+        $Name = $script:presentStateDefaultPlanName
     )
 
     $returnValue = $false
@@ -109,7 +109,7 @@ function Test-TargetResource
     {
         $returnValue = $true
     }
-    elseif ($result.Ensure -eq 'Absent' -and $result.Name -eq 'Balanced' )
+    elseif ($result.Ensure -eq 'Absent' -and $result.Name -eq $script:absentStateDefaultPlanName )
     {
         $returnValue = $true
     }
