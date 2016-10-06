@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'xComputerManagement' 
-$script:DSCResourceName    = 'xPowerPlan' 
+$script:DSCResourceName    = 'MSFT_xPowerPlan' 
 
 #region HEADER
 
