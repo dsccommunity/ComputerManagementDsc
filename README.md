@@ -74,8 +74,8 @@ xScheduledTask has the following properties:
 ## xPowerPlan
 xPowerPlan resource has following properties:
 
-* Ensure: Use value 'Present' if the plan name should be activated. Use value 'Absent' to active the default plan for the operating system (hard-coded to plan 'Balanced').
-* Name: The name och the plan to activate. Default value is 'High performance'.
+ * IsSingleInstance: Specifies the resource is a single instance, the value must be 'Yes'.
+ * Name: The name of the plan to activate.
 
 ## Versions
 

@@ -11,7 +11,7 @@ configuration Sample_xPowerPlan
     {
         xPowerPlan SetPlanHighPerformance
         {
-          Ensure = 'Present'
+          IsSingleInstance = 'Yes'
           Name = 'High performance'
         }
     }

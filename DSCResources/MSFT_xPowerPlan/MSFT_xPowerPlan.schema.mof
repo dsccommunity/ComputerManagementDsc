@@ -1,6 +1,6 @@
 [ClassVersion("1.0.0.0"), FriendlyName("xPowerPlan")]
 class MSFT_xPowerPlan : OMI_BaseResource
 {
-    [Key, Description("Use value 'Present' if the plan name should be activated. Use value 'Absent' to active the default plan for the operating system (hard-coded to plan 'Balanced')."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
-    [Write, Description("The name och the plan to activate. Default value is 'High performance'.")] String Name;
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'"), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Required, Description("The name of the plan to activate.")] String Name;
 };

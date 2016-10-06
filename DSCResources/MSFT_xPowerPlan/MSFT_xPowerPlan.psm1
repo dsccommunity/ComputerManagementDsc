@@ -1,7 +1,3 @@
-$script:presentStateDefaultPlanName = 'High performance'
-# Absent state is hard-coded to plan name 'Balanced' because that is the default plan after OS installation
-$script:absentStateDefaultPlanName = 'Balanced'
-
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -9,21 +5,18 @@ function Get-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Present","Absent")]
+        [ValidateSet('Yes')]
         [System.String]
-        $Ensure,
+        $IsSingleInstance,
 
+        [parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [System.String]
-        $Name = $script:presentStateDefaultPlanName
+        $Name
     )
 
     try
     {
-        if ($Ensure -eq 'Absent' )
-        {
-            $Name = $script:absentStateDefaultPlanName 
-        }
-        
         $plan = Get-CimInstance -Name root\cimv2\power -Class Win32_PowerPlan -Filter "ElementName = '$Name'"
         if ($plan)
         {
@@ -49,7 +42,7 @@ function Get-TargetResource
     }
 
     return @{
-        Ensure = $Ensure
+        IsSingleInstance = $IsSingleInstance
         Name = $activePlanName
     }
 }
@@ -60,18 +53,15 @@ function Set-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Present","Absent")]
+        [ValidateSet('Yes')]
         [System.String]
-        $Ensure,
+        $IsSingleInstance,
 
+        [parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [System.String]
-        $Name = $script:presentStateDefaultPlanName
+        $Name
     )
-
-    if ($Ensure -eq 'Absent' )
-    {
-        $Name = $script:absentStateDefaultPlanName
-    }
 
     if ($PSCmdlet.ShouldProcess($Name, 'Activating power plan'))
     {
@@ -94,22 +84,20 @@ function Test-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Present","Absent")]
+        [ValidateSet('Yes')]
         [System.String]
-        $Ensure,
+        $IsSingleInstance,
 
+        [parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [System.String]
-        $Name = $script:presentStateDefaultPlanName
+        $Name
     )
 
     $returnValue = $false
 
-    $result = Get-TargetResource -Ensure $Ensure -Name $Name
-    if ($result.Ensure -eq 'Present' -and $result.Name -eq $Name )
-    {
-        $returnValue = $true
-    }
-    elseif ($result.Ensure -eq 'Absent' -and $result.Name -eq $script:absentStateDefaultPlanName )
+    $result = Get-TargetResource -IsSingleInstance $IsSingleInstance -Name $Name
+    if ($result.Name -eq $Name)
     {
         $returnValue = $true
     }

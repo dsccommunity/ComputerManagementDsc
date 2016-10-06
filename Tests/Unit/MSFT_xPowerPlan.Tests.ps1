@@ -14,8 +14,8 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName 'xComputerManagement' `
-    -DSCResourceName 'xPowerPlan' `
+    -DSCModuleName $script:DSCModuleName `
+    -DSCResourceName $script:DSCResourceName `
     -TestType Unit 
 
 #endregion HEADER
@@ -34,73 +34,25 @@ try
     Invoke-TestSetup
 
     Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        BeforeEach {
+            $testParameters = @{
+                IsSingleInstance = 'Yes'
+                Name = 'High performance'
+            }
+        }
+        
         Context 'When the system is in the desired present state' {
             BeforeEach {
                 Mock -CommandName Get-CimInstance -MockWith {
                     return New-Object Object | 
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
                 } -ModuleName $script:DSCResourceName -Verifiable
-
-                $ensureState = 'Present'
-                $planName = 'High performance'
-
-                $testParameters = @{
-                    Ensure = $ensureState
-                    Name = $planName
-                }
             }
 
             It 'Should return the same values as passed as parameters' {
                 $result = Get-TargetResource @testParameters
-                $result.Ensure | Should Be $ensureState
-                $result.Name | Should Be $planName
-            }
-        }
-
-        Context 'When the system is in the desired present state (using default parameter value)' {
-            BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object | 
-                        Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
-                } -ModuleName $script:DSCResourceName -Verifiable
-
-                $ensureState = 'Present'
-
-                $testParameters = @{
-                    Ensure = $ensureState
-                }
-            }
-
-            It 'Should return the same values as passed as parameters' {
-                $result = Get-TargetResource @testParameters
-                $result.Ensure | Should Be $ensureState
-                $result.Name | Should Be 'High performance'
-            }
-        }        
-
-        Context 'When the system is in the desired absent state' {
-            BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object | 
-                        Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
-                } -ModuleName $script:DSCResourceName -Verifiable
-
-                $ensureState = 'Absent'
-                $planName = 'Balanced'
-
-                $testParameters = @{
-                    Ensure = $ensureState
-                }
-            }
-
-            It 'Should return the same value as passed in the Ensure parameter' {
-                $result = Get-TargetResource @testParameters
-                $result.Ensure | Should Be $ensureState
-            }
-
-            It 'Should return the plan name as Balanced' {
-                $result = Get-TargetResource @testParameters
-                $result.Name | Should Be $planName
+                $result.IsSingleInstance | Should Be 'Yes'
+                $result.Name | Should Be $testParameters.Name
             }
         }
 
@@ -110,63 +62,20 @@ try
                     return New-Object Object | 
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
                 } -ModuleName $script:DSCResourceName -Verifiable
-
-                $ensureState = 'Present'
-                $planName = 'High performance'
-
-                $testParameters = @{
-                    Ensure = $ensureState
-                    Name = $planName
-                }
-            }
-
-            It 'Should return the same value as passed in the Ensure parameter' {
-                $result = Get-TargetResource @testParameters
-                $result.Ensure | Should Be $ensureState
             }
 
             It 'Should not return any plan name' {
                 $result = Get-TargetResource @testParameters
+                $result.IsSingleInstance | Should Be 'Yes'
                 $result.Name | Should Be $null
             }
         }
     
-        Context 'When the system is not in the desired absent state' {
-            BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object | 
-                        Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
-                } -ModuleName $script:DSCResourceName -Verifiable
-
-                $ensureState = 'Absent'
-
-                $testParameters = @{
-                    Ensure = $ensureState
-                }
-            }
-
-            It 'Should return the same value as passed in the Ensure parameter' {
-                $result = Get-TargetResource @testParameters
-                $result.Ensure | Should Be $ensureState
-            }
-
-            It 'Should not return any plan name' {
-                $result = Get-TargetResource @testParameters
-                $result.Name | Should Be $null
-            }
-        }
-
         Context 'When the Get-CimInstance cannot retrive information about power plans' {
             BeforeEach {
                 Mock -CommandName Get-CimInstance -MockWith {
                     throw
                 } -ModuleName $script:DSCResourceName -Verifiable
-
-                $ensureState = 'Absent'
-
-                $testParameters = @{
-                    Ensure = $ensureState
-                }
             }
 
             It 'Should throw an error' {
@@ -179,16 +88,10 @@ try
                 Mock -CommandName Get-CimInstance -MockWith {
                     return $null
                 } -ModuleName $script:DSCResourceName -Verifiable
-
-                $ensureState = 'Absent'
-
-                $testParameters = @{
-                    Ensure = $ensureState
-                }
             }
 
-            It 'Should throw saying it was not able to find the plan Balanced' {
-                { Get-TargetResource @testParameters } | Should Throw 'Unable to find the power plan Balanced.'
+            It 'Should throw saying it was not able to find the plan High performance' {
+                { Get-TargetResource @testParameters } | Should Throw 'Unable to find the power plan High performance.'
             }
         }
 
@@ -197,6 +100,11 @@ try
 
     Describe "$($script:DSCResourceName)\Set-TargetResource" {
         BeforeEach {
+            $testParameters = @{
+                IsSingleInstance = 'Yes'
+                Name = 'High performance'
+            }
+
             Mock -CommandName Invoke-CimMethod -MockWith {} -ModuleName $script:DSCResourceName -Verifiable
 
             Mock -CommandName Get-CimInstance -MockWith {
@@ -205,27 +113,6 @@ try
         }
 
         Context 'When the system is not in the desired present state' {
-            BeforeEach {
-                $testParameters = @{
-                    Ensure = 'Present'
-                    Name = 'High performance'
-                }
-            }
-
-            It 'Should call the mocked function Invoke-CimMethod exactly once' {
-                Set-TargetResource @testParameters
-
-                Assert-MockCalled -CommandName Invoke-CimMethod -Exactly 1 -Scope It -ModuleName $script:DSCResourceName
-            }
-        }
-
-        Context 'When the system is not in the desired absent state' {
-            BeforeEach {
-                $testParameters = @{
-                    Ensure = 'Absent'
-                }
-            }
-
             It 'Should call the mocked function Invoke-CimMethod exactly once' {
                 Set-TargetResource @testParameters
 
@@ -238,15 +125,9 @@ try
                 Mock -CommandName Invoke-CimMethod -MockWith {
                     throw
                 } -ModuleName $script:DSCResourceName -Verifiable
-
-                $ensureState = 'Absent'
-
-                $testParameters = @{
-                    Ensure = $ensureState
-                }
             }
 
-            It 'Should throw an error' {
+            It 'Should catch the error thrown by Invoke-CimMethod' {
                 { Set-TargetResource @testParameters } | Should Throw
             }
         }
@@ -255,34 +136,19 @@ try
     }
 
     Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        BeforeEach {
+            $testParameters = @{
+                IsSingleInstance = 'Yes'
+                Name = 'High performance'
+            }
+        }
+
         Context 'When the system is in the desired present state' {
             BeforeEach {
                 Mock -CommandName Get-CimInstance -MockWith {
                     return New-Object Object | 
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
                 } -ModuleName $script:DSCResourceName -Verifiable
-
-                $testParameters = @{
-                    Ensure = 'Present'
-                    Name = 'High performance'
-                }
-            }
-
-            It 'Should return the the state as present ($true)' {
-                Test-TargetResource @testParameters | Should Be $true
-            }
-        }
-
-        Context 'When the system is in the desired absent state' {
-            BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object | 
-                        Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
-                } -ModuleName $script:DSCResourceName -Verifiable
-
-                $testParameters = @{
-                    Ensure = 'Absent'
-                }
             }
 
             It 'Should return the the state as present ($true)' {
@@ -296,11 +162,6 @@ try
                     return New-Object Object | 
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
                 } -ModuleName $script:DSCResourceName -Verifiable
-
-                $testParameters = @{
-                    Ensure = 'Present'
-                    Name = 'High performance'
-                }
             }
 
             It 'Should return the the state as absent ($false)' {
