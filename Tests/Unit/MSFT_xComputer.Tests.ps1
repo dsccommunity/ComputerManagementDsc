@@ -1,4 +1,4 @@
-﻿$Global:DSCModuleName      = 'xComputerManagement'
+$Global:DSCModuleName      = 'xComputerManagement'
 $Global:DSCResourceName    = 'MSFT_xComputer'
 
 #region HEADER
@@ -121,16 +121,27 @@ try
                 It 'Should not Throw if name is localhost' {
                     {Test-TargetResource -Name "localhost"} | Should Not Throw
                 }
+                It 'Should throw if an invalid SystemLocale is provided' {
+                    {Test-TargetResource -Name "localhost" -SystemLocale 'badlocale'} | Should Throw
+                }
+                It 'Should not throw if a valid SystemLocale is provided' {
+                    {Test-TargetResource -Name "localhost" -SystemLocale en-US} | Should Not Throw
+                }
+                It 'Should get SystemLocale if a valid SystemLocale is provided' {
+                    Mock Get-WinSystemLocale {}
+                    {Test-TargetResource -Name "localhost" -SystemLocale en-US} | Should Not Throw
+                    Assert-MockCalled -CommandName Get-WinSystemLocale -Exactly 1
+                }
                 
             }
             Context "$($Global:DSCResourceName)\Get-TargetResource" {
                 It 'should not throw' {
                     {Get-TargetResource -Name $env:COMPUTERNAME} | Should Not Throw
                 }
-                It 'Should return a hashtable containing Name, DomainName, JoinOU, CurrentOU, Credential, UnjoinCredential and WorkGroupName' {
+                It 'Should return a hashtable containing Name, DomainName, JoinOU, CurrentOU, Credential, UnjoinCredential, WorkGroupName and SystemLocale' {
                     $Result = Get-TargetResource -Name $env:COMPUTERNAME
                     $Result.GetType().Fullname | Should Be 'System.Collections.Hashtable'
-                    $Result.Keys | Should Be @('Name', 'DomainName', 'JoinOU', 'CurrentOU', 'Credential', 'UnjoinCredential', 'WorkGroupName')
+                    $Result.Keys | Should Be @('Name', 'DomainName', 'JoinOU', 'CurrentOU', 'Credential', 'UnjoinCredential', 'WorkGroupName', 'SystemLocale')
                 }
                 It 'Throws if name is to long' {
                     {Get-TargetResource -Name "ThisNameIsTooLong"} | Should Throw
@@ -273,6 +284,11 @@ try
                 }
                 It 'Throws if name contains illigal characters' {
                     {Set-TargetResource -Name "ThisIsBad<>"} | Should Throw
+                }
+                It 'Changes SystemLocale when a locale is specified' {
+                    Mock Set-WinSystemLocale {}
+                    {Set-TargetResource -Name "LocalHost" -SystemLocale 'en-US'} | Should Not Throw
+                    Assert-MockCalled -CommandName Set-WinSystemLocale -Exactly 1 -Scope It -ParameterFilter {$SystemLocale -and $SystemLocale -eq 'en-US'}
                 }
             }
         }
