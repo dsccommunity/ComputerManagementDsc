@@ -21,7 +21,10 @@ function Get-TargetResource
 
         [PSCredential] $UnjoinCredential,
 
-        [string] $WorkGroupName
+        [string] $WorkGroupName,
+
+        [ValidateScript({[CultureInfo]::GetCultureInfo($_) -ne $null})]
+        [string] $Locale
     )
 
     $convertToCimCredential = New-CimInstance -ClassName MSFT_Credential -Property @{Username=[string]$Credential.UserName; Password=[string]$null} -Namespace root/microsoft/windows/desiredstateconfiguration -ClientOnly
@@ -35,6 +38,7 @@ function Get-TargetResource
         Credential = [ciminstance]$convertToCimCredential
         UnjoinCredential = [ciminstance]$convertToCimUnjoinCredential
         WorkGroupName= (gwmi WIN32_ComputerSystem).WorkGroup
+        Locale = (Get-WinSystemLocale).Name
     }
 
     $returnValue
@@ -57,7 +61,10 @@ function Set-TargetResource
 
         [PSCredential] $UnjoinCredential,
 
-        [string] $WorkGroupName
+        [string] $WorkGroupName,
+
+        [ValidateScript({[CultureInfo]::GetCultureInfo($_) -ne $null})]
+        [string] $Locale
     )
 
     ValidateDomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
@@ -155,7 +162,7 @@ function Set-TargetResource
             }
         }
     }
-    else
+    else # No Credentials
     {
         if ($DomainName)
         {
@@ -196,6 +203,17 @@ function Set-TargetResource
         }
     }
 
+    if($Locale)
+    {
+        if((Get-WinSystemLocale).Name -ne $Locale)
+        {
+            Write-Verbose -Message "Trying to set computer locale to $Locale."
+            Set-WinSystemLocale -SystemLocale $Locale
+        }
+    }
+    
+
+    # Request a reboot from DSC
     $global:DSCMachineStatus = 1
 }
 
@@ -218,13 +236,31 @@ function Test-TargetResource
         
         [string] $DomainName,
 
-        [string] $WorkGroupName
+        [string] $WorkGroupName,
+
+        [ValidateScript({[CultureInfo]::GetCultureInfo($_) -ne $null})]
+        [string] $Locale
     )
     
     Write-Verbose -Message "Validate desired Name is a valid name"
     
     Write-Verbose -Message "Checking if computer name is correct"
     if (($Name -ne 'localhost') -and ($Name -ne $env:COMPUTERNAME)) {return $false}
+
+    if($Locale)
+    {
+        Write-Verbose "Validating Locale Settings are correct"
+
+        if( -not (Test-Locale -Locale $Locale) )
+        {
+            throw "Invalid Locale passed to xComputer resource"
+        }
+
+        if((Get-WinSystemLocale).Name -ne $Locale)
+        {
+            return $false
+        }
+    }
 
     ValidateDomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
 
@@ -290,6 +326,19 @@ function Get-ComputerOU
     }
 
     return $ou
+}
+
+function Test-Locale
+{
+    param(
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Locale
+    )
+
+    Write-Verbose "Testing Locale '$Locale' is a valid Locale"
+    $Cultures = [CultureInfo]::GetCultures("AllCultures").Name
+    return ($Cultures -contains $Locale)
 }
 
 Export-ModuleMember -Function *-TargetResource
