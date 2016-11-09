@@ -75,7 +75,7 @@ xScheduledTask has the following properties:
 xPowerPlan resource has following properties:
 
  * IsSingleInstance: Specifies the resource is a single instance, the value must be 'Yes'.
- * Name: The name of the plan to activate.
+ * Name: The name of the power plan to activate.
 
 ## Versions
 
