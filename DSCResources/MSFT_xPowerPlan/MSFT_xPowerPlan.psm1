@@ -1,3 +1,7 @@
+Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
+                               -ChildPath 'CommonResourceHelper.psm1')
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xPowerPlan'
+
 <#
     .SYNOPSIS
         Returns the current state of the power plan.
@@ -23,42 +27,43 @@ function Get-TargetResource
         [System.String]
         $IsSingleInstance,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Name
     )
 
+    $arguments = @{
+        Name = 'root\cimv2\power'
+        Class = 'Win32_PowerPlan'
+        Filter = "ElementName = '$Name'"
+    }
+
     try
     {
-        $arguments = @{
-            Name = 'root\cimv2\power'
-            Class = 'Win32_PowerPlan'
-            Filter = "ElementName = '$Name'"
-        }
-
         $plan = Get-CimInstance @arguments
-        if ($plan)
-        {
-            if( $plan.IsActive )
-            {
-                Write-Verbose "The power plan '$Name' is the active plan"
-                $activePlanName = $Name
-            }
-            else
-            {
-                Write-Verbose "The power plan '$Name' is not the active plan"
-                $activePlanName = $null
-            }
-        }
-        else
-        {
-            throw "Unable to find the power plan $Name." 
-        }
     }
     catch
     {
-        throw $_
+        throw ($script:localizedData.PowerPlanCIMError -f $($arguments.Class) )
+    }
+
+    if ($plan)
+    {
+        if( $plan.IsActive )
+        {
+            Write-Verbose -Message ($script:localizedData.PowerPlanIsActive -f $Name)
+            $activePlanName = $Name
+        }
+        else
+        {
+            Write-Verbose -Message ($script:localizedData.PowerPlanIsNotActive -f $Name)
+            $activePlanName = $null
+        }
+    }
+    else
+    {
+        throw ($script:localizedData.PowerPlanNotFound -f $Name)
     }
 
     return @{
@@ -91,28 +96,36 @@ function Set-TargetResource
         [System.String]
         $IsSingleInstance,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Name
     )
 
+    Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingActivated -f $Name)
+
+    $arguments = @{
+        Name = 'root\cimv2\power'
+        Class = 'Win32_PowerPlan'
+        Filter = "ElementName = '$Name'"
+    }
+
     try
     {
-        Write-Verbose -Message "Activating power plan $Name"
+        $plan = Get-CimInstance @arguments
+    }
+    catch
+    {
+        throw ($script:localizedData.PowerPlanCIMError -f $($arguments.Class) )
+    }
 
-        $arguments = @{
-            Name = 'root\cimv2\power'
-            Class = 'Win32_PowerPlan'
-            Filter = "ElementName = '$Name'"
-        }
-
-        $plan = Get-CimInstance @arguments 
+    try
+    {
         $plan | Invoke-CimMethod -MethodName Activate
     }
     catch
     {
-        Throw "Unable to set the power plan $Name to the active plan. Error message: $($_.Exception.Message)" 
+        throw ($script:localizedData.PowerPlanWasUnableToBeSet -f $Name, $($_.Exception.Message))
     }
 }
 
@@ -141,7 +154,7 @@ function Test-TargetResource
         [System.String]
         $IsSingleInstance,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Name
@@ -149,8 +162,10 @@ function Test-TargetResource
 
     $returnValue = $false
 
-    $result = Get-TargetResource -IsSingleInstance $IsSingleInstance -Name $Name
-    if ($result.Name -eq $Name)
+    Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingValidate -f $Name)
+
+    $getTargetResourceResult = Get-TargetResource -IsSingleInstance $IsSingleInstance -Name $Name
+    if ($getTargetResourceResult.Name -eq $Name)
     {
         $returnValue = $true
     }

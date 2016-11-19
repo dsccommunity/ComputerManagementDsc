@@ -20,9 +20,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 #endregion HEADER
 
-function Invoke-TestSetup {
-}
-
 function Invoke-TestCleanup {
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
 }
@@ -30,9 +27,6 @@ function Invoke-TestCleanup {
 # Begin Testing
 try
 {
-
-    Invoke-TestSetup
-
     Describe "$($script:DSCResourceName)\Get-TargetResource" {
         BeforeEach {
             $testParameters = @{
@@ -78,8 +72,8 @@ try
                 } -ModuleName $script:DSCResourceName -Verifiable
             }
 
-            It 'Should throw an error' {
-                { Get-TargetResource @testParameters } | Should Throw
+            It 'Should throw the correct error' {
+                { Get-TargetResource @testParameters } | Should Throw 'Could not get the Common Information Model (CIM) instances of class Win32_PowerPlan'
             }
         }
 
@@ -91,7 +85,7 @@ try
             }
 
             It 'Should throw saying it was not able to find the plan High performance' {
-                { Get-TargetResource @testParameters } | Should Throw 'Unable to find the power plan High performance.'
+                { Get-TargetResource @testParameters } | Should Throw "Unable to find the power plan 'High performance'."
             }
         }
 
@@ -120,15 +114,27 @@ try
             }
         }
 
-        Context 'When the Invoke-CimMethod throws an error' {
+        Context 'When the Get-CimInstance cannot retrive information about power plans' {
             BeforeEach {
-                Mock -CommandName Invoke-CimMethod -MockWith {
+                Mock -CommandName Get-CimInstance -MockWith {
                     throw
                 } -ModuleName $script:DSCResourceName -Verifiable
             }
 
-            It 'Should catch the error thrown by Invoke-CimMethod' {
-                { Set-TargetResource @testParameters } | Should Throw
+            It 'Should throw the correct error' {
+                { Set-TargetResource @testParameters } | Should Throw 'Could not get the Common Information Model (CIM) instances of class Win32_PowerPlan'
+            }
+        }
+
+        Context 'When the Invoke-CimMethod throws an error' {
+            BeforeEach {
+                Mock -CommandName Invoke-CimMethod -MockWith {
+                    throw 'Failed to set value'
+                } -ModuleName $script:DSCResourceName -Verifiable
+            }
+
+            It 'Should catch the correct error thrown by Invoke-CimMethod' {
+                { Set-TargetResource @testParameters } | Should Throw "Unable to set the power plan 'High performance' to the active plan. Error message: Failed to set value"
             }
         }
 
