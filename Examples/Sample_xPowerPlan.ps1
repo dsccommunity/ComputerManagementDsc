@@ -1,8 +1,17 @@
-configuration Sample_xPowerPlan
+<#
+    .SYNOPSIS
+        Example to set a power plan. 
+
+    .DESCRIPTION
+        This examples sets the active power plan to the 'High performance' plan. 
+#>
+Configuration Sample_xPowerPlan
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xComputerManagement
