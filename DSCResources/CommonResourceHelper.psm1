@@ -6,9 +6,9 @@
     .PARAMETER ResourceName
         The name of the resource as it appears before '.strings.psd1' of the localized string file.
         For example:
-            WindowsOptionalFeature: MSFT_WindowsOptionalFeature
-            Service: MSFT_ServiceResource
-            Registry: MSFT_RegistryResource
+            xSQLServerEndpoint: MSFT_xSQLServerEndpoint
+            xSQLServerConfiguration: MSFT_xSQLServerConfiguration
+            xSQLServerRole: MSFT_xSQLServerRole
 #>
 function Get-LocalizedData
 {
@@ -39,8 +39,5 @@ function Get-LocalizedData
 }
 
 Export-ModuleMember -Function @(
-    'Test-IsNanoServer',
-    'New-InvalidArgumentException',
-    'New-InvalidOperationException',
     'Get-LocalizedData'
     )
