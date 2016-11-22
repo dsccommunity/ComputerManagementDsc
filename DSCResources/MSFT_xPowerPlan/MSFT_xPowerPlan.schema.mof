@@ -1,0 +1,6 @@
+[ClassVersion("1.0.0.0"), FriendlyName("xPowerPlan")]
+class MSFT_xPowerPlan : OMI_BaseResource
+{
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'"), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Required, Description("The name of the power plan to activate.")] String Name;
+};

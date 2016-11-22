@@ -28,7 +28,7 @@ try
         
         Context "No scheduled task exists, but it should" {
             $CurrentConfig = "xScheduledTask_Add"
-            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
             It "should compile a MOF file without error" {
@@ -50,7 +50,7 @@ try
         
         Context "A scheduled task with minutes based repetition exists, but has the wrong settings" {
             $CurrentConfig = "xScheduledTask_Edit1"
-            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
             It "should compile a MOF file without error" {
@@ -72,7 +72,7 @@ try
         
         Context "A scheduled task with hourly based repetition exists, but has the wrong settings" {
             $CurrentConfig = "xScheduledTask_Edit2"
-            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
             It "should compile a MOF file without error" {
@@ -94,7 +94,7 @@ try
         
         Context "A scheduled task with daily based repetition exists, but has the wrong settings" {
             $CurrentConfig = "xScheduledTask_Edit3"
-            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
             It "should compile a MOF file without error" {
@@ -116,7 +116,7 @@ try
         
         Context "A scheduled task exists and is configured with the wrong working directory" {
             $CurrentConfig = "xScheduledTask_Edit4"
-            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
             It "should compile a MOF file without error" {
@@ -138,7 +138,7 @@ try
         
         Context "A scheduled task exists and is configured with the wrong executable arguments" {
             $CurrentConfig = "xScheduledTask_Edit5"
-            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
             It "should compile a MOF file without error" {
@@ -160,7 +160,7 @@ try
         
         Context "A scheduled task exists, but it shouldn't" {
             $CurrentConfig = "xScheduledTask_Remove"
-            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
             It "should compile a MOF file without error" {
@@ -182,7 +182,7 @@ try
         
         Context "A scheduled task exists, and should be enabled" {
             $CurrentConfig = "xScheduledTask_Enable"
-            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
             It "should compile a MOF file without error" {
@@ -204,7 +204,7 @@ try
         
         Context "A scheduled task exists, and should be disabled" {
             $CurrentConfig = "xScheduledTask_Disable"
-            $ConfigDir = (Join-Path $TestEnvironment.WorkingFolder $CurrentConfig)
+            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
             $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
             
             It "should compile a MOF file without error" {
