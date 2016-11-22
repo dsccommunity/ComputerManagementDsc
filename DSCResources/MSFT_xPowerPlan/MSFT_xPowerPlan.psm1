@@ -162,7 +162,7 @@ function Test-TargetResource
 
     $returnValue = $false
 
-    Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingValidate -f $Name)
+    Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingValidated -f $Name)
 
     $getTargetResourceResult = Get-TargetResource -IsSingleInstance $IsSingleInstance -Name $Name
     if ($getTargetResourceResult.Name -eq $Name)
