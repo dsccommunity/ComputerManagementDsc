@@ -50,7 +50,7 @@ function Get-TargetResource
 
     if ($plan)
     {
-        if( $plan.IsActive )
+        if ($plan.IsActive)
         {
             Write-Verbose -Message ($script:localizedData.PowerPlanIsActive -f $Name)
             $activePlanName = $Name
