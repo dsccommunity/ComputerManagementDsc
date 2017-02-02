@@ -80,6 +80,7 @@ xPowerPlan resource has following properties:
 ## Versions
 
 ### Unreleased
+* Updated AppVeyor.yml to use AppVeyor.psm1 module in DSCResource.Tests.
 
 ### 1.9.0.0
 * Added resources
