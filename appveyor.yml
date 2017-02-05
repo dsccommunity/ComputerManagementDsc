@@ -7,7 +7,7 @@ install:
 
   - ps: |
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
-        Start-AppveyorInstallTask
+        Invoke-AppveyorInstallTask
 
 #---------------------------------#
 #      build configuration        #
@@ -21,7 +21,7 @@ build: false
 
 test_script:
     - ps: |
-          Start-AppveyorTestScriptTask `
+          Invoke-AppveyorTestScriptTask `
             -ExcludeTag 'Examples','Markdown'
 
 #---------------------------------#
@@ -31,4 +31,4 @@ test_script:
 # scripts to run before deployment
 deploy_script:
     - ps: |
-          Start-AppveyorAfterTestTask
+          Invoke-AppveyorAfterTestTask
