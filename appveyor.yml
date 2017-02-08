@@ -22,7 +22,7 @@ build: false
 test_script:
     - ps: |
           Invoke-AppveyorTestScriptTask `
-            -ExcludeTag 'Examples','Markdown'
+            -ExcludeTag 'Examples'
 
 #---------------------------------#
 #      deployment configuration   #
