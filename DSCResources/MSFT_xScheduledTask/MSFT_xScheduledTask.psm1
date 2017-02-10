@@ -49,7 +49,7 @@ function Get-TargetResource
         $ExecuteAsCredential
     )
 
-    if($TaskPath -eq '\')
+    if(($TaskPath -eq '\') -or ($TaskPath.Length -eq 0))
     {
          $fixedTaskPath = '\'
     }
