@@ -80,7 +80,8 @@ xPowerPlan resource has following properties:
 ## Versions
 
 ### Unreleased
-
+- xScheduledTask
+    - Fixed incorrect TaskPath handling (Fix #45)
 ### 1.9.0.0
 * Added resources
   - xPowerPlan
