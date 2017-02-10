@@ -49,10 +49,18 @@ function Get-TargetResource
         $ExecuteAsCredential
     )
 
-    $fixedTaskPath = "\$(($TaskPath -split '\\').Where({$_}) -join '\')\"
-
-    $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $fixedTaskPath -ErrorAction SilentlyContinue
+    if($TaskPath -eq '\')
+    {
+         $fixedTaskPath = '\'
+    }
+    else
+    {
+        $fixedTaskPath = "\$(($TaskPath -split '\\').Where({$_}) -join '\')\"
+        
+    }
     
+    $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $fixedTaskPath -ErrorAction SilentlyContinue
+
     if ($null -eq $task) 
     {
         return @{

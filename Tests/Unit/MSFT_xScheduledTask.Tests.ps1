@@ -36,6 +36,7 @@ try
             Context "No scheduled task exists, but it should" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
@@ -59,6 +60,7 @@ try
             Context "A scheduled task exists, but it shouldn't" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
@@ -66,8 +68,8 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                     })
@@ -99,6 +101,7 @@ try
             Context "A scheduled task doesnt exist, and it shouldn't" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
@@ -119,14 +122,15 @@ try
             Context "A scheduled task with minutes based repetition exists, but has the wrong settings" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                     })
@@ -158,14 +162,15 @@ try
             Context "A scheduled task with minutes based repetition exists and has the correct settings" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                     })
@@ -192,14 +197,15 @@ try
             Context "A scheduled task with hourly based repetition exists, but has the wrong settings" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Hourly"
                     RepeatInterval = 4
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                     })
@@ -231,14 +237,15 @@ try
             Context "A scheduled task with hourly based repetition exists and has the correct settings" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Hourly"
                     RepeatInterval = 4
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                     })
@@ -265,14 +272,15 @@ try
             Context "A scheduled task with daily based repetition exists, but has the wrong settings" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Daily"
                     RepeatInterval = 3
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                     })
@@ -304,14 +312,15 @@ try
             Context "A scheduled task with daily based repetition exists and has the correct settings" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Daily"
                     RepeatInterval = 3
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                     })
@@ -338,6 +347,7 @@ try
             Context "A scheduled task exists and is configured with the wrong execution account" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
@@ -345,8 +355,8 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                     })
@@ -378,6 +388,7 @@ try
             Context "A scheduled task exists and is configured with the wrong working directory" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ActionWorkingPath = "C:\Example"
                     ScheduleType = "Minutes"
@@ -385,8 +396,8 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                         WorkingDirectory = "C:\Wrong"
@@ -419,6 +430,7 @@ try
             Context "A scheduled task exists and is configured with the wrong executable arguments" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ActionArguments = "-File `"C:\something\right.ps1`""
                     ScheduleType = "Minutes"
@@ -426,8 +438,8 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                         Arguments = "-File `"C:\something\wrong.ps1`""
@@ -460,6 +472,7 @@ try
             Context "A scheduled task is enabled and should be disabled" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
@@ -467,8 +480,8 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                         Arguments = $testParams.Arguments
@@ -505,6 +518,7 @@ try
             Context "A scheduled task is enabled and has the correct settings" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
@@ -512,8 +526,8 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                         Arguments = $testParams.Arguments
@@ -544,6 +558,7 @@ try
             Context "A scheduled task is disabled and has the correct settings" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
@@ -551,8 +566,8 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                         Arguments = $testParams.Arguments
@@ -583,6 +598,7 @@ try
             Context "A scheduled task is disabled but should be enabled" {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
@@ -590,8 +606,8 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                         Arguments = $testParams.Arguments
@@ -627,14 +643,15 @@ try
             Context "A Scheduled task exists, is disabled, and the optional parameter enable is not specified" -Fixture {
                 $testParams = @{
                     TaskName = "Test task"
+                    TaskPath = '\Test\'
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Minutes"
                     RepeatInterval = 15
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
+                    TaskName = $testParams.TaskName
+                    TaskPath = $testParams.TaskPath
                     Actions = @(@{
                         Execute = $testParams.ActionExecutable
                         Arguments = $testParams.Arguments
