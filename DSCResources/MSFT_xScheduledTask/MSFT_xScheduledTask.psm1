@@ -48,15 +48,18 @@ function Get-TargetResource
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential
     )
-    $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
+
+    $fixedTaskPath = "\$(($TaskPath -split '\\').Where({$_}) -join '\')\"
+
+    $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $fixedTaskPath -ErrorAction SilentlyContinue
     
     if ($null -eq $task) 
     {
         return @{
             TaskName = $TaskName
-            TaskPath = $TaskPath
+            TaskPath = $fixedTaskPath
             Ensure = "Absent"
-            TriggerType = "Unknown"
+            ScheduleType = "Unknown"
         }
     } 
     else 
@@ -129,7 +132,7 @@ function Get-TargetResource
         
         return @{
             TaskName = $TaskName
-            TaskPath = $TaskPath
+            TaskPath = $task.TaskPath
             Ensure = "Present"
             ActionExecutable  = $action.Execute
             ActionArguments   = $action.Arguments
