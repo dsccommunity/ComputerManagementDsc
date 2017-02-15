@@ -51,21 +51,21 @@ function Get-TargetResource
 
     if(($TaskPath -eq '\') -or ($TaskPath.Length -eq 0))
     {
-         $fixedTaskPath = '\'
+         $realTaskPath = '\'
     }
     else
     {
-        $fixedTaskPath = "\$(($TaskPath -split '\\').Where({$_}) -join '\')\"
+        $realTaskPath = "\$(($TaskPath -split '\\').Where({$_}) -join '\')\"
         
     }
     
-    $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $fixedTaskPath -ErrorAction SilentlyContinue
+    $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $realTaskPath -ErrorAction SilentlyContinue
 
     if ($null -eq $task) 
     {
         return @{
             TaskName = $TaskName
-            TaskPath = $fixedTaskPath
+            TaskPath = $realTaskPath
             Ensure = "Absent"
             ScheduleType = "Unknown"
         }
@@ -368,7 +368,17 @@ function Test-TargetResource
     }
     if ($Ensure -eq "Present") 
     {
-        if ($TaskPath -ne $currentValues.TaskPath) 
+        if(($TaskPath -eq '\') -or ($TaskPath.Length -eq 0))
+        {
+            $realTaskPath = '\'
+        }
+        else
+        {
+            $realTaskPath = "\$(($TaskPath -split '\\').Where({$_}) -join '\')\"
+            
+        }
+
+        if ($realTaskPath -ne $currentValues.TaskPath) 
         { 
             Write-Verbose -Message "TaskPath does not match desired state. Current value: $($currentValues.TaskPath) - Desired Value: $TaskPath"
             return $false 
