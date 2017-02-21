@@ -8,14 +8,9 @@ function Get-TargetResource {
         $Drive,
 
         [ValidateSet("AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile")]
+        [parameter(Mandatory = $true)]
         [System.String]
-        $Type,
-
-        [System.Int64]
-        $InitialSize,
-
-        [System.Int64]
-        $MaximumSize
+        $Type
     )
 
     $returnValue = @{
@@ -65,6 +60,7 @@ function Set-TargetResource {
         $Drive,
 
         [ValidateSet("AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile")]
+        [parameter(Mandatory = $true)]
         [System.String]
         $Type,
 
@@ -143,6 +139,7 @@ function Test-TargetResource {
         $Drive,
 
         [ValidateSet("AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile")]
+        [parameter(Mandatory = $true)]
         [System.String]
         $Type,
 

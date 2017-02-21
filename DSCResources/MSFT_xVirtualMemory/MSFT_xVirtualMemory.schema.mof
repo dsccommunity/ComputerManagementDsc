@@ -3,7 +3,7 @@
 class MSFT_xVirtualMemory : OMI_BaseResource
 {
     [Key] String Drive;
-    [Write, ValueMap{"AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile"}, Values{"AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile"}] String Type;
+    [Key, ValueMap{"AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile"}, Values{"AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile"}] String Type;
     [Write] Sint64 InitialSize;
     [Write] Sint64 MaximumSize;
 };
