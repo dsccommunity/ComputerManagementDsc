@@ -43,6 +43,7 @@ function Get-TargetResource {
         $returnValue.Type = "CustomSize"
     }
 
+    $returnValue.Drive = $driveItem.Name
     $returnValue.InitialSize = $virtualMemoryInstance.InitialSize
     $returnValue.MaximumSize = $virtualMemoryInstance.MaximumSize
 
