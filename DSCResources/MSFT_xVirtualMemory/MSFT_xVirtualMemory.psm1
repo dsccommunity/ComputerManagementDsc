@@ -119,8 +119,7 @@ function Set-TargetResource {
             $driveInfo = [System.IO.DriveInfo]$Drive
             $PageFile = Get-CimInstance -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
                 
-            if($PageFile)
-            {
+            if($PageFile) {
                 $PageFile | Remove-CimInstance
             }
             break
@@ -169,14 +168,12 @@ function Test-TargetResource {
 
             $driveInfo = [System.IO.DriveInfo]$Drive
             $PageFile = Get-CimInstance -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
-            if(-not $PageFile)
-            {
+            if(-not $PageFile) {
                 $result = $false
                 break
             }
 
-            if(-not $PageFile.InitialSize -eq $InitialSize -and -not $PageFile.MaximumSize -eq $MaximumSize)
-            {
+            if(-not $PageFile.InitialSize -eq $InitialSize -and -not $PageFile.MaximumSize -eq $MaximumSize) {
                 $result = $false
                 break
             }
@@ -192,14 +189,12 @@ function Test-TargetResource {
 
             $driveInfo = [System.IO.DriveInfo]$Drive
             $PageFile = Get-CimInstance -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
-            if(-not $PageFile)
-            {
+            if(-not $PageFile) {
                 $result = $false
                 break
             }
 
-            if(-not $PageFile.InitialSize -eq 0 -and -not $PageFile.MaximumSize -eq 0)
-            {
+            if(-not $PageFile.InitialSize -eq 0 -and -not $PageFile.MaximumSize -eq 0) {
                 $result = $false
                 break
             }
@@ -216,8 +211,7 @@ function Test-TargetResource {
             $driveInfo = [System.IO.DriveInfo]$Drive
             $PageFile = Get-CimInstance -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
                 
-            if($PageFile)
-            {
+            if($PageFile) {
                 $result = $false
                 break
             }
