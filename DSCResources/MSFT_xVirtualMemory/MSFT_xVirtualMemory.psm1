@@ -152,7 +152,7 @@ function Set-TargetResource {
                 Write-Error "Drive $($driveInfo.Name) is not ready. Please ensure that the drive exists and is available" -TargetObject $driveInfo
             }
 
-            $pageFileName = Join-Path $Drive.Name 'pagefile.sys'
+            $pageFileName = Join-Path $driveInfo.Name 'pagefile.sys'
 
             Write-Verbose ('Checking if a paging file already exists at {0}' -f $pageFileName)
 
@@ -164,7 +164,7 @@ function Set-TargetResource {
 
             $setParams = @{ 
                 Namespace = 'root\cimv2' 
-                ClassName = 'Win32_PageFileSetting'
+                Query = "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
                 Property = @{
                     InitialSize = 0
                     MaximumSize = 0
@@ -173,7 +173,7 @@ function Set-TargetResource {
 
             Write-Verbose "Enabling system-managed page file on $pageFileName"
 
-            New-CimInstance @setParams
+            Set-CimInstance @setParams
             $global:DSCMachineStatus = 1
             break
         }
