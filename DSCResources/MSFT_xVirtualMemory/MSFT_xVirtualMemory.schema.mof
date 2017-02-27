@@ -1,5 +1,5 @@
 
-[ClassVersion("1.0.0.0"), FriendlyName("MSFT_xVirtualMemory")]
+[ClassVersion("1.0.0.0"), FriendlyName("xVirtualMemory")]
 class MSFT_xVirtualMemory : OMI_BaseResource
 {
     [Key] String Drive;
