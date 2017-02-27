@@ -76,10 +76,21 @@ xPowerPlan resource has following properties:
 
  * IsSingleInstance: Specifies the resource is a single instance, the value must be 'Yes'.
  * Name: The name of the power plan to activate.
+ 
+## xVirtualMemory
+xVirtualMemory resource is used to set the properties of the paging file on the local computer.
+xVirtualMemory has the following properties:
+* Type: The type of the paging settings, mandatory, out of "AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile"
+* Drive: The drive to enable paging on, mandatory. Ignored for "AutoManagePagingFile"
+* InitialSize: The initial size in MB of the paging file. Ignored for Type "AutoManagePagingFile" and "SystemManagedSize"
+* MaximumSize: The maximum size in MB of the paging file. Ignored for Type "AutoManagePagingFile" and "SystemManagedSize"
 
 ## Versions
 
 ### Unreleased
+### 2.0.0.0
+* Added resources
+  - xVirtualMemory
 
 ### 1.9.0.0
 * Added resources
