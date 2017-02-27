@@ -33,6 +33,7 @@ function Get-TargetResource {
 
     Write-Verbose "Pagefile was not automatically managed. Retrieving detailed page file settings with query Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveItem.Name.Substring(0,2))'"
 
+    # Find existing page file settings by drive letter
     $virtualMemoryInstance =  Get-CimInstance -Namespace root\cimv2 -Query "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveItem.Name.Substring(0,2))'"
     
     if (-not $virtualMemoryInstance) {
@@ -95,6 +96,7 @@ function Set-TargetResource {
         }
         "CustomSize" {
             if ($SystemInfo.AutomaticManagedPageFile) {
+                # First set AutomaticManagedPageFile to $false to be able to set a custom one later
 
                 $setParams = @{ 
                     Namespace = 'root\cimv2' 
@@ -120,6 +122,10 @@ function Set-TargetResource {
                 [void] (New-CimInstance -Namespace 'root\cimv2' -ClassName 'Win32_PageFileSetting' -Property @{Name = $pageFileName})
             }            
 
+            <# 
+            # New-CimInstance does not support properties InitialSize and MaximumSize. Therefore, create
+            # a New-CimInstance with the page file name only if it does not exist and Set-CimInstance on the instance
+            #>
             $setParams = @{ 
                 Namespace = 'root\cimv2' 
                 Query = "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
@@ -129,7 +135,8 @@ function Set-TargetResource {
                 } 
             } 
 
-            Write-Verbose "Setting page file to $pageFileName. Initial size $InitialSize MB, maximum size $MaximumSize MB"
+            Write-Verbose ("Setting page file to {0}. Initial size {1}MB, maximum size {3}MB" -f $pageFileName, $InitialSize, $MaximumSize)
+
             Set-CimInstance @setParams
             $global:DSCMachineStatus = 1
             break
@@ -149,7 +156,7 @@ function Set-TargetResource {
 
             $driveInfo = [System.IO.DriveInfo] $Drive
             if (-not $driveInfo.IsReady) {
-                Write-Error "Drive $($driveInfo.Name) is not ready. Please ensure that the drive exists and is available" -TargetObject $driveInfo
+                throw "Drive $($driveInfo.Name) is not ready. Please ensure that the drive exists and is available"
             }
 
             $pageFileName = Join-Path $driveInfo.Name 'pagefile.sys'
@@ -190,7 +197,7 @@ function Set-TargetResource {
 
             $driveInfo = [System.IO.DriveInfo] $Drive
             if (-not $driveInfo.IsReady) {
-                Write-Error "Drive $($driveInfo.Name) is not ready. Please ensure that the drive exists and is available" -TargetObject $driveInfo
+                throw "Drive $($driveInfo.Name) is not ready. Please ensure that the drive exists and is available"
             }
 
             $PageFile = Get-CimInstance -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
@@ -233,6 +240,7 @@ function Test-TargetResource {
         [System.Int64]
         $MaximumSize
     )
+
     $SystemInfo = Get-CimInstance -Class Win32_ComputerSystem
     $result = $false
 
@@ -308,6 +316,4 @@ function Test-TargetResource {
     $result
 }
 
-
 Export-ModuleMember -Function *-TargetResource
-
