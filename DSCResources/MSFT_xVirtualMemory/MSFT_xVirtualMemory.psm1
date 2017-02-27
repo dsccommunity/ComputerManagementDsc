@@ -135,7 +135,7 @@ function Set-TargetResource {
                 } 
             } 
 
-            Write-Verbose ("Setting page file to {0}. Initial size {1}MB, maximum size {3}MB" -f $pageFileName, $InitialSize, $MaximumSize)
+            Write-Verbose ("Setting page file to {0}. Initial size {1}MB, maximum size {2}MB" -f $pageFileName, $InitialSize, $MaximumSize)
 
             Set-CimInstance @setParams
             $global:DSCMachineStatus = 1
