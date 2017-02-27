@@ -99,7 +99,7 @@ try {
                 It 'Should call the mocked function Set-CimInstance exactly once' {
                     Set-TargetResource @testParameters
 
-                    Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1 -Scope It #-ModuleName $script:DSCResourceName -Verbose
+                    Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1 -Scope It
                 }
             }
 
