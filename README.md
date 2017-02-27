@@ -88,7 +88,6 @@ xVirtualMemory has the following properties:
 ## Versions
 
 ### Unreleased
-### 2.0.0.0
 * Added resources
   - xVirtualMemory
 
