@@ -85,7 +85,7 @@ try {
             Context 'When the system is not in the desired state' {
                 BeforeEach {
                     $testParameters = @{
-                        Drive = 'D:'
+                        Drive = 'C:'
                         Type = 'CustomSize'
                         InitialSize = 0
                         MaximumSize = 1337
