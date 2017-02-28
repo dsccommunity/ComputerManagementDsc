@@ -68,7 +68,7 @@ xScheduledTask has the following properties:
  * ScheduleType: How frequently should this task be executed? Minutes, Hourly or Daily
  * RepeatInterval: How many units (minutes, hours, days) between each run of this task?
  * StartTime: The time of day this task should start at - optional, defaults to '12:00 AM'
- * Ensure: Present if the task should exist, false if it should be removed - optional, defaults to 'Ensure'
+ * Ensure: Present if the task should exist, false if it should be removed - optional, defaults to 'Present'
  * ExecuteAsCredential: The credential this task should execute as - Optional, defaults to running as 'NT AUTHORITY\SYSTEM'
 
 ## xPowerPlan
