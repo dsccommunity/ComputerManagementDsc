@@ -43,9 +43,7 @@ try {
             Context 'When the system is in the desired present state' {
                 BeforeEach {
                     Mock -CommandName Get-CimInstance -MockWith {
-                        return New-Object Object | 
-                        Add-Member -MemberType NoteProperty -Name AutomaticManagedPagefile -Value $false -PassThru -Force |
-                        Add-Member -MemberType NoteProperty -Name Name -Value "D:\pagefile.sys" -PassThru -Force
+                        [PSObject] @{ AutomaticManagedPageFile = $false; Name = 'D:\pagefile.sys' }
                     } -ModuleName $script:DSCResourceName -Verifiable
                 }
 
@@ -59,10 +57,11 @@ try {
             Context 'When the system is not in the desired present state' {
                 BeforeEach {
                     Mock -CommandName Get-CimInstance -MockWith {
-                        return New-Object Object | 
-                        Add-Member -MemberType NoteProperty -Name InitialSize -Value 0 -PassThru -Force |
-                        Add-Member -MemberType NoteProperty -Name MaximumSize -Value 0 -PassThru -Force |
-                        Add-Member -MemberType NoteProperty -Name Name -Value "C:\pagefile.sys" -PassThru -Force
+                        [PSObject] @{
+                        InitialSize = 0
+                        MaximumSize = 0
+                        Name = "C:\pagefile.sys"
+                        }
                     } -ModuleName $script:DSCResourceName -Verifiable
                 }
 
@@ -109,11 +108,12 @@ try {
                 Mock -CommandName New-CimInstance -MockWith {} -ModuleName $script:DSCResourceName -Verifiable
                 Mock -CommandName Remove-CimInstance -MockWith {} -ModuleName $script:DSCResourceName -Verifiable
                 Mock -CommandName Get-CimInstance -MockWith {
-                    New-Object psobject |
-                    Add-Member -MemberType NoteProperty -Name InitialSize -Value 0 -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name MaximumSize -Value 1338 -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name Name -Value "D:\pagefile.sys" -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name AutomaticManagedPageFile -Value $false -PassThru -Force
+                    [PSObject] @{
+                        InitialSize = 0
+                        MaximumSize = 1338
+                        Name = "D:\pagefile.sys"
+                        AutomaticManagedPageFile = $false
+                        }
                 }
 
                 $testParameters = @{
@@ -122,7 +122,9 @@ try {
                     InitialSize = 0
                     MaximumSize = 1337
                 } 
-                It 'Should throw if no valid drive letter has been used' { { Set-TargetResource @testParameters } | Should Throw
+                It 'Should throw if no valid drive letter has been used' 
+                {
+                    { Set-TargetResource @testParameters } | Should Throw
                 }
 
                 $testParameters = @{
@@ -131,7 +133,9 @@ try {
                     InitialSize = 0
                     MaximumSize = 1337
                 } 
-                It 'Should throw if the drive is not ready' { { Set-TargetResource @testParameters } | Should Throw
+                It 'Should throw if the drive is not ready'
+                {
+                    { Set-TargetResource @testParameters } | Should Throw
                 }
             }
 
@@ -147,41 +151,42 @@ try {
                         InitialSize = 0
                         MaximumSize = 1337
                     }                
-                }  
+                }
+
+                $pageFileObject = [PSObject] @{
+                        InitialSize = 0
+                        MaximumSize = 1338
+                        Name = "D:\pagefile.sys"
+                        AutomaticManagedPageFile = $false
+                    }
+                    
                 Mock -CommandName Get-CimInstance -MockWith {
-                    New-Object psobject |
-                    Add-Member -MemberType NoteProperty -Name InitialSize -Value 0 -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name MaximumSize -Value 1337 -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name Name -Value "D:\pagefile.sys" -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name AutomaticManagedPageFile -Value $false -PassThru -Force
+                    $pageFileObject.MaximumSize = 1337
+                    $pageFileObject
                 }
                 It 'Should return True if the input matches the actual values' {
                     Test-TargetResource @testParameters | Should Be $true
                 }
 
                 Mock -CommandName Get-CimInstance -MockWith {
-                    New-Object psobject |
-                    Add-Member -MemberType NoteProperty -Name InitialSize -Value 0 -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name MaximumSize -Value 1337 -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name Name -Value "D:\pagefile.sys" -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name AutomaticManagedPageFile -Value $true -PassThru -Force
+                    $pageFileObject.MaximumSize = 1337
+                    $pageFileObject.AutomaticManagedPageFile = $true
+                    $pageFileObject
                 }
                 It 'Should return False if the type is wrong' {
                     Test-TargetResource @testParameters | Should Be $false
                 }
 
                 Mock -CommandName Get-CimInstance -MockWith {
-                    New-Object psobject |
-                    Add-Member -MemberType NoteProperty -Name InitialSize -Value 0 -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name MaximumSize -Value 1338 -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name Name -Value "D:\pagefile.sys" -PassThru -Force |
-                    Add-Member -MemberType NoteProperty -Name AutomaticManagedPageFile -Value $false -PassThru -Force
+                    $pageFileObject.MaximumSize = 1338
+                    $pageFileObject
                 }
                 It 'Should return False if InitialSize and/or MaximumSize do not match' {
                     Test-TargetResource @testParameters | Should Be $false
                 }
 
-                Mock -CommandName Get-CimInstance -MockWith { # In this case Get-CimInstance returns an empty object
+                Mock -CommandName Get-CimInstance -MockWith {
+                    # In this case Get-CimInstance returns an empty object
                 }
                 It 'Should return False if Name does not match' {
                     Test-TargetResource @testParameters | Should Be $false
