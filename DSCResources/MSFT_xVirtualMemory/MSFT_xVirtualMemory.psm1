@@ -13,7 +13,7 @@ function Get-TargetResource {
         $Type
     )
 
-    Write-Verbose 'Getting current page file settings'
+    Write-Verbose -Message 'Getting current page file settings'
 
     $returnValue = @{
         Drive = [string]::Empty
@@ -24,27 +24,31 @@ function Get-TargetResource {
 
     [bool] $isSystemManaged = (Get-CimInstance -ClassName Win32_ComputerSystem).AutomaticManagedPagefile
     
-    if ($isSystemManaged) {
+    if ($isSystemManaged)
+    {
         $returnValue.Type = 'AutoManagePagingFile'
         return $returnValue
     }    
 
     $driveItem = [System.IO.DriveInfo] $Drive
 
-    Write-Verbose "Pagefile was not automatically managed. Retrieving detailed page file settings with query Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveItem.Name.Substring(0,2))'"
+    Write-Verbose -Message "Pagefile was not automatically managed. Retrieving detailed page file settings with query Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveItem.Name.Substring(0,2))'"
 
     # Find existing page file settings by drive letter
-    $virtualMemoryInstance =  Get-CimInstance -Namespace root\cimv2 -Query "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveItem.Name.Substring(0,2))'"
+    $virtualMemoryInstance = Get-CimInstance -Namespace root\cimv2 -Query "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveItem.Name.Substring(0,2))'"
     
-    if (-not $virtualMemoryInstance) {
+    if (-not $virtualMemoryInstance)
+    {
         $returnValue.Type = 'NoPagingFile'
         return $returnValue
     }
 
-    if ($virtualMemoryInstance.InitialSize -eq 0 -and $virtualMemoryInstance.MaximumSize -eq 0) {
+    if ($virtualMemoryInstance.InitialSize -eq 0 -and $virtualMemoryInstance.MaximumSize -eq 0)
+    {
         $returnValue.Type = 'SystemManagedSize'
     }
-    else {
+    else
+    {
         $returnValue.Type = "CustomSize"
     }
 
@@ -76,26 +80,30 @@ function Set-TargetResource {
         $MaximumSize
     )
 
-    Write-Verbose 'Setting page file'
+    Write-Verbose -Message 'Setting page file'
 
     $SystemInfo = Get-CimInstance -Class Win32_ComputerSystem
 
-    switch($Type) {
-        "AutoManagePagingFile" {
+    switch($Type)
+    {
+        "AutoManagePagingFile" 
+        {
             $setParams = @{ 
                 Namespace = 'root\cimv2' 
                 Query = 'Select * from Win32_ComputerSystem' 
                 Property = @{AutomaticManagedPageFile = $true} 
             } 
 
-            Write-Verbose 'Enabling AutoManagePagingFile'
+            Write-Verbose -Message 'Enabling AutoManagePagingFile'
 
             Set-CimInstance @setParams
             $global:DSCMachineStatus = 1
             break
         }
-        "CustomSize" {
-            if ($SystemInfo.AutomaticManagedPageFile) {
+        "CustomSize"
+        {
+            if ($SystemInfo.AutomaticManagedPageFile)
+            {
                 # First set AutomaticManagedPageFile to $false to be able to set a custom one later
 
                 $setParams = @{ 
@@ -104,27 +112,29 @@ function Set-TargetResource {
                     Property = @{AutomaticManagedPageFile = $false} 
                 } 
 
-                Write-Verbose 'Disabling AutoManagePagingFile'
+                Write-Verbose -Message 'Disabling AutoManagePagingFile'
 
                 Set-CimInstance @setParams
             }
 
             $driveInfo = [System.IO.DriveInfo] $Drive
-            if (-not $driveInfo.IsReady) {
+            if (-not $driveInfo.IsReady)
+            {
                 throw "Drive $($driveInfo.Name) is not ready. Please ensure that the drive exists and is available"
             }
 
-            $pageFileName = Join-Path $driveInfo.Name 'pagefile.sys'
+            $pageFileName = Join-Path -Path $driveInfo.Name -ChildPath 'pagefile.sys'
 
-            Write-Verbose ('Checking if a paging file already exists at {0}' -f $pageFileName)
+            Write-Verbose -Message ('Checking if a paging file already exists at {0}' -f $pageFileName)
             $existingPageFileSetting = Get-CimInstance -Namespace root\cimv2 -Query "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
-            if (-not $existingPageFileSetting) {
+            if (-not $existingPageFileSetting)
+            {
                 [void] (New-CimInstance -Namespace 'root\cimv2' -ClassName 'Win32_PageFileSetting' -Property @{Name = $pageFileName})
             }            
 
             <# 
-            # New-CimInstance does not support properties InitialSize and MaximumSize. Therefore, create
-            # a New-CimInstance with the page file name only if it does not exist and Set-CimInstance on the instance
+            New-CimInstance does not support properties InitialSize and MaximumSize. Therefore, create
+            a New-CimInstance with the page file name only if it does not exist and Set-CimInstance on the instance
             #>
             $setParams = @{ 
                 Namespace = 'root\cimv2' 
@@ -135,36 +145,40 @@ function Set-TargetResource {
                 } 
             } 
 
-            Write-Verbose ("Setting page file to {0}. Initial size {1}MB, maximum size {2}MB" -f $pageFileName, $InitialSize, $MaximumSize)
+            Write-Verbose -Message ("Setting page file to {0}. Initial size {1}MB, maximum size {2}MB" -f $pageFileName, $InitialSize, $MaximumSize)
 
             Set-CimInstance @setParams
             $global:DSCMachineStatus = 1
             break
         }
-        "SystemManagedSize" {
-            if ($SystemInfo.AutomaticManagedPageFile) {
+        "SystemManagedSize"
+        {
+            if ($SystemInfo.AutomaticManagedPageFile)
+            {
                 $setParams = @{ 
                     Namespace = 'root\cimv2' 
                     Query = 'Select * from Win32_ComputerSystem' 
                     Property = @{AutomaticManagedPageFile = $false} 
                 } 
 
-                Write-Verbose 'Disabling AutoManagePagingFile'
+                Write-Verbose -Message 'Disabling AutoManagePagingFile'
 
                 Set-CimInstance @setParams
             }
 
             $driveInfo = [System.IO.DriveInfo] $Drive
-            if (-not $driveInfo.IsReady) {
+            if (-not $driveInfo.IsReady)
+            {
                 throw "Drive $($driveInfo.Name) is not ready. Please ensure that the drive exists and is available"
             }
 
-            $pageFileName = Join-Path $driveInfo.Name 'pagefile.sys'
+            $pageFileName = Join-Path -Path $driveInfo.Name -ChildPath 'pagefile.sys'
 
-            Write-Verbose ('Checking if a paging file already exists at {0}' -f $pageFileName)
+            Write-Verbose -Message ('Checking if a paging file already exists at {0}' -f $pageFileName)
 
             $existingPageFileSetting = Get-CimInstance -Namespace root\cimv2 -Query "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
-            if (-not $existingPageFileSetting) {
+            if (-not $existingPageFileSetting)
+            {
                 [void] (New-CimInstance -Namespace 'root\cimv2' -ClassName 'Win32_PageFileSetting' -Property @{Name = $pageFileName})
             }
             
@@ -178,14 +192,15 @@ function Set-TargetResource {
                 } 
             } 
 
-            Write-Verbose "Enabling system-managed page file on $pageFileName"
+            Write-Verbose -Message "Enabling system-managed page file on $pageFileName"
 
             Set-CimInstance @setParams
             $global:DSCMachineStatus = 1
             break
         }
         "NoPagingFile" {
-            if ($SystemInfo.AutomaticManagedPageFile) {
+            if ($SystemInfo.AutomaticManagedPageFile)
+            {
                 $setParams = @{ 
                     Namespace = 'root\cimv2' 
                     Query = 'Select * from Win32_ComputerSystem' 
@@ -196,24 +211,27 @@ function Set-TargetResource {
             }
 
             $driveInfo = [System.IO.DriveInfo] $Drive
-            if (-not $driveInfo.IsReady) {
+            if (-not $driveInfo.IsReady)
+            {
                 throw "Drive $($driveInfo.Name) is not ready. Please ensure that the drive exists and is available"
             }
 
             $PageFile = Get-CimInstance -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
                 
             $existingPageFileSetting = Get-CimInstance -Namespace root\cimv2 -Query "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
-            if ($existingPageFileSetting) {
-                Write-Verbose "Removing existing page file $($existingPageFileSetting.Name)"
+            if ($existingPageFileSetting)
+            {
+                Write-Verbose -Message "Removing existing page file $($existingPageFileSetting.Name)"
                 Remove-CimInstance -InputObject $existingPageFileSetting
                 $global:DSCMachineStatus = 1
             }
 
-            Write-Verbose "Disabled page file for drive $Drive"
+            Write-Verbose -Message "Disabled page file for drive $Drive"
 
             break
         }
-        default {
+        default
+        {
             throw "A wrong type '$Type' has been selected."
         }
     }
