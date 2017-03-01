@@ -122,8 +122,7 @@ try {
                     InitialSize = 0
                     MaximumSize = 1337
                 } 
-                It 'Should throw if no valid drive letter has been used' 
-                {
+                It 'Should throw if no valid drive letter has been used' {
                     { Set-TargetResource @testParameters } | Should Throw
                 }
 
@@ -133,8 +132,7 @@ try {
                     InitialSize = 0
                     MaximumSize = 1337
                 } 
-                It 'Should throw if the drive is not ready'
-                {
+                It 'Should throw if the drive is not ready' {
                     { Set-TargetResource @testParameters } | Should Throw
                 }
             }
