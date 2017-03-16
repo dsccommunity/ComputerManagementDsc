@@ -1,3 +1,19 @@
+Add-Type -TypeDefinition @'
+namespace xScheduledTask
+{
+    public enum DaysOfWeek
+    {
+        Sunday = 1,
+        Monday = 2,
+        Tuesday = 4,
+        Wednesday = 8,
+        Thursday = 16,
+        Friday = 32,
+        Saturday = 64
+    }
+}
+'@
+
 function Get-TargetResource
 {
     [OutputType([System.Collections.Hashtable])]
@@ -7,47 +23,127 @@ function Get-TargetResource
         [System.String]
         $TaskName,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         $TaskPath = "\",
+
+        [System.String]
+        $Description,
         
         [Parameter(Mandatory=$true)]
         [System.String]
         $ActionExecutable,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         $ActionArguments,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         $ActionWorkingPath,
         
         [Parameter(Mandatory=$true)]
         [System.String]
-        [ValidateSet("Minutes", "Hourly", "Daily")] $ScheduleType,
+        [ValidateSet("Once", "Daily", "Weekly", "AtStartup", "AtLogOn")]
+        $ScheduleType,
         
-        [Parameter(Mandatory=$true)]
-        [System.UInt32]
-        $RepeatInterval,
+        [System.DateTime]
+        $RepeatInterval = [datetime]"00:00:00",
         
-        [Parameter(Mandatory=$false)]
-        [System.String]
-        $StartTime = "12:00 AM",
+        [System.DateTime]
+        $StartTime = [datetime]::Today,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         [ValidateSet("Present","Absent")]
         $Ensure = "Present",
         
-        [Parameter(Mandatory=$false)]
         [System.Boolean]
-        $Enable,
+        $Enable = $true,
         
-        [Parameter(Mandatory=$false)]
         [System.Management.Automation.PSCredential]
-        $ExecuteAsCredential
+        $ExecuteAsCredential,
+
+        [System.UInt32]
+        $DaysInterval = 1,
+
+        [System.DateTime]
+        $RandomDelay = [datetime]"00:00:00",
+
+        [System.DateTime]
+        $RepetitionDuration = [datetime]"00:00:00",
+
+        [System.String[]]
+        $DaysOfWeek,
+
+        [System.UInt32]
+        $WeeksInterval = 1,
+
+        [System.String]
+        $User,
+
+        [System.Boolean]
+        $DisallowDemandStart = $false,
+
+        [System.Boolean]
+        $DisallowHardTerminate = $false,
+
+        [ValidateSet("AT","V1","Vista","Win7","Win8")]
+        [System.String]
+        $Compatibility = "Vista",
+
+        [System.Boolean]
+        $AllowStartIfOnBatteries = $false,
+
+        [System.Boolean]
+        $Hidden = $false,
+
+        [System.Boolean]
+        $RunOnlyIfIdle = $false,
+
+        [System.DateTime]
+        $IdleWaitTimeout = [datetime]"02:00:00",
+
+        [System.String]
+        $NetworkName,
+
+        [System.Boolean]
+        $DisallowStartOnRemoteAppSession = $false,
+
+        [System.Boolean]
+        $StartWhenAvailable = $false,
+
+        [System.Boolean]
+        $DontStopIfGoingOnBatteries = $false,
+
+        [System.Boolean]
+        $WakeToRun = $false,
+
+        [System.DateTime]
+        $IdleDuration = [datetime]"01:00:00",
+
+        [System.Boolean]
+        $RestartOnIdle = $false,
+
+        [System.Boolean]
+        $DontStopOnIdleEnd = $false,
+
+        [System.DateTime]
+        $ExecutionTimeLimit = [datetime]"8:00:00",
+
+        [ValidateSet("IgnoreNew","Parallel","Queue")]
+        [System.String]
+        $MultipleInstances = "Queue",
+
+        [System.UInt32]
+        $Priority = 7,
+
+        [System.UInt32]
+        $RestartCount = 0,
+
+        [System.DateTime]
+        $RestartInterval = [datetime]"00:00:00",
+
+        [System.Boolean]
+        $RunOnlyIfNetworkAvailable = $false
     )
+
     $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
     
     if ($null -eq $task) 
@@ -61,69 +157,189 @@ function Get-TargetResource
     } 
     else 
     {
-        $action = $task.Actions | Select -First 1
-        $trigger = $task.Triggers | Select -First 1
+        $action = $task.Actions | Select-Object -First 1
+        $trigger = $task.Triggers | Select-Object -First 1
+        $settings = $task.Settings
         $repetition = $trigger.Repetition
         $returnScheduleType = "Unknown"
         $returnInveral = 0
-        
-        # Check for full formatting 
-        if ($repetition.Interval -like "P*DT*H*M*S") 
+
+        switch($trigger.CimClass.CimClassName)
         {
-            $timespan = [Timespan]::Parse(($repetition.Interval -replace "P" -replace "DT", ":" -replace "H", ":" -replace "M", ":" -replace "S"))
+            "MSFT_TaskTimeTrigger"
+            {
+                $returnScheduleType = "Once"
+                break;
+            }
+            "MSFT_TaskDailyTrigger"
+            {
+                $returnScheduleType = "Daily"
+                break;
+            }
             
-            if ($timespan.Days -ge 1) 
+            "MSFT_TaskWeeklyTrigger"
             {
-                $returnScheduleType = "Daily"
-                $returnInveral = $timespan.TotalDays
+                $returnScheduleType = "Weekly"
+                break;
             }
-            elseif ($timespan.Hours -ge 1 -and $timespan.Minutes -eq 0) 
+            
+            "MSFT_TaskBootTrigger"
             {
-                $returnScheduleType = "Hourly"
-                $returnInveral = $timespan.TotalHours
+                $returnScheduleType = "AtStartup"
+                break;
             }
-            elseif ($timespan.Minutes -ge 1) 
+            
+            "MSFT_TaskLogonTrigger"
             {
-                $returnScheduleType = "Minutes"
-                $returnInveral = $timespan.TotalMinutes
+                $returnScheduleType = "AtLogon"
+                break;
             }
-        } 
-        else 
+
+            default
+            {
+                throw "Trigger type $_ not recognized."
+            }            
+        }
+        
+        $repInterval = $trigger.Repetition.Interval
+        $Days = $Hours = $Minutes = $Seconds = 0
+
+        if ($repInterval -match 'P(?<Days>\d{0,3})D')
         {
-            if ($repetition.Duration -eq $null -and $repetition.Interval -eq $null) 
+            $Days = $matches.Days
+        }
+        if ($repInterval -match '(?<Hours>\d{0,2})H')
+        {
+            $Hours = $matches.Hours
+        }
+        if ($repInterval -match '(?<Minutes>\d{0,2})M')
+        {
+            $Minutes = $matches.Minutes
+        }
+        if ($repInterval -match '(?<Seconds>\d{0,2})S')
+        {
+            $Seconds = $matches.Seconds
+        }
+        
+        $returnInveral = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
+
+        $repDuration = $trigger.Repetition.Duration
+        $Days = $Hours = $Minutes = $Seconds = 0
+
+        if ($repDuration -match 'P(?<Days>\d{0,3})D')
+        {
+            $Days = $matches.Days
+        }
+        if ($repDuration -match '(?<Hours>\d{0,2})H')
+        {
+            $Hours = $matches.Hours
+        }
+        if ($repDuration -match '(?<Minutes>\d{0,2})M')
+        {
+            $Minutes = $matches.Minutes
+        }
+        if ($repDuration -match '(?<Seconds>\d{0,2})S')
+        {
+            $Seconds = $matches.Seconds
+        }
+        
+        $repetitionDurationReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
+
+        $exeLim = $settings.ExecutionTimeLimit
+        $Days = $Hours = $Minutes = $Seconds = 0
+
+        if ($exeLim -match 'P(?<Days>\d{0,3})D')
+        {
+            $Days = $matches.Days
+        }
+        if ($exeLim -match '(?<Hours>\d{0,2})H')
+        {
+            $Hours = $matches.Hours
+        }
+        if ($exeLim -match '(?<Minutes>\d{0,2})M')
+        {
+            $Minutes = $matches.Minutes
+        }
+        if ($exeLim -match '(?<Seconds>\d{0,2})S')
+        {
+            $Seconds = $matches.Seconds
+        }
+        
+        $executionTimeLimitReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
+
+        $idleDur = $settings.IdleSettings.IdleDuration
+        $Days = $Hours = $Minutes = $Seconds = 0
+
+        if ($idleDur -match 'P(?<Days>\d{0,3})D')
+        {
+            $Days = $matches.Days
+        }
+        if ($idleDur -match '(?<Hours>\d{0,2})H')
+        {
+            $Hours = $matches.Hours
+        }
+        if ($idleDur -match '(?<Minutes>\d{0,2})M')
+        {
+            $Minutes = $matches.Minutes
+        }
+        if ($idleDur -match '(?<Seconds>\d{0,2})S')
+        {
+            $Seconds = $matches.Seconds
+        }
+        
+        $idleDurationReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
+
+        $idleWait = $settings.IdleSettings.IdleWaitTimeout
+        $Days = $Hours = $Minutes = $Seconds = 0
+
+        if ($idleWait -match 'P(?<Days>\d{0,3})D')
+        {
+            $Days = $matches.Days
+        }
+        if ($idleWait -match '(?<Hours>\d{0,2})H')
+        {
+            $Hours = $matches.Hours
+        }
+        if ($idleWait -match '(?<Minutes>\d{0,2})M')
+        {
+            $Minutes = $matches.Minutes
+        }
+        if ($idleWait -match '(?<Seconds>\d{0,2})S')
+        {
+            $Seconds = $matches.Seconds
+        }
+        
+        $idleWaitTimeoutReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
+
+        $rndDelay = $trigger.RandomDelay
+        $Days = $Hours = $Minutes = $Seconds = 0
+
+        if ($rndDelay -match 'P(?<Days>\d{0,3})D')
+        {
+            $Days = $matches.Days
+        }
+        if ($rndDelay -match '(?<Hours>\d{0,2})H')
+        {
+            $Hours = $matches.Hours
+        }
+        if ($rndDelay -match '(?<Minutes>\d{0,2})M')
+        {
+            $Minutes = $matches.Minutes
+        }
+        if ($rndDelay -match '(?<Seconds>\d{0,2})S')
+        {
+            $Seconds = $matches.Seconds
+        }
+        
+        $randomDelayReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
+        
+        $DaysOfWeek = @()
+        foreach($binaryAdductor in 1,2,4,8,16,32,64)
+        {
+            $Day = $trigger.DaysOfWeek -band $binaryAdductor
+            if($Day -ne 0)
             {
-                $returnScheduleType = "Daily"
-                $returnInveral = $trigger.DaysInterval
-            }
-            if ($repetition.Duration -eq $null -and $repetition.Interval -like "P*D") 
-            {
-                $returnScheduleType = "Daily"
-                [System.Uint32]$returnInveral = $repetition.Interval -replace "P" -replace "D"
-            }
-            if ($repetition.Duration -eq $null -and $repetition.Interval -like "P*D*") 
-            {
-                $returnScheduleType = "Daily"
-                [System.Uint32]$returnInveral = $repetition.Interval.Substring(0, $repetition.Interval.IndexOf('D')) -replace "P"
-            }
-            if (($repetition.Duration -eq "P1D" -or $repetition.Duration -eq $null) `
-                    -and $repetition.Interval -like "PT*H") 
-            {
-                $returnScheduleType = "Hourly"
-                [System.Uint32]$returnInveral = $repetition.Interval -replace "PT" -replace "H"
-            }
-            if (($repetition.Duration -eq "P1D" -or $repetition.Duration -eq $null) `
-                    -and $repetition.Interval -like "PT*M") 
-            {
-                $returnScheduleType = "Minutes"
-                if ($repetition.Interval.Contains('H')) 
-                {
-                    $timeToParse = ($repetition.Interval -replace "PT" -replace "H",":" -replace "M")
-                    [System.Uint32]$returnInveral = [TimeSpan]::Parse($timeToParse).TotalMinutes
-                } 
-                else 
-                {
-                    [System.Uint32]$returnInveral = $repetition.Interval -replace "PT" -replace "M"
-                }
+                $DaysOfWeek += [xScheduledTask.DaysOfWeek]$Day
             }
         }
         
@@ -135,9 +351,36 @@ function Get-TargetResource
             ActionArguments   = $action.Arguments
             ActionWorkingPath = $action.WorkingDirectory
             ScheduleType = $returnScheduleType
-            RepeatInterval = $returnInveral
+            RepeatInterval = [datetime]::Today.Add($returnInveral)
             ExecuteAsCredential = $task.Principal.UserId
-            Enable = $task.Settings.Enabled
+            Enable = $settings.Enabled
+            DaysInterval = $trigger.DaysInterval
+            RandomDelay = [datetime]::Today.Add($randomDelayReturn)
+            RepetitionDuration = [datetime]::Today.Add($repetitionDurationReturn)
+            DaysOfWeek = $DaysOfWeek
+            WeeksInterval = $trigger.WeeksInterval
+            User = $trigger.UserId
+            DisallowDemandStart = $settings.DisallowDemandStart
+            DisallowHardTerminate = $settings.DisallowHardTerminate
+            Compatibility = $settings.Compatibility
+            AllowStartIfOnBatteries = $settings.AllowStartIfOnBatteries
+            Hidden = $settings.Hidden
+            RunOnlyIfIdle = $settings.RunOnlyIfIdle
+            IdleWaitTimeout = $idleWaitTimeout
+            NetworkName = $settings.NetworkSettings.Name
+            DisallowStartOnRemoteAppSession = $settings.DisallowStartOnRemoteAppSession
+            StartWhenAvailable = $settings.StartWhenAvailable
+            DontStopIfGoingOnBatteries = $settings.DontStopIfGoingOnBatteries
+            WakeToRun = $settings.WakeToRun
+            IdleDuration = [datetime]::Today.Add($idleDurationReturn)
+            RestartOnIdle = $settings.IdleSettings.RestartOnIdle
+            DontStopOnIdleEnd = -not $settings.IdleSettings.StopOnIdleEnd
+            ExecutionTimeLimit = [datetime]::Today.Add($executionTimeLimitReturn)
+            MultipleInstances = [System.String]
+            Priority = [System.UInt32]
+            RestartCount = [System.UInt32]
+            RestartInterval = [System.DateTime]
+            RunOnlyIfNetworkAvailable = $settings.RunOnlyIfNetworkAvailable
         }
     }
 }
@@ -150,46 +393,125 @@ function Set-TargetResource
         [System.String]
         $TaskName,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         $TaskPath = "\",
+
+        [System.String]
+        $Description,
         
         [Parameter(Mandatory=$true)]
         [System.String]
         $ActionExecutable,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         $ActionArguments,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         $ActionWorkingPath,
         
         [Parameter(Mandatory=$true)]
         [System.String]
-        [ValidateSet("Minutes", "Hourly", "Daily")] $ScheduleType,
+        [ValidateSet("Once", "Daily", "Weekly", "AtStartup", "AtLogOn")]
+        $ScheduleType,
         
-        [Parameter(Mandatory=$true)]
-        [System.UInt32]
-        $RepeatInterval,
+        [System.DateTime]
+        $RepeatInterval = [datetime]"00:00:00",
         
-        [Parameter(Mandatory=$false)]
-        [System.String]
-        $StartTime = "12:00 AM",
+        [System.DateTime]
+        $StartTime = [datetime]::Today,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         [ValidateSet("Present","Absent")]
         $Ensure = "Present",
         
-        [Parameter(Mandatory=$false)]
         [System.Boolean]
-        $Enable,
+        $Enable = $true,
         
-        [Parameter(Mandatory=$false)]
         [System.Management.Automation.PSCredential]
-        $ExecuteAsCredential
+        $ExecuteAsCredential,
+
+        [System.UInt32]
+        $DaysInterval = 1,
+
+        [System.DateTime]
+        $RandomDelay = [datetime]"00:00:00",
+
+        [System.DateTime]
+        $RepetitionDuration = [datetime]"00:00:00",
+
+        [System.String[]]
+        $DaysOfWeek,
+
+        [System.UInt32]
+        $WeeksInterval = 1,
+
+        [System.String]
+        $User,
+
+        [System.Boolean]
+        $DisallowDemandStart = $false,
+
+        [System.Boolean]
+        $DisallowHardTerminate = $false,
+
+        [ValidateSet("AT","V1","Vista","Win7","Win8")]
+        [System.String]
+        $Compatibility = "Vista",
+
+        [System.Boolean]
+        $AllowStartIfOnBatteries = $false,
+
+        [System.Boolean]
+        $Hidden = $false,
+
+        [System.Boolean]
+        $RunOnlyIfIdle = $false,
+
+        [System.DateTime]
+        $IdleWaitTimeout = [datetime]"02:00:00",
+
+        [System.String]
+        $NetworkName,
+
+        [System.Boolean]
+        $DisallowStartOnRemoteAppSession = $false,
+
+        [System.Boolean]
+        $StartWhenAvailable = $false,
+
+        [System.Boolean]
+        $DontStopIfGoingOnBatteries = $false,
+
+        [System.Boolean]
+        $WakeToRun = $false,
+
+        [System.DateTime]
+        $IdleDuration = [datetime]"01:00:00",
+
+        [System.Boolean]
+        $RestartOnIdle = $false,
+
+        [System.Boolean]
+        $DontStopOnIdleEnd = $false,
+
+        [System.DateTime]
+        $ExecutionTimeLimit = [datetime]"8:00:00",
+
+        [ValidateSet("IgnoreNew","Parallel","Queue")]
+        [System.String]
+        $MultipleInstances = "Queue",
+
+        [System.UInt32]
+        $Priority = 7,
+
+        [System.UInt32]
+        $RestartCount = 0,
+
+        [System.DateTime]
+        $RestartInterval = [datetime]"00:00:00",
+
+        [System.Boolean]
+        $RunOnlyIfNetworkAvailable = $false
     )
     
     $currentValues = Get-TargetResource @PSBoundParameters
@@ -199,64 +521,125 @@ function Set-TargetResource
         $actionArgs = @{
             Execute = $ActionExecutable
         }
-        if ($PSBoundParameters.ContainsKey("ActionArguments")) 
+        if ($ActionArguments) 
         { 
             $actionArgs.Add("Argument", $ActionArguments)
         }
-        if ($PSBoundParameters.ContainsKey("ActionWorkingPath")) 
+        if ($ActionWorkingPath) 
         { 
             $actionArgs.Add("WorkingDirectory", $ActionWorkingPath)
         }
         $action = New-ScheduledTaskAction @actionArgs
         
-        $settingArgs = @{}
-            
-        if ($PSBoundParameters.ContainsKey("Enable"))
-        {
-            $settingArgs.Add("Disable", (-not $Enable))
+        $settingArgs = @{
+            DisallowDemandStart = $DisallowDemandStart           
+            DisallowHardTerminate = $DisallowHardTerminate
+            Compatibility = $Compatibility
+            AllowStartIfOnBatteries = $AllowStartIfOnBatteries
+            Disable = $Disable
+            Hidden = $Hidden
+            RunOnlyIfIdle = $RunOnlyIfIdle          
+            DisallowStartOnRemoteAppSession = $DisallowStartOnRemoteAppSession            
+            StartWhenAvailable  = $StartWhenAvailable
+            DontStopIfGoingOnBatteries = $DontStopIfGoingOnBatteries
+            WakeToRun = $WakeToRun
+            RestartOnIdle = $RestartOnIdle
+            DontStopOnIdleEnd = $DontStopOnIdleEnd
+            MultipleInstances = $MultipleInstances
+            Priority = $Priority
+            RestartCount = $RestartCount
+            RunOnlyIfNetworkAvailable = $RunOnlyIfNetworkAvailable
         }
         
+        if ($IdleDuration.TimeOfDay -gt [timespan]"00:00:00")
+        {
+            $settingArgs.Add('IdleDuration', $IdleDuration.TimeOfDay)
+        }
+        if ($IdleWaitTimeout.TimeOfDay -gt [timespan]"00:00:00")
+        {
+            $settingArgs.Add('IdleWaitTimeout', $IdleWaitTimeout.TimeOfDay)
+        }
+        if ($ExecutionTimeLimit.TimeOfDay -gt [timespan]"00:00:00")
+        {
+            $settingArgs.Add('ExecutionTimeLimit', $ExecutionTimeLimit.TimeOfDay)
+        }
+        if ($RestartInterval.TimeOfDay -gt [timespan]"00:00:00")
+        {
+            $settingArgs.Add('RestartInterval', $RestartInterval.TimeOfDay)
+        }
+        
+        if(-not [string]::IsNullOrWhiteSpace($NetworkName))
+        {
+            $setting.Add('NetworkName', $NetworkName)
+        }
         $setting = New-ScheduledTaskSettingsSet @settingArgs
         
-        $date = (Get-Date).Date
-        $startTime = [DateTime]::Parse("$($date.ToShortDateString()) $StartTime")
-        switch ($ScheduleType) 
+        $triggerArgs = @{}
+        if ($RandomDelay.TimeOfDay -gt [timespan]::FromSeconds(0))
         {
-            "Minutes" 
-            { 
-                $repeatAt = New-TimeSpan -Minutes $RepeatInterval
+            $triggerArgs.Add('RandomDelay', $RandomDelay)
+        }
+
+        switch ($ScheduleType)
+        {
+            "Once"
+            {
+                $triggerArgs.Add('Once',$true)
+                $triggerArgs.Add('At', $StartTime.TimeOfDay)
+
+                break;
             }
-            "Hourly" 
-            { 
-                $repeatAt = New-TimeSpan -Hours $RepeatInterval
+            "Daily"
+            {
+                $triggerArgs.Add('Daily',$true)
+                $triggerArgs.Add('At', $StartTime.TimeOfDay)
+                $triggerArgs.Add('DaysInterval', $DaysInterval)
+                break;
             }
-            "Daily" 
-            { 
-                $repeatAt = New-TimeSpan -Days $RepeatInterval
+            "Weekly"
+            {
+                $triggerArgs.Add('Weekly',$true)
+                $triggerArgs.Add('At', $StartTime.TimeOfDay)
+                if ($DaysOfWeek.Count -gt 0)
+                {
+                    $triggerArgs.Add('DaysOfWeek', $DaysOfWeek)
+                }
+                break;
+            }
+            "AtStartup"
+            {
+                $triggerArgs.Add('AtStartup', $true)
+                break;
+            }
+            "AtLogOn"
+            {
+                $triggerArgs.Add('AtLogOn', $true)
+                if  (-not [string]::IsNullOrWhiteSpace($User))
+                {
+                    $triggerArgs.Add('User', $User)
+                }
+                break;
             }
         }
-        try
-        {
-            $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
-                                                -RepetitionInterval $repeatAt 
-        }
-        catch
-        {
-            $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
-                                                -RepetitionInterval $repeatAt `
-                                                -RepetitionDuration ([TimeSpan]::MaxValue)
-        }
+
+        $trigger = New-ScheduledTaskTrigger @triggerArgs
         
         if ($currentValues.Ensure -eq "Absent") 
         {
             Write-Verbose -Message "Creating new scheduled task `"$TaskName`""
 
             $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
+            if  (-not [string]::IsNullOrWhiteSpace($Description))
+            {
+                $scheduledTask.Description = $Description
+            }
+
             $registerArgs = @{
                 TaskName = $TaskName
                 TaskPath = $TaskPath
                 InputObject = $scheduledTask
             }
+
             if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) 
             {
                 $registerArgs.Add("User", $ExecuteAsCredential.UserName)
@@ -266,6 +649,7 @@ function Set-TargetResource
             {
                 $registerArgs.Add("User", "NT AUTHORITY\SYSTEM")
             }
+
             Register-ScheduledTask @registerArgs
         }
         if ($currentValues.Ensure -eq "Present") 
@@ -279,6 +663,7 @@ function Set-TargetResource
                 Trigger = $trigger
                 Settings = $setting
             }
+
             if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) 
             {
                 $setArgs.Add("User", $ExecuteAsCredential.UserName)
@@ -288,6 +673,7 @@ function Set-TargetResource
             {
                 $setArgs.Add("User", "NT AUTHORITY\SYSTEM")
             }
+
             Set-ScheduledTask @setArgs
         }
     }
@@ -308,46 +694,125 @@ function Test-TargetResource
         [System.String]
         $TaskName,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         $TaskPath = "\",
+
+        [System.String]
+        $Description,
         
         [Parameter(Mandatory=$true)]
         [System.String]
         $ActionExecutable,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         $ActionArguments,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         $ActionWorkingPath,
         
         [Parameter(Mandatory=$true)]
         [System.String]
-        [ValidateSet("Minutes", "Hourly", "Daily")] $ScheduleType,
+        [ValidateSet("Once", "Daily", "Weekly", "AtStartup", "AtLogOn")]
+        $ScheduleType,
         
-        [Parameter(Mandatory=$true)]
-        [System.UInt32]
-        $RepeatInterval,
+        [System.DateTime]
+        $RepeatInterval = [datetime]"00:00:00",
         
-        [Parameter(Mandatory=$false)]
-        [System.String]
-        $StartTime = "12:00 AM",
+        [System.DateTime]
+        $StartTime = [datetime]::Today,
         
-        [Parameter(Mandatory=$false)]
         [System.String]
         [ValidateSet("Present","Absent")]
         $Ensure = "Present",
         
-        [Parameter(Mandatory=$false)]
         [System.Boolean]
-        $Enable,
+        $Enable = $true,
         
-        [Parameter(Mandatory=$false)]
         [System.Management.Automation.PSCredential]
-        $ExecuteAsCredential
+        $ExecuteAsCredential,
+
+        [System.UInt32]
+        $DaysInterval = 1,
+
+        [System.DateTime]
+        $RandomDelay = [datetime]"00:00:00",
+
+        [System.DateTime]
+        $RepetitionDuration = [datetime]"00:00:00",
+
+        [System.String[]]
+        $DaysOfWeek,
+
+        [System.UInt32]
+        $WeeksInterval = 1,
+
+        [System.String]
+        $User,
+
+        [System.Boolean]
+        $DisallowDemandStart = $false,
+
+        [System.Boolean]
+        $DisallowHardTerminate = $false,
+
+        [ValidateSet("AT","V1","Vista","Win7","Win8")]
+        [System.String]
+        $Compatibility = "Vista",
+
+        [System.Boolean]
+        $AllowStartIfOnBatteries = $false,
+
+        [System.Boolean]
+        $Hidden = $false,
+
+        [System.Boolean]
+        $RunOnlyIfIdle = $false,
+
+        [System.DateTime]
+        $IdleWaitTimeout = [datetime]"02:00:00",
+
+        [System.String]
+        $NetworkName,
+
+        [System.Boolean]
+        $DisallowStartOnRemoteAppSession = $false,
+
+        [System.Boolean]
+        $StartWhenAvailable = $false,
+
+        [System.Boolean]
+        $DontStopIfGoingOnBatteries = $false,
+
+        [System.Boolean]
+        $WakeToRun = $false,
+
+        [System.DateTime]
+        $IdleDuration = [datetime]"01:00:00",
+
+        [System.Boolean]
+        $RestartOnIdle = $false,
+
+        [System.Boolean]
+        $DontStopOnIdleEnd = $false,
+
+        [System.DateTime]
+        $ExecutionTimeLimit = [datetime]"8:00:00",
+
+        [ValidateSet("IgnoreNew","Parallel","Queue")]
+        [System.String]
+        $MultipleInstances = "Queue",
+
+        [System.UInt32]
+        $Priority = 7,
+
+        [System.UInt32]
+        $RestartCount = 0,
+
+        [System.DateTime]
+        $RestartInterval = [datetime]"00:00:00",
+
+        [System.Boolean]
+        $RunOnlyIfNetworkAvailable = $false
     )
     
     $currentValues = Get-TargetResource @PSBoundParameters
@@ -384,7 +849,7 @@ function Test-TargetResource
             Write-Verbose -Message "ScheduleType does not match desired state. Current value: $($currentValues.ScheduleType) - Desired Value: $ScheduleType"
             return $false 
         }
-        if ($RepeatInterval -ne $currentValues.RepeatInterval) 
+        if ($RepeatInterval.TimeOfDay -ne $currentValues.RepeatInterval.TimeOfDay) 
         { 
             Write-Verbose -Message "RepeatInterval does not match desired state. Current value: $($currentValues.RepeatInterval) - Desired Value: $RepeatInterval"
             return $false 
