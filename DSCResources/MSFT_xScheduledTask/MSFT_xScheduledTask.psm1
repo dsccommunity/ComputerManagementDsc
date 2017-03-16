@@ -585,21 +585,21 @@ function Set-TargetResource
             "Once"
             {
                 $triggerArgs.Add('Once',$true)
-                $triggerArgs.Add('At', $StartTime.TimeOfDay)
+                $triggerArgs.Add('At', $StartTime)
 
                 break;
             }
             "Daily"
             {
                 $triggerArgs.Add('Daily',$true)
-                $triggerArgs.Add('At', $StartTime.TimeOfDay)
+                $triggerArgs.Add('At', $StartTime)
                 $triggerArgs.Add('DaysInterval', $DaysInterval)
                 break;
             }
             "Weekly"
             {
                 $triggerArgs.Add('Weekly',$true)
-                $triggerArgs.Add('At', $StartTime.TimeOfDay)
+                $triggerArgs.Add('At', $StartTime)
                 if ($DaysOfWeek.Count -gt 0)
                 {
                     $triggerArgs.Add('DaysOfWeek', $DaysOfWeek)
