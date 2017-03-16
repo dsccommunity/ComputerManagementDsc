@@ -37,8 +37,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                 }
                 
                 Mock Get-ScheduledTask { return $null }
@@ -60,8 +60,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                     Ensure = "Absent"
                 }
                 
@@ -74,7 +74,10 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Principal = @{
@@ -100,8 +103,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                     Ensure = "Absent"
                 }
                 
@@ -116,12 +119,12 @@ try
                 }
             }
             
-            Context "A scheduled task with minutes based repetition exists, but has the wrong settings" {
+            Context "A scheduled task with Once based repetition exists, but has the wrong settings" {
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval =[datetime]::Today + (New-TimeSpan -Minutes 15)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -133,7 +136,10 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$(($testParams.RepeatInterval) + 1)M"
+                            Interval = "PT$(($testParams.RepeatInterval.TimeOfDay.TotalMinutes) + 1)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Principal = @{
@@ -159,8 +165,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -172,7 +178,10 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Principal = @{
@@ -193,8 +202,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Hourly"
-                    RepeatInterval = 4
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Hours 4)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -206,7 +215,10 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$(($testParams.RepeatInterval) + 1)H"
+                            Interval = "PT$(($testParams.RepeatInterval.TimeOfDay.TotalHours) + 1)H"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Principal = @{
@@ -232,8 +244,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Hourly"
-                    RepeatInterval = 4
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Hours 4)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -245,7 +257,10 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)H"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalHours)H"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Principal = @{
@@ -267,7 +282,7 @@ try
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Daily"
-                    RepeatInterval = 3
+                    DaysInterval = 3
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -279,7 +294,10 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "P$(($testParams.RepeatInterval) + 1)D"
+                            Interval = "P$(($testParams.DaysInterval) + 1)D"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskDailyTrigger"
                         }
                     })
                     Principal = @{
@@ -306,7 +324,7 @@ try
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Daily"
-                    RepeatInterval = 3
+                    DaysInterval = 3
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -318,7 +336,10 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "P$($testParams.RepeatInterval)D"
+                            Interval = "P$($testParams.DaysInterval)D"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskDailyTrigger"
                         }
                     })
                     Principal = @{
@@ -339,8 +360,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [DateTime]::Today.Add((New-TimeSpan -Minutes 15))
                     ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ("DEMO\RightUser", (ConvertTo-SecureString "ExamplePassword" -AsPlainText -Force))
                 }
                 
@@ -354,6 +375,9 @@ try
                         Repetition = @{
                             Duration = $null
                             Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Principal = @{
@@ -380,8 +404,8 @@ try
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ActionWorkingPath = "C:\Example"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -395,6 +419,9 @@ try
                         Repetition = @{
                             Duration = $null
                             Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Principal = @{
@@ -421,8 +448,8 @@ try
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ActionArguments = "-File `"C:\something\right.ps1`""
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -436,6 +463,9 @@ try
                         Repetition = @{
                             Duration = $null
                             Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Principal = @{
@@ -461,8 +491,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                     Enable = $false
                 }
                 
@@ -477,6 +507,9 @@ try
                         Repetition = @{
                             Duration = $null
                             Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Settings = @(@{
@@ -506,8 +539,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                     Enable = $true
                 }
                 
@@ -522,6 +555,9 @@ try
                         Repetition = @{
                             Duration = $null
                             Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Settings = @(@{
@@ -545,8 +581,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                     Enable = $false
                 }
                 
@@ -561,6 +597,9 @@ try
                         Repetition = @{
                             Duration = $null
                             Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Settings = @(@{
@@ -584,8 +623,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                     Enable = $true
                 }
                 
@@ -600,6 +639,9 @@ try
                         Repetition = @{
                             Duration = $null
                             Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Settings = @(@{
@@ -628,8 +670,8 @@ try
                 $testParams = @{
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-                    ScheduleType = "Minutes"
-                    RepeatInterval = 15
+                    ScheduleType = "Once"
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -643,6 +685,9 @@ try
                         Repetition = @{
                             Duration = $null
                             Interval = "PT$($testParams.RepeatInterval)M"
+                        }
+                        CimClass = @{
+                            CimClassName = "MSFT_TaskTimeTrigger"
                         }
                     })
                     Settings = @(@{
