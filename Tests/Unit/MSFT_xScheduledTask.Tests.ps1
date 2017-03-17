@@ -104,7 +104,6 @@ try
                     TaskName = "Test task"
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
-                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                     Ensure = "Absent"
                 }
                 
@@ -334,10 +333,7 @@ try
                         Execute = $testParams.ActionExecutable
                     })
                     Triggers = @(@{
-                        Repetition = @{
-                            Duration = $null
-                            Interval = "P$($testParams.DaysInterval)D"
-                        }
+                        DaysInterval = $testParams.DaysInterval
                         CimClass = @{
                             CimClassName = "MSFT_TaskDailyTrigger"
                         }
@@ -554,7 +550,7 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
                             CimClassName = "MSFT_TaskTimeTrigger"
@@ -572,7 +568,7 @@ try
                     (Get-TargetResource @testParams).Ensure | Should Be "Present"
                 }
                 
-                It "should return false from the test method" {
+                It "should return true from the test method" {
                     Test-TargetResource @testParams | Should Be $true
                 }
             }
@@ -596,7 +592,7 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
                             CimClassName = "MSFT_TaskTimeTrigger"
@@ -638,7 +634,7 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
                             CimClassName = "MSFT_TaskTimeTrigger"
@@ -684,7 +680,7 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
                             CimClassName = "MSFT_TaskTimeTrigger"
