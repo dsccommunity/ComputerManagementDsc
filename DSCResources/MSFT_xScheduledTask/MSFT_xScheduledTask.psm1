@@ -13,13 +13,214 @@ namespace xScheduledTask
     }
 }
 '@
+function Test-ObjectHasProperty
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [parameter(Mandatory = $true, Position = 1)]  
+        [Object] 
+        $Object,
 
+        [parameter(Mandatory = $true, Position = 2)]
+        [String]
+        $PropertyName
+    )
+
+    if (([bool]($Object.PSobject.Properties.name -contains $PropertyName)) -eq $true) 
+    {
+        if ($null -ne $Object.$PropertyName) 
+        {
+            return $true
+        }
+    }
+    return $false
+}
+
+function Test-DscParameterState 
+{
+    [CmdletBinding()]
+    param
+    (
+        [parameter(Mandatory = $true, Position = 1)]  
+        [HashTable]
+        $CurrentValues,
+        
+        [parameter(Mandatory = $true, Position = 2)]  
+        [Object]
+        $DesiredValues,
+
+        [parameter(Mandatory = $false, Position = 3)] 
+        [Array]
+        $ValuesToCheck
+    )
+
+    $returnValue = $true
+
+    if (($DesiredValues.GetType().Name -ne "HashTable") `
+ -and ($DesiredValues.GetType().Name -ne "CimInstance") `
+ -and ($DesiredValues.GetType().Name -ne "PSBoundParametersDictionary")) 
+    {
+        throw ("Property 'DesiredValues' in Test-DscParameterState must be either a " + `
+               "Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().Name)")
+    }
+
+    if (($DesiredValues.GetType().Name -eq "CimInstance") -and ($null -eq $ValuesToCheck)) 
+    {
+        throw ("If 'DesiredValues' is a CimInstance then property 'ValuesToCheck' must contain " + `
+               "a value")
+    }
+
+    if (($null -eq $ValuesToCheck) -or ($ValuesToCheck.Count -lt 1)) 
+    {
+        $KeyList = $DesiredValues.Keys
+    } 
+    else 
+    {
+        $KeyList = $ValuesToCheck
+    }
+
+    $KeyList | ForEach-Object -Process {
+        if (($_ -ne "Verbose") -and ($_ -ne "InstallAccount")) 
+        {
+            if (($CurrentValues.ContainsKey($_) -eq $false) `
+ -or ($CurrentValues.$_ -ne $DesiredValues.$_) `
+ -or (($DesiredValues.ContainsKey($_) -eq $true) -and ($null -ne $DesiredValues.$_ -and $DesiredValues.$_.GetType().IsArray)))  
+            {
+                if ($DesiredValues.GetType().Name -eq "HashTable" -or `
+                    $DesiredValues.GetType().Name -eq "PSBoundParametersDictionary") 
+                {
+                    $CheckDesiredValue = $DesiredValues.ContainsKey($_)
+                } 
+                else 
+                {
+                    $CheckDesiredValue = Test-ObjectHasProperty $DesiredValues $_
+                }
+
+                if ($CheckDesiredValue) 
+                {
+                    $desiredType = $DesiredValues.$_.GetType()
+                    $fieldName = $_
+                    if ($desiredType.IsArray -eq $true) 
+                    {
+                        if (($CurrentValues.ContainsKey($fieldName) -eq $false) `
+ -or ($null -eq $CurrentValues.$fieldName)) 
+                        {
+                            Write-Verbose -Message ("Expected to find an array value for " + `
+                                                    "property $fieldName in the current " + `
+                                                    "values, but it was either not present or " + `
+                                                    "was null. This has caused the test method " + `
+                                                    "to return false.")
+                            $returnValue = $false
+                        } 
+                        else 
+                        {
+                            $arrayCompare = Compare-Object -ReferenceObject $CurrentValues.$fieldName `
+                                                           -DifferenceObject $DesiredValues.$fieldName
+                            if ($null -ne $arrayCompare) 
+                            {
+                                Write-Verbose -Message ("Found an array for property $fieldName " + `
+                                                        "in the current values, but this array " + `
+                                                        "does not match the desired state. " + `
+                                                        "Details of the changes are below.")
+                                $arrayCompare | ForEach-Object -Process {
+                                    Write-Verbose -Message "$($_.InputObject) - $($_.SideIndicator)"
+                                }
+                                $returnValue = $false
+                            }
+                        }
+                    } 
+                    else 
+                    {
+                        switch ($desiredType.Name) 
+                        {
+                            "String"
+                            {
+                                if ([string]::IsNullOrEmpty($CurrentValues.$fieldName) `
+ -and [string]::IsNullOrEmpty($DesiredValues.$fieldName)) 
+                                {} 
+                                else 
+                                {
+                                    Write-Verbose -Message ("String value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
+                                    $returnValue = $false
+                                }
+                            }
+                            "Int32"
+                            {
+                                if (($DesiredValues.$fieldName -eq 0) `
+ -and ($null -eq $CurrentValues.$fieldName)) 
+                                {} 
+                                else 
+                                {
+                                    Write-Verbose -Message ("Int32 value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
+                                    $returnValue = $false
+                                }
+                            }
+                            "Int16"
+                            {
+                                if (($DesiredValues.$fieldName -eq 0) `
+ -and ($null -eq $CurrentValues.$fieldName)) 
+                                {} 
+                                else 
+                                {
+                                    Write-Verbose -Message ("Int16 value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
+                                    $returnValue = $false
+                                }
+                            }
+                            "DateTime"
+                            {
+                                if (($DesiredValues.$fieldName -eq 0) `
+ -and ($null -eq $CurrentValues.$fieldName)) 
+                                {} 
+                                else 
+                                {
+                                    Write-Verbose -Message ("DateTime value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
+                                    $returnValue = $false
+                                }
+                            }
+                            default
+                            {
+                                Write-Verbose -Message ("Unable to compare property $fieldName " + `
+                                                        "as the type ($($desiredType.Name)) is " + `
+                                                        "not handled by the " + `
+                                                        "Test-DscParameterState cmdlet")
+                                $returnValue = $false
+                            }
+                        }
+                    }
+                }            
+            }
+        } 
+    }
+    return $returnValue
+}
 function Get-TargetResource
 {
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $TaskName,
         
@@ -29,7 +230,7 @@ function Get-TargetResource
         [System.String]
         $Description,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $ActionExecutable,
         
@@ -39,7 +240,7 @@ function Get-TargetResource
         [System.String]
         $ActionWorkingPath,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         [ValidateSet("Once", "Daily", "Weekly", "AtStartup", "AtLogOn")]
         $ScheduleType,
@@ -51,7 +252,7 @@ function Get-TargetResource
         $StartTime = [datetime]::Today,
         
         [System.String]
-        [ValidateSet("Present","Absent")]
+        [ValidateSet("Present", "Absent")]
         $Ensure = "Present",
         
         [System.Boolean]
@@ -84,7 +285,7 @@ function Get-TargetResource
         [System.Boolean]
         $DisallowHardTerminate = $false,
 
-        [ValidateSet("AT","V1","Vista","Win7","Win8")]
+        [ValidateSet("AT", "V1", "Vista", "Win7", "Win8")]
         [System.String]
         $Compatibility = "Vista",
 
@@ -127,7 +328,7 @@ function Get-TargetResource
         [System.DateTime]
         $ExecutionTimeLimit = [datetime]"8:00:00",
 
-        [ValidateSet("IgnoreNew","Parallel","Queue")]
+        [ValidateSet("IgnoreNew", "Parallel", "Queue")]
         [System.String]
         $MultipleInstances = "Queue",
 
@@ -150,9 +351,9 @@ function Get-TargetResource
     {
         return @{
             TaskName = $TaskName
-            TaskPath = $TaskPath
+            ActionExecutable = $ActionExecutable
             Ensure = "Absent"
-            TriggerType = "Unknown"
+            ScheduleType = $ScheduleType
         }
     } 
     else 
@@ -164,7 +365,7 @@ function Get-TargetResource
         $returnScheduleType = "Unknown"
         $returnInveral = 0
 
-        switch($trigger.CimClass.CimClassName)
+        switch ($trigger.CimClass.CimClassName)
         {
             "MSFT_TaskTimeTrigger"
             {
@@ -334,10 +535,10 @@ function Get-TargetResource
         $randomDelayReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
         
         $DaysOfWeek = @()
-        foreach($binaryAdductor in 1,2,4,8,16,32,64)
+        foreach ($binaryAdductor in 1, 2, 4, 8, 16, 32, 64)
         {
             $Day = $trigger.DaysOfWeek -band $binaryAdductor
-            if($Day -ne 0)
+            if ($Day -ne 0)
             {
                 $DaysOfWeek += [xScheduledTask.DaysOfWeek]$Day
             }
@@ -347,8 +548,8 @@ function Get-TargetResource
             TaskName = $TaskName
             TaskPath = $TaskPath
             Ensure = "Present"
-            ActionExecutable  = $action.Execute
-            ActionArguments   = $action.Arguments
+            ActionExecutable = $action.Execute
+            ActionArguments = $action.Arguments
             ActionWorkingPath = $action.WorkingDirectory
             ScheduleType = $returnScheduleType
             RepeatInterval = [datetime]::Today.Add($returnInveral)
@@ -389,7 +590,7 @@ function Set-TargetResource
 {
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $TaskName,
         
@@ -399,7 +600,7 @@ function Set-TargetResource
         [System.String]
         $Description,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $ActionExecutable,
         
@@ -409,7 +610,7 @@ function Set-TargetResource
         [System.String]
         $ActionWorkingPath,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         [ValidateSet("Once", "Daily", "Weekly", "AtStartup", "AtLogOn")]
         $ScheduleType,
@@ -421,7 +622,7 @@ function Set-TargetResource
         $StartTime = [datetime]::Today,
         
         [System.String]
-        [ValidateSet("Present","Absent")]
+        [ValidateSet("Present", "Absent")]
         $Ensure = "Present",
         
         [System.Boolean]
@@ -454,7 +655,7 @@ function Set-TargetResource
         [System.Boolean]
         $DisallowHardTerminate = $false,
 
-        [ValidateSet("AT","V1","Vista","Win7","Win8")]
+        [ValidateSet("AT", "V1", "Vista", "Win7", "Win8")]
         [System.String]
         $Compatibility = "Vista",
 
@@ -497,7 +698,7 @@ function Set-TargetResource
         [System.DateTime]
         $ExecutionTimeLimit = [datetime]"8:00:00",
 
-        [ValidateSet("IgnoreNew","Parallel","Queue")]
+        [ValidateSet("IgnoreNew", "Parallel", "Queue")]
         [System.String]
         $MultipleInstances = "Queue",
 
@@ -540,7 +741,7 @@ function Set-TargetResource
             Hidden = $Hidden
             RunOnlyIfIdle = $RunOnlyIfIdle          
             DisallowStartOnRemoteAppSession = $DisallowStartOnRemoteAppSession            
-            StartWhenAvailable  = $StartWhenAvailable
+            StartWhenAvailable = $StartWhenAvailable
             DontStopIfGoingOnBatteries = $DontStopIfGoingOnBatteries
             WakeToRun = $WakeToRun
             RestartOnIdle = $RestartOnIdle
@@ -568,7 +769,7 @@ function Set-TargetResource
             $settingArgs.Add('RestartInterval', $RestartInterval.TimeOfDay)
         }
         
-        if(-not [string]::IsNullOrWhiteSpace($NetworkName))
+        if (-not [string]::IsNullOrWhiteSpace($NetworkName))
         {
             $setting.Add('NetworkName', $NetworkName)
         }
@@ -584,21 +785,21 @@ function Set-TargetResource
         {
             "Once"
             {
-                $triggerArgs.Add('Once',$true)
+                $triggerArgs.Add('Once', $true)
                 $triggerArgs.Add('At', $StartTime)
 
                 break;
             }
             "Daily"
             {
-                $triggerArgs.Add('Daily',$true)
+                $triggerArgs.Add('Daily', $true)
                 $triggerArgs.Add('At', $StartTime)
                 $triggerArgs.Add('DaysInterval', $DaysInterval)
                 break;
             }
             "Weekly"
             {
-                $triggerArgs.Add('Weekly',$true)
+                $triggerArgs.Add('Weekly', $true)
                 $triggerArgs.Add('At', $StartTime)
                 if ($DaysOfWeek.Count -gt 0)
                 {
@@ -614,7 +815,7 @@ function Set-TargetResource
             "AtLogOn"
             {
                 $triggerArgs.Add('AtLogOn', $true)
-                if  (-not [string]::IsNullOrWhiteSpace($User))
+                if (-not [string]::IsNullOrWhiteSpace($User))
                 {
                     $triggerArgs.Add('User', $User)
                 }
@@ -629,7 +830,7 @@ function Set-TargetResource
             Write-Verbose -Message "Creating new scheduled task `"$TaskName`""
 
             $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
-            if  (-not [string]::IsNullOrWhiteSpace($Description))
+            if (-not [string]::IsNullOrWhiteSpace($Description))
             {
                 $scheduledTask.Description = $Description
             }
@@ -659,7 +860,7 @@ function Set-TargetResource
             $setArgs = @{
                 TaskName = $TaskName
                 TaskPath = $TaskPath
-                Action= $action
+                Action = $action
                 Trigger = $trigger
                 Settings = $setting
             }
@@ -690,7 +891,7 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $TaskName,
         
@@ -700,7 +901,7 @@ function Test-TargetResource
         [System.String]
         $Description,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $ActionExecutable,
         
@@ -710,7 +911,7 @@ function Test-TargetResource
         [System.String]
         $ActionWorkingPath,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         [ValidateSet("Once", "Daily", "Weekly", "AtStartup", "AtLogOn")]
         $ScheduleType,
@@ -722,7 +923,7 @@ function Test-TargetResource
         $StartTime = [datetime]::Today,
         
         [System.String]
-        [ValidateSet("Present","Absent")]
+        [ValidateSet("Present", "Absent")]
         $Ensure = "Present",
         
         [System.Boolean]
@@ -755,7 +956,7 @@ function Test-TargetResource
         [System.Boolean]
         $DisallowHardTerminate = $false,
 
-        [ValidateSet("AT","V1","Vista","Win7","Win8")]
+        [ValidateSet("AT", "V1", "Vista", "Win7", "Win8")]
         [System.String]
         $Compatibility = "Vista",
 
@@ -798,7 +999,7 @@ function Test-TargetResource
         [System.DateTime]
         $ExecutionTimeLimit = [datetime]"8:00:00",
 
-        [ValidateSet("IgnoreNew","Parallel","Queue")]
+        [ValidateSet("IgnoreNew", "Parallel", "Queue")]
         [System.String]
         $MultipleInstances = "Queue",
 
@@ -815,64 +1016,14 @@ function Test-TargetResource
         $RunOnlyIfNetworkAvailable = $false
     )
     
-    $currentValues = Get-TargetResource @PSBoundParameters
-    if ($Ensure -ne $currentValues.Ensure) 
+    Write-Verbose -Message "Testing scheduled task $TaskName"
+
+    $CurrentValues = Get-TargetResource @PSBoundParameters
+
+    if ($null -eq $CurrentValues) 
     { 
         return $false 
     }
-    if ($Ensure -eq "Present") 
-    {
-        if ($TaskPath -ne $currentValues.TaskPath) 
-        { 
-            Write-Verbose -Message "TaskPath does not match desired state. Current value: $($currentValues.TaskPath) - Desired Value: $TaskPath"
-            return $false 
-        }
-        if ($ActionExecutable -ne $currentValues.ActionExecutable) 
-        { 
-            Write-Verbose -Message "ActionExecutable does not match desired state. Current value: $($currentValues.ActionExecutable) - Desired Value: $ActionExecutable"
-            return $false 
-        }
-        if (($PSBoundParameters.ContainsKey("ActionArguments") -eq $true) `
-            -and ($ActionArguments -ne $currentValues.ActionArguments)) 
-        { 
-            Write-Verbose -Message "ActionArguments does not match desired state. Current value: $($currentValues.ActionArguments) - Desired Value: $ActionArguments"
-            return $false 
-        }
-        if (($PSBoundParameters.ContainsKey("ActionWorkingPath") -eq $true) `
-            -and ($ActionWorkingPath -ne $currentValues.ActionWorkingPath)) 
-        { 
-            Write-Verbose -Message "ActionWorkingPath does not match desired state. Current value: $($currentValues.ActionWorkingPath) - Desired Value: $ActionWorkingPath"
-            return $false 
-        }
-        if ($ScheduleType -ne $currentValues.ScheduleType) 
-        { 
-            Write-Verbose -Message "ScheduleType does not match desired state. Current value: $($currentValues.ScheduleType) - Desired Value: $ScheduleType"
-            return $false 
-        }
-        if ($RepeatInterval.TimeOfDay -ne $currentValues.RepeatInterval.TimeOfDay) 
-        { 
-            Write-Verbose -Message "RepeatInterval does not match desired state. Current value: $($currentValues.RepeatInterval) - Desired Value: $RepeatInterval"
-            return $false 
-        }
-        
-        if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) 
-        {
-            if ($ExecuteAsCredential.UserName -ne $currentValues.ExecuteAsCredential) 
-            { 
-                Write-Verbose -Message "ExecuteAsCredential does not match desired state. Current value: $($currentValues.ExecuteAsCredential) - Desired Value: $localUser"
-                return $false 
-            }
-        }
-        
-        if ($PSBoundParameters.ContainsKey("Enable") -eq $true)
-        {
-            if ($Enable -ne ($currentValues.Enable))
-            {
-                Write-Verbose -Message "Enable does not match desired state. Current value: $($currentValues.Enabled) - Desired Vale: $Enable"
-                return $false
-            }
-        }
-    }
-    
-    return $true
+    return Test-DscParameterState -CurrentValues $CurrentValues `
+                                    -DesiredValues $PSBoundParameters
 }
