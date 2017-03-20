@@ -875,7 +875,7 @@ function Set-TargetResource
         # To overcome the issue of not being able to set the task repetition for tasks with a schedule type other than Once
         if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0))
         {
-            if($RepetitionDuration.TimeOfDay  -le (New-TimeSpan -Seconds 0))
+            if ($RepetitionDuration.TimeOfDay -le $RepeatInterval.TimeOfDay)
             {
                 $exceptionObject = New-Object System.ArgumentException -ArgumentList `
                     ('Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval.TimeOfDay, $RepetitionDuration.TimeOfDay),`
