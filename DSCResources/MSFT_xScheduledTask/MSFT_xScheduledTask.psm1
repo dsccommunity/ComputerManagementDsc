@@ -1085,6 +1085,10 @@ function Test-TargetResource
 
     $CurrentValues = Get-TargetResource @PSBoundParameters
 
+    if($Ensure -eq 'Absent' -and $CurrentValues.Ensure -eq 'Absent')
+    {
+        return $true
+    }
     if ($null -eq $CurrentValues) 
     { 
         return $false 
