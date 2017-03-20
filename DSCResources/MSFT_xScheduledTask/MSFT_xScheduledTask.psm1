@@ -400,7 +400,7 @@ function Get-TargetResource
             {
                 throw "Trigger type $_ not recognized."
             }            
-        }
+        }        
         
         $repInterval = $trigger.Repetition.Interval
         $Days = $Hours = $Minutes = $Seconds = 0
@@ -543,10 +543,22 @@ function Get-TargetResource
                 $DaysOfWeek += [xScheduledTask.DaysOfWeek]$Day
             }
         }
+
+        $startAt = $trigger.StartBoundary
+
+        if($startAt)
+        {
+            $startAt = [datetime]$startAt
+        }
+        else
+        {
+            $startAt = $StartTime
+        }
         
         return @{
             TaskName = $TaskName
             TaskPath = $TaskPath
+            StartTime = $startAt
             Ensure = "Present"
             ActionExecutable = $action.Execute
             ActionArguments = $action.Arguments
@@ -632,7 +644,7 @@ function Set-TargetResource
         $ExecuteAsCredential,
 
         [System.UInt32]
-        $DaysInterval = 1,
+        $DaysInterval,
 
         [System.DateTime]
         $RandomDelay = [datetime]"00:00:00",
@@ -644,7 +656,7 @@ function Set-TargetResource
         $DaysOfWeek,
 
         [System.UInt32]
-        $WeeksInterval = 1,
+        $WeeksInterval,
 
         [System.String]
         $User,
@@ -706,7 +718,7 @@ function Set-TargetResource
         $Priority = 7,
 
         [System.UInt32]
-        $RestartCount = 0,
+        $RestartCount,
 
         [System.DateTime]
         $RestartInterval = [datetime]"00:00:00",
@@ -719,6 +731,37 @@ function Set-TargetResource
     
     if ($Ensure -eq "Present") 
     {
+        if($RepetitionDuration.TimeOfDay -lt $RepeatInterval.TimeOfDay)
+        {
+            $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
+                    ('Repetition duration {0} is less than repetition interval {1}. Please set RepeatInterval to a value lower or equal to RepetitionDuration' -f $RepetitionDuration.TimeOfDay,$RepeatInterval.TimeOfDay),`
+                    'RepeatInterval'
+                throw $exceptionObject
+        }
+
+        if($ScheduleType -eq 'Daily' -and $DaysInterval -eq 0)
+        {
+            $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
+                    ('Schedules of the type Daily must have a DaysInterval greater than 0 (value entered: {0})' -f $DaysInterval),`
+                    'DaysInterval'
+                throw $exceptionObject
+        }
+
+        if($ScheduleType -eq 'Weekly' -and $WeeksInterval -eq 0)
+        {
+            $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
+                    ('Schedules of the type Weekly must have a WeeksInterval greater than 0 (value entered: {0})' -f $WeeksInterval),`
+                    'WeeksInterval'
+                throw $exceptionObject
+        }
+
+        if($ScheduleType -eq 'Weekly' -and $DaysOfWeek.Count -eq 0)
+        {
+            $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
+                    'Schedules of the type Weekly must have at least one weekday selected', 'DaysOfWeek'
+                throw $exceptionObject
+        }
+
         $actionArgs = @{
             Execute = $ActionExecutable
         }
@@ -787,7 +830,6 @@ function Set-TargetResource
             {
                 $triggerArgs.Add('Once', $true)
                 $triggerArgs.Add('At', $StartTime)
-
                 break;
             }
             "Daily"
@@ -804,6 +846,11 @@ function Set-TargetResource
                 if ($DaysOfWeek.Count -gt 0)
                 {
                     $triggerArgs.Add('DaysOfWeek', $DaysOfWeek)
+                }
+
+                if($WeeksInterval -gt 0)
+                {
+                    $triggerArgs.Add('WeeksInterval', $WeeksInterval)
                 }
                 break;
             }
@@ -824,6 +871,24 @@ function Set-TargetResource
         }
 
         $trigger = New-ScheduledTaskTrigger @triggerArgs
+
+        # To overcome the issue of not being able to set the task repetition for tasks with a schedule type other than Once
+        if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0))
+        {
+            if($RepetitionDuration.TimeOfDay  -le (New-TimeSpan -Seconds 0))
+            {
+                $exceptionObject = New-Object System.ArgumentException -ArgumentList `
+                    ('Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval.TimeOfDay, $RepetitionDuration.TimeOfDay),`
+                    'RepetitionDuration'
+                throw $exceptionObject
+            }
+
+            $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
+
+            Write-Verbose 'Copying values from temporary trigger to property Repetition of $trigger.Repetition'
+
+            $trigger.Repetition = $tempTrigger.Repetition
+        }
         
         if ($currentValues.Ensure -eq "Absent") 
         {
