@@ -183,6 +183,38 @@ function Test-DscParameterState
                                     $returnValue = $false
                                 }
                             }
+                            "UInt32"
+                            {
+                                if (($DesiredValues.$fieldName -eq 0) `
+ -and ($null -eq $CurrentValues.$fieldName)) 
+                                {} 
+                                else 
+                                {
+                                    Write-Verbose -Message ("UInt32 value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
+                                    $returnValue = $false
+                                }
+                            }
+                            "UInt16"
+                            {
+                                if (($DesiredValues.$fieldName -eq 0) `
+ -and ($null -eq $CurrentValues.$fieldName)) 
+                                {} 
+                                else 
+                                {
+                                    Write-Verbose -Message ("UInt16 value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
+                                    $returnValue = $false
+                                }
+                            }
                             "DateTime"
                             {
                                 if (($DesiredValues.$fieldName -eq 0) `
