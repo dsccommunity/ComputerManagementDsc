@@ -746,7 +746,7 @@ function Set-TargetResource
             }
 
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
-            Write-Verbose -Message 'Copying values from temporary trigger to property Repetition of $trigger.Repetition'
+            Write-Verbose -Message 'PS V5 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
             
             $trigger.Repetition = $tempTrigger.Repetition
         }
@@ -772,8 +772,8 @@ function Set-TargetResource
             }
 
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
-            $tempTask = New-ScheduledTask -Trigger $temptrigger -Action $action
-            Write-Verbose -Message 'Copying values from temporary trigger to property Repetition of $trigger.Repetition'
+            $tempTask = New-ScheduledTask -Trigger $tempTrigger -Action $action
+            Write-Verbose -Message 'PS V4 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
             
             $scheduledTask.Triggers[0].Repetition = $tempTask.Triggers[0].Repetition
         }
