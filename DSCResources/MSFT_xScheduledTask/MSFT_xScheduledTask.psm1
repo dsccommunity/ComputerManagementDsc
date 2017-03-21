@@ -748,7 +748,14 @@ function Set-TargetResource
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
             Write-Verbose -Message 'PS V5 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
             
-            $trigger.Repetition = $tempTrigger.Repetition
+            try 
+            {
+                $trigger.Repetition = $tempTrigger.Repetition
+            }
+            catch 
+            {
+                $triggerRepetitionFailed = $true
+            }            
         }
 
         if ($currentValues.Ensure -eq "Present") 
@@ -761,7 +768,7 @@ function Set-TargetResource
 
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
 
-        if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0) -and $PSVersionTable.PSVersion.Major -eq 4)
+        if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0) -and ($PSVersionTable.PSVersion.Major -eq 4 -or $triggerRepetitionFailed))
         {
             if ($RepetitionDuration.TimeOfDay -le $RepeatInterval.TimeOfDay)
             {
