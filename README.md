@@ -429,8 +429,9 @@ configuration Sample_xScheduledTask
           TaskName = "Custom maintenance tasks"
           ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
           ActionArguments = "-File `"C:\scripts\my custom script.ps1`""
-          ScheduleType = "Minutes"
-          RepeatInterval = 15
+          ScheduleType = 'Once'
+          RepeatInterval = [datetime]::TOday.AddMinutes(15)
+          RepetitionDuration = [datetime]::TOday.AddHours(10)
         }
     }
 }
