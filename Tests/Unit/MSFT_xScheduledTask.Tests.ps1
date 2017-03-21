@@ -39,6 +39,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Minutes 150)
                 }
                 
                 Mock Get-ScheduledTask { return $null }
@@ -62,6 +63,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Minutes 15)
                     Ensure = "Absent"
                 }
                 
@@ -73,7 +75,7 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalMinutes)M"
                             Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
@@ -124,6 +126,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval =[datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Minutes 150)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -156,7 +159,8 @@ try
                 
                 It "should update the scheduled task in the set method" {
                     Set-TargetResource @testParams
-                    Assert-MockCalled Set-ScheduledTask
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
             }
             
@@ -166,6 +170,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Minutes 30)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -176,7 +181,7 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalMinutes)M"
                             Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
@@ -203,6 +208,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Hours 4)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -213,7 +219,7 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
+                            Duration = "PT$(($testParams.RepetitionDuration.TimeOfDay.TotalHours))H"
                             Interval = "PT$(($testParams.RepeatInterval.TimeOfDay.TotalHours) + 1)H"
                         }
                         CimClass = @{
@@ -235,7 +241,8 @@ try
                 
                 It "should update the scheduled task in the set method" {
                     Set-TargetResource @testParams
-                    Assert-MockCalled Set-ScheduledTask
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
             }
             
@@ -245,6 +252,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Hours 4)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -255,7 +263,7 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
                             Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalHours)H"
                         }
                         CimClass = @{
@@ -314,7 +322,8 @@ try
                 
                 It "should update the scheduled task in the set method" {
                     Set-TargetResource @testParams
-                    Assert-MockCalled Set-ScheduledTask
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
             }
             
@@ -358,6 +367,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [DateTime]::Today.Add((New-TimeSpan -Minutes 15))
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                     ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ("DEMO\RightUser", (ConvertTo-SecureString "ExamplePassword" -AsPlainText -Force))
                 }
                 
@@ -369,8 +379,8 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
                             CimClassName = "MSFT_TaskTimeTrigger"
@@ -391,7 +401,8 @@ try
                 
                 It "should update the scheduled task in the set method" {
                     Set-TargetResource @testParams
-                    Assert-MockCalled Set-ScheduledTask
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
             }
             
@@ -402,6 +413,7 @@ try
                     ActionWorkingPath = "C:\Example"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -414,7 +426,7 @@ try
                     Triggers = @(@{
                         Repetition = @{
                             Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
                             CimClassName = "MSFT_TaskTimeTrigger"
@@ -435,7 +447,8 @@ try
                 
                 It "should update the scheduled task in the set method" {
                     Set-TargetResource @testParams
-                    Assert-MockCalled Set-ScheduledTask
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
             }
             
@@ -446,6 +459,7 @@ try
                     ActionArguments = "-File `"C:\something\right.ps1`""
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -457,8 +471,8 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
                             CimClassName = "MSFT_TaskTimeTrigger"
@@ -479,7 +493,8 @@ try
                 
                 It "should update the scheduled task in the set method" {
                     Set-TargetResource @testParams
-                    Assert-MockCalled Set-ScheduledTask
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
             }
             
@@ -489,6 +504,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                     Enable = $false
                 }
                 
@@ -501,8 +517,8 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval)M"
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
                             CimClassName = "MSFT_TaskTimeTrigger"
@@ -526,7 +542,8 @@ try
                 
                 It "should update the scheduled task in the set method" {
                     Set-TargetResource @testParams
-                    Assert-MockCalled Set-ScheduledTask
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
             
             }
@@ -537,6 +554,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                     Enable = $true
                 }
                 
@@ -549,7 +567,7 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
                             Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
@@ -579,6 +597,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                     Enable = $false
                 }
                 
@@ -591,7 +610,7 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
                             Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
@@ -621,6 +640,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                     Enable = $true
                 }
                 
@@ -633,7 +653,7 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
                             Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
@@ -658,7 +678,8 @@ try
                 
                 It "should update the scheduled task in the set method" {
                     Set-TargetResource @testParams
-                    Assert-MockCalled Set-ScheduledTask
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
             }
             
@@ -668,6 +689,7 @@ try
                     ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
                     ScheduleType = "Once"
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepetitionDuration = [datetime]::Today + (New-TimeSpan -Hours 8)
                 }
                 
                 Mock Get-ScheduledTask { return @{
@@ -679,7 +701,7 @@ try
                     })
                     Triggers = @(@{
                         Repetition = @{
-                            Duration = $null
+                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
                             Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
                         }
                         CimClass = @{
