@@ -231,6 +231,16 @@ function Test-DscParameterState
                                     $returnValue = $false
                                 }
                             }
+                            "Boolean"
+                            {
+                                Write-Verbose -Message ("Boolean value for property " + `
+                                                            "$fieldName does not match. " + `
+                                                            "Current state is " + `
+                                                            "'$($CurrentValues.$fieldName)' " + `
+                                                            "and desired state is " + `
+                                                            "'$($DesiredValues.$fieldName)'")
+                                $returnValue = $false
+                            }
                             default
                             {
                                 Write-Verbose -Message ("Unable to compare property $fieldName " + `
