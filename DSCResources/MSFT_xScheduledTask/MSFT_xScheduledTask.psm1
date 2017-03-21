@@ -165,7 +165,6 @@ function Get-TargetResource
         $action = $task.Actions | Select-Object -First 1
         $trigger = $task.Triggers | Select-Object -First 1
         $settings = $task.Settings
-        $repetition = $trigger.Repetition
         $returnScheduleType = "Unknown"
         $returnInveral = 0
 
@@ -217,14 +216,17 @@ function Get-TargetResource
         {
             $Days = $matches.Days
         }
+
         if ($repInterval -match '(?<Hours>\d{0,2})H')
         {
             $Hours = $matches.Hours
         }
+
         if ($repInterval -match '(?<Minutes>\d{0,2})M')
         {
             $Minutes = $matches.Minutes
         }
+
         if ($repInterval -match '(?<Seconds>\d{0,2})S')
         {
             $Seconds = $matches.Seconds
@@ -239,14 +241,17 @@ function Get-TargetResource
         {
             $Days = $matches.Days
         }
+
         if ($repDuration -match '(?<Hours>\d{0,2})H')
         {
             $Hours = $matches.Hours
         }
+
         if ($repDuration -match '(?<Minutes>\d{0,2})M')
         {
             $Minutes = $matches.Minutes
         }
+
         if ($repDuration -match '(?<Seconds>\d{0,2})S')
         {
             $Seconds = $matches.Seconds
@@ -261,14 +266,17 @@ function Get-TargetResource
         {
             $Days = $matches.Days
         }
+
         if ($resInterval -match '(?<Hours>\d{0,2})H')
         {
             $Hours = $matches.Hours
         }
+        
         if ($resInterval -match '(?<Minutes>\d{0,2})M')
         {
             $Minutes = $matches.Minutes
         }
+
         if ($resInterval -match '(?<Seconds>\d{0,2})S')
         {
             $Seconds = $matches.Seconds
@@ -283,14 +291,17 @@ function Get-TargetResource
         {
             $Days = $matches.Days
         }
+
         if ($exeLim -match '(?<Hours>\d{0,2})H')
         {
             $Hours = $matches.Hours
         }
+
         if ($exeLim -match '(?<Minutes>\d{0,2})M')
         {
             $Minutes = $matches.Minutes
         }
+
         if ($exeLim -match '(?<Seconds>\d{0,2})S')
         {
             $Seconds = $matches.Seconds
@@ -305,14 +316,17 @@ function Get-TargetResource
         {
             $Days = $matches.Days
         }
+
         if ($idleDur -match '(?<Hours>\d{0,2})H')
         {
             $Hours = $matches.Hours
         }
+
         if ($idleDur -match '(?<Minutes>\d{0,2})M')
         {
             $Minutes = $matches.Minutes
         }
+
         if ($idleDur -match '(?<Seconds>\d{0,2})S')
         {
             $Seconds = $matches.Seconds
@@ -327,14 +341,17 @@ function Get-TargetResource
         {
             $Days = $matches.Days
         }
+
         if ($idleWait -match '(?<Hours>\d{0,2})H')
         {
             $Hours = $matches.Hours
         }
+
         if ($idleWait -match '(?<Minutes>\d{0,2})M')
         {
             $Minutes = $matches.Minutes
         }
+
         if ($idleWait -match '(?<Seconds>\d{0,2})S')
         {
             $Seconds = $matches.Seconds
@@ -349,14 +366,17 @@ function Get-TargetResource
         {
             $Days = $matches.Days
         }
+
         if ($rndDelay -match '(?<Hours>\d{0,2})H')
         {
             $Hours = $matches.Hours
         }
+
         if ($rndDelay -match '(?<Minutes>\d{0,2})M')
         {
             $Minutes = $matches.Minutes
         }
+
         if ($rndDelay -match '(?<Seconds>\d{0,2})S')
         {
             $Seconds = $matches.Seconds
@@ -376,7 +396,7 @@ function Get-TargetResource
 
         $startAt = $trigger.StartBoundary
 
-        if($startAt)
+        if ($startAt)
         {
             $startAt = [datetime]$startAt
         }
@@ -410,7 +430,7 @@ function Get-TargetResource
             AllowStartIfOnBatteries = -not $settings.DisallowStartIfOnBatteries
             Hidden = $settings.Hidden
             RunOnlyIfIdle = $settings.RunOnlyIfIdle
-            IdleWaitTimeout = $idleWaitTimeout
+            IdleWaitTimeout = $idleWaitTimeoutReturn
             NetworkName = $settings.NetworkSettings.Name
             DisallowStartOnRemoteAppSession = $settings.DisallowStartOnRemoteAppSession
             StartWhenAvailable = $settings.StartWhenAvailable
@@ -563,7 +583,7 @@ function Set-TargetResource
     
     if ($Ensure -eq "Present") 
     {
-        if($RepetitionDuration.TimeOfDay -lt $RepeatInterval.TimeOfDay)
+        if ($RepetitionDuration.TimeOfDay -lt $RepeatInterval.TimeOfDay)
         {
             $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
                     ('Repetition duration {0} is less than repetition interval {1}. Please set RepeatInterval to a value lower or equal to RepetitionDuration' -f $RepetitionDuration.TimeOfDay,$RepeatInterval.TimeOfDay),`
@@ -571,7 +591,7 @@ function Set-TargetResource
                 throw $exceptionObject
         }
 
-        if($ScheduleType -eq 'Daily' -and $DaysInterval -eq 0)
+        if ($ScheduleType -eq 'Daily' -and $DaysInterval -eq 0)
         {
             $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
                     ('Schedules of the type Daily must have a DaysInterval greater than 0 (value entered: {0})' -f $DaysInterval),`
@@ -579,7 +599,7 @@ function Set-TargetResource
                 throw $exceptionObject
         }
 
-        if($ScheduleType -eq 'Weekly' -and $WeeksInterval -eq 0)
+        if ($ScheduleType -eq 'Weekly' -and $WeeksInterval -eq 0)
         {
             $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
                     ('Schedules of the type Weekly must have a WeeksInterval greater than 0 (value entered: {0})' -f $WeeksInterval),`
@@ -587,7 +607,7 @@ function Set-TargetResource
                 throw $exceptionObject
         }
 
-        if($ScheduleType -eq 'Weekly' -and $DaysOfWeek.Count -eq 0)
+        if ($ScheduleType -eq 'Weekly' -and $DaysOfWeek.Count -eq 0)
         {
             $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
                     'Schedules of the type Weekly must have at least one weekday selected', 'DaysOfWeek'
@@ -597,14 +617,17 @@ function Set-TargetResource
         $actionArgs = @{
             Execute = $ActionExecutable
         }
+
         if ($ActionArguments) 
         { 
             $actionArgs.Add("Argument", $ActionArguments)
         }
+
         if ($ActionWorkingPath) 
         { 
             $actionArgs.Add("WorkingDirectory", $ActionWorkingPath)
         }
+
         $action = New-ScheduledTaskAction @actionArgs
         
         $settingArgs = @{
@@ -631,14 +654,17 @@ function Set-TargetResource
         {
             $settingArgs.Add('IdleDuration', $IdleDuration.TimeOfDay)
         }
+        
         if ($IdleWaitTimeout.TimeOfDay -gt [timespan]"00:00:00")
         {
             $settingArgs.Add('IdleWaitTimeout', $IdleWaitTimeout.TimeOfDay)
         }
+
         if ($ExecutionTimeLimit.TimeOfDay -gt [timespan]"00:00:00")
         {
             $settingArgs.Add('ExecutionTimeLimit', $ExecutionTimeLimit.TimeOfDay)
         }
+
         if ($RestartInterval.TimeOfDay -gt [timespan]"00:00:00")
         {
             $settingArgs.Add('RestartInterval', $RestartInterval.TimeOfDay)
@@ -723,7 +749,7 @@ function Set-TargetResource
         if ($currentValues.Ensure -eq "Present") 
         {
             Write-Verbose -Message ('Removing previous scheduled task' -f $TaskName)
-            Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+            $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
         }
         
         Write-Verbose -Message ('Creating new scheduled task' -f $TaskName)
@@ -750,7 +776,7 @@ function Set-TargetResource
             $registerArgs.Add("User", "NT AUTHORITY\SYSTEM")
         }
 
-        Register-ScheduledTask @registerArgs
+        $null = Register-ScheduledTask @registerArgs
     }
     
     if ($Ensure -eq "Absent") 
@@ -894,14 +920,14 @@ function Test-TargetResource
 
     $CurrentValues = Get-TargetResource @PSBoundParameters
 
-    if($Ensure -eq 'Absent' -and $CurrentValues.Ensure -eq 'Absent')
+    if ($Ensure -eq 'Absent' -and $CurrentValues.Ensure -eq 'Absent')
     {
         return $true
     }
+
     if ($null -eq $CurrentValues) 
     { 
         return $false 
     }
-    return Test-DscParameterState -CurrentValues $CurrentValues `
-                                    -DesiredValues $PSBoundParameters
+    return Test-DscParameterState -CurrentValues $CurrentValues -DesiredValues $PSBoundParameters
 }
