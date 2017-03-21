@@ -488,6 +488,28 @@ function Get-TargetResource
         
         $repetitionDurationReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
 
+        $resInterval = $settings.RestartInterval
+        $Days = $Hours = $Minutes = $Seconds = 0
+
+        if ($resInterval -match 'P(?<Days>\d{0,3})D')
+        {
+            $Days = $matches.Days
+        }
+        if ($resInterval -match '(?<Hours>\d{0,2})H')
+        {
+            $Hours = $matches.Hours
+        }
+        if ($resInterval -match '(?<Minutes>\d{0,2})M')
+        {
+            $Minutes = $matches.Minutes
+        }
+        if ($resInterval -match '(?<Seconds>\d{0,2})S')
+        {
+            $Seconds = $matches.Seconds
+        }
+        
+        $restartIntervalReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
+
         $exeLim = $settings.ExecutionTimeLimit
         $Days = $Hours = $Minutes = $Seconds = 0
 
@@ -615,10 +637,10 @@ function Get-TargetResource
             DaysOfWeek = $DaysOfWeek
             WeeksInterval = $trigger.WeeksInterval
             User = $trigger.UserId
-            DisallowDemandStart = $settings.DisallowDemandStart
-            DisallowHardTerminate = $settings.DisallowHardTerminate
+            DisallowDemandStart = -not $settings.AllowDemandStart
+            DisallowHardTerminate = -not $settings.AllowHardTerminate
             Compatibility = $settings.Compatibility
-            AllowStartIfOnBatteries = $settings.AllowStartIfOnBatteries
+            AllowStartIfOnBatteries = -not $settings.DisallowStartIfOnBatteries
             Hidden = $settings.Hidden
             RunOnlyIfIdle = $settings.RunOnlyIfIdle
             IdleWaitTimeout = $idleWaitTimeout
@@ -631,10 +653,10 @@ function Get-TargetResource
             RestartOnIdle = $settings.IdleSettings.RestartOnIdle
             DontStopOnIdleEnd = -not $settings.IdleSettings.StopOnIdleEnd
             ExecutionTimeLimit = [datetime]::Today.Add($executionTimeLimitReturn)
-            MultipleInstances = [System.String]
-            Priority = [System.UInt32]
-            RestartCount = [System.UInt32]
-            RestartInterval = [System.DateTime]
+            MultipleInstances = $settings.MultipleInstances
+            Priority = $settings.Priority
+            RestartCount = $settings.RestartCount
+            RestartInterval = [datetime]::Today.Add($restartIntervalReturn)
             RunOnlyIfNetworkAvailable = $settings.RunOnlyIfNetworkAvailable
         }
     }
