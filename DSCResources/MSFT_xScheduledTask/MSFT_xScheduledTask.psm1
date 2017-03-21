@@ -844,7 +844,7 @@ function Set-TargetResource
             DisallowHardTerminate = $DisallowHardTerminate
             Compatibility = $Compatibility
             AllowStartIfOnBatteries = $AllowStartIfOnBatteries
-            Disable = $Disable
+            Disable = -not $Enable
             Hidden = $Hidden
             RunOnlyIfIdle = $RunOnlyIfIdle          
             DisallowStartOnRemoteAppSession = $DisallowStartOnRemoteAppSession            
@@ -885,7 +885,7 @@ function Set-TargetResource
         $triggerArgs = @{}
         if ($RandomDelay.TimeOfDay -gt [timespan]::FromSeconds(0))
         {
-            $triggerArgs.Add('RandomDelay', $RandomDelay)
+            $triggerArgs.Add('RandomDelay', $RandomDelay.TimeOfDay)
         }
 
         switch ($ScheduleType)
