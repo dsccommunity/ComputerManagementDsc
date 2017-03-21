@@ -743,13 +743,13 @@ function Set-TargetResource
 
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
             Write-Verbose -Message 'Copying values from temporary trigger to property Repetition of $trigger.Repetition'
-            $trigger.Repetition = $tempTrigger.Repetition
+            $trigger.CimInstanceProperties['Repetition'].Value = $tempTrigger.Repetition
         }
 
         if ($currentValues.Ensure -eq "Present") 
         {
             Write-Verbose -Message ('Removing previous scheduled task' -f $TaskName)
-            $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+            $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
         }
         
         Write-Verbose -Message ('Creating new scheduled task' -f $TaskName)
@@ -916,9 +916,11 @@ function Test-TargetResource
         $RunOnlyIfNetworkAvailable = $false
     )
     
-    Write-Verbose -Message ('Testing scheduled task' -f $TaskName)
+    Write-Verbose -Message ('Testing scheduled task {0}' -f $TaskName)
 
     $CurrentValues = Get-TargetResource @PSBoundParameters
+
+    Write-Verbose -Message "Current values retrieved"
 
     if ($Ensure -eq 'Absent' -and $CurrentValues.Ensure -eq 'Absent')
     {
@@ -926,8 +928,11 @@ function Test-TargetResource
     }
 
     if ($null -eq $CurrentValues) 
-    { 
+    {
+        Write-Verbose -Message "Current values were null"
         return $false 
     }
+
+    Write-Verbose "Testing DSC parameter state"
     return Test-DscParameterState -CurrentValues $CurrentValues -DesiredValues $PSBoundParameters
 }
