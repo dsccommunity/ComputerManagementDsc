@@ -5,6 +5,8 @@ param(
 $Global:DSCModuleName      = 'xComputerManagement'
 $Global:DSCResourceName    = 'MSFT_xScheduledTask'
 
+
+
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
@@ -20,6 +22,7 @@ $TestEnvironment = Initialize-TestEnvironment `
     -DSCResourceName $Global:DSCResourceName `
     -TestType Unit 
 
+$VerbosePreference = 'Continue'
 # Begin Testing
 try
 {
@@ -53,7 +56,7 @@ try
                 }
                 
                 It "should create the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                 }
             }
             
@@ -96,7 +99,7 @@ try
                 }
                 
                 It "should remove the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                     Assert-MockCalled Unregister-ScheduledTask
                 }
             }
@@ -158,7 +161,7 @@ try
                 }
                 
                 It "should update the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                     Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
                     Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
@@ -240,7 +243,7 @@ try
                 }
                 
                 It "should update the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                     Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
                     Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
@@ -321,7 +324,7 @@ try
                 }
                 
                 It "should update the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                     Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
                     Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
@@ -400,7 +403,7 @@ try
                 }
                 
                 It "should update the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                     Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
                     Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
@@ -446,7 +449,7 @@ try
                 }
                 
                 It "should update the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                     Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
                     Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
@@ -492,7 +495,7 @@ try
                 }
                 
                 It "should update the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                     Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
                     Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
@@ -541,7 +544,7 @@ try
                 }
                 
                 It "should update the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                     Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
                     Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
@@ -677,7 +680,7 @@ try
                 }
                 
                 It "should update the scheduled task in the set method" {
-                    Set-TargetResource @testParams
+                    Set-TargetResource @testParams -Verbose
                     Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
                     Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }

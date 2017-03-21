@@ -40,12 +40,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Verbose -Wait -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -62,12 +62,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -84,12 +84,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         #endregion
@@ -108,12 +108,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -130,12 +130,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -152,12 +152,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         #endregion
@@ -176,12 +176,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -198,12 +198,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -220,12 +220,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         #endregion
@@ -244,12 +244,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -266,12 +266,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -288,12 +288,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         #endregion
@@ -313,12 +313,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -336,12 +336,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
@@ -358,12 +358,12 @@ try
             
             It "should apply the MOF correctly" {
                 {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
         #endregion        
