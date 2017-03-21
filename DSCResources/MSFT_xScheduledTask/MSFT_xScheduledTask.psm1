@@ -728,7 +728,11 @@ function Set-TargetResource
             }
         }
 
-        $trigger = New-ScheduledTaskTrigger @triggerArgs
+        $trigger = New-ScheduledTaskTrigger @triggerArgs -ErrorAction SilentlyContinue
+        if(-not $trigger)
+        {
+            throw "Error creating new scheduled task trigger. $($_.Exception.Message)"
+        }
 
         # To overcome the issue of not being able to set the task repetition for tasks with a schedule type other than Once
         if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0))
@@ -743,7 +747,17 @@ function Set-TargetResource
 
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
             Write-Verbose -Message 'Copying values from temporary trigger to property Repetition of $trigger.Repetition'
-            $trigger.CimInstanceProperties['Repetition'].Value = $tempTrigger.Repetition
+            try {
+                $trigger.CimInstanceProperties['Repetition'].Value = $tempTrigger.Repetition                
+            }
+            catch {
+                try {
+                    $trigger.Repetition = $tempTrigger.Repetition
+                }
+                catch {
+                    throw $PSItem
+                }
+            }            
         }
 
         if ($currentValues.Ensure -eq "Present") 
