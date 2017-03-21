@@ -624,6 +624,7 @@ function Get-TargetResource
             TaskPath = $TaskPath
             StartTime = $startAt
             Ensure = "Present"
+            Description = $task.Description
             ActionExecutable = $action.Execute
             ActionArguments = $action.Arguments
             ActionWorkingPath = $action.WorkingDirectory
@@ -647,7 +648,7 @@ function Get-TargetResource
             NetworkName = $settings.NetworkSettings.Name
             DisallowStartOnRemoteAppSession = $settings.DisallowStartOnRemoteAppSession
             StartWhenAvailable = $settings.StartWhenAvailable
-            DontStopIfGoingOnBatteries = $settings.DontStopIfGoingOnBatteries
+            DontStopIfGoingOnBatteries = -not $settings.StopIfGoingOnBatteries
             WakeToRun = $settings.WakeToRun
             IdleDuration = [datetime]::Today.Add($idleDurationReturn)
             RestartOnIdle = $settings.IdleSettings.RestartOnIdle
