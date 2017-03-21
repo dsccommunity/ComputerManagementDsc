@@ -735,7 +735,7 @@ function Set-TargetResource
         }
 
         # To overcome the issue of not being able to set the task repetition for tasks with a schedule type other than Once
-        if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0))
+        if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0) -and $PSVersionTable.PSVersion.Major -gt 4)
         {
             if ($RepetitionDuration.TimeOfDay -le $RepeatInterval.TimeOfDay)
             {
@@ -747,17 +747,8 @@ function Set-TargetResource
 
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
             Write-Verbose -Message 'Copying values from temporary trigger to property Repetition of $trigger.Repetition'
-            try {
-                $trigger.CimInstanceProperties['Repetition'].Value = $tempTrigger.Repetition                
-            }
-            catch {
-                try {
-                    $trigger.Repetition = $tempTrigger.Repetition
-                }
-                catch {
-                    throw $PSItem
-                }
-            }            
+            
+            $trigger.Repetition = $tempTrigger.Repetition
         }
 
         if ($currentValues.Ensure -eq "Present") 
@@ -769,6 +760,24 @@ function Set-TargetResource
         Write-Verbose -Message ('Creating new scheduled task' -f $TaskName)
 
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
+
+        if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0) -and $PSVersionTable.PSVersion.Major -eq 4)
+        {
+            if ($RepetitionDuration.TimeOfDay -le $RepeatInterval.TimeOfDay)
+            {
+                $exceptionObject = New-Object System.ArgumentException -ArgumentList `
+                    ('Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval.TimeOfDay, $RepetitionDuration.TimeOfDay),`
+                    'RepetitionDuration'
+                throw $exceptionObject
+            }
+
+            $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
+            $tempTask = New-ScheduledTask -Trigger $temptrigger -Action $action
+            Write-Verbose -Message 'Copying values from temporary trigger to property Repetition of $trigger.Repetition'
+            
+            $scheduledTask.Triggers[0].Repetition = $tempTask.Triggers[0].Repetition
+        }
+
         if (-not [string]::IsNullOrWhiteSpace($Description))
         {
             $scheduledTask.Description = $Description

@@ -49,7 +49,7 @@ Configuration Sample_xScheduledTask
             Hidden = $true
         }
     
-        xScheduledTask xScheduledTaskOnceAdd
+        xScheduledTask xScheduledTaskLogonAdd
         {
             TaskName = "Test task Logon"
             TaskPath = "\MyTasks"
@@ -59,7 +59,7 @@ Configuration Sample_xScheduledTask
             RepetitionDuration = [datetime]::Today.AddHours(8)
         }
   
-        xScheduledTask xScheduledTaskOnceAdd
+        xScheduledTask xScheduledTaskStartupAdd
         {
             TaskName = "Test task Startup"
             TaskPath = "\MyTasks"
