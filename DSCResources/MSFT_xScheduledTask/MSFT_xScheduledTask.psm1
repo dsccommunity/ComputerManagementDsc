@@ -13,250 +13,254 @@ namespace xScheduledTask
     }
 }
 '@
-function Test-ObjectHasProperty
+
+function Remove-CommonParameter
 {
-    [CmdletBinding()]
-    [OutputType([System.Boolean])]
+    [OutputType([hashtable])]
+    [cmdletbinding()]
     param
     (
-        [parameter(Mandatory = $true, Position = 1)]  
-        [Object] 
-        $Object,
-
-        [parameter(Mandatory = $true, Position = 2)]
-        [String]
-        $PropertyName
+        [Parameter(Mandatory)]
+        [hashtable]
+        $Hashtable
     )
 
-    if (([bool]($Object.PSobject.Properties.name -contains $PropertyName)) -eq $true) 
-    {
-        if ($null -ne $Object.$PropertyName) 
-        {
-            return $true
-        }
+    $inputClone = $Hashtable.Clone()
+    $commonParameters = [System.Management.Automation.PSCmdlet]::CommonParameters
+    $commonParameters += [System.Management.Automation.PSCmdlet]::OptionalCommonParameters
+
+    $Hashtable.Keys | Where-Object { $_ -in $commonParameters } | ForEach-Object {
+        $inputClone.Remove($_)
     }
-    return $false
+
+    $inputClone
 }
 
-function Test-DscParameterState 
+function Test-DscParameterState
 {
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true, Position = 1)]  
-        [HashTable]
+        [Parameter(Mandatory)] 
+        [hashtable]
         $CurrentValues,
-        
-        [parameter(Mandatory = $true, Position = 2)]  
-        [Object]
-        $DesiredValues,
 
-        [parameter(Mandatory = $false, Position = 3)] 
-        [Array]
-        $ValuesToCheck
+        [Parameter(Mandatory)] 
+        [object]
+        $DesiredValues,
+        
+        [string[]]
+        $ValuesToCheck,
+        
+        [switch]$TurnOffTypeChecking
     )
 
     $returnValue = $true
 
-    if (($DesiredValues.GetType().Name -ne "HashTable") `
- -and ($DesiredValues.GetType().Name -ne "CimInstance") `
- -and ($DesiredValues.GetType().Name -ne "PSBoundParametersDictionary")) 
+    $types = 'System.Management.Automation.PSBoundParametersDictionary', 'System.Collections.Hashtable', 'Microsoft.Management.Infrastructure.CimInstance'
+    
+    if ($DesiredValues.GetType().FullName -notin $types)
     {
-        throw ("Property 'DesiredValues' in Test-DscParameterState must be either a " + `
-               "Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().Name)")
+        throw ("Property 'DesiredValues' in Test-DscParameterState must be either a Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().Name)")
     }
 
-    if (($DesiredValues.GetType().Name -eq "CimInstance") -and ($null -eq $ValuesToCheck)) 
+    if ($DesiredValues.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance' -and -not $ValuesToCheck)
     {
-        throw ("If 'DesiredValues' is a CimInstance then property 'ValuesToCheck' must contain " + `
-               "a value")
+        throw ("If 'DesiredValues' is a CimInstance then property 'ValuesToCheck' must contain a value")
     }
+    
+    $DesiredValuesClean = Remove-CommonParameter -Hashtable $DesiredValues
 
-    if (($null -eq $ValuesToCheck) -or ($ValuesToCheck.Count -lt 1)) 
+    if (-not $ValuesToCheck)
     {
-        $KeyList = $DesiredValues.Keys
+        $keyList = $DesiredValuesClean.Keys
     } 
-    else 
+    else
     {
-        $KeyList = $ValuesToCheck
+        $keyList = $ValuesToCheck
     }
 
-    $KeyList | ForEach-Object -Process {
-        if (($_ -ne "Verbose") -and ($_ -ne "InstallAccount")) 
+    foreach ($key in $keyList)
+    {
+        if ($null -ne $DesiredValuesClean.$key)
         {
-            if (($CurrentValues.ContainsKey($_) -eq $false) `
- -or ($CurrentValues.$_ -ne $DesiredValues.$_) `
- -or (($DesiredValues.ContainsKey($_) -eq $true) -and ($null -ne $DesiredValues.$_ -and $DesiredValues.$_.GetType().IsArray)))  
-            {
-                if ($DesiredValues.GetType().Name -eq "HashTable" -or `
-                    $DesiredValues.GetType().Name -eq "PSBoundParametersDictionary") 
-                {
-                    $CheckDesiredValue = $DesiredValues.ContainsKey($_)
-                } 
-                else 
-                {
-                    $CheckDesiredValue = Test-ObjectHasProperty $DesiredValues $_
-                }
+            $desiredType = $DesiredValuesClean.$key.GetType()
+        }
+        else
+        {
+            $desiredType = [psobject]@{ Name = 'Unknown' }
+        }
+        
+        if ($null -ne $CurrentValues.$key)
+        {
+            $currentType = $CurrentValues.$key.GetType()
+        }
+        else
+        {
+            $currentType = [psobject]@{ Name = 'Unknown' }
+        }
 
-                if ($CheckDesiredValue) 
+        if ($currentType.Name -ne 'Unknown' -and $desiredType.Name -eq 'PSCredential')
+        {
+            # This is a credential object. Compare only the user name
+            if ($currentType.Name -eq 'PSCredential' -and $CurrentValues.$key.UserName -eq $DesiredValuesClean.$key.UserName)
+            {
+                Write-Verbose -Message ('MATCH: PSCredential username match. Current state is {0} and desired state is {1}' -f $CurrentValues.$key.UserName, $DesiredValuesClean.$key.UserName)
+                continue
+            }
+            else
+            {
+                Write-Verbose -Message ('NOTMATCH: PSCredential username mismatch. Current state is {0} and desired state is {1}' -f $CurrentValues.$key.UserName, $DesiredValuesClean.$key.UserName)
+                $returnValue = $false
+            }
+            
+            # Assume the string is our username when the matching desired value is actually a credential
+            if($currentType.Name -eq 'string' -and $CurrentValues.$key -eq $DesiredValuesClean.$key.UserName)
+            {
+                Write-Verbose -Message ('MATCH: PSCredential username match. Current state is {0} and desired state is {1}' -f $CurrentValues.$key, $DesiredValuesClean.$key.UserName)
+                continue
+            }
+            else
+            {
+                Write-Verbose -Message ('NOTMATCH: PSCredential username mismatch. Current state is {0} and desired state is {1}' -f $CurrentValues.$key, $DesiredValuesClean.$key.UserName)
+                $returnValue = $false
+            }
+        }
+     
+        if (-not $TurnOffTypeChecking)
+        {   
+            if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
+            $desiredType.FullName -ne $currentType.FullName)
+            {
+                Write-Verbose -Message "NOTMATCH: Type mismatch for property '$key' Current state type is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
+                continue
+            }
+        }
+
+        if ($CurrentValues.$key -eq $DesiredValuesClean.$key -and -not $desiredType.IsArray)
+        {
+            Write-Verbose -Message "MATCH: Value (type $($desiredType.Name)) for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
+            continue
+        }
+                    
+        if ($DesiredValuesClean.GetType().Name -in 'HashTable', 'PSBoundParametersDictionary')
+        {
+            $checkDesiredValue = $DesiredValuesClean.ContainsKey($key)
+        } 
+        else
+        {
+            $checkDesiredValue = Test-DSCObjectHasProperty -Object $DesiredValuesClean -PropertyName $key
+        }
+        
+        if (-not $checkDesiredValue)
+        {
+            Write-Verbose -Message "MATCH: Value (type $($desiredType.Name)) for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
+            continue
+        }
+        
+        if ($desiredType.IsArray)
+        {
+            Write-Verbose "Comparing values in property '$key'"
+            if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
+            {
+                Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
+                $returnValue = $false
+                continue
+            }
+            elseif ($CurrentValues.$key.Count -ne $DesiredValues.$key.Count)
+            {
+                Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does have a different count. Current state count is '$($CurrentValues.$key.Count)' and desired state count is '$($DesiredValuesClean.$key.Count)'"
+                $returnValue = $false
+                continue
+            }
+            else
+            {
+                $desiredArrayValues = $DesiredValues.$key
+                $currentArrayValues = $CurrentValues.$key
+
+                for ($i = 0; $i -lt $desiredArrayValues.Count; $i++)
                 {
-                    $desiredType = $DesiredValues.$_.GetType()
-                    $fieldName = $_
-                    if ($desiredType.IsArray -eq $true) 
+                    if ($null -ne $desiredArrayValues[$i])
                     {
-                        if (($CurrentValues.ContainsKey($fieldName) -eq $false) `
- -or ($null -eq $CurrentValues.$fieldName)) 
+                        $desiredType = $desiredArrayValues[$i].GetType()
+                    }
+                    else
+                    {
+                        $desiredType = [psobject]@{ Name = 'Unknown' }
+                    }
+                    
+                    if ($null -ne $currentArrayValues[$i])
+                    {
+                        $currentType = $currentArrayValues[$i].GetType()
+                    }
+                    else
+                    {
+                        $currentType = [psobject]@{ Name = 'Unknown' }
+                    }
+                    
+                    if (-not $TurnOffTypeChecking)
+                    {
+                        if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
+                        $desiredType.FullName -ne $currentType.FullName)
                         {
-                            Write-Verbose -Message ("Expected to find an array value for " + `
-                                                    "property $fieldName in the current " + `
-                                                    "values, but it was either not present or " + `
-                                                    "was null. This has caused the test method " + `
-                                                    "to return false.")
+                            Write-Verbose -Message "`tNOTMATCH: Type mismatch for property '$key' Current state type of element [$i] is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
                             $returnValue = $false
-                        } 
-                        else 
-                        {
-                            $arrayCompare = Compare-Object -ReferenceObject $CurrentValues.$fieldName `
-                                                           -DifferenceObject $DesiredValues.$fieldName
-                            if ($null -ne $arrayCompare) 
-                            {
-                                Write-Verbose -Message ("Found an array for property $fieldName " + `
-                                                        "in the current values, but this array " + `
-                                                        "does not match the desired state. " + `
-                                                        "Details of the changes are below.")
-                                $arrayCompare | ForEach-Object -Process {
-                                    Write-Verbose -Message "$($_.InputObject) - $($_.SideIndicator)"
-                                }
-                                $returnValue = $false
-                            }
-                        }
-                    } 
-                    else 
-                    {
-                        switch ($desiredType.Name) 
-                        {
-                            "String"
-                            {
-                                if ([string]::IsNullOrEmpty($CurrentValues.$fieldName) `
- -and [string]::IsNullOrEmpty($DesiredValues.$fieldName)) 
-                                {} 
-                                else 
-                                {
-                                    Write-Verbose -Message ("String value for property " + `
-                                                            "$fieldName does not match. " + `
-                                                            "Current state is " + `
-                                                            "'$($CurrentValues.$fieldName)' " + `
-                                                            "and desired state is " + `
-                                                            "'$($DesiredValues.$fieldName)'")
-                                    $returnValue = $false
-                                }
-                            }
-                            "Int32"
-                            {
-                                if (($DesiredValues.$fieldName -eq 0) `
- -and ($null -eq $CurrentValues.$fieldName)) 
-                                {} 
-                                else 
-                                {
-                                    Write-Verbose -Message ("Int32 value for property " + `
-                                                            "$fieldName does not match. " + `
-                                                            "Current state is " + `
-                                                            "'$($CurrentValues.$fieldName)' " + `
-                                                            "and desired state is " + `
-                                                            "'$($DesiredValues.$fieldName)'")
-                                    $returnValue = $false
-                                }
-                            }
-                            "Int16"
-                            {
-                                if (($DesiredValues.$fieldName -eq 0) `
- -and ($null -eq $CurrentValues.$fieldName)) 
-                                {} 
-                                else 
-                                {
-                                    Write-Verbose -Message ("Int16 value for property " + `
-                                                            "$fieldName does not match. " + `
-                                                            "Current state is " + `
-                                                            "'$($CurrentValues.$fieldName)' " + `
-                                                            "and desired state is " + `
-                                                            "'$($DesiredValues.$fieldName)'")
-                                    $returnValue = $false
-                                }
-                            }
-                            "UInt32"
-                            {
-                                if (($DesiredValues.$fieldName -eq 0) `
- -and ($null -eq $CurrentValues.$fieldName)) 
-                                {} 
-                                else 
-                                {
-                                    Write-Verbose -Message ("UInt32 value for property " + `
-                                                            "$fieldName does not match. " + `
-                                                            "Current state is " + `
-                                                            "'$($CurrentValues.$fieldName)' " + `
-                                                            "and desired state is " + `
-                                                            "'$($DesiredValues.$fieldName)'")
-                                    $returnValue = $false
-                                }
-                            }
-                            "UInt16"
-                            {
-                                if (($DesiredValues.$fieldName -eq 0) `
- -and ($null -eq $CurrentValues.$fieldName)) 
-                                {} 
-                                else 
-                                {
-                                    Write-Verbose -Message ("UInt16 value for property " + `
-                                                            "$fieldName does not match. " + `
-                                                            "Current state is " + `
-                                                            "'$($CurrentValues.$fieldName)' " + `
-                                                            "and desired state is " + `
-                                                            "'$($DesiredValues.$fieldName)'")
-                                    $returnValue = $false
-                                }
-                            }
-                            "DateTime"
-                            {
-                                if (($DesiredValues.$fieldName -eq 0) `
- -and ($null -eq $CurrentValues.$fieldName)) 
-                                {} 
-                                else 
-                                {
-                                    Write-Verbose -Message ("DateTime value for property " + `
-                                                            "$fieldName does not match. " + `
-                                                            "Current state is " + `
-                                                            "'$($CurrentValues.$fieldName)' " + `
-                                                            "and desired state is " + `
-                                                            "'$($DesiredValues.$fieldName)'")
-                                    $returnValue = $false
-                                }
-                            }
-                            "Boolean"
-                            {
-                                Write-Verbose -Message ("Boolean value for property " + `
-                                                            "$fieldName does not match. " + `
-                                                            "Current state is " + `
-                                                            "'$($CurrentValues.$fieldName)' " + `
-                                                            "and desired state is " + `
-                                                            "'$($DesiredValues.$fieldName)'")
-                                $returnValue = $false
-                            }
-                            default
-                            {
-                                Write-Verbose -Message ("Unable to compare property $fieldName " + `
-                                                        "as the type ($($desiredType.Name)) is " + `
-                                                        "not handled by the " + `
-                                                        "Test-DscParameterState cmdlet")
-                                $returnValue = $false
-                            }
+                            continue
                         }
                     }
-                }            
+                        
+                    if ($desiredArrayValues[$i] -ne $currentArrayValues[$i])
+                    {
+                        Write-Verbose -Message "`tNOTMATCH: Value [$i] (type $($desiredType.Name)) for property '$key' does match. Current state is '$($currentArrayValues[$i])' and desired state is '$($desiredArrayValues[$i])'"
+                        $returnValue = $false
+                        continue
+                    }
+                    else
+                    {
+                        Write-Verbose -Message "`tMATCH: Value [$i] (type $($desiredType.Name)) for property '$key' does match. Current state is '$($currentArrayValues[$i])' and desired state is '$($desiredArrayValues[$i])'"
+                        continue
+                    }
+                }
+                
             }
         } 
+        else {
+            if ($DesiredValuesClean.$key -ne $CurrentValues.$key)
+            {
+                Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
+                $returnValue = $false
+            }
+        
+        } 
     }
+    
+    Write-Verbose "Result is '$returnValue'"
     return $returnValue
 }
+
+function Test-DSCObjectHasProperty
+{
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param
+    (
+        [Parameter(Mandatory)] 
+        [object]
+        $Object,
+
+        [Parameter(Mandatory)]
+        [string]
+        $PropertyName
+    )
+
+    if ($Object.PSObject.Properties.Name -contains $PropertyName) 
+    {
+        return [bool]$Object.$PropertyName
+    }
+    
+    return $false
+}
+
 function Get-TargetResource
 {
     [OutputType([System.Collections.Hashtable])]
@@ -637,7 +641,7 @@ function Get-TargetResource
             RepetitionDuration = [datetime]::Today.Add($repetitionDurationReturn)
             DaysOfWeek = $DaysOfWeek
             WeeksInterval = $trigger.WeeksInterval
-            User = $trigger.UserId
+            User = $task.Principal.UserId
             DisallowDemandStart = -not $settings.AllowDemandStart
             DisallowHardTerminate = -not $settings.AllowHardTerminate
             Compatibility = $settings.Compatibility
