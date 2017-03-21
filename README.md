@@ -109,7 +109,7 @@ xPowerPlan resource has following properties:
 ## Versions
 
 ### Unreleased
- * Updated resources
+* Updated resources
   - xScheduledTask: Added nearly all available parameters for tasks
 
 ### 1.9.0.0
