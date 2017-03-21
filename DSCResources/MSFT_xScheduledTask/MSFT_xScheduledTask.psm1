@@ -953,59 +953,38 @@ function Set-TargetResource
 
             $trigger.Repetition = $tempTrigger.Repetition
         }
-        
-        if ($currentValues.Ensure -eq "Absent") 
-        {
-            Write-Verbose -Message "Creating new scheduled task `"$TaskName`""
 
-            $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
-            if (-not [string]::IsNullOrWhiteSpace($Description))
-            {
-                $scheduledTask.Description = $Description
-            }
-
-            $registerArgs = @{
-                TaskName = $TaskName
-                TaskPath = $TaskPath
-                InputObject = $scheduledTask
-            }
-
-            if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) 
-            {
-                $registerArgs.Add("User", $ExecuteAsCredential.UserName)
-                $registerArgs.Add("Password", $ExecuteAsCredential.GetNetworkCredential().Password)
-            } 
-            else 
-            {
-                $registerArgs.Add("User", "NT AUTHORITY\SYSTEM")
-            }
-
-            Register-ScheduledTask @registerArgs
-        }
         if ($currentValues.Ensure -eq "Present") 
         {
-            Write-Verbose -Message "Updating scheduled task `"$TaskName`""
-            
-            $setArgs = @{
-                TaskName = $TaskName
-                TaskPath = $TaskPath
-                Action = $action
-                Trigger = $trigger
-                Settings = $setting
-            }
-
-            if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) 
-            {
-                $setArgs.Add("User", $ExecuteAsCredential.UserName)
-                $setArgs.Add("Password", $ExecuteAsCredential.GetNetworkCredential().Password)
-            } 
-            else 
-            {
-                $setArgs.Add("User", "NT AUTHORITY\SYSTEM")
-            }
-
-            Set-ScheduledTask @setArgs
+            Write-Verbose -Message "Removing previous scheduled task `"$TaskName`""
+            Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
         }
+        
+        Write-Verbose -Message "Creating new scheduled task `"$TaskName`""
+
+        $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
+        if (-not [string]::IsNullOrWhiteSpace($Description))
+        {
+            $scheduledTask.Description = $Description
+        }
+
+        $registerArgs = @{
+            TaskName = $TaskName
+            TaskPath = $TaskPath
+            InputObject = $scheduledTask
+        }
+
+        if ($PSBoundParameters.ContainsKey("ExecuteAsCredential") -eq $true) 
+        {
+            $registerArgs.Add("User", $ExecuteAsCredential.UserName)
+            $registerArgs.Add("Password", $ExecuteAsCredential.GetNetworkCredential().Password)
+        } 
+        else 
+        {
+            $registerArgs.Add("User", "NT AUTHORITY\SYSTEM")
+        }
+
+        Register-ScheduledTask @registerArgs
     }
     
     if ($Ensure -eq "Absent") 
