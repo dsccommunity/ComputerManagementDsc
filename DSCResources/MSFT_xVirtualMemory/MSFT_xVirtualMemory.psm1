@@ -1,4 +1,5 @@
-function Get-TargetResource {
+function Get-TargetResource
+{
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
@@ -7,7 +8,7 @@ function Get-TargetResource {
         [System.String]
         $Drive,
 
-        [ValidateSet("AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile")]
+        [ValidateSet("AutoManagePagingFile", "CustomSize", "SystemManagedSize", "NoPagingFile")]
         [parameter(Mandatory = $true)]
         [System.String]
         $Type
@@ -52,7 +53,7 @@ function Get-TargetResource {
         $returnValue.Type = "CustomSize"
     }
 
-    $returnValue.Drive = $virtualMemoryInstance.Name.Substring(0,3)
+    $returnValue.Drive = $virtualMemoryInstance.Name.Substring(0, 3)
     $returnValue.InitialSize = $virtualMemoryInstance.InitialSize
     $returnValue.MaximumSize = $virtualMemoryInstance.MaximumSize
 
@@ -60,7 +61,8 @@ function Get-TargetResource {
 }
 
 
-function Set-TargetResource {
+function Set-TargetResource
+{
     [CmdletBinding()]
     param
     (
@@ -68,7 +70,7 @@ function Set-TargetResource {
         [System.String]
         $Drive,
 
-        [ValidateSet("AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile")]
+        [ValidateSet("AutoManagePagingFile", "CustomSize", "SystemManagedSize", "NoPagingFile")]
         [parameter(Mandatory = $true)]
         [System.String]
         $Type,
@@ -84,7 +86,7 @@ function Set-TargetResource {
 
     $SystemInfo = Get-CimInstance -Class Win32_ComputerSystem
 
-    switch($Type)
+    switch ($Type)
     {
         "AutoManagePagingFile" 
         {
@@ -198,7 +200,8 @@ function Set-TargetResource {
             $global:DSCMachineStatus = 1
             break
         }
-        "NoPagingFile" {
+        "NoPagingFile"
+        {
             if ($SystemInfo.AutomaticManagedPageFile)
             {
                 $setParams = @{ 
@@ -238,7 +241,8 @@ function Set-TargetResource {
 }
 
 
-function Test-TargetResource {
+function Test-TargetResource
+{
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
@@ -247,7 +251,7 @@ function Test-TargetResource {
         [System.String]
         $Drive,
 
-        [ValidateSet("AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile")]
+        [ValidateSet("AutoManagePagingFile", "CustomSize", "SystemManagedSize", "NoPagingFile")]
         [parameter(Mandatory = $true)]
         [System.String]
         $Type,
@@ -262,25 +266,31 @@ function Test-TargetResource {
     $SystemInfo = Get-CimInstance -Class Win32_ComputerSystem
     $result = $false
 
-    switch($Type) {
-        "AutoManagePagingFile" {
+    switch ($Type)
+    {
+        "AutoManagePagingFile"
+        {
             $result = $SystemInfo.AutomaticManagedPagefile
             break
         }
-        "CustomSize" {
-            if ($SystemInfo.AutomaticManagedPageFile) {
+        "CustomSize"
+        {
+            if ($SystemInfo.AutomaticManagedPageFile)
+            {
                 $result = $false
                 break
             }
 
             $driveInfo = [System.IO.DriveInfo] $Drive
             $PageFile = Get-CimInstance -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
-            if (-not $PageFile) {
+            if (-not $PageFile)
+            {
                 $result = $false
                 break
             }
 
-            if (-not ($PageFile.InitialSize -eq $InitialSize -and $PageFile.MaximumSize -eq $MaximumSize)) {
+            if (-not ($PageFile.InitialSize -eq $InitialSize -and $PageFile.MaximumSize -eq $MaximumSize))
+            {
                 $result = $false
                 break
             }
@@ -288,20 +298,24 @@ function Test-TargetResource {
             $result = $true
             break
         }
-        "SystemManagedSize" {
-            if ($SystemInfo.AutomaticManagedPageFile) {
+        "SystemManagedSize"
+        {
+            if ($SystemInfo.AutomaticManagedPageFile)
+            {
                 $result = $false
                 break
             }
 
             $driveInfo = [System.IO.DriveInfo] $Drive
             $PageFile = Get-CimInstance -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
-            if (-not $PageFile) {
+            if (-not $PageFile)
+            {
                 $result = $false
                 break
             }
 
-            if (-not ($PageFile.InitialSize -eq 0 -and $PageFile.MaximumSize -eq 0)) {
+            if (-not ($PageFile.InitialSize -eq 0 -and $PageFile.MaximumSize -eq 0))
+            {
                 $result = $false
                 break
             }
@@ -309,8 +323,10 @@ function Test-TargetResource {
             $result = $true
             break
         }
-        "NoPagingFile" {
-            if ($SystemInfo.AutomaticManagedPageFile) {
+        "NoPagingFile"
+        {
+            if ($SystemInfo.AutomaticManagedPageFile)
+            {
                 $result = $false
                 break
             }
@@ -318,7 +334,8 @@ function Test-TargetResource {
             $driveInfo = [System.IO.DriveInfo] $Drive
             $PageFile = Get-CimInstance -Class Win32_PageFileSetting -Filter "SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
                 
-            if ($PageFile) {
+            if ($PageFile)
+            {
                 $result = $false
                 break
             }
@@ -326,7 +343,8 @@ function Test-TargetResource {
             $result = $true
             break
         }
-        default {
+        default
+        {
             break
         }
     }
