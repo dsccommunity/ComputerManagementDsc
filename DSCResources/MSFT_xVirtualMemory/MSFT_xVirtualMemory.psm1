@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+    Returns the current state of the virtual memory configuration
+.PARAMETER Drive
+    The drive for which the virtual memory configuration needs to be returned
+.PARAMETER Type
+    The type of the virtual memory configuration
+#>
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -60,6 +68,18 @@ function Get-TargetResource
     $returnValue
 }
 
+<#
+.SYNOPSIS
+    Sets the virtual memory settings based on the parameters supplied
+.PARAMETER Drive
+    The drive for which the virtual memory configuration should be set.
+.PARAMETER Type
+    The paging type. When set to AutoManagePagingFile, drive letters are ignored
+.PARAMETER InitialSize
+    The initial page file size in megabyte
+.PARAMETER MaximumSize
+    The maximum page file size in megabyte. May not be smaller than InitialSize
+#>
 function Set-TargetResource
 {
     [CmdletBinding()]
@@ -239,6 +259,18 @@ function Set-TargetResource
     }
 }
 
+<#
+.SYNOPSIS
+    Tests if virtual memory settings need to be applied based on the parameters supplied
+.PARAMETER Drive
+    The drive letter that should be tested
+.PARAMETER Type
+    The type of the virtual memory configuration
+.PARAMETER InitialSize
+    The initial page file size in megabyte
+.PARAMETER MaximumSize
+    The maximum page file size in megabyte
+#>
 function Test-TargetResource
 {
     [CmdletBinding()]
