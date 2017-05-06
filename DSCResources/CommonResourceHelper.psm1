@@ -38,13 +38,21 @@ function Get-LocalizedData
     return $localizedData
 }
 
+<#
+.SYNOPSIS
+    Removes common parameters from a hashtable
+.DESCRIPTION
+    This function serves the purpose of removing common parameters and option common parameters from a parameter hashtable
+.PARAMETER Hashtable
+    The parameter hashtable that should be pruned
+#>
 function Remove-CommonParameter
 {
     [OutputType([hashtable])]
     [cmdletbinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [hashtable]
         $Hashtable
     )
@@ -57,26 +65,41 @@ function Remove-CommonParameter
         $inputClone.Remove($_)
     }
 
-    $inputClone
+    return $inputClone
 }
 
+<#
+.SYNOPSIS
+    Tests the status of DSC resource parameters
+.DESCRIPTION
+    This function tests the parameter status of DSC resource parameters against the current values present on the system
+.PARAMETER CurrentValues
+    A hashtable with the current values on the system, obtained by e.g. Get-TargetResource
+.PARAMETER DesiredValues
+    The hashtable of desired values
+.PARAMETER ValuesToCheck
+    The values to check if not all values should be checked
+.PARAMETER TurnOffTypeChecking
+    Indicates that the type of the parameter should not be checked
+#>
 function Test-DscParameterState
 {
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)] 
+        [Parameter(Mandatory = $true)] 
         [hashtable]
         $CurrentValues,
 
-        [Parameter(Mandatory)] 
+        [Parameter(Mandatory = $true)] 
         [object]
         $DesiredValues,
         
         [string[]]
         $ValuesToCheck,
         
-        [switch]$TurnOffTypeChecking
+        [switch]
+        $TurnOffTypeChecking
     )
 
     $returnValue = $true
@@ -85,19 +108,19 @@ function Test-DscParameterState
     
     if ($DesiredValues.GetType().FullName -notin $types)
     {
-        throw ("Property 'DesiredValues' in Test-DscParameterState must be either a Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().Name)")
+        throw ("Property 'DesiredValues' in Test-DscParameterState must be either a Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().FullName)")
     }
 
-    if ($DesiredValues.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance' -and -not $ValuesToCheck)
+    if ($DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance] -and -not $ValuesToCheck)
     {
         throw ("If 'DesiredValues' is a CimInstance then property 'ValuesToCheck' must contain a value")
     }
     
-    $DesiredValuesClean = Remove-CommonParameter -Hashtable $DesiredValues
+    $desiredValuesClean = Remove-CommonParameter -Hashtable $DesiredValues
 
     if (-not $ValuesToCheck)
     {
-        $keyList = $DesiredValuesClean.Keys
+        $keyList = $desiredValuesClean.Keys
     } 
     else
     {
@@ -106,13 +129,15 @@ function Test-DscParameterState
 
     foreach ($key in $keyList)
     {
-        if ($null -ne $DesiredValuesClean.$key)
+        if ($null -ne $desiredValuesClean.$key)
         {
-            $desiredType = $DesiredValuesClean.$key.GetType()
+            $desiredType = $desiredValuesClean.$key.GetType()
         }
         else
         {
-            $desiredType = [psobject]@{ Name = 'Unknown' }
+            $desiredType = [psobject]@{ 
+                Name = 'Unknown' 
+            }
         }
         
         if ($null -ne $CurrentValues.$key)
@@ -121,64 +146,66 @@ function Test-DscParameterState
         }
         else
         {
-            $currentType = [psobject]@{ Name = 'Unknown' }
+            $currentType = [psobject]@{ 
+                Name = 'Unknown' 
+            }
         }
 
         if ($currentType.Name -ne 'Unknown' -and $desiredType.Name -eq 'PSCredential')
         {
             # This is a credential object. Compare only the user name
-            if ($currentType.Name -eq 'PSCredential' -and $CurrentValues.$key.UserName -eq $DesiredValuesClean.$key.UserName)
+            if ($currentType.Name -eq 'PSCredential' -and $CurrentValues.$key.UserName -eq $desiredValuesClean.$key.UserName)
             {
-                Write-Verbose -Message ('MATCH: PSCredential username match. Current state is {0} and desired state is {1}' -f $CurrentValues.$key.UserName, $DesiredValuesClean.$key.UserName)
+                Write-Verbose -Message ('MATCH: PSCredential username match. Current state is {0} and desired state is {1}' -f $CurrentValues.$key.UserName, $desiredValuesClean.$key.UserName)
                 continue
             }
             else
             {
-                Write-Verbose -Message ('NOTMATCH: PSCredential username mismatch. Current state is {0} and desired state is {1}' -f $CurrentValues.$key.UserName, $DesiredValuesClean.$key.UserName)
+                Write-Verbose -Message ('NOTMATCH: PSCredential username mismatch. Current state is {0} and desired state is {1}' -f $CurrentValues.$key.UserName, $desiredValuesClean.$key.UserName)
                 $returnValue = $false
             }
             
             # Assume the string is our username when the matching desired value is actually a credential
-            if($currentType.Name -eq 'string' -and $CurrentValues.$key -eq $DesiredValuesClean.$key.UserName)
+            if ($currentType.Name -eq 'string' -and $CurrentValues.$key -eq $desiredValuesClean.$key.UserName)
             {
-                Write-Verbose -Message ('MATCH: PSCredential username match. Current state is {0} and desired state is {1}' -f $CurrentValues.$key, $DesiredValuesClean.$key.UserName)
+                Write-Verbose -Message ('MATCH: PSCredential username match. Current state is {0} and desired state is {1}' -f $CurrentValues.$key, $desiredValuesClean.$key.UserName)
                 continue
             }
             else
             {
-                Write-Verbose -Message ('NOTMATCH: PSCredential username mismatch. Current state is {0} and desired state is {1}' -f $CurrentValues.$key, $DesiredValuesClean.$key.UserName)
+                Write-Verbose -Message ('NOTMATCH: PSCredential username mismatch. Current state is {0} and desired state is {1}' -f $CurrentValues.$key, $desiredValuesClean.$key.UserName)
                 $returnValue = $false
             }
         }
      
         if (-not $TurnOffTypeChecking)
         {   
-            if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
-            $desiredType.FullName -ne $currentType.FullName)
+            if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and 
+                $desiredType.FullName -ne $currentType.FullName)
             {
                 Write-Verbose -Message "NOTMATCH: Type mismatch for property '$key' Current state type is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
                 continue
             }
         }
 
-        if ($CurrentValues.$key -eq $DesiredValuesClean.$key -and -not $desiredType.IsArray)
+        if ($CurrentValues.$key -eq $desiredValuesClean.$key -and -not $desiredType.IsArray)
         {
-            Write-Verbose -Message "MATCH: Value (type $($desiredType.Name)) for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
+            Write-Verbose -Message "MATCH: Value (type $($desiredType.Name)) for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($desiredValuesClean.$key)'"
             continue
         }
                     
-        if ($DesiredValuesClean.GetType().Name -in 'HashTable', 'PSBoundParametersDictionary')
+        if ($desiredValuesClean.GetType().Name -in 'HashTable', 'PSBoundParametersDictionary')
         {
-            $checkDesiredValue = $DesiredValuesClean.ContainsKey($key)
+            $checkDesiredValue = $desiredValuesClean.ContainsKey($key)
         } 
         else
         {
-            $checkDesiredValue = Test-DSCObjectHasProperty -Object $DesiredValuesClean -PropertyName $key
+            $checkDesiredValue = Test-DSCObjectHasProperty -Object $desiredValuesClean -PropertyName $key
         }
         
         if (-not $checkDesiredValue)
         {
-            Write-Verbose -Message "MATCH: Value (type $($desiredType.Name)) for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
+            Write-Verbose -Message "MATCH: Value (type $($desiredType.Name)) for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($desiredValuesClean.$key)'"
             continue
         }
         
@@ -187,13 +214,13 @@ function Test-DscParameterState
             Write-Verbose "Comparing values in property '$key'"
             if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
             {
-                Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
+                Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($desiredValuesClean.$key)'"
                 $returnValue = $false
                 continue
             }
             elseif ($CurrentValues.$key.Count -ne $DesiredValues.$key.Count)
             {
-                Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does have a different count. Current state count is '$($CurrentValues.$key.Count)' and desired state count is '$($DesiredValuesClean.$key.Count)'"
+                Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does have a different count. Current state count is '$($CurrentValues.$key.Count)' and desired state count is '$($desiredValuesClean.$key.Count)'"
                 $returnValue = $false
                 continue
             }
@@ -210,7 +237,9 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $desiredType = [psobject]@{ Name = 'Unknown' }
+                        $desiredType = [psobject]@{ 
+                            Name = 'Unknown'
+                        }
                     }
                     
                     if ($null -ne $currentArrayValues[$i])
@@ -219,13 +248,15 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $currentType = [psobject]@{ Name = 'Unknown' }
+                        $currentType = [psobject]@{
+                            Name = 'Unknown' 
+                        }
                     }
                     
                     if (-not $TurnOffTypeChecking)
                     {
-                        if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
-                        $desiredType.FullName -ne $currentType.FullName)
+                        if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and 
+                            $desiredType.FullName -ne $currentType.FullName)
                         {
                             Write-Verbose -Message "`tNOTMATCH: Type mismatch for property '$key' Current state type of element [$i] is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
                             $returnValue = $false
@@ -248,10 +279,11 @@ function Test-DscParameterState
                 
             }
         } 
-        else {
-            if ($DesiredValuesClean.$key -ne $CurrentValues.$key)
+        else 
+        {
+            if ($desiredValuesClean.$key -ne $CurrentValues.$key)
             {
-                Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
+                Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($desiredValuesClean.$key)'"
                 $returnValue = $false
             }
         
@@ -262,24 +294,32 @@ function Test-DscParameterState
     return $returnValue
 }
 
+<#
+.SYNOPSIS
+    Tests of an object has a property
+.PARAMETER Object
+    The object to test
+.PARAMETER PropertyName
+    The property name
+#>
 function Test-DSCObjectHasProperty
 {
     [CmdletBinding()]
     [OutputType([bool])]
     param
     (
-        [Parameter(Mandatory)] 
+        [Parameter(Mandatory = $true)] 
         [object]
         $Object,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $PropertyName
     )
 
     if ($Object.PSObject.Properties.Name -contains $PropertyName) 
     {
-        return [bool]$Object.$PropertyName
+        return [bool] $Object.$PropertyName
     }
     
     return $false
@@ -290,4 +330,4 @@ Export-ModuleMember -Function @(
     'Remove-CommonParameter'
     'Test-DscParameterState'
     'Test-DSCObjectHasProperty'
-    )
+)

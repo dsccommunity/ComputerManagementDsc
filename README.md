@@ -442,8 +442,8 @@ configuration Sample_xScheduledTask
           ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
           ActionArguments = "-File `"C:\scripts\my custom script.ps1`""
           ScheduleType = 'Once'
-          RepeatInterval = [datetime]::TOday.AddMinutes(15)
-          RepetitionDuration = [datetime]::TOday.AddHours(10)
+          RepeatInterval = [datetime]::Today.AddMinutes(15)
+          RepetitionDuration = [datetime]::Today.AddHours(10)
         }
     }
 }
