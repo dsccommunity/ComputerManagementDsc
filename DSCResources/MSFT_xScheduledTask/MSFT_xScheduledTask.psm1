@@ -322,7 +322,7 @@ function Get-TargetResource
 
             default
             {
-                throw "Trigger type $_ not recognized."
+                New-InvalidArgumentException -Message "Trigger type $_ not recognized." -ArgumentName CimClassName
             }            
         }
         
@@ -657,7 +657,7 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
-param
+    param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -827,33 +827,26 @@ param
     {
         if ($RepetitionDuration.TimeOfDay -lt $RepeatInterval.TimeOfDay)
         {
-            $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
-                    ('Repetition duration {0} is less than repetition interval {1}. Please set RepeatInterval to a value lower or equal to RepetitionDuration' -f $RepetitionDuration.TimeOfDay, $RepeatInterval.TimeOfDay), `
-                    'RepeatInterval'
-            throw $exceptionObject
+            $exceptionMessage = 'Repetition duration {0} is less than repetition interval {1}. Please set RepeatInterval to a value lower or equal to RepetitionDuration' -f $RepetitionDuration.TimeOfDay, $RepeatInterval.TimeOfDay
+            New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepeatInterval
         }
 
         if ($ScheduleType -eq 'Daily' -and $DaysInterval -eq 0)
         {
-            $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
-                    ('Schedules of the type Daily must have a DaysInterval greater than 0 (value entered: {0})' -f $DaysInterval), `
-                    'DaysInterval'
-            throw $exceptionObject
+            $exceptionMessage = 'Schedules of the type Daily must have a DaysInterval greater than 0 (value entered: {0})' -f $DaysInterval
+            New-InvalidArgumentException -Message $exceptionMessage -ArgumentName DaysInterval
         }
 
         if ($ScheduleType -eq 'Weekly' -and $WeeksInterval -eq 0)
         {
-            $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
-                    ('Schedules of the type Weekly must have a WeeksInterval greater than 0 (value entered: {0})' -f $WeeksInterval), `
-                    'WeeksInterval'
-            throw $exceptionObject
+            $exceptionMessage = 'Schedules of the type Weekly must have a WeeksInterval greater than 0 (value entered: {0})' -f $WeeksInterval
+            New-InvalidArgumentException -Message $exceptionMessage -ArgumentName WeeksInterval
         }
 
         if ($ScheduleType -eq 'Weekly' -and $DaysOfWeek.Count -eq 0)
         {
-            $exceptionObject = New-Object -TypeName System.ArgumentException -ArgumentList `
-                    'Schedules of the type Weekly must have at least one weekday selected', 'DaysOfWeek'
-            throw $exceptionObject
+            $exceptionMessage = 'Schedules of the type Weekly must have at least one weekday selected'
+            New-InvalidArgumentException -Message $exceptionMessage -ArgumentName DaysOfWeek
         }
 
         $actionArgs = @{
@@ -973,7 +966,7 @@ param
         $trigger = New-ScheduledTaskTrigger @triggerArgs -ErrorAction SilentlyContinue
         if (-not $trigger)
         {
-            throw "Error creating new scheduled task trigger. $($_.Exception.Message)"
+            New-InvalidOperationException -Message 'Error creating new scheduled task trigger' -ErrorRecord $_
         }
 
         # To overcome the issue of not being able to set the task repetition for tasks with a schedule type other than Once
@@ -981,10 +974,8 @@ param
         {
             if ($RepetitionDuration.TimeOfDay -le $RepeatInterval.TimeOfDay)
             {
-                $exceptionObject = New-Object System.ArgumentException -ArgumentList `
-                    ('Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval.TimeOfDay, $RepetitionDuration.TimeOfDay), `
-                    'RepetitionDuration'
-                throw $exceptionObject
+                $exceptionMessage ='Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval.TimeOfDay, $RepetitionDuration.TimeOfDay
+                New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
@@ -1014,10 +1005,8 @@ param
         {
             if ($RepetitionDuration.TimeOfDay -le $RepeatInterval.TimeOfDay)
             {
-                $exceptionObject = New-Object System.ArgumentException -ArgumentList `
-                    ('Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval.TimeOfDay, $RepetitionDuration.TimeOfDay), `
-                    'RepetitionDuration'
-                throw $exceptionObject
+                $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval.TimeOfDay, $RepetitionDuration.TimeOfDay
+                New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
@@ -1326,6 +1315,6 @@ function Test-TargetResource
         return $false 
     }
 
-    Write-Verbose 'Testing DSC parameter state'
+    Write-Verbose -Message 'Testing DSC parameter state'
     return Test-DscParameterState -CurrentValues $CurrentValues -DesiredValues $PSBoundParameters
 }
