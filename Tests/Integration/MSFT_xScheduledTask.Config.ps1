@@ -1,13 +1,13 @@
 Configuration xScheduledTaskOnceAdd
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskOnceAdd
         {
-            TaskName = "Test task once"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task once'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Once'
             RepeatInterval = [datetime]::Today.AddMinutes(15)
             RepetitionDuration = [datetime]::Today.AddHours(8)
@@ -24,13 +24,13 @@ Configuration xScheduledTaskOnceAdd
 Configuration xScheduledTaskDailyAdd
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskDailyAdd
         {
-            TaskName = "Test task Daily"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Daily'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Daily'
             DaysInterval = 1
             RepeatInterval = [datetime]::Today.AddMinutes(15)
@@ -46,19 +46,19 @@ Configuration xScheduledTaskDailyAdd
 Configuration xScheduledTaskWeeklyAdd
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskWeeklyAdd
         {
-            TaskName = "Test task Weekly"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Weekly'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Weekly'
             WeeksInterval = 1
-            DaysOfWeek = 'Monday','Wednesday','Saturday'
+            DaysOfWeek = 'Monday', 'Wednesday', 'Saturday'
             RepeatInterval = [datetime]::Today.AddMinutes(15)
             RepetitionDuration = [datetime]::Today.AddHours(8)
-            AllowStartIfOnBatteries =             $true
+            AllowStartIfOnBatteries = $true
             Compatibility = 'Win8'
             Hidden = $true
         }
@@ -68,13 +68,13 @@ Configuration xScheduledTaskWeeklyAdd
 Configuration xScheduledTaskLogonAdd
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskOnceAdd
         {
-            TaskName = "Test task Logon"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Logon'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtLogOn'
             RepeatInterval = [datetime]::Today.AddMinutes(15)
             RepetitionDuration = [datetime]::Today.AddHours(8)
@@ -85,13 +85,13 @@ Configuration xScheduledTaskLogonAdd
 Configuration xScheduledTaskStartupAdd
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskOnceAdd
         {
-            TaskName = "Test task Startup"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Startup'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtStartup'
             RepeatInterval = [datetime]::Today.AddMinutes(15)
             RepetitionDuration = [datetime]::Today.AddHours(8)
@@ -102,13 +102,13 @@ Configuration xScheduledTaskStartupAdd
 Configuration xScheduledTaskOnceMod
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskOnceMod
         {
-            TaskName = "Test task once"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task once'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Once'
             RepeatInterval = [datetime]::Today.AddMinutes(20)
             RepetitionDuration = [datetime]::Today.AddHours(8)
@@ -120,13 +120,13 @@ Configuration xScheduledTaskOnceMod
 Configuration xScheduledTaskDailyMod
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskDailyMod
         {
-            TaskName = "Test task Daily"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Daily'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Daily'
             DaysInterval = 2
             RepeatInterval = [datetime]::Today.AddMinutes(30)            
@@ -139,16 +139,16 @@ Configuration xScheduledTaskDailyMod
 Configuration xScheduledTaskWeeklyMod
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskWeeklyMod
         {
-            TaskName = "Test task Weekly"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Weekly'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Weekly'
             WeeksInterval = 1
-            DaysOfWeek = 'Monday','Thursday','Saturday'
+            DaysOfWeek = 'Monday', 'Thursday', 'Saturday'
             RepeatInterval = [datetime]::Today.AddMinutes(40)
             RepetitionDuration = [datetime]::Today.AddHours(8)
         }
@@ -158,13 +158,13 @@ Configuration xScheduledTaskWeeklyMod
 Configuration xScheduledTaskLogonMod
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskOnceMod
         {
-            TaskName = "Test task Logon"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Logon'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtStartup'
             RepeatInterval = [datetime]::Today.AddMinutes(12)
             RepetitionDuration = [datetime]::Today.AddHours(8)
@@ -175,13 +175,13 @@ Configuration xScheduledTaskLogonMod
 Configuration xScheduledTaskStartupMod
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskOnceMod
         {
-            TaskName = "Test task Startup"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Startup'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtLogOn'
             RepeatInterval = [datetime]::Today.AddMinutes(10)
             RepetitionDuration = [datetime]::Today.AddHours(8)
@@ -192,13 +192,13 @@ Configuration xScheduledTaskStartupMod
 Configuration xScheduledTaskOnceDel
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskOnceDel
         {
-            TaskName = "Test task once"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task once'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Once'
             RepeatInterval = [datetime]::Today.AddMinutes(20)
             RepetitionDuration = [datetime]::Today.AddHours(8)
@@ -211,13 +211,13 @@ Configuration xScheduledTaskOnceDel
 Configuration xScheduledTaskDailyDel
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskDailyDel
         {
-            TaskName = "Test task Daily"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Daily'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Daily'
             DaysInterval = 2
             RepeatInterval = [datetime]::Today.AddMinutes(30)            
@@ -231,16 +231,16 @@ Configuration xScheduledTaskDailyDel
 Configuration xScheduledTaskWeeklyDel
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskWeeklyDel
         {
-            TaskName = "Test task Weekly"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Weekly'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Weekly'
             WeeksInterval = 1
-            DaysOfWeek = 'Monday','Thursday','Saturday'
+            DaysOfWeek = 'Monday', 'Thursday', 'Saturday'
             RepeatInterval = [datetime]::Today.AddMinutes(40)
             RepetitionDuration = [datetime]::Today.AddHours(8)
             Ensure = 'Absent'
@@ -251,13 +251,13 @@ Configuration xScheduledTaskWeeklyDel
 Configuration xScheduledTaskLogonDel
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskLogonDel
         {
-            TaskName = "Test task Logon"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Logon'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtStartup'
             RepeatInterval = [datetime]::Today.AddMinutes(12)
             RepetitionDuration = [datetime]::Today.AddHours(8)
@@ -269,13 +269,13 @@ Configuration xScheduledTaskLogonDel
 Configuration xScheduledTaskStartupDel
 {
     Import-DscResource -ModuleName xComputerManagement
-    node "localhost"
+    node 'localhost'
     {
         xScheduledTask xScheduledTaskStartupDel
         {
-            TaskName = "Test task Startup"
-            TaskPath = "\xComputerManagement\"
-            ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            TaskName = 'Test task Startup'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtLogOn'
             RepeatInterval = [datetime]::Today.AddMinutes(10)
             RepetitionDuration = [datetime]::Today.AddHours(8)

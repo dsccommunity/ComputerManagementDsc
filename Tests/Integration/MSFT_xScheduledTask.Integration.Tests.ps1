@@ -28,67 +28,67 @@ try
         
         #region Schedule type once
         Context '[Once] No scheduled task exists but it should' {
-            $CurrentConfig = "xScheduledTaskOnceAdd"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskOnceAdd'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Verbose -Wait -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[Once] A scheduled task exists with the wrong settings'{
-            $CurrentConfig = "xScheduledTaskOnceMod"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskOnceMod'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[Once] A scheduled tasks exists but it should not' {
-            $CurrentConfig = "xScheduledTaskOnceDel"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskOnceDel'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
@@ -96,67 +96,67 @@ try
 
         #region Schedule type daily
         Context '[Daily] No scheduled task exists but it should'{
-            $CurrentConfig = "xScheduledTaskDailyAdd"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskDailyAdd'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[Daily] A scheduled task exists with the wrong settings' {
-            $CurrentConfig = "xScheduledTaskDailyMod"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskDailyMod'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[Daily] A scheduled tasks exists but it should not' {
-            $CurrentConfig = "xScheduledTaskDailyDel"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskDailyDel'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
@@ -164,67 +164,67 @@ try
         
         #region Schedule type weekly
         Context '[Weekly] No scheduled task exists but it should'{
-            $CurrentConfig = "xScheduledTaskWeeklyAdd"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskWeeklyAdd'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[Weekly] A scheduled task exists with the wrong settings' {
-            $CurrentConfig = "xScheduledTaskWeeklyMod"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskWeeklyMod'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[Weekly] A scheduled tasks exists but it should not' {
-            $CurrentConfig = "xScheduledTaskWeeklyDel"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskWeeklyDel'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
@@ -232,67 +232,67 @@ try
         
         #region Schedule type atlogon
         Context '[AtLogon] No scheduled task exists but it should' {
-            $CurrentConfig = "xScheduledTaskLogonAdd"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskLogonAdd'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[AtLogon] A scheduled task exists with the wrong settings' {
-            $CurrentConfig = "xScheduledTaskLogonMod"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskLogonMod'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[AtLogon] A scheduled tasks exists but it should not' {
-            $CurrentConfig = "xScheduledTaskLogonDel"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskLogonDel'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
@@ -301,68 +301,68 @@ try
         #region Schedule type atstartup
         Context '[AtStartup] No scheduled task exists but it should' {
 
-            $CurrentConfig = "xScheduledTaskStartupAdd"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskStartupAdd'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[AtStartup] A scheduled task exists with the wrong settings' {
 
-            $CurrentConfig = "xScheduledTaskStartupMod"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskStartupMod'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
 
         Context '[AtStartup] A scheduled tasks exists but it should not' {
-            $CurrentConfig = "xScheduledTaskStartupDel"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+            $CurrentConfig = 'xScheduledTaskStartupDel'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
             
-            It "should apply the MOF correctly" {
+            It 'should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should Not Throw
             }
             
-            It "should return a compliant state after being applied" {
+            It 'should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
             }
         }
