@@ -373,6 +373,15 @@ try
 finally
 {
     #region FOOTER
+    
+    # Remove any traces of the created tasks
+    Get-ScheduledTask -TaskPath '\xComputerManagement\' -ErrorAction SilentlyContinue | Unregister-ScheduledTask -ErrorAction SilentlyContinue -Confirm:$false
+
+    $scheduler = New-Object -ComObject Schedule.Service
+    $scheduler.Connect()
+    $rootFolder = $scheduler.GetFolder('\')
+    $rootFolder.DeleteFolder('xComputerManagement', 0)
+    
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }
