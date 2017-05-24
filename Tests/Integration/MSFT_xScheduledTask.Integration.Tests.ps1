@@ -30,6 +30,8 @@ try
             Once      = 'xScheduledTaskOnce'
             Daily     = 'xScheduledTaskDaily'
             Weekly    = 'xScheduledTaskWeekly'
+            AtLogon   = 'xScheduledTaskLogon'
+            AtStartup = 'xScheduledTaskStartup'
         }
         
         foreach ($contextInfo in $contexts.GetEnumerator())
@@ -47,6 +49,7 @@ try
             
                 It 'should apply the MOF correctly' {
                     {
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
                     } | Should Not Throw
                 }
             
@@ -68,6 +71,7 @@ try
             
                 It 'should apply the MOF correctly' {
                     {
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
                     } | Should Not Throw
                 }
             
@@ -89,6 +93,7 @@ try
             
                 It 'should apply the MOF correctly' {
                     {
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
                     } | Should Not Throw
                 }
             
