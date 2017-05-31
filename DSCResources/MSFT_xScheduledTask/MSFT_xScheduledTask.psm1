@@ -25,9 +25,9 @@ function Get-TargetResource
         
         [Parameter(Mandatory=$true)]
         [System.String]
-        [ValidateSet("Minutes", "Hourly", "Daily")] $ScheduleType,
+        [ValidateSet("Minutes", "Hourly", "Daily", "Startup", "OnLogon")] $ScheduleType,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [System.UInt32]
         $RepeatInterval,
         
@@ -49,6 +49,7 @@ function Get-TargetResource
         $ExecuteAsCredential
     )
     $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
+    
     
     if ($null -eq $task) 
     {
@@ -92,8 +93,20 @@ function Get-TargetResource
         {
             if ($repetition.Duration -eq $null -and $repetition.Interval -eq $null) 
             {
-                $returnScheduleType = "Daily"
-                $returnInveral = $trigger.DaysInterval
+                $taskexport = Export-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
+                if((([xml]$taskexport).Task.Triggers.ChildNodes | Where-object {$_.Name -eq "LogonTrigger"} | Measure-Object).Count -gt 0)
+                {
+                    $returnScheduleType = "OnLogon"
+                }
+                elseif((([xml]$taskexport).Task.Triggers.ChildNodes | Where-object {$_.Name -eq "BootTrigger"} | Measure-Object).Count -gt 0)
+                {
+                    $returnScheduleType = "Startup"
+                }
+                else
+                {                
+                    $returnScheduleType = "Daily"
+                    $returnInveral = $trigger.DaysInterval
+                }
             }
             if ($repetition.Duration -eq $null -and $repetition.Interval -like "P*D") 
             {
@@ -168,9 +181,9 @@ function Set-TargetResource
         
         [Parameter(Mandatory=$true)]
         [System.String]
-        [ValidateSet("Minutes", "Hourly", "Daily")] $ScheduleType,
+        [ValidateSet("Minutes", "Hourly", "Daily", "Startup", "OnLogon")] $ScheduleType,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [System.UInt32]
         $RepeatInterval,
         
@@ -234,18 +247,31 @@ function Set-TargetResource
             { 
                 $repeatAt = New-TimeSpan -Days $RepeatInterval
             }
+            "Startup"
+            {
+                $trigger = New-ScheduledTaskTrigger -AtStartup
+            }
+            "OnLogon"
+            {
+                $trigger = New-ScheduledTaskTrigger -AtLogOn
+            }
         }
-        try
+        
+        if($ScheduleType -ne "Startup" -and $ScheduleType -ne "OnLogon")
         {
-            $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
-                                                -RepetitionInterval $repeatAt 
+            try
+            {
+                $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
+                                                    -RepetitionInterval $repeatAt 
+            }
+            catch
+            {
+                $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
+                                                    -RepetitionInterval $repeatAt `
+                                                    -RepetitionDuration ([TimeSpan]::MaxValue)
+            }
         }
-        catch
-        {
-            $trigger = New-ScheduledTaskTrigger -Once -At $startTime `
-                                                -RepetitionInterval $repeatAt `
-                                                -RepetitionDuration ([TimeSpan]::MaxValue)
-        }
+
         
         if ($currentValues.Ensure -eq "Absent") 
         {
@@ -326,9 +352,9 @@ function Test-TargetResource
         
         [Parameter(Mandatory=$true)]
         [System.String]
-        [ValidateSet("Minutes", "Hourly", "Daily")] $ScheduleType,
+        [ValidateSet("Minutes", "Hourly", "Daily", "Startup", "OnLogon")] $ScheduleType,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [System.UInt32]
         $RepeatInterval,
         
@@ -411,3 +437,4 @@ function Test-TargetResource
     
     return $true
 }
+
