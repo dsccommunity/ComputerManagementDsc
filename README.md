@@ -121,6 +121,8 @@ xVirtualMemory has the following properties:
 ### Unreleased
 * Updated resources
   - xScheduledTask: Added nearly all available parameters for tasks
+
+### 1.10.0.0
 * Added resources
   - xVirtualMemory
 

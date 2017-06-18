@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '1.9.0.0'
+ModuleVersion = '1.10.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -50,7 +50,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '* Added resources
-  - xPowerPlan
+  - xVirtualMemory
 
 '
 
@@ -58,6 +58,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 
