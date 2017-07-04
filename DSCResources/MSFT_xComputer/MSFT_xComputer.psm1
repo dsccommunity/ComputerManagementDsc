@@ -238,7 +238,7 @@ function Test-TargetResource
         try
         {
             Write-Verbose "Checking if the machine is a member of $DomainName."
-            return ($DomainName.ToLower() -eq (GetComputerDomain).ToLower())
+            return (($DomainName.ToLower()).Split('.')[0] -eq ((GetComputerDomain).Split('.')[0]).ToLower())
         }
         catch
         {
