@@ -3,9 +3,9 @@
 #---------------------------------#
 version: 1.9.{build}.0
 install:
-  - git clone https://github.com/PowerShell/DscResource.Tests
+    - git clone https://github.com/PowerShell/DscResource.Tests
 
-  - ps: |
+    - ps: |
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
         Invoke-AppveyorInstallTask
 
@@ -22,7 +22,7 @@ build: false
 test_script:
     - ps: |
           Invoke-AppveyorTestScriptTask `
-            -ExcludeTag 'Examples'
+            -CodeCoverage
 
 #---------------------------------#
 #      deployment configuration   #
