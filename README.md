@@ -92,6 +92,9 @@ xVirtualMemory has the following properties:
 
 * Updated AppVeyor.yml to use AppVeyor.psm1 module in DSCResource.Tests.
 * Removed Markdown.md errors.
+* Added CodeCov.io support.
+* xVirtualMemory:
+  * Fixed failing tests.
 
 ### 1.10.0.0
 
