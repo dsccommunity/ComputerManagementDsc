@@ -4,9 +4,12 @@
 
 The **xComputerManagement** module contains the following resources:
 
-* xComputer - allows you to configure a computer by changing its name and modifying its domain or workgroup.
-* xOfflineDomainJoin - allows you to join computers to an AD Domain using an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx) request file.
-* xScheduledTask - used to define basic recurring scheduled tasks on the local computer.
+* xComputer - allows you to configure a computer by changing its name and
+  modifying its domain or workgroup.
+* xOfflineDomainJoin - allows you to join computers to an AD Domain using
+  an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx) request file.
+* xScheduledTask - used to define basic recurring scheduled tasks on the
+  local computer.
 * xPowerPlan - specifies a power plan to activate.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
@@ -24,22 +27,26 @@ xComputer resource has following properties:
 
 * Name: The desired computer name
 * DomainName: The name of the domain to join
-* JoinOU: The distinguished name of the organizational unit that the computer account will be created in
+* JoinOU: The distinguished name of the organizational unit that the computer
+  account will be created in
 * WorkGroupName: The name of the workgroup
 * Credential: Credential to be used to join or leave domain
-* CurrentOU: A read-only property that specifies the organizational unit that the computer account is currently in
+* CurrentOU: A read-only property that specifies the organizational unit that
+  the computer account is currently in
 
 ## xOfflineDomainJoin
 
-xOfflineDomainJoin resource is a [Single Instance](https://msdn.microsoft.com/en-us/powershell/dsc/singleinstance) resource that can only be used once in a configuration and has following properties:
+xOfflineDomainJoin resource is a [Single Instance](https://msdn.microsoft.com/en-us/powershell/dsc/singleinstance)
+resource that can only be used once in a configuration and has following properties:
 
 * IsSingleInstance: Must be set to 'Yes'. Required.
 * RequestFile: The full path to the Offline Domain Join request file. Required.
 
 ## xScheduledTask
 
-xScheduledTask resource is used to define basic recurring scheduled tasks on the local computer.
-Tasks are created to run indefinitly based on the schedule defined.
+xScheduledTask resource is used to define basic recurring scheduled tasks on the
+local computer.
+Tasks are created to run indefinitely based on the schedule defined.
 xScheduledTask has the following properties:
 
 * TaskName: The name of the task
@@ -48,27 +55,35 @@ xScheduledTask has the following properties:
 * ActionArguments: The arguments to pass the executable - optional
 * ActionWorkingPath: The working path to specify for the executable - optional
 * ScheduleType: How frequently should this task be executed? Minutes, Hourly or Daily
-* RepeatInterval: How many units (minutes, hours, days) between each run of this task?
-* StartTime: The time of day this task should start at - optional, defaults to '12:00 AM'
-* Ensure: Present if the task should exist, false if it should be removed - optional, defaults to 'Ensure'
-* ExecuteAsCredential: The credential this task should execute as - Optional, defaults to running as 'NT AUTHORITY\SYSTEM'
+* RepeatInterval: How many units (minutes, hours, days) between each run of this
+ task?
+* StartTime: The time of day this task should start at - optional, defaults to
+  '12:00 AM'
+* Ensure: Present if the task should exist, false if it should be removed -
+  optional, defaults to 'Ensure'
+* ExecuteAsCredential: The credential this task should execute as -
+  optional, defaults to running as 'NT AUTHORITY\SYSTEM'
 
 ## xPowerPlan
 
 xPowerPlan resource has following properties:
 
-* IsSingleInstance: Specifies the resource is a single instance, the value must be 'Yes'.
+* IsSingleInstance: Specifies the resource is a single instance, the value must
+  be 'Yes'.
 * Name: The name of the power plan to activate.
 
 ## xVirtualMemory
 
-xVirtualMemory resource is used to set the properties of the paging file on the local computer.
+xVirtualMemory resource is used to set the properties of the paging file on the
+local computer.
 xVirtualMemory has the following properties:
 
 * Type: The type of the paging settings, mandatory, out of "AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile"
 * Drive: The drive to enable paging on, mandatory. Ignored for "AutoManagePagingFile"
-* InitialSize: The initial size in MB of the paging file. Ignored for Type "AutoManagePagingFile" and "SystemManagedSize"
-* MaximumSize: The maximum size in MB of the paging file. Ignored for Type "AutoManagePagingFile" and "SystemManagedSize"
+* InitialSize: The initial size in MB of the paging file. Ignored for Type
+  "AutoManagePagingFile" and "SystemManagedSize"
+* MaximumSize: The maximum size in MB of the paging file. Ignored for Type
+  "AutoManagePagingFile" and "SystemManagedSize"
 
 ## Versions
 
@@ -89,9 +104,11 @@ xVirtualMemory has the following properties:
 
 ### 1.8.0.0
 
-* Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
+* Converted AppVeyor.yml to pull Pester from PSGallery instead of
+  Chocolatey.
 * Changed AppVeyor.yml to use default image
-* xScheduledTask: Fixed bug with different OS versions returning repeat interval differently
+* xScheduledTask: Fixed bug with different OS versions returning repeat interval
+  differently
 
 ### 1.7.0.0
 
@@ -101,11 +118,13 @@ xVirtualMemory has the following properties:
 ### 1.6.0.0
 
 * Added the following resources:
-  * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an Offline Domain Join request file.
+  * MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an
+    Offline Domain Join request file.
   * MSFT_xScheduledTask resource to control scheduled tasks on the local server
 * MSFT_xOfflineDomainJoin: Corrected localizedData.DomainAlreadyJoinedhMessage name.
-* xComputer: Changed credential generation code in tests to avoid triggering PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
-             Renamed unit test file to match the name of Resource file.
+* xComputer: Changed credential generation code in tests to avoid triggering
+  PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
+  Renamed unit test file to match the name of Resource file.
 
 ### 1.5.0.0
 
@@ -115,18 +134,22 @@ xVirtualMemory has the following properties:
 ### 1.4.0.0
 
 * Added validation to the Name parameter
-* Added the JoinOU parameter which allows you to specify the organizational unit that the computer account will be created in
-* Added the CurrentOU read-only property that shows the organizational unit that the computer account is currently in
+* Added the JoinOU parameter which allows you to specify the organizational unit
+  that the computer account will be created in
+* Added the CurrentOU read-only property that shows the organizational unit that
+  the computer account is currently in
 
 ### 1.3.0
 
 * xComputer
-  * Fixed issue with Test-TargetResource when not specifying Domain or Workgroup name
+  * Fixed issue with Test-TargetResource when not specifying Domain or
+    Workgroup name
   * Added tests
 
 ### 1.2.2
 
-* Added types to Get/Set/Test definitions to allow xResourceDesigner validation to succeed
+* Added types to Get/Set/Test definitions to allow xResourceDesigner validation
+  to succeed
 
 ### 1.2
 
@@ -391,7 +414,8 @@ Start-DscConfiguration -Path Sample_xOfflineDomainJoin -Wait -Verbose -Force
 
 ### Run a PowerShell script every 15 minutes on a server
 
-This example will create a scheduled task that will call PowerShell.exe every 15 minutes to run a script saved locally.
+This example will create a scheduled task that will call PowerShell.exe every 15
+minutes to run a script saved locally.
 The script will be called as the local system account
 
 ```powershell
