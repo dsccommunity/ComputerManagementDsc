@@ -7,7 +7,8 @@ The **xComputerManagement** module contains the following resources:
 * xComputer - allows you to configure a computer by changing its name and
   modifying its domain or workgroup.
 * xOfflineDomainJoin - allows you to join computers to an AD Domain using
-  an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx) request file.
+  an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx)
+  request file.
 * xScheduledTask - used to define basic recurring scheduled tasks on the
   local computer.
 * xPowerPlan - specifies a power plan to activate.
@@ -233,20 +234,24 @@ configuration Sample_xComputer_WorkgroupToDomain
 
 
 <#****************************
-To save the credential in plain-text in the mof file, use the following configuration data
+To save the credential in plain-text in the mof file, use the following
+configuration data
 
 $ConfigData = @{
-                 AllNodes = @(
-                              @{
-                                 NodeName = "localhost"
-                                 # Allows credential to be saved in plain-text in the the *.mof instance document.
+    AllNodes = @(
+        @{
+            NodeName = "localhost"
+            
+            # Allows credential to be saved in plain-text in the the *.mof
+            # instance document.
 
-                                 PSDscAllowPlainTextPassword = $true
-                              }
-                            )
-              }
+            PSDscAllowPlainTextPassword = $true
+        }
+    )
+}
 
-Sample_xComputer_WorkgroupToDomain -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -Domain <domainName>
+Sample_xComputer_WorkgroupToDomain -ConfigurationData $ConfigData `
+    -MachineName <machineName> -credential (Get-Credential) -Domain <domainName>
 ****************************#>
 ```
 
@@ -283,22 +288,24 @@ function Sample_xComputer_ChangeNameInDomain
 }
 
 <#****************************
-To save the credential in plain-text in the mof file, use the following configuration data
+To save the credential in plain-text in the mof file, use the following
+configuration data
 
 $ConfigData = @{
-                AllNodes = @(
-                             @{
-                                NodeName = "localhost";
+    AllNodes = @(
+        @{
+            NodeName = "localhost";
 
-                                # Allows credential to be saved in plain-text in the the *.mof instance document.
+            # Allows credential to be saved in plain-text
+            # in the the *.mof instance document.
 
-                                PSDscAllowPlainTextPassword = $true;
-                          }
-                 )
-            }
+            PSDscAllowPlainTextPassword = $true;
+        }
+    )
+}
 
-Sample_xComputer_ChangeNameInDomain -ConfigurationData $ConfigData -MachineName <machineName>  -Credential (Get-Credential)
-
+Sample_xComputer_ChangeNameInDomain -ConfigurationData $ConfigData `
+    -MachineName <machineName>  -Credential (Get-Credential)
 *****************************#>
 ```
 
@@ -367,20 +374,24 @@ function  Sample_xComputer_DomainToWorkgroup
 }
 
 <#****************************
-To save the credential in plain-text in the mof file, use the following configuration data
+To save the credential in plain-text in the mof file, use the following
+configuration data
 
 $ConfigData = @{
-                AllNodes = @(
-                             @{
-                                NodeName = "localhost";
-                                # Allows credential to be saved in plain-text in the the *.mof instance document.
+    AllNodes = @(
+        @{
+            NodeName = "localhost";
+    
+            # Allows credential to be saved in plain-text in the the *.mof
+            # instance document.
 
-                                PSDscAllowPlainTextPassword = $true;
-                              }
-                           )
-                }
+            PSDscAllowPlainTextPassword = $true;
+        }
+    )
+}
 
-Sample_xComputer_DomainToWorkgroup -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -WorkGroup <workgroupName>
+Sample_xComputer_DomainToWorkgroup -ConfigurationData $ConfigData `
+    -MachineName <machineName> -credential (Get-Credential) -WorkGroup <workgroupName>
 ****************************#>
 ```
 
