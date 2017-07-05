@@ -218,7 +218,7 @@ configuration Sample_xComputer_WorkgroupToDomain
         [pscredential]$Credential
     )
 
-    #Import the required DSC Resources
+    # Import the required DSC Resources
     Import-DscResource -Module xComputerManagement
 
     Node $NodeName
@@ -233,7 +233,7 @@ configuration Sample_xComputer_WorkgroupToDomain
 }
 
 
-<#****************************
+<#
 To save the credential in plain-text in the mof file, use the following
 configuration data
 
@@ -252,7 +252,7 @@ $ConfigData = @{
 
 Sample_xComputer_WorkgroupToDomain -ConfigurationData $ConfigData `
     -MachineName <machineName> -credential (Get-Credential) -Domain <domainName>
-****************************#>
+#>
 ```
 
 ### Change the Name while staying on the Domain
@@ -274,7 +274,7 @@ function Sample_xComputer_ChangeNameInDomain
         [pscredential]$Credential
     )
 
-    #Import the required DSC Resources
+    # Import the required DSC Resources
     Import-DscResource -Module xComputerManagement
 
     Node $NodeName
@@ -287,7 +287,7 @@ function Sample_xComputer_ChangeNameInDomain
     }
 }
 
-<#****************************
+<#
 To save the credential in plain-text in the mof file, use the following
 configuration data
 
@@ -306,7 +306,7 @@ $ConfigData = @{
 
 Sample_xComputer_ChangeNameInDomain -ConfigurationData $ConfigData `
     -MachineName <machineName>  -Credential (Get-Credential)
-*****************************#>
+#>
 ```
 
 ### Change the Name while staying on the Workgroup
@@ -359,7 +359,7 @@ function  Sample_xComputer_DomainToWorkgroup
         [pscredential]$Credential
     )
 
-    #Import the required DSC Resources
+    # Import the required DSC Resources
     Import-DscResource -Module xComputerManagement
 
     Node $NodeName
@@ -373,7 +373,7 @@ function  Sample_xComputer_DomainToWorkgroup
     }
 }
 
-<#****************************
+<#
 To save the credential in plain-text in the mof file, use the following
 configuration data
 
@@ -392,7 +392,7 @@ $ConfigData = @{
 
 Sample_xComputer_DomainToWorkgroup -ConfigurationData $ConfigData `
     -MachineName <machineName> -credential (Get-Credential) -WorkGroup <workgroupName>
-****************************#>
+#>
 ```
 
 ### Join a Domain using an ODJ Request File
