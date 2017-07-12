@@ -166,6 +166,7 @@ xVirtualMemory has the following properties:
 * Added CodeCov.io support.
 
 ### 2.0.0.0
+
 * Updated resources
   * BREAKING CHANGE: xScheduledTask: Added nearly all available parameters for tasks
 * xVirtualMemory:
