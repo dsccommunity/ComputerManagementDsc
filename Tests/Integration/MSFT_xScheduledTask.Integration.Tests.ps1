@@ -1,22 +1,22 @@
 #Requires -Version 5.0
-$Global:DSCModuleName      = 'xComputerManagement'
-$Global:DSCResourceName    = 'MSFT_xScheduledTask'
-
+$Global:DSCModuleName = 'xComputerManagement'
+$Global:DSCResourceName = 'MSFT_xScheduledTask'
 #region HEADER
-# Unit Test Template Version: 1.1.0
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+# Integration Test Template Version: 1.1.1
+[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
-    -TestType Integration 
+    -TestType Integration
 
+#endregion
 # Begin Testing
 try
 {
@@ -25,214 +25,97 @@ try
     
     #region Pester Tests
     Describe $Global:DSCResourceName {
-        
-        Context "No scheduled task exists, but it should" {
-            $CurrentConfig = "xScheduledTask_Add"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
-            
-            It "should compile a MOF file without error" {
-                {
-                    . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
-            }
-            
-            It "should apply the MOF correctly" {
-                {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
-            }
-            
-            It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
-            }
+
+        $contexts = @{
+            Once      = 'xScheduledTaskOnce'
+            Daily     = 'xScheduledTaskDaily'
+            Weekly    = 'xScheduledTaskWeekly'
+            AtLogon   = 'xScheduledTaskLogon'
+            AtStartup = 'xScheduledTaskStartup'
         }
         
-        Context "A scheduled task with minutes based repetition exists, but has the wrong settings" {
-            $CurrentConfig = "xScheduledTask_Edit1"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+        foreach ($contextInfo in $contexts.GetEnumerator())
+        {
+            Context "[$($contextInfo.Key)] No scheduled task exists but it should" {
+                $CurrentConfig = '{0}Add' -f $contextInfo.Value
+                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
-                {
-                    . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
-            }
+                It 'should compile and apply the MOF without throwing' {
+                    {
+                        . $CurrentConfig -OutputPath $ConfigDir
+                    } | Should Not Throw
+                }
             
-            It "should apply the MOF correctly" {
-                {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
-            }
+                It 'should apply the MOF correctly' {
+                    {
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    } | Should Not Throw
+                }
             
-            It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                It 'should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                }
             }
-        }
-        
-        Context "A scheduled task with hourly based repetition exists, but has the wrong settings" {
-            $CurrentConfig = "xScheduledTask_Edit2"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+
+            Context "[$($contextInfo.Key)] A scheduled task exists with the wrong settings" {
+                $CurrentConfig = '{0}Mod' -f $contextInfo.Value
+                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
-                {
-                    . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
-            }
+                It 'should compile and apply the MOF without throwing' {
+                    {
+                        . $CurrentConfig -OutputPath $ConfigDir
+                    } | Should Not Throw
+                }
             
-            It "should apply the MOF correctly" {
-                {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
-            }
+                It 'should apply the MOF correctly' {
+                    {
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    } | Should Not Throw
+                }
             
-            It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                It 'should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                }
             }
-        }
-        
-        Context "A scheduled task with daily based repetition exists, but has the wrong settings" {
-            $CurrentConfig = "xScheduledTask_Edit3"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
+
+            Context "[$($contextInfo.Key)] A scheduled tasks exists but it should not" {
+                $CurrentConfig = '{0}Del' -f $contextInfo.Value
+                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
             
-            It "should compile a MOF file without error" {
-                {
-                    . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
-            }
+                It 'should compile and apply the MOF without throwing' {
+                    {
+                        . $CurrentConfig -OutputPath $ConfigDir
+                    } | Should Not Throw
+                }
             
-            It "should apply the MOF correctly" {
-                {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
-            }
+                It 'should apply the MOF correctly' {
+                    {
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                    } | Should Not Throw
+                }
             
-            It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                It 'should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                }
             }
-        }
-        
-        Context "A scheduled task exists and is configured with the wrong working directory" {
-            $CurrentConfig = "xScheduledTask_Edit4"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
-            
-            It "should compile a MOF file without error" {
-                {
-                    . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
-            }
-            
-            It "should apply the MOF correctly" {
-                {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
-            }
-            
-            It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
-            }
-        }
-        
-        Context "A scheduled task exists and is configured with the wrong executable arguments" {
-            $CurrentConfig = "xScheduledTask_Edit5"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
-            
-            It "should compile a MOF file without error" {
-                {
-                    . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
-            }
-            
-            It "should apply the MOF correctly" {
-                {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
-            }
-            
-            It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
-            }
-        }
-        
-        Context "A scheduled task exists, but it shouldn't" {
-            $CurrentConfig = "xScheduledTask_Remove"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
-            
-            It "should compile a MOF file without error" {
-                {
-                    . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
-            }
-            
-            It "should apply the MOF correctly" {
-                {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
-            }
-            
-            It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
-            }
-        }
-        
-        Context "A scheduled task exists, and should be enabled" {
-            $CurrentConfig = "xScheduledTask_Enable"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
-            
-            It "should compile a MOF file without error" {
-                {
-                    . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
-            }
-            
-            It "should apply the MOF correctly" {
-                {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
-            }
-            
-            It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
-            }
-        }
-        
-        Context "A scheduled task exists, and should be disabled" {
-            $CurrentConfig = "xScheduledTask_Disable"
-            $ConfigDir = (Join-Path $TestDrive $CurrentConfig)
-            $ConfigMof = (Join-Path $ConfigDir "localhost.mof")
-            
-            It "should compile a MOF file without error" {
-                {
-                    . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
-            }
-            
-            It "should apply the MOF correctly" {
-                {
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
-            }
-            
-            It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
-            }
-        }
-        
-        AfterEach {
-            Remove-DscConfigurationDocument -Stage Current, Pending, Previous -Force -Confirm:$false -WarningAction SilentlyContinue
         }
     }
-    #endregion
 }
 finally
 {
     #region FOOTER
+    
+    # Remove any traces of the created tasks
+    Get-ScheduledTask -TaskPath '\xComputerManagement\' -ErrorAction SilentlyContinue | Unregister-ScheduledTask -ErrorAction SilentlyContinue -Confirm:$false
+
+    $scheduler = New-Object -ComObject Schedule.Service
+    $scheduler.Connect()
+    $rootFolder = $scheduler.GetFolder('\')
+    $rootFolder.DeleteFolder('xComputerManagement', 0)
+    
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }
