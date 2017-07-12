@@ -161,11 +161,13 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
-* Updated resources
-  * BREAKING CHANGE: xScheduledTask: Added nearly all available parameters for tasks
 * Updated AppVeyor.yml to use AppVeyor.psm1 module in DSCResource.Tests.
 * Removed Markdown.md errors.
 * Added CodeCov.io support.
+
+### 2.0.0.0
+* Updated resources
+  * BREAKING CHANGE: xScheduledTask: Added nearly all available parameters for tasks
 * xVirtualMemory:
   * Fixed failing tests.
 
