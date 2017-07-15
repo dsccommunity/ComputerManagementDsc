@@ -130,9 +130,7 @@ try
                 It 'Should return a hashtable containing Name, DomainName, JoinOU, CurrentOU, Credential, UnjoinCredential and WorkGroupName' {
                     $Result = Get-TargetResource -Name $env:COMPUTERNAME
                     $Result.GetType().Fullname | Should Be 'System.Collections.Hashtable'
-                    $referenceKeys = @('Name', 'DomainName', 'JoinOU', 'CurrentOU', 'Credential', 'UnjoinCredential', 'WorkGroupName')|Sort-Object
-                    $resultKeys = $Result.Keys|Sort-Object
-                    $resultKeys | Should Be $referenceKeys
+                    $Result.Keys | Sort-Object | Should Be @('Credential', 'CurrentOU', 'DomainName', 'JoinOU', 'Name',  'UnjoinCredential', 'WorkGroupName')
                 }
                 It 'Throws if name is to long' {
                     {Get-TargetResource -Name "ThisNameIsTooLong"} | Should Throw

@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '1.9.0.0'
+ModuleVersion = '2.0.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,8 +49,8 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* Added resources
-  - xPowerPlan
+        ReleaseNotes = '* Updated resources
+  - BREAKING CHANGE: xScheduledTask: Added nearly all available parameters for tasks
 
 '
 
@@ -58,6 +58,8 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
+
 
 
 

@@ -61,27 +61,76 @@ Tasks are created to run indefinitly based on the schedule defined.
 xScheduledTask has the following properties:
 
  * TaskName: The name of the task
- * TaskPath: The path to the task - optional, defaults to '\'
+ * TaskPath: The path to the task - defaults to the root directory
+ * Description: The task description
  * ActionExecutable: The path to the .exe for this task
- * ActionArguments: The arguments to pass the executable - optional
- * ActionWorkingPath: The working path to specify for the executable - optional
- * ScheduleType: How frequently should this task be executed? Minutes, Hourly or Daily
+ * ActionArguments: The arguments to pass the executable
+ * ActionWorkingPath: The working path to specify for the executable
+ * ScheduleType: When should the task be executed ("Once", "Daily", "Weekly", "AtStartup", "AtLogOn")
  * RepeatInterval: How many units (minutes, hours, days) between each run of this task?
- * StartTime: The time of day this task should start at - optional, defaults to '12:00 AM'
- * Ensure: Present if the task should exist, false if it should be removed - optional, defaults to 'Ensure'
- * ExecuteAsCredential: The credential this task should execute as - Optional, defaults to running as 'NT AUTHORITY\SYSTEM'
+ * StartTime: The time of day this task should start at - defaults to 12:00 AM. Not valid for AtLogon and AtStartup tasks
+ * Ensure: Present if the task should exist, false if it should be removed
+ * Enable: True if the task should be enabled, false if it should be disabled
+ * ExecuteAsCredential: The credential this task should execute as. If not specified defaults to running as the local system account
+ * DaysInterval: Specifies the interval between the days in the schedule. An interval of 1 produces a daily schedule. An interval of 2 produces an every-other day schedule.
+ * RandomDelay: Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting.
+ * RepetitionDuration: Specifies how long the repetition pattern repeats after the task starts.
+ * DaysOfWeek: Specifies an array of the days of the week on which Task Scheduler runs the task.
+ * WeeksInterval: Specifies the interval between the weeks in the schedule. An interval of 1 produces a weekly schedule. An interval of 2 produces an every-other week schedule.
+ * User: Specifies the identifier of the user for a trigger that starts a task when a user logs on.
+ * DisallowDemandStart: Indicates whether the task is prohibited to run on demand or not. Defaults to $false
+ * DisallowHardTerminate: Indicates whether the task is prohibited to be terminated or not. Defaults to $false
+ * Compatibility: The task compatibility level. Defaults to Vista. Possible values: "AT","V1","Vista","Win7","Win8"
+ * AllowStartIfOnBatteries: Indicates whether the task should start if the machine is on batteries or not. Defaults to $false
+ * Hidden: Indicates that the task is hidden in the Task Scheduler UI. Defaults to $false
+ * RunOnlyIfIdle: Indicates that Task Scheduler runs the task only when the computer is idle.
+ * IdleWaitTimeout: Specifies the amount of time that Task Scheduler waits for an idle condition to occur. DateTime ;
+ * NetworkName: Specifies the name of a network profile that Task Scheduler uses to determine if the task can run. The Task Scheduler UI uses this setting for display purposes. Specify a network name if you specify the RunOnlyIfNetworkAvailable parameter.
+ * DisallowStartOnRemoteAppSession: Indicates that the task does not start if the task is triggered to run in a Remote Applications Integrated Locally (RAIL) session.
+ * StartWhenAvailable: Indicates that Task Scheduler can start the task at any time after its scheduled time has passed.
+ * DontStopIfGoingOnBatteries: Indicates that the task does not stop if the computer switches to battery power.
+ * WakeToRun: Indicates that Task Scheduler wakes the computer before it runs the task.
+ * IdleDuration: Specifies the amount of time that the computer must be in an idle state before Task Scheduler runs the task.
+ * RestartOnIdle: Indicates that Task Scheduler restarts the task when the computer cycles into an idle condition more than once.
+ * DontStopOnIdleEnd: Indicates that Task Scheduler does not terminate the task if the idle condition ends before the task is completed.
+ * ExecutionTimeLimit: Specifies the amount of time that Task Scheduler is allowed to complete the task.
+ * MultipleInstances: Specifies the policy that defines how Task Scheduler handles multiple instances of the task. Possible values: "IgnoreNew","Parallel","Queue"
+ * Priority: Specifies the priority level of the task. Priority must be an integer from 0 (highest priority) to 10 (lowest priority). The default value is 7. Priority levels 7 and 8 are used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.
+ * RestartCount: Specifies the number of times that Task Scheduler attempts to restart the task.
+ * RestartInterval: Specifies the amount of time that Task Scheduler attempts to restart the task.
+ * RunOnlyIfNetworkAvailable: Indicates that Task Scheduler runs the task only when a network is available. Task Scheduler uses the NetworkID parameter and NetworkName parameter that you specify in this cmdlet to determine if the network is available.
 
 ## xPowerPlan
 xPowerPlan resource has following properties:
 
  * IsSingleInstance: Specifies the resource is a single instance, the value must be 'Yes'.
  * Name: The name of the power plan to activate.
+ 
+## xVirtualMemory
+
+xVirtualMemory resource is used to set the properties of the paging file on the local computer.
+xVirtualMemory has the following properties:
+
+* Type: The type of the paging settings, mandatory, out of "AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile"
+* Drive: The drive to enable paging on, mandatory. Ignored for "AutoManagePagingFile"
+* InitialSize: The initial size in MB of the paging file. Ignored for Type "AutoManagePagingFile" and "SystemManagedSize"
+* MaximumSize: The maximum size in MB of the paging file. Ignored for Type "AutoManagePagingFile" and "SystemManagedSize"
 
 ## Versions
 
 ### Unreleased
 - xScheduledTask
     - Fixed incorrect TaskPath handling (Fix #45)
+
+### 2.0.0.0
+* Updated resources
+  - BREAKING CHANGE: xScheduledTask: Added nearly all available parameters for tasks
+
+### 1.10.0.0
+* Added resources
+  - xVirtualMemory
+
+>>>>>>> 09d3709ed7a50e2c4bcb965c871b18cfafc52454
 ### 1.9.0.0
 * Added resources
   - xPowerPlan
@@ -399,8 +448,9 @@ configuration Sample_xScheduledTask
           TaskName = "Custom maintenance tasks"
           ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
           ActionArguments = "-File `"C:\scripts\my custom script.ps1`""
-          ScheduleType = "Minutes"
-          RepeatInterval = 15
+          ScheduleType = 'Once'
+          RepeatInterval = [datetime]::Today.AddMinutes(15)
+          RepetitionDuration = [datetime]::Today.AddHours(10)
         }
     }
 }
