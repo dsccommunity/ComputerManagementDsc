@@ -234,11 +234,23 @@ function Test-TargetResource
         {
             throw "Need to specify credentials with domain"
         }
-        
+
         try
         {
             Write-Verbose "Checking if the machine is a member of $DomainName."
-            return ($DomainName.ToLower() -eq (GetComputerDomain).ToLower())
+            if ($DomainName.Contains('.'))
+            {
+                $getComputerDomainSplat = @{
+                    netbios = $false
+                }
+            }
+            else
+            {
+                $getComputerDomainSplat = @{
+                    netbios = $true
+                }
+            }
+            return ($DomainName -eq (GetComputerDomain @getComputerDomainSplat ))
         }
         catch
         {
@@ -268,9 +280,25 @@ function ValidateDomainOrWorkGroup($DomainName, $WorkGroupName)
 
 function GetComputerDomain
 {
-  try
+    [CmdletBinding()]
+    param
+    (
+        [Parameter()]
+        [Switch]
+        $NetBios
+    )
+
+    try
     {
-        return ([System.DirectoryServices.ActiveDirectory.Domain]::GetComputerDomain()).Name
+        if ($NetBios)
+        {
+            $domainName = $ENV:USERDOMAIN
+        }
+        else
+        {
+            $domainName = ([System.DirectoryServices.ActiveDirectory.Domain]::GetComputerDomain()).Name
+        }
+        return $domainName
     }
     catch [System.Management.Automation.MethodInvocationException]
     {
