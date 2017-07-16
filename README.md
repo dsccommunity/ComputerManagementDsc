@@ -119,6 +119,7 @@ xVirtualMemory has the following properties:
 ## Versions
 
 ### Unreleased
+* xComputer: Changed comparision that validates if we are in the correct AD Domain to work correctly if FQDN wasn't used
 
 ### 2.0.0.0
 * Updated resources
