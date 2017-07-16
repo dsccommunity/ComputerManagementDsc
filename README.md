@@ -160,6 +160,7 @@ xVirtualMemory has the following properties:
 ## Versions
 
 ### Unreleased
+* xComputer: Changed comparision that validates if we are in the correct AD Domain to work correctly if FQDN wasn't used
 
 * Updated AppVeyor.yml to use AppVeyor.psm1 module in DSCResource.Tests.
 * Removed Markdown.md errors.
