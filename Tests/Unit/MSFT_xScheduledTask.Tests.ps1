@@ -39,6 +39,7 @@ try
             Context 'No scheduled task exists, but it should' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
@@ -63,6 +64,7 @@ try
             Context 'A scheduled task exists, but it should not' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
@@ -71,24 +73,24 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalMinutes)M"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalMinutes)M"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -107,6 +109,7 @@ try
             Context 'A scheduled task doesnt exist, and it should not' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     Ensure = 'Absent'
@@ -126,31 +129,32 @@ try
             Context 'A scheduled task with Once based repetition exists, but has the wrong settings' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
-                    RepeatInterval =[datetime]::Today + (New-TimeSpan -Minutes 15)
+                    RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
                     RepetitionDuration = [datetime]::Today + (New-TimeSpan -Minutes 150)
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = $null
-                            Interval = "PT$(($testParams.RepeatInterval.TimeOfDay.TotalMinutes) + 1)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = $null
+                                    Interval = "PT$(($testParams.RepeatInterval.TimeOfDay.TotalMinutes) + 1)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -170,6 +174,7 @@ try
             Context 'A scheduled task with minutes based repetition exists and has the correct settings' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
@@ -177,24 +182,24 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalMinutes)M"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalMinutes)M"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -208,6 +213,7 @@ try
             Context 'A scheduled task with hourly based repetition exists, but has the wrong settings' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Hours 4)
@@ -215,24 +221,24 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$(($testParams.RepetitionDuration.TimeOfDay.TotalHours))H"
-                            Interval = "PT$(($testParams.RepeatInterval.TimeOfDay.TotalHours) + 1)H"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$(($testParams.RepetitionDuration.TimeOfDay.TotalHours))H"
+                                    Interval = "PT$(($testParams.RepeatInterval.TimeOfDay.TotalHours) + 1)H"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -252,6 +258,7 @@ try
             Context 'A scheduled task with hourly based repetition exists and has the correct settings' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Hours 4)
@@ -259,24 +266,24 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalHours)H"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalHours)H"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -290,30 +297,31 @@ try
             Context 'A scheduled task with daily based repetition exists, but has the wrong settings' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Daily'
                     DaysInterval = 3
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = $null
-                            Interval = "P$(($testParams.DaysInterval) + 1)D"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = $null
+                                    Interval = "P$(($testParams.DaysInterval) + 1)D"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskDailyTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskDailyTrigger'
-                        }
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -333,27 +341,28 @@ try
             Context 'A scheduled task with daily based repetition exists and has the correct settings' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Daily'
                     DaysInterval = 3
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                    })
-                    Triggers = @(@{
-                        DaysInterval = $testParams.DaysInterval
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskDailyTrigger'
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                DaysInterval = $testParams.DaysInterval
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskDailyTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -367,6 +376,7 @@ try
             Context 'A scheduled task exists and is configured with the wrong execution account' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [DateTime]::Today.Add((New-TimeSpan -Minutes 15))
@@ -375,24 +385,24 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'WrongUser'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Principal = @{
-                        UserId = 'WrongUser'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -412,6 +422,7 @@ try
             Context 'A scheduled task exists and is configured with the wrong working directory' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ActionWorkingPath = 'C:\Example'
                     ScheduleType = 'Once'
@@ -420,25 +431,25 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                        WorkingDirectory = 'C:\Wrong'
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = $null
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                                WorkingDirectory = 'C:\Wrong'
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = $null
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -458,6 +469,7 @@ try
             Context 'A scheduled task exists and is configured with the wrong executable arguments' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ActionArguments = '-File "C:\something\right.ps1"'
                     ScheduleType = 'Once'
@@ -466,25 +478,25 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                        Arguments = '-File "C:\something\wrong.ps1"'
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                                Arguments = '-File "C:\something\wrong.ps1"'
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -504,6 +516,7 @@ try
             Context 'A scheduled task is enabled and should be disabled' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
@@ -512,27 +525,27 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                        Arguments = $testParams.Arguments
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                                Arguments = $testParams.Arguments
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Settings = @(@{
+                                Enabled = $true
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Settings = @(@{
-                        Enabled = $true
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
                     } }
                 
                 It 'should return present from the get method' {
@@ -554,6 +567,7 @@ try
             Context 'A scheduled task is enabled and has the correct settings' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
@@ -562,28 +576,28 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                        Arguments = $testParams.Arguments
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                                Arguments = $testParams.Arguments
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Settings = @(@{
+                                Enabled = $true
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Settings = @(@{
-                        Enabled = $true
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -597,6 +611,7 @@ try
             Context 'A scheduled task is disabled and has the correct settings' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
@@ -605,28 +620,28 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                        Arguments = $testParams.Arguments
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                                Arguments = $testParams.Arguments
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Settings = @(@{
+                                Enabled = $false
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Settings = @(@{
-                        Enabled = $false
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -640,6 +655,7 @@ try
             Context 'A scheduled task is disabled but should be enabled' {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
@@ -648,28 +664,28 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                        Arguments = $testParams.Arguments
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                                Arguments = $testParams.Arguments
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Settings = @(@{
+                                Enabled = $false
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Settings = @(@{
-                        Enabled = $false
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -689,6 +705,7 @@ try
             Context 'A Scheduled task exists, is disabled, and the optional parameter enable is not specified' -Fixture {
                 $testParams = @{
                     TaskName = 'Test task'
+                    TaskPath = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType = 'Once'
                     RepeatInterval = [datetime]::Today + (New-TimeSpan -Minutes 15)
@@ -696,28 +713,28 @@ try
                 }
                 
                 Mock Get-ScheduledTask { return @{
-                    Name = $testParams.TaskName
-                    Path = $testParams.TaskPath
-                    Actions = @(@{
-                        Execute = $testParams.ActionExecutable
-                        Arguments = $testParams.Arguments
-                    })
-                    Triggers = @(@{
-                        Repetition = @{
-                            Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
-                            Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                                Arguments = $testParams.Arguments
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$($testParams.RepetitionDuration.TimeOfDay.TotalHours)H"
+                                    Interval = "PT$($testParams.RepeatInterval.TimeOfDay.TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Settings = @(@{
+                                Enabled = $false
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
                         }
-                        CimClass = @{
-                            CimClassName = 'MSFT_TaskTimeTrigger'
-                        }
-                    })
-                    Settings = @(@{
-                        Enabled = $false
-                    })
-                    Principal = @{
-                        UserId = 'SYSTEM'
-                    }
-                } }
+                    } }
                 
                 It 'should return present from the get method' {
                     (Get-TargetResource @testParams).Ensure | Should Be 'Present'
@@ -728,6 +745,27 @@ try
                 }
             }
             
+            Context 'A scheduled task path is root or custom' -Fixture {
+                It 'should return backslash' {
+                    ConvertTo-NormalizedTaskPath -TaskPath '\'| Should Be '\'
+                }
+
+                It 'should add backslash at the end' {
+                    ConvertTo-NormalizedTaskPath -TaskPath '\Test'| Should Be '\Test\'
+                }
+
+                It 'should add backslash at the beginning' {
+                    ConvertTo-NormalizedTaskPath -TaskPath 'Test\'| Should Be '\Test\'
+                }
+
+                It 'should add backslash at the beginning and at the end' {
+                    ConvertTo-NormalizedTaskPath -TaskPath 'Test'| Should Be '\Test\'
+                }
+
+                It 'should not add backslash' {
+                    ConvertTo-NormalizedTaskPath -TaskPath '\Test\'| Should Be '\Test\'
+                }
+            }
         }
     }
     #endregion

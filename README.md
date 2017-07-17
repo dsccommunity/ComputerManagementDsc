@@ -1,10 +1,5 @@
 # xComputerManagement
 
-| Branch | Build Status | Code Coverage |
-| --- | --- | --- |
-| master | [![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xComputerManagement/branch/master) | [![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master) |
-| dev | [![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xComputerManagement/branch/dev) | [![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/dev) |
-
 The **xComputerManagement** module contains the following resources:
 
 * xComputer - allows you to configure a computer by changing its name and
@@ -15,11 +10,32 @@ The **xComputerManagement** module contains the following resources:
 * xScheduledTask - used to define basic recurring scheduled tasks on the
   local computer.
 * xPowerPlan - specifies a power plan to activate.
+* xVirtualMemory - used to set the properties of the paging file on the
+  local computer.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
 or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
 additional questions or comments.
+
+## Branches
+
+### master
+
+[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xsqlserver/branch/master)
+[![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master)
+
+This is the branch containing the latest release - no contributions should be made
+directly to this branch.
+
+### dev
+
+[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xComputerManagement/branch/dev)
+[![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/dev)
+
+This is the development branch to which contributions should be proposed by contributors
+as pull requests. This development branch will periodically be merged to the master
+branch, and be released to [PowerShell Gallery](https://www.powershellgallery.com/).
 
 ## Contributing
 
@@ -65,7 +81,8 @@ xScheduledTask has the following properties:
   task?
 * StartTime: The time of day this task should start at - defaults to 12:00 AM.
   Not valid for AtLogon and AtStartup tasks
-* Ensure: Present if the task should exist, false if it should be removed
+* Ensure: Present if the task should exist, false if it should be removed - defaults
+  to Present.
 * Enable: True if the task should be enabled, false if it should be
   disabled
 * ExecuteAsCredential: The credential this task should execute as. If not
@@ -160,11 +177,13 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
-* xComputer: Changed comparision that validates if we are in the correct AD
-  Domain to work correctly if FQDN wasn't used
+* xComputer: Changed comparison that validates if we are in the correct AD
+  Domain to work correctly if FQDN wasn't used.
 * Updated AppVeyor.yml to use AppVeyor.psm1 module in DSCResource.Tests.
 * Removed Markdown.md errors.
 * Added CodeCov.io support.
+* xScheduledTask
+  * Fixed incorrect TaskPath handling - [Issue #45](https://github.com/PowerShell/xComputerManagement/issues/45)
 
 ### 2.0.0.0
 
@@ -175,7 +194,7 @@ xVirtualMemory has the following properties:
 
 ### 1.10.0.0
 
-* Added resources
+* Added resources:
   * xVirtualMemory
 
 ### 1.9.0.0
