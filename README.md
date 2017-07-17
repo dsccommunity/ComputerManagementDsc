@@ -1,10 +1,9 @@
 # xComputerManagement
 
-master: [![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xCertificate/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/xCertificate/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xCertificate)
-
-dev: [![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xcomputermanagement/branch/dev)
-[![codecov](https://codecov.io/gh/PowerShell/xcomputermanagement/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xCertificate)
+| Branch | Build Status | Code Coverage |
+| --- | --- | --- |
+| master | [![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xComputerManagement/branch/master) | [![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master) |
+| dev | [![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xComputerManagement/branch/dev) | [![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/dev) |
 
 The **xComputerManagement** module contains the following resources:
 

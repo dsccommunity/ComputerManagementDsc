@@ -3,7 +3,7 @@
     "MD029": {
         "style": "ordered"
     },
-    "MD013": true,
+    "MD013": false,
     "MD024": true,
     "MD034": true,
     "no-hard-tabs": true
