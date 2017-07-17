@@ -119,8 +119,10 @@ xVirtualMemory has the following properties:
 ## Versions
 
 ### Unreleased
-- xScheduledTask
+* xScheduledTask
     - Fixed incorrect TaskPath handling [Fix #45](https://github.com/PowerShell/xComputerManagement/issues/45)
+
+* xComputer: Changed comparision that validates if we are in the correct AD Domain to work correctly if FQDN wasn't used
 
 ### 2.0.0.0
 * Updated resources
