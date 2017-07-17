@@ -120,7 +120,7 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 - xScheduledTask
-    - Fixed incorrect TaskPath handling (Fix #45)
+    - Fixed incorrect TaskPath handling [Fix #45](https://github.com/PowerShell/xComputerManagement/issues/45)
 
 ### 2.0.0.0
 * Updated resources
@@ -129,8 +129,7 @@ xVirtualMemory has the following properties:
 ### 1.10.0.0
 * Added resources
   - xVirtualMemory
-
->>>>>>> 09d3709ed7a50e2c4bcb965c871b18cfafc52454
+  
 ### 1.9.0.0
 * Added resources
   - xPowerPlan

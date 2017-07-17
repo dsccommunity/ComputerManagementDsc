@@ -267,12 +267,7 @@ function Get-TargetResource
         $RunOnlyIfNetworkAvailable = $false
     )
 
-    # Normalize path 
-    $pathArray = ($TaskPath -split '\\').Where( {$_})
-    if ($pathArray.Count -gt 0)
-    {
-        $TaskPath = "\$($pathArray -join '\')\"
-    }
+    $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
     
     Write-Verbose -Message ('Retrieving existing task ({0} in {1})' -f $TaskName, $TaskPath)
 
@@ -828,6 +823,8 @@ function Set-TargetResource
         $RunOnlyIfNetworkAvailable = $false
     )
     
+    $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
+
     Write-Verbose -Message ('Entering Set-TargetResource for {0} in {1}' -f $TaskName, $TaskPath)
     $currentValues = Get-TargetResource @PSBoundParameters
     
@@ -1001,11 +998,11 @@ function Set-TargetResource
 
         if ($currentValues.Ensure -eq 'Present') 
         {
-            Write-Verbose -Message ('Removing previous scheduled task' -f $TaskName)
+            Write-Verbose -Message ('Removing previous scheduled task {0}' -f $TaskName)
             $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
         }
         
-        Write-Verbose -Message ('Creating new scheduled task' -f $TaskName)
+        Write-Verbose -Message ('Creating new scheduled task {0}' -f $TaskName)
 
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
 
@@ -1050,7 +1047,7 @@ function Set-TargetResource
     
     if ($Ensure -eq 'Absent') 
     {
-        Write-Verbose -Message ('Removing scheduled task' -f $TaskName)
+        Write-Verbose -Message ('Removing scheduled task {0}' -f $TaskName)
         Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
     }
 }
@@ -1306,12 +1303,7 @@ function Test-TargetResource
         $RunOnlyIfNetworkAvailable = $false
     )
 
-    # Normalize path 
-    $pathArray = ($TaskPath -split '\\').Where( {$_})
-    if ($pathArray.Count -gt 0)
-    {
-        $TaskPath = "\$($pathArray -join '\')\"
-    }
+    $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
     
     Write-Verbose -Message ('Testing scheduled task {0}' -f $TaskName)
 
@@ -1330,9 +1322,36 @@ function Test-TargetResource
         return $false 
     }
 
-    $DesiredValues = $PSBoundParameters
-    $DesiredValues.TaskPath = $TaskPath
+    $desiredValues = $PSBoundParameters
+    $desiredValues.TaskPath = $TaskPath
 
     Write-Verbose -Message 'Testing DSC parameter state'
-    return Test-DscParameterState -CurrentValues $CurrentValues -DesiredValues $DesiredValues
+    return Test-DscParameterState -CurrentValues $CurrentValues -DesiredValues $desiredValues
+}
+
+<#
+.SYNOPSIS
+Helper function to convert TaskPath to the right form
+
+.PARAMETER TaskPath
+The path to the task 
+#>
+
+function ConvertTo-NormalizedTaskPath
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $TaskPath
+    )
+
+    $pathArray = $TaskPath.Split('\').Where( {$_})
+    if ($pathArray.Count -gt 0)
+    {
+        $TaskPath = "\$($pathArray -join '\')\"
+    }
+  
+    return $TaskPath
 }
