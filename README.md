@@ -56,11 +56,11 @@ xComputer resource has following properties:
 
 ### xComputer Examples
 
-[Set the Name and the Workgroup Name](/Examples/xComputer/1-RnameComputerAndSetWorkgroup.ps1)
-[Switch from a Workgroup to a Domain](/Examples/xComputer/2-JoinDomain.ps1)
-[Set the Name while staying on the Domain](/Examples/xComputer/3-RenameComputerInDomain.ps1)
-[Set the Name while staying on the Workgroup](/Examples/xComputer/4-RenameComputerInWorkgroup.ps1)
-[Switch from a Domain to a Workgroup](/Examples/xComputer/5-UnjoinDomainAndJoinWorkgroup.ps1)
+* [Set the Name and the Workgroup Name](/Examples/xComputer/1-RenameComputerAndSetWorkgroup.ps1)
+* [Switch from a Workgroup to a Domain](/Examples/xComputer/2-JoinDomain.ps1)
+* [Set the Name while staying on the Domain](/Examples/xComputer/3-RenameComputerInDomain.ps1)
+* [Set the Name while staying on the Workgroup](/Examples/xComputer/4-RenameComputerInWorkgroup.ps1)
+* [Switch from a Domain to a Workgroup](/Examples/xComputer/5-UnjoinDomainAndJoinWorkgroup.ps1)
 
 ## xOfflineDomainJoin
 
@@ -72,7 +72,7 @@ resource that can only be used once in a configuration and has following propert
 
 ### xOfflineDomainJoin Examples
 
-[Join a Domain using an ODJ Request File](/Examples/xOfflineDomainJoin/1-JoinDomainUsingODJBlob.ps1)
+* [Join a Domain using an ODJ Request File](/Examples/xOfflineDomainJoin/1-JoinDomainUsingODJBlob.ps1)
 
 ## xScheduledTask
 
@@ -165,8 +165,8 @@ xScheduledTask has the following properties:
 
 ### xScheduledTask Examples
 
-[Create five different scheduled tasks that run PowerShell](/Examples/xScheduledTask/1-CreateScheduledTasks.ps1)
-[Run a PowerShell script every 15 minutes on a server](/Examples/xScheduledTask/2-RunPowerShellTaskEvery15Minutes.ps1)
+* [Create five different scheduled tasks that run PowerShell](/Examples/xScheduledTask/1-CreateScheduledTasks.ps1)
+* [Run a PowerShell script every 15 minutes on a server](/Examples/xScheduledTask/2-RunPowerShellTaskEvery15Minutes.ps1)
 
 ## xPowerPlan
 
@@ -178,7 +178,7 @@ xPowerPlan resource has following properties:
 
 ### xPowerPlan Examples
 
-[Sets Active Power Plan to the High Performance plan](/Examples/xPowerPlan/1-SetPowerPlan.ps1)
+* [Sets Active Power Plan to the High Performance plan](/Examples/xPowerPlan/1-SetPowerPlan.ps1)
 
 ## xVirtualMemory
 
@@ -196,7 +196,7 @@ xVirtualMemory has the following properties:
 
 ### xVirtualMemory Examples
 
-[Set Page File to be 2GB on C Drive](/Examples/xVirtualMemory/1-SetVirtualMemory.ps1)
+* [Set Page File to be 2GB on C Drive](/Examples/xVirtualMemory/1-SetVirtualMemory.ps1)
 
 ## Versions
 
