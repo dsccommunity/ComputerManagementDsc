@@ -54,6 +54,14 @@ xComputer resource has following properties:
 * CurrentOU: A read-only property that specifies the organizational unit that
   the computer account is currently in
 
+### xComputer Examples
+
+[Set the Name and the Workgroup Name](1-RnameComputerAndSetWorkgroup.ps1)
+[Switch from a Workgroup to a Domain](2-JoinDomain.ps1)
+[Set the Name while staying on the Domain](3-RenameComputerInDomain.ps1)
+[Set the Name while staying on the Workgroup](4-RnameComputerInWorkgroup.ps1)
+[Switch from a Domain to a Workgroup](5-UnjoinDomainAndJoinWorkgroup.ps1)
+
 ## xOfflineDomainJoin
 
 xOfflineDomainJoin resource is a [Single Instance](https://msdn.microsoft.com/en-us/powershell/dsc/singleinstance)
@@ -61,6 +69,10 @@ resource that can only be used once in a configuration and has following propert
 
 * IsSingleInstance: Must be set to 'Yes'. Required.
 * RequestFile: The full path to the Offline Domain Join request file. Required.
+
+### xOfflineDomainJoin Examples
+
+[Join a Domain using an ODJ Request File](1-JoinDomainUsingODJBlob.ps1)
 
 ## xScheduledTask
 
@@ -151,6 +163,11 @@ xScheduledTask has the following properties:
   NetworkName parameter that you specify in this cmdlet to determine if the
   network is available.
 
+### xScheduledTask Examples
+
+[Create five different scheduled tasks that run PowerShell](1-CreateScheduledTasks.ps1)
+[Run a PowerShell script every 15 minutes on a server](2-RunPowerShellTaskEvery15Minutes.ps1)
+
 ## xPowerPlan
 
 xPowerPlan resource has following properties:
@@ -158,6 +175,10 @@ xPowerPlan resource has following properties:
 * IsSingleInstance: Specifies the resource is a single instance, the value must
   be 'Yes'.
 * Name: The name of the power plan to activate.
+
+### xPowerPlan Examples
+
+[Sets Active Power Plan to the High Performance plan](1-SetPowerPlan.ps1)
 
 ## xVirtualMemory
 
@@ -172,6 +193,10 @@ xVirtualMemory has the following properties:
   "AutoManagePagingFile" and "SystemManagedSize"
 * MaximumSize: The maximum size in MB of the paging file. Ignored for Type
   "AutoManagePagingFile" and "SystemManagedSize"
+
+### xVirtualMemory Examples
+
+[Set Page File to be 2GB on C Drive](1-SetVirtualMemory.ps1)
 
 ## Versions
 
@@ -262,256 +287,3 @@ xVirtualMemory has the following properties:
 
 * Initial release with the following resources:
   * xComputer
-
-## Examples
-
-### Set the Name and the Workgroup Name
-
-This configuration will set the computer name to 'Server01'
-and make it part of 'ContosoWorkgroup' Workgroup.
-
-```powershell
-Configuration Example
-{
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost'
-    )
-
-    Import-DscResource -Module xComputerManagement
-
-    Node $NodeName
-    {
-        xComputer NewNameAndWorkgroup
-        {
-            Name          = 'Server01'
-            WorkGroupName = 'ContosoWorkgroup'
-        }
-    }
-}
-```
-
-### Switch from a Workgroup to a Domain
-
-This configuration sets the machine name to 'Server01' and
-joins the 'Contoso' domain.
-Note: this requires an AD credential to join the domain.
-
-```powershell
-Configuration Example
-{
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullorEmpty()]
-        [System.Management.Automation.PSCredential]
-        $Credential
-    )
-
-    Import-DscResource -Module xComputerManagement
-
-    Node $NodeName
-    {
-        xComputer JoinDomain
-        {
-            Name       = 'Server01'
-            DomainName = 'Contoso'
-            Credential = $Credential # Credential to join to domain
-        }
-    }
-}
-```
-
-### Set the Name while staying on the Domain
-
-This example will set the machines name 'Server01' while remaining
-joined to the current domain.
-Note: this requires a credential for renaming the machine on the
-domain.
-
-```powershell
-Configuration Example
-{
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullorEmpty()]
-        [System.Management.Automation.PSCredential]
-        $Credential
-    )
-
-    Import-DscResource -Module xComputerManagement
-
-    Node $NodeName
-    {
-        xComputer NewName
-        {
-            Name       = 'Server01'
-            Credential = $Credential # Domain credential
-        }
-    }
-}
-```
-
-### Set the Name while staying on the Workgroup
-
-This example will set the machine name to 'Server01' while remaining
-in the workgroup.
-
-```powershell
-Configuration Example
-{
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost'
-    )
-
-    Import-DscResource -Module xComputerManagement
-
-    Node $NodeName
-    {
-        xComputer NewName
-        {
-            Name = 'Server01'
-        }
-    }
-}
-```
-
-### Switch from a Domain to a Workgroup
-
-This example switches the computer 'Server01' from a domain and joins it
-to the 'ContosoWorkgroup' Workgroup.
-Note: this requires a credential.
-
-```powershell
-Configuration Example
-{
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullorEmpty()]
-        [System.Management.Automation.PSCredential]
-        $Credential
-    )
-
-    Import-DscResource -Module xComputerManagement
-
-    Node $NodeName
-    {
-        xComputer JoinWorkgroup
-        {
-            Name          = 'Server01'
-            WorkGroupName = 'ContosoWorkgroup'
-            Credential    = $Credential # Credential to unjoin from domain
-        }
-    }
-}
-```
-
-### Join a Domain using an ODJ Request File
-
-This example will join the computer to a domain using the ODJ
-request file C:\ODJ\ODJRequest.txt.
-
-```powershell
-configuration Example
-{
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost'
-    )
-
-    Import-DscResource -ModuleName xComputerManagement
-
-    Node $NodeName
-    {
-        xOfflineDomainJoin ODJ
-        {
-          RequestFile = 'C:\ODJ\ODJBlob.txt'
-          IsSingleInstance = 'Yes'
-        }
-    }
-}
-```
-
-### Run a PowerShell script every 15 minutes on a server
-
-This example will create a scheduled task that will call PowerShell.exe every 15
-minutes to run a script saved locally.
-The script will be called as the local system account
-
-```powershell
-Configuration Example
-{
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost'
-    )
-
-    Import-DscResource -ModuleName xComputerManagement
-
-    Node $NodeName
-    {
-        xScheduledTask MaintenanceScriptExample
-        {
-          TaskName           = "Custom maintenance tasks"
-          ActionExecutable   = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-          ActionArguments    = "-File `"C:\scripts\my custom script.ps1`""
-          ScheduleType       = 'Once'
-          RepeatInterval     = [datetime]::Today.AddMinutes(15)
-          RepetitionDuration = [datetime]::Today.AddHours(10)
-        }
-    }
-}
-```
-
-### Set Page File to be 2GB on C Drive
-
-Example script that sets the paging file to reside on
-drive C with the custom size 2048MB
-
-```powershell
-Configuration Example
-{
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost'
-    )
-
-    Import-DSCResource -ModuleName xComputerManagement
-
-    Node $NodeName
-    {
-        xVirtualMemory pagingSettings
-        {
-            Type        = 'CustomSize'
-            Drive       = 'C'
-            InitialSize = '2048'
-            MaximumSize = '2048'
-        }
-    }
-}
-```
