@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    This example will change the machines name while remaining
+    This example will set the machine name to 'Server01' while remaining
     in the workgroup.
 #>
 Configuration Example
@@ -9,11 +9,7 @@ Configuration Example
     (
         [Parameter()]
         [System.String[]]
-        $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $MachineName
+        $NodeName = 'localhost'
     )
 
     Import-DscResource -Module xComputerManagement
@@ -22,7 +18,7 @@ Configuration Example
     {
         xComputer NewName
         {
-            Name = $MachineName
+            Name = 'Server01'
         }
     }
 }

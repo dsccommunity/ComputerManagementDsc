@@ -1,7 +1,9 @@
 <#
     .EXAMPLE
-    This example will change the machines name while remaining on the domain.
-    Note: this requires a credential.
+    This example will change the machines name 'Server01' while remaining
+    joined to the current domain.
+    Note: this requires a credential for renaming the machine on the
+    domain.
 #>
 Configuration Example
 {
@@ -10,10 +12,6 @@ Configuration Example
         [Parameter()]
         [System.String[]]
         $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $MachineName,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -27,7 +25,7 @@ Configuration Example
     {
         xComputer NewName
         {
-            Name       = $MachineName
+            Name       = 'Server01'
             Credential = $Credential # Domain credential
         }
     }

@@ -1,6 +1,7 @@
 <#
     .EXAMPLE
-    This example switches the computer from a domain to a workgroup.
+    This example switches the computer 'Server01' from a domain and joins it
+    to the 'ContosoWorkgroup' Workgroup.
     Note: this requires a credential.
 #>
 Configuration Example
@@ -10,14 +11,6 @@ Configuration Example
         [Parameter()]
         [System.String[]]
         $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $MachineName,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $WorkGroup,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -31,8 +24,8 @@ Configuration Example
     {
         xComputer JoinWorkgroup
         {
-            Name          = $MachineName
-            WorkGroupName = $WorkGroup
+            Name          = 'Server01'
+            WorkGroupName = 'ContosoWorkgroup'
             Credential    = $Credential # Credential to unjoin from domain
         }
     }

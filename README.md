@@ -265,9 +265,10 @@ xVirtualMemory has the following properties:
 
 ## Examples
 
-### Change the Name and the Workgroup Name
+### Set the Name and the Workgroup Name
 
-This configuration will set a machine name and changes the workgroup it is in.
+This configuration will set the computer name to 'Server01'
+and make it part of 'ContosoWorkgroup' Workgroup.
 
 ```powershell
 Configuration Example
@@ -276,15 +277,7 @@ Configuration Example
     (
         [Parameter()]
         [System.String[]]
-        $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $MachineName,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $WorkGroup
+        $NodeName = 'localhost'
     )
 
     Import-DscResource -Module xComputerManagement
@@ -293,8 +286,8 @@ Configuration Example
     {
         xComputer NewNameAndWorkgroup
         {
-            Name          = $MachineName
-            WorkGroupName = $WorkGroup
+            Name          = 'Server01'
+            WorkGroupName = 'ContosoWorkgroup'
         }
     }
 }
@@ -302,8 +295,9 @@ Configuration Example
 
 ### Switch from a Workgroup to a Domain
 
-This configuration sets the machine name and joins a domain.
-Note: this requires a credential.
+This configuration sets the machine name to 'Server01' and
+joins the 'Contoso' domain.
+Note: this requires an AD credential to join the domain.
 
 ```powershell
 Configuration Example
@@ -313,14 +307,6 @@ Configuration Example
         [Parameter()]
         [System.String[]]
         $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $MachineName,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $DomainName,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -334,18 +320,20 @@ Configuration Example
     {
         xComputer JoinDomain
         {
-            Name       = $MachineName
-            DomainName = $DomainName
+            Name       = 'Server01'
+            DomainName = 'Contoso'
             Credential = $Credential # Credential to join to domain
         }
     }
 }
 ```
 
-### Change the Name while staying on the Domain
+### Set the Name while staying on the Domain
 
-This example will change the machines name while remaining on the domain.
-Note: this requires a credential.
+This example will set the machines name 'Server01' while remaining
+joined to the current domain.
+Note: this requires a credential for renaming the machine on the
+domain.
 
 ```powershell
 Configuration Example
@@ -355,10 +343,6 @@ Configuration Example
         [Parameter()]
         [System.String[]]
         $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $MachineName,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -372,16 +356,17 @@ Configuration Example
     {
         xComputer NewName
         {
-            Name       = $MachineName
+            Name       = 'Server01'
             Credential = $Credential # Domain credential
         }
     }
 }
 ```
 
-### Change the Name while staying on the Workgroup
+### Set the Name while staying on the Workgroup
 
-This example will change the machines name while remaining in the workgroup.
+This example will set the machine name to 'Server01' while remaining
+in the workgroup.
 
 ```powershell
 Configuration Example
@@ -390,24 +375,16 @@ Configuration Example
     (
         [Parameter()]
         [System.String[]]
-        $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullorEmpty()]
-        [System.Management.Automation.PSCredential]
-        $Credential
+        $NodeName = 'localhost'
     )
 
-    Import-DscResource -ModuleName xCertificate
+    Import-DscResource -Module xComputerManagement
 
-    Node $AllNodes.NodeName
+    Node $NodeName
     {
-        xCertificateExport SSLCert
+        xComputer NewName
         {
-            Type         = 'PFX'
-            FriendlyName = 'Web Site SSL Certificate for www.contoso.com'
-            Path         = 'c:\sslcert.cer'
-            Password     = $Credential
+            Name = 'Server01'
         }
     }
 }
@@ -415,7 +392,8 @@ Configuration Example
 
 ### Switch from a Domain to a Workgroup
 
-This example switches the computer from a domain to a workgroup.
+This example switches the computer 'Server01' from a domain and joins it
+to the 'ContosoWorkgroup' Workgroup.
 Note: this requires a credential.
 
 ```powershell
@@ -426,14 +404,6 @@ Configuration Example
         [Parameter()]
         [System.String[]]
         $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $MachineName,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $WorkGroup,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -447,8 +417,8 @@ Configuration Example
     {
         xComputer JoinWorkgroup
         {
-            Name          = $MachineName
-            WorkGroupName = $WorkGroup
+            Name          = 'Server01'
+            WorkGroupName = 'ContosoWorkgroup'
             Credential    = $Credential # Credential to unjoin from domain
         }
     }

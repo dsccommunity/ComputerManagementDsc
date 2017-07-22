@@ -1,7 +1,8 @@
 <#
     .EXAMPLE
-    This configuration sets the machine name and joins a domain.
-    Note: this requires a credential.
+    This configuration sets the machine name to 'Server01' and
+    joins the 'Contoso' domain.
+    Note: this requires an AD credential to join the domain.
 #>
 Configuration Example
 {
@@ -10,14 +11,6 @@ Configuration Example
         [Parameter()]
         [System.String[]]
         $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $MachineName,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $DomainName,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
@@ -31,8 +24,8 @@ Configuration Example
     {
         xComputer JoinDomain
         {
-            Name       = $MachineName
-            DomainName = $DomainName
+            Name       = 'Server01'
+            DomainName = 'Contoso'
             Credential = $Credential # Credential to join to domain
         }
     }

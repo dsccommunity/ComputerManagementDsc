@@ -1,7 +1,7 @@
 <#
     .EXAMPLE
-    This configuration will set a machine name and changes the
-    workgroup it is in.
+    This configuration will set the computer name to 'Server01'
+    and make it part of 'ContosoWorkgroup' Workgroup.
 #>
 Configuration Example
 {
@@ -9,15 +9,7 @@ Configuration Example
     (
         [Parameter()]
         [System.String[]]
-        $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $MachineName,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $WorkGroup
+        $NodeName = 'localhost'
     )
 
     Import-DscResource -Module xComputerManagement
@@ -26,8 +18,8 @@ Configuration Example
     {
         xComputer NewNameAndWorkgroup
         {
-            Name          = $MachineName
-            WorkGroupName = $WorkGroup
+            Name          = 'Server01'
+            WorkGroupName = 'ContosoWorkgroup'
         }
     }
 }
