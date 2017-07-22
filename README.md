@@ -184,6 +184,8 @@ xVirtualMemory has the following properties:
 * Added CodeCov.io support.
 * xScheduledTask
   * Fixed incorrect TaskPath handling - [Issue #45](https://github.com/PowerShell/xComputerManagement/issues/45)
+* Change examples to meet HQRM standards and optin to Example validation
+  tests.
 
 ### 2.0.0.0
 
@@ -268,20 +270,23 @@ xVirtualMemory has the following properties:
 This configuration will set a machine name and changes the workgroup it is in.
 
 ```powershell
-configuration Sample_xComputer_ChangeNameAndWorkGroup
+Configuration Example
 {
     param
     (
-        [string[]]$NodeName ='localhost',
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost',
 
-        [Parameter(Mandatory)]
-        [string]$MachineName,
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $MachineName,
 
-        [Parameter(Mandatory)]
-        [string]$WorkGroupName
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $WorkGroup
     )
 
-    #Import the required DSC Resources
     Import-DscResource -Module xComputerManagement
 
     Node $NodeName
@@ -289,7 +294,7 @@ configuration Sample_xComputer_ChangeNameAndWorkGroup
         xComputer NewNameAndWorkgroup
         {
             Name          = $MachineName
-            WorkGroupName = $WorkGroupName
+            WorkGroupName = $WorkGroup
         }
     }
 }
@@ -301,57 +306,40 @@ This configuration sets the machine name and joins a domain.
 Note: this requires a credential.
 
 ```powershell
-configuration Sample_xComputer_WorkgroupToDomain
+Configuration Example
 {
     param
     (
-        [string[]]$NodeName="localhost",
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost',
 
-        [Parameter(Mandatory)]
-        [string]$MachineName,
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $MachineName,
 
-        [Parameter(Mandatory)]
-        [string]$Domain,
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DomainName,
 
-        [Parameter(Mandatory)]
-        [pscredential]$Credential
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [System.Management.Automation.PSCredential]
+        $Credential
     )
 
-    # Import the required DSC Resources
     Import-DscResource -Module xComputerManagement
 
     Node $NodeName
     {
         xComputer JoinDomain
         {
-            Name          = $MachineName
-            DomainName    = $Domain
-            Credential    = $Credential  # Credential to join to domain
+            Name       = $MachineName
+            DomainName = $DomainName
+            Credential = $Credential # Credential to join to domain
         }
     }
 }
-
-
-<#
-To save the credential in plain-text in the mof file, use the following
-configuration data
-
-$ConfigData = @{
-    AllNodes = @(
-        @{
-            NodeName = "localhost"
-
-            # Allows credential to be saved in plain-text in the the *.mof
-            # instance document.
-
-            PSDscAllowPlainTextPassword = $true
-        }
-    )
-}
-
-Sample_xComputer_WorkgroupToDomain -ConfigurationData $ConfigData `
-    -MachineName <machineName> -credential (Get-Credential) -Domain <domainName>
-#>
 ```
 
 ### Change the Name while staying on the Domain
@@ -360,77 +348,66 @@ This example will change the machines name while remaining on the domain.
 Note: this requires a credential.
 
 ```powershell
-function Sample_xComputer_ChangeNameInDomain
+Configuration Example
 {
     param
     (
-        [string[]]$NodeName="localhost",
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost',
 
-        [Parameter(Mandatory)]
-        [string]$MachineName,
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $MachineName,
 
-        [Parameter(Mandatory)]
-        [pscredential]$Credential
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [System.Management.Automation.PSCredential]
+        $Credential
     )
 
-    # Import the required DSC Resources
     Import-DscResource -Module xComputerManagement
 
     Node $NodeName
     {
         xComputer NewName
         {
-            Name          = $MachineName
-            Credential    = $Credential # Domain credential
+            Name       = $MachineName
+            Credential = $Credential # Domain credential
         }
     }
 }
-
-<#
-To save the credential in plain-text in the mof file, use the following
-configuration data
-
-$ConfigData = @{
-    AllNodes = @(
-        @{
-            NodeName = "localhost";
-
-            # Allows credential to be saved in plain-text
-            # in the the *.mof instance document.
-
-            PSDscAllowPlainTextPassword = $true;
-        }
-    )
-}
-
-Sample_xComputer_ChangeNameInDomain -ConfigurationData $ConfigData `
-    -MachineName <machineName>  -Credential (Get-Credential)
-#>
 ```
 
 ### Change the Name while staying on the Workgroup
 
-This example will change the machines name while remaining on the workgroup.
+This example will change the machines name while remaining in the workgroup.
 
 ```powershell
-function Sample_xComputer_ChangeNameInWorkgroup
+Configuration Example
 {
     param
     (
-        [string[]]$NodeName="localhost",
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost',
 
-        [Parameter(Mandatory)]
-        [string]$MachineName
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [System.Management.Automation.PSCredential]
+        $Credential
     )
 
-    #Import the required DSC Resources
-    Import-DscResource -Module xComputerManagement
+    Import-DscResource -ModuleName xCertificate
 
-    Node $NodeName
+    Node $AllNodes.NodeName
     {
-        xComputer NewName
+        xCertificateExport SSLCert
         {
-            Name = $MachineName
+            Type         = 'PFX'
+            FriendlyName = 'Web Site SSL Certificate for www.contoso.com'
+            Path         = 'c:\sslcert.cer'
+            Password     = $Credential
         }
     }
 }
@@ -442,23 +419,28 @@ This example switches the computer from a domain to a workgroup.
 Note: this requires a credential.
 
 ```powershell
-function  Sample_xComputer_DomainToWorkgroup
+Configuration Example
 {
     param
     (
-        [string[]]$NodeName="localhost",
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost',
 
-        [Parameter(Mandatory)]
-        [string]$MachineName,
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $MachineName,
 
-        [Parameter(Mandatory)]
-        [string]$WorkGroup,
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $WorkGroup,
 
-        [Parameter(Mandatory)]
-        [pscredential]$Credential
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [System.Management.Automation.PSCredential]
+        $Credential
     )
 
-    # Import the required DSC Resources
     Import-DscResource -Module xComputerManagement
 
     Node $NodeName
@@ -471,55 +453,34 @@ function  Sample_xComputer_DomainToWorkgroup
         }
     }
 }
-
-<#
-To save the credential in plain-text in the mof file, use the following
-configuration data
-
-$ConfigData = @{
-    AllNodes = @(
-        @{
-            NodeName = "localhost";
-
-            # Allows credential to be saved in plain-text in the the *.mof
-            # instance document.
-
-            PSDscAllowPlainTextPassword = $true;
-        }
-    )
-}
-
-Sample_xComputer_DomainToWorkgroup -ConfigurationData $ConfigData `
-    -MachineName <machineName> -credential (Get-Credential) -WorkGroup <workgroupName>
-#>
 ```
 
 ### Join a Domain using an ODJ Request File
 
-This example will join the computer to a domain using the ODJ request file C:\ODJ\ODJRequest.txt.
+This example will join the computer to a domain using the ODJ
+request file C:\ODJ\ODJRequest.txt.
 
 ```powershell
-configuration Sample_xOfflineDomainJoin
+configuration Example
 {
     param
     (
-        [string[]]$NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
-    Import-DSCResource -ModuleName xComputerManagement
+    Import-DscResource -ModuleName xComputerManagement
 
-    Node $NodeName
+    node $NodeName
     {
         xOfflineDomainJoin ODJ
         {
-          RequestFile = 'C:\ODJ\ODJRequest.txt'
+          RequestFile = 'C:\ODJ\ODJBlob.txt'
           IsSingleInstance = 'Yes'
         }
     }
 }
-
-Sample_xOfflineDomainJoin
-Start-DscConfiguration -Path Sample_xOfflineDomainJoin -Wait -Verbose -Force
 ```
 
 ### Run a PowerShell script every 15 minutes on a server
@@ -529,29 +490,58 @@ minutes to run a script saved locally.
 The script will be called as the local system account
 
 ```powershell
-configuration Sample_xScheduledTask
+Configuration Example
 {
     param
     (
-        [string[]]$NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
+    Import-DscResource -ModuleName xComputerManagement
+
+    Node $NodeName
+    {
+        xScheduledTask MaintenanceScriptExample
+        {
+          TaskName           = "Custom maintenance tasks"
+          ActionExecutable   = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+          ActionArguments    = "-File `"C:\scripts\my custom script.ps1`""
+          ScheduleType       = 'Once'
+          RepeatInterval     = [datetime]::Today.AddMinutes(15)
+          RepetitionDuration = [datetime]::Today.AddHours(10)
+        }
+    }
+}
+```
+
+### Set Page File to be 2GB on C Drive
+
+Example script that sets the paging file to reside on
+drive C with the custom size 2048MB
+
+```powershell
+Configuration Example
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xComputerManagement
 
     Node $NodeName
     {
-        xScheduledTask MaintenanceScriptExample
+        xVirtualMemory pagingSettings
         {
-          TaskName = "Custom maintenance tasks"
-          ActionExecutable = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-          ActionArguments = "-File `"C:\scripts\my custom script.ps1`""
-          ScheduleType = 'Once'
-          RepeatInterval = [datetime]::Today.AddMinutes(15)
-          RepetitionDuration = [datetime]::Today.AddHours(10)
+            Type = "CustomSize"
+            Drive = "C"
+            InitialSize = "2048"
+            MaximumSize = "2048"
         }
     }
 }
-
-Sample_xScheduledTask
-Start-DscConfiguration -Path Sample_xScheduledTask -Wait -Verbose -Force
 ```

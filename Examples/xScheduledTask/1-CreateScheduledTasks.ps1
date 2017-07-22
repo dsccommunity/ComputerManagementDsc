@@ -1,15 +1,24 @@
 <#
-This example creates five tasks with the following schedules that start a new powershell process
-- Once at 00:00 repeating every 15 minutes for 8 hours
-- Daily at 00:00 repeating every 15 minutes for 8 hours
-- Weekly at 00:00 repeating every 15 minutes for 8 hours on Mon, Wed, Sat
-- At logon repeating every 15 minutes for 8 hours
-- At startup repeating every 15 minutes for 8 hours
+    .EXAMPLE
+    This example creates five tasks with the following schedules that start a new powershell process
+        - Once at 00:00 repeating every 15 minutes for 8 hours
+        - Daily at 00:00 repeating every 15 minutes for 8 hours
+        - Weekly at 00:00 repeating every 15 minutes for 8 hours on Mon, Wed, Sat
+        - At logon repeating every 15 minutes for 8 hours
+        - At startup repeating every 15 minutes for 8 hours
 #>
-Configuration Sample_xScheduledTask
+Configuration Example
 {
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
     Import-DscResource -ModuleName xComputerManagement
-    node 'localhost'
+
+    Node $NodeName
     {
         xScheduledTask xScheduledTaskOnceAdd
         {
@@ -26,7 +35,7 @@ Configuration Sample_xScheduledTask
             RunOnlyIfIdle = $false
             Priority = 9
         }
-    
+
         xScheduledTask xScheduledTaskDailyAdd
         {
             TaskName = 'Test task Daily'
@@ -41,7 +50,7 @@ Configuration Sample_xScheduledTask
             RunOnlyIfNetworkAvailable = $true
             WakeToRun = $true
         }
-    
+
         xScheduledTask xScheduledTaskWeeklyAdd
         {
             TaskName = 'Test task Weekly'
@@ -56,7 +65,7 @@ Configuration Sample_xScheduledTask
             Compatibility = 'Win8'
             Hidden = $true
         }
-    
+
         xScheduledTask xScheduledTaskLogonAdd
         {
             TaskName = 'Test task Logon'
@@ -78,6 +87,3 @@ Configuration Sample_xScheduledTask
         }
     }
 }
-
-Sample_xScheduledTask
-Start-DscConfiguration -Path Sample_xScheduledTask -Wait -Verbose -Force

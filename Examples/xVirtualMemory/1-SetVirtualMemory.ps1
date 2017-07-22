@@ -1,21 +1,20 @@
 <#
-.SYNOPSIS
-    Example to set the paging file
-.DESCRIPTION
-    Example script that sets the paging file to reside on drive C with the custom size 2048MB
+    .EXAMPLE
+    Example script that sets the paging file to reside on
+    drive C with the custom size 2048MB
 #>
-configuration Sample_xVirtualMemory
+Configuration Example
 {
     param
     (
         [Parameter()]
-        [String[]]
+        [System.String[]]
         $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xComputerManagement
 
-    node $NodeName
+    Node $NodeName
     {
         xVirtualMemory pagingSettings
         {
@@ -26,6 +25,3 @@ configuration Sample_xVirtualMemory
         }
     }
 }
-
-Sample_xVirtualMemory
-Start-DscConfiguration -Path Sample_xVirtualMemory -Wait -verbose -Force
