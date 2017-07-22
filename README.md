@@ -211,6 +211,7 @@ xVirtualMemory has the following properties:
   * Fixed incorrect TaskPath handling - [Issue #45](https://github.com/PowerShell/xComputerManagement/issues/45)
 * Change examples to meet HQRM standards and optin to Example validation
   tests.
+* Replaced examples in README.MD to links to Example files.
 
 ### 2.0.0.0
 
