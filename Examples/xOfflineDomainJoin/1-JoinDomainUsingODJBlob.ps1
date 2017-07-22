@@ -14,7 +14,7 @@ Configuration Example
 
     Import-DscResource -ModuleName xComputerManagement
 
-    node $NodeName
+    Node $NodeName
     {
         xOfflineDomainJoin ODJ
         {

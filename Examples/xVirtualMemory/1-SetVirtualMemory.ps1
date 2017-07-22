@@ -18,10 +18,10 @@ Configuration Example
     {
         xVirtualMemory pagingSettings
         {
-            Type = "CustomSize"
-            Drive = "C"
-            InitialSize = "2048"
-            MaximumSize = "2048"
+            Type        = 'CustomSize'
+            Drive       = 'C'
+            InitialSize = '2048'
+            MaximumSize = '2048'
         }
     }
 }
