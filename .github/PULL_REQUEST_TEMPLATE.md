@@ -1,8 +1,8 @@
 <!--
 Thanks for submitting a Pull Request (PR) to this project. Your contribution to this project is greatly appreciated!
 
-Please prefix the PR title with the resource name, i.e. 'xCertReq: My short description'
-If this is a breaking change, then also prefix the PR title with 'BREAKING CHANGE:', i.e. 'BREAKING CHANGE: xCertReq: My short description'
+Please prefix the PR title with the resource name, i.e. 'xComputer: My short description'
+If this is a breaking change, then also prefix the PR title with 'BREAKING CHANGE:', i.e. 'BREAKING CHANGE: xComputer: My short description'
 
 To aid community reviewers in reviewing and merging your PR, please take the time to run through the below checklist.
 Change to [x] for each task in the task list that applies to this PR.

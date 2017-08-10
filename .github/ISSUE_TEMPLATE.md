@@ -1,7 +1,7 @@
 <!--
 Your feedback and support is greatly appreciated, thanks for contributing!
 
-Please prefix the issue title with the resource name, i.e. 'xCertReq: Short description of my issue'
+Please prefix the issue title with the resource name, i.e. 'xComputer: Short description of my issue'
 Please provide the following information regarding your issue (place N/A if the fields that don't apply to your issue):
 -->
 **Details of the scenario you tried and the problem that is occurring:**
