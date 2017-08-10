@@ -1,4 +1,4 @@
-﻿$Global:DSCModuleName      = 'xComputerManagement'
+$Global:DSCModuleName      = 'xComputerManagement'
 $Global:DSCResourceName    = 'MSFT_xComputer'
 
 #region HEADER
@@ -16,7 +16,7 @@ Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHel
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
-    -TestType Unit 
+    -TestType Unit
 #endregion
 
 # Begin Testing
@@ -31,7 +31,7 @@ try
             $SecPassword = New-Object -Type SecureString
             $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER',$SecPassword
             $NotComputerName  = if($env:COMPUTERNAME -ne 'othername'){'othername'}else{'name'}
-        
+
             Context "$($Global:DSCResourceName)\Test-TargetResource" {
                 Mock Get-WMIObject {[PSCustomObject]@{DomainName = 'ContosoLtd'}} -ParameterFilter {$Class -eq 'Win32_NTDomain'}
                 It 'Throws if both DomainName and WorkGroupName are specified' {
@@ -121,7 +121,7 @@ try
                 It 'Should not Throw if name is localhost' {
                     {Test-TargetResource -Name "localhost"} | Should Not Throw
                 }
-                
+
             }
             Context "$($Global:DSCResourceName)\Get-TargetResource" {
                 It 'should not throw' {
