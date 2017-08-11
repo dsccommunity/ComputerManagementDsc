@@ -212,7 +212,7 @@ xVirtualMemory has the following properties:
 * Change examples to meet HQRM standards and optin to Example validation
   tests.
 * Replaced examples in README.MD to links to Example files.
-* Added the VS Code PowerShell extension formatting settings that cause PowerShell.
+* Added the VS Code PowerShell extension formatting settings that cause PowerShell
   files to be formatted as per the DSC Resource kit style guidelines - [Issue #91](https://github.com/PowerShell/xComputerManagement/issues/91).
 * Opted into Common Tests 'Validate Module Files' and 'Validate Script Files'.
 * Converted files with UTF8 with BOM over to UTF8 - fixes [Issue #90](https://github.com/PowerShell/xComputerManagement/issues/90).
