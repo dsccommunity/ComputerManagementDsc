@@ -103,13 +103,14 @@ Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -C
 #>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
         $TaskName,
-        
+
         [Parameter()]
         [System.String]
         $TaskPath = '\',
@@ -117,41 +118,41 @@ function Get-TargetResource
         [Parameter()]
         [System.String]
         $Description,
-        
+
         [Parameter(Mandatory = $true)]
         [System.String]
         $ActionExecutable,
-        
+
         [Parameter()]
         [System.String]
         $ActionArguments,
-        
+
         [Parameter()]
         [System.String]
         $ActionWorkingPath,
-        
+
         [Parameter(Mandatory = $true)]
         [System.String]
         [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
         $ScheduleType,
-        
+
         [Parameter()]
         [System.DateTime]
         $RepeatInterval = [System.DateTime] '00:00:00',
-        
+
         [Parameter()]
         [System.DateTime]
         $StartTime = [System.DateTime]::Today,
-        
+
         [Parameter()]
         [System.String]
         [ValidateSet('Present', 'Absent')]
         $Ensure = 'Present',
-        
+
         [Parameter()]
         [System.Boolean]
         $Enable = $true,
-        
+
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
@@ -268,12 +269,12 @@ function Get-TargetResource
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
-    
+
     Write-Verbose -Message ('Retrieving existing task ({0} in {1})' -f $TaskName, $TaskPath)
 
     $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
 
-    if ($null -eq $task) 
+    if ($null -eq $task)
     {
         Write-Verbose -Message ('No task found. returning empty task {0} with Ensure = "Absent"' -f $Taskname)
         return @{
@@ -282,8 +283,8 @@ function Get-TargetResource
             Ensure = 'Absent'
             ScheduleType = $ScheduleType
         }
-    } 
-    else 
+    }
+    else
     {
         Write-Verbose -Message ('Task {0} found in {1}. Retrieving settings, first action, first trigger and repetition settings' -f $TaskName, $TaskPath)
         $action = $task.Actions | Select-Object -First 1
@@ -304,19 +305,19 @@ function Get-TargetResource
                 $returnScheduleType = 'Daily'
                 break
             }
-            
+
             'MSFT_TaskWeeklyTrigger'
             {
                 $returnScheduleType = 'Weekly'
                 break
             }
-            
+
             'MSFT_TaskBootTrigger'
             {
                 $returnScheduleType = 'AtStartup'
                 break
             }
-            
+
             'MSFT_TaskLogonTrigger'
             {
                 $returnScheduleType = 'AtLogon'
@@ -326,11 +327,11 @@ function Get-TargetResource
             default
             {
                 New-InvalidArgumentException -Message "Trigger type $_ not recognized." -ArgumentName CimClassName
-            }            
+            }
         }
-        
+
         Write-Verbose -Message ('Detected schedule type {0} for first trigger' -f $returnScheduleType)
-        
+
         Write-Verbose -Message 'Calculating timespans/datetimes from trigger repetition settings'
 
         $repInterval = $trigger.Repetition.Interval
@@ -355,7 +356,7 @@ function Get-TargetResource
         {
             $Seconds = $matches.Seconds
         }
-        
+
         $returnInveral = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
 
         $repDuration = $trigger.Repetition.Duration
@@ -380,7 +381,7 @@ function Get-TargetResource
         {
             $Seconds = $matches.Seconds
         }
-        
+
         $repetitionDurationReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
 
         $resInterval = $settings.RestartInterval
@@ -395,7 +396,7 @@ function Get-TargetResource
         {
             $Hours = $matches.Hours
         }
-        
+
         if ($resInterval -match '(?<Minutes>\d{0,2})M')
         {
             $Minutes = $matches.Minutes
@@ -405,7 +406,7 @@ function Get-TargetResource
         {
             $Seconds = $matches.Seconds
         }
-        
+
         $restartIntervalReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
 
         $exeLim = $settings.ExecutionTimeLimit
@@ -430,7 +431,7 @@ function Get-TargetResource
         {
             $Seconds = $matches.Seconds
         }
-        
+
         $executionTimeLimitReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
 
         $idleDur = $settings.IdleSettings.IdleDuration
@@ -455,7 +456,7 @@ function Get-TargetResource
         {
             $Seconds = $matches.Seconds
         }
-        
+
         $idleDurationReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
 
         $idleWait = $settings.IdleSettings.IdleWaitTimeout
@@ -480,7 +481,7 @@ function Get-TargetResource
         {
             $Seconds = $matches.Seconds
         }
-        
+
         $idleWaitTimeoutReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
 
         $rndDelay = $trigger.RandomDelay
@@ -505,9 +506,9 @@ function Get-TargetResource
         {
             $Seconds = $matches.Seconds
         }
-        
+
         $randomDelayReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
-        
+
         $DaysOfWeek = @()
         foreach ($binaryAdductor in 1, 2, 4, 8, 16, 32, 64)
         {
@@ -528,7 +529,7 @@ function Get-TargetResource
         {
             $startAt = $StartTime
         }
-        
+
         return @{
             TaskName = $task.TaskName
             TaskPath = $task.TaskPath
@@ -660,12 +661,13 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
         $TaskName,
-        
+
         [Parameter()]
         [System.String]
         $TaskPath = '\',
@@ -673,41 +675,41 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         $Description,
-        
+
         [Parameter(Mandatory = $true)]
         [System.String]
         $ActionExecutable,
-        
+
         [Parameter()]
         [System.String]
         $ActionArguments,
-        
+
         [Parameter()]
         [System.String]
         $ActionWorkingPath,
-        
+
         [Parameter(Mandatory = $true)]
         [System.String]
         [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
         $ScheduleType,
-        
+
         [Parameter()]
         [System.DateTime]
         $RepeatInterval = [System.DateTime] '00:00:00',
-        
+
         [Parameter()]
         [System.DateTime]
         $StartTime = [System.DateTime]::Today,
-        
+
         [Parameter()]
         [System.String]
         [ValidateSet('Present', 'Absent')]
         $Ensure = 'Present',
-        
+
         [Parameter()]
         [System.Boolean]
         $Enable = $true,
-        
+
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
@@ -822,13 +824,13 @@ function Set-TargetResource
         [System.Boolean]
         $RunOnlyIfNetworkAvailable = $false
     )
-    
+
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
     Write-Verbose -Message ('Entering Set-TargetResource for {0} in {1}' -f $TaskName, $TaskPath)
     $currentValues = Get-TargetResource @PSBoundParameters
-    
-    if ($Ensure -eq 'Present') 
+
+    if ($Ensure -eq 'Present')
     {
         if ($RepetitionDuration.TimeOfDay -lt $RepeatInterval.TimeOfDay)
         {
@@ -858,27 +860,27 @@ function Set-TargetResource
             Execute = $ActionExecutable
         }
 
-        if ($ActionArguments) 
-        { 
+        if ($ActionArguments)
+        {
             $actionArgs.Add('Argument', $ActionArguments)
         }
 
-        if ($ActionWorkingPath) 
-        { 
+        if ($ActionWorkingPath)
+        {
             $actionArgs.Add('WorkingDirectory', $ActionWorkingPath)
         }
 
         $action = New-ScheduledTaskAction @actionArgs
-        
+
         $settingArgs = @{
-            DisallowDemandStart = $DisallowDemandStart           
+            DisallowDemandStart = $DisallowDemandStart
             DisallowHardTerminate = $DisallowHardTerminate
             Compatibility = $Compatibility
             AllowStartIfOnBatteries = $AllowStartIfOnBatteries
             Disable = -not $Enable
             Hidden = $Hidden
-            RunOnlyIfIdle = $RunOnlyIfIdle          
-            DisallowStartOnRemoteAppSession = $DisallowStartOnRemoteAppSession            
+            RunOnlyIfIdle = $RunOnlyIfIdle
+            DisallowStartOnRemoteAppSession = $DisallowStartOnRemoteAppSession
             StartWhenAvailable = $StartWhenAvailable
             DontStopIfGoingOnBatteries = $DontStopIfGoingOnBatteries
             WakeToRun = $WakeToRun
@@ -889,12 +891,12 @@ function Set-TargetResource
             RestartCount = $RestartCount
             RunOnlyIfNetworkAvailable = $RunOnlyIfNetworkAvailable
         }
-        
+
         if ($IdleDuration.TimeOfDay -gt [System.TimeSpan] '00:00:00')
         {
             $settingArgs.Add('IdleDuration', $IdleDuration.TimeOfDay)
         }
-        
+
         if ($IdleWaitTimeout.TimeOfDay -gt [System.TimeSpan] '00:00:00')
         {
             $settingArgs.Add('IdleWaitTimeout', $IdleWaitTimeout.TimeOfDay)
@@ -909,13 +911,13 @@ function Set-TargetResource
         {
             $settingArgs.Add('RestartInterval', $RestartInterval.TimeOfDay)
         }
-        
+
         if (-not [System.String]::IsNullOrWhiteSpace($NetworkName))
         {
             $setting.Add('NetworkName', $NetworkName)
         }
         $setting = New-ScheduledTaskSettingsSet @settingArgs
-        
+
         $triggerArgs = @{}
         if ($RandomDelay.TimeOfDay -gt [System.TimeSpan]::FromSeconds(0))
         {
@@ -985,23 +987,23 @@ function Set-TargetResource
 
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
             Write-Verbose -Message 'PS V5 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
-            
-            try 
+
+            try
             {
                 $trigger.Repetition = $tempTrigger.Repetition
             }
-            catch 
+            catch
             {
                 $triggerRepetitionFailed = $true
-            }            
+            }
         }
 
-        if ($currentValues.Ensure -eq 'Present') 
+        if ($currentValues.Ensure -eq 'Present')
         {
             Write-Verbose -Message ('Removing previous scheduled task {0}' -f $TaskName)
             $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
         }
-        
+
         Write-Verbose -Message ('Creating new scheduled task {0}' -f $TaskName)
 
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
@@ -1017,7 +1019,7 @@ function Set-TargetResource
             $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
             $tempTask = New-ScheduledTask -Trigger $tempTrigger -Action $action
             Write-Verbose -Message 'PS V4 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
-            
+
             $scheduledTask.Triggers[0].Repetition = $tempTask.Triggers[0].Repetition
         }
 
@@ -1032,20 +1034,20 @@ function Set-TargetResource
             InputObject = $scheduledTask
         }
 
-        if ($PSBoundParameters.ContainsKey('ExecuteAsCredential') -eq $true) 
+        if ($PSBoundParameters.ContainsKey('ExecuteAsCredential') -eq $true)
         {
             $registerArgs.Add('User', $ExecuteAsCredential.UserName)
             $registerArgs.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
-        } 
-        else 
+        }
+        else
         {
             $registerArgs.Add('User', 'NT AUTHORITY\SYSTEM')
         }
 
         $null = Register-ScheduledTask @registerArgs
     }
-    
-    if ($Ensure -eq 'Absent') 
+
+    if ($Ensure -eq 'Absent')
     {
         Write-Verbose -Message ('Removing scheduled task {0}' -f $TaskName)
         Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
@@ -1139,13 +1141,14 @@ function Set-TargetResource
 #>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
         $TaskName,
-        
+
         [Parameter()]
         [System.String]
         $TaskPath = '\',
@@ -1153,41 +1156,41 @@ function Test-TargetResource
         [Parameter()]
         [System.String]
         $Description,
-        
+
         [Parameter(Mandatory = $true)]
         [System.String]
         $ActionExecutable,
-        
+
         [Parameter()]
         [System.String]
         $ActionArguments,
-        
+
         [Parameter()]
         [System.String]
         $ActionWorkingPath,
-        
+
         [Parameter(Mandatory = $true)]
         [System.String]
         [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
         $ScheduleType,
-        
+
         [Parameter()]
         [System.DateTime]
         $RepeatInterval = [System.DateTime] '00:00:00',
-        
+
         [Parameter()]
         [System.DateTime]
         $StartTime = [System.DateTime]::Today,
-        
+
         [Parameter()]
         [System.String]
         [ValidateSet('Present', 'Absent')]
         $Ensure = 'Present',
-        
+
         [Parameter()]
         [System.Boolean]
         $Enable = $true,
-        
+
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
@@ -1304,7 +1307,7 @@ function Test-TargetResource
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
-    
+
     Write-Verbose -Message ('Testing scheduled task {0}' -f $TaskName)
 
     $CurrentValues = Get-TargetResource @PSBoundParameters
@@ -1316,10 +1319,10 @@ function Test-TargetResource
         return $true
     }
 
-    if ($null -eq $CurrentValues) 
+    if ($null -eq $CurrentValues)
     {
         Write-Verbose -Message 'Current values were null'
-        return $false 
+        return $false
     }
 
     $desiredValues = $PSBoundParameters
@@ -1334,12 +1337,13 @@ function Test-TargetResource
 Helper function to convert TaskPath to the right form
 
 .PARAMETER TaskPath
-The path to the task 
+The path to the task
 #>
 
 function ConvertTo-NormalizedTaskPath
 {
     [CmdletBinding()]
+    [OutputType([System.String])]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -1352,6 +1356,6 @@ function ConvertTo-NormalizedTaskPath
     {
         $TaskPath = "\$($pathArray -join '\')\"
     }
-  
+
     return $TaskPath
 }

@@ -95,9 +95,11 @@ function Test-DscParameterState
         [object]
         $DesiredValues,
 
+        [Parameter()]
         [string[]]
         $ValuesToCheck,
 
+        [Parameter()]
         [switch]
         $TurnOffTypeChecking
     )
@@ -377,10 +379,12 @@ function New-InvalidOperationException
     [CmdletBinding()]
     param
     (
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
         $Message,
 
+        [Parameter()]
         [ValidateNotNull()]
         [System.Management.Automation.ErrorRecord]
         $ErrorRecord

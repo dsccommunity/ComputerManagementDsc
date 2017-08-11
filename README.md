@@ -221,6 +221,7 @@ xVirtualMemory has the following properties:
   * CONTRIBUTING.md
   * ISSUE_TEMPLATE.md
   * PULL_REQUEST_TEMPLATE.md
+* Resolved all PSScriptAnalyzer warnings and style guide warnings.
 
 ### 2.0.0.0
 
