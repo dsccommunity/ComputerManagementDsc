@@ -1,3 +1,8 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope="Function")]
+param
+(
+)
+
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -30,6 +35,8 @@ function Get-TargetResource
         [System.String]
         $WorkGroupName
     )
+
+    Write-Verbose -Message "Getting computer state for '$($Name)'."
 
     $convertToCimCredential = New-CimInstance -ClassName MSFT_Credential -Property @{Username=[System.String]$Credential.UserName; Password=[System.String]$null} -Namespace root/microsoft/windows/desiredstateconfiguration -ClientOnly
     $convertToCimUnjoinCredential = New-CimInstance -ClassName MSFT_Credential -Property @{Username=[System.String]$UnjoinCredential.UserName; Password=[System.String]$null} -Namespace root/microsoft/windows/desiredstateconfiguration -ClientOnly
@@ -270,17 +277,17 @@ function Test-TargetResource
             Write-Verbose "Checking if the machine is a member of $DomainName."
             if ($DomainName.Contains('.'))
             {
-                $Get-ComputerDomainSplat = @{
+                $GetComputerDomainSplat = @{
                     netbios = $false
                 }
             }
             else
             {
-                $Get-ComputerDomainSplat = @{
+                $GetComputerDomainSplat = @{
                     netbios = $true
                 }
             }
-            return ($DomainName -eq (Get-ComputerDomain @Get-ComputerDomainSplat ))
+            return ($DomainName -eq (Get-ComputerDomain @GetComputerDomainSplat))
         }
         catch
         {
@@ -326,7 +333,7 @@ function Get-ComputerDomain
         }
         else
         {
-            $domainName = ([System.DirectoryServices.ActiveDirectory.Domain]::Get-ComputerDomain()).Name
+            $domainName = ([System.DirectoryServices.ActiveDirectory.Domain]::GetComputerDomain()).Name
         }
         return $domainName
     }

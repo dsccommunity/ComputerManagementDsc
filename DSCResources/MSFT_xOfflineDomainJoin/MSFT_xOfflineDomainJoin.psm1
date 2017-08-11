@@ -1,20 +1,11 @@
-$moduleRoot = Split-Path `
-    -Path $MyInvocation.MyCommand.Path `
-    -Parent
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope="Function")]
+param
+(
+)
 
-#region LocalizedData
-$Culture = 'en-us'
-if (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath $PSUICulture))
-{
-    $Culture = $PSUICulture
-}
-Import-LocalizedData `
-    -BindingVariable LocalizedData `
-    -Filename MSFT_xOfflineDomainJoin.psd1 `
-    -BaseDirectory $moduleRoot `
-    -UICulture $Culture
-#endregion
-
+Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
+    -ChildPath 'CommonResourceHelper.psm1')
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xOfflineDomainJoin'
 
 function Get-TargetResource
 {
@@ -34,7 +25,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingOfflineDomainJoinMessage)
+        $($script:localizedData.GettingOfflineDomainJoinMessage)
         ) -join '')
 
     # It is not possible to read the ODJ file that was used to join a domain
@@ -47,7 +38,6 @@ function Get-TargetResource
     #Output the target resource
     $returnValue
 } # Get-TargetResource
-
 
 function Set-TargetResource
 {
@@ -66,7 +56,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.ApplyingOfflineDomainJoinMessage)
+        $($script:localizedData.ApplyingOfflineDomainJoinMessage)
         ) -join '')
 
     # Check the ODJ Request file exists
@@ -74,7 +64,7 @@ function Set-TargetResource
     {
         $errorId = 'RequestFileNotFoundError'
         $errorCategory = [System.Management.Automation.ErrorCategory]::ObjectNotFound
-        $errorMessage = $($LocalizedData.RequestFileNotFoundError) `
+        $errorMessage = $($script:localizedData.RequestFileNotFoundError) `
             -f $RequestFile
         $exception = New-Object -TypeName System.ArgumentException `
             -ArgumentList $errorMessage
@@ -88,7 +78,6 @@ function Set-TargetResource
     # Set-TargetResource wouldn't fire unless it wasn't.
     Join-Domain -RequestFile $RequestFile
 } # Set-TargetResource
-
 
 function Test-TargetResource
 {
@@ -111,7 +100,7 @@ function Test-TargetResource
     [Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.CheckingOfflineDomainJoinMessage)
+        $($script:localizedData.CheckingOfflineDomainJoinMessage)
         ) -join '')
 
     # Check the ODJ Request file exists
@@ -119,7 +108,7 @@ function Test-TargetResource
     {
         $errorId = 'RequestFileNotFoundError'
         $errorCategory = [System.Management.Automation.ErrorCategory]::ObjectNotFound
-        $errorMessage = $($LocalizedData.RequestFileNotFoundError) `
+        $errorMessage = $($script:localizedData.RequestFileNotFoundError) `
             -f $RequestFile
         $exception = New-Object -TypeName System.ArgumentException `
             -ArgumentList $errorMessage
@@ -136,7 +125,7 @@ function Test-TargetResource
         # Domain is already joined.
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DomainAlreadyJoinedMessage) `
+            $($script:localizedData.DomainAlreadyJoinedMessage) `
                 -f $CurrentDomainName `
             ) -join '' )
     }
@@ -144,7 +133,7 @@ function Test-TargetResource
     {
         # Domain is not joined, so change is required.
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.DomainNotJoinedMessage)
+            $($script:localizedData.DomainNotJoinedMessage)
             ) -join '')
 
         $desiredConfigurationMatch = $false
@@ -152,10 +141,9 @@ function Test-TargetResource
     return $desiredConfigurationMatch
 } # Test-TargetResource
 
-
 <#
-.SYNOPSIS
-Uses DJoin.exe to join a Domain using a ODJ Request File.
+    .SYNOPSIS
+        Uses DJoin.exe to join a Domain using a ODJ Request File.
 #>
 function Join-Domain {
     [CmdletBinding()]
@@ -167,7 +155,7 @@ function Join-Domain {
 
     Write-Verbose -Message ( @(
         "$($MyInvocation.MyCommand): "
-        $($LocalizedData.AttemptingDomainJoinMessage) `
+        $($script:localizedData.AttemptingDomainJoinMessage) `
             -f $RequestFile `
         ) -join '' )
 
@@ -189,7 +177,7 @@ function Join-Domain {
 
         $errorId = 'DjoinError'
         $errorCategory = [System.Management.Automation.ErrorCategory]::ObjectNotFound
-        $errorMessage = $($LocalizedData.DjoinError) `
+        $errorMessage = $($script:localizedData.DjoinError) `
             -f $LASTEXITCODE
         $exception = New-Object -TypeName System.ArgumentException `
             -ArgumentList $errorMessage
@@ -201,16 +189,15 @@ function Join-Domain {
 
     Write-Verbose -Message ( @(
         "$($MyInvocation.MyCommand): "
-        $($LocalizedData.DomainJoinedMessage) `
+        $($script:localizedData.DomainJoinedMessage) `
             -f $RequestFile `
         ) -join '' )
 } # function Join-Domain
 
-
 <#
-.SYNOPSIS
-Returns the name of the Domain the computer is joined to or
-$null if not domain joined.
+    .SYNOPSIS
+        Returns the name of the Domain the computer is joined to or
+        $null if not domain joined.
 #>
 function Get-DomainName
 {
@@ -229,6 +216,5 @@ function Get-DomainName
         $ComputerSystem.Domain
     }
 } # function Get-DomainName
-
 
 Export-ModuleMember -Function *-TargetResource

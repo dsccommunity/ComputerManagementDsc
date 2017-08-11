@@ -222,6 +222,17 @@ xVirtualMemory has the following properties:
   * ISSUE_TEMPLATE.md
   * PULL_REQUEST_TEMPLATE.md
 * Resolved all PSScriptAnalyzer warnings and style guide warnings.
+* xOfflineDomainJoin:
+  * Changed to use CommonResourceHelper to load localization strings.
+  * Renamed en-US to be correct case so that localization strings can be loaded.
+  * Suppress PSScriptAnalyzer rule PSAvoidGlobalVars for
+    `$global:DSCMachineStatus = 1`.
+* xComputer:
+  * Suppress PSScriptAnalyzer rule PSAvoidGlobalVars for
+    `$global:DSCMachineStatus = 1`.
+* xVirtualMemory:
+  * Suppress PSScriptAnalyzer rule PSAvoidGlobalVars for
+    `$global:DSCMachineStatus = 1`.
 
 ### 2.0.0.0
 
