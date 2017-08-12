@@ -300,18 +300,18 @@ function Test-TargetResource
 
             if ($DomainName.Contains('.'))
             {
-                $GetComputerDomainParameters = @{
+                $getComputerDomainParameters = @{
                     netbios = $false
                 }
             }
             else
             {
-                $GetComputerDomainParameters = @{
+                $getComputerDomainParameters = @{
                     netbios = $true
                 }
             }
 
-            return ($DomainName -eq (Get-ComputerDomain @GetComputerDomainParameters))
+            return ($DomainName -eq (Get-ComputerDomain @getComputerDomainParameters))
         }
         catch
         {
