@@ -48,12 +48,12 @@ function Get-LocalizedData
 #>
 function Remove-CommonParameter
 {
-    [OutputType([hashtable])]
+    [OutputType([System.Collections.Hashtable])]
     [cmdletbinding()]
     param
     (
         [Parameter(Mandatory = $true)]
-        [hashtable]
+        [System.Collections.Hashtable]
         $Hashtable
     )
 
@@ -88,16 +88,18 @@ function Test-DscParameterState
     param
     (
         [Parameter(Mandatory = $true)]
-        [hashtable]
+        [System.Collections.Hashtable]
         $CurrentValues,
 
         [Parameter(Mandatory = $true)]
         [object]
         $DesiredValues,
 
+        [Parameter()]
         [string[]]
         $ValuesToCheck,
 
+        [Parameter()]
         [switch]
         $TurnOffTypeChecking
     )
@@ -377,10 +379,12 @@ function New-InvalidOperationException
     [CmdletBinding()]
     param
     (
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Message,
 
+        [Parameter()]
         [ValidateNotNull()]
         [System.Management.Automation.ErrorRecord]
         $ErrorRecord
