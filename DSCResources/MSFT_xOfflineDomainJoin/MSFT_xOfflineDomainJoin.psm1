@@ -10,7 +10,7 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xOfflineDomainJoin
 function Get-TargetResource
 {
     [CmdletBinding()]
-    [OutputType([Hashtable])]
+    [OutputType([System.Collections.Hashtable])]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -28,15 +28,16 @@ function Get-TargetResource
         $($script:localizedData.GettingOfflineDomainJoinMessage)
         ) -join '')
 
-    # It is not possible to read the ODJ file that was used to join a domain
-    # So it has to always be returned as blank.
+    <#
+        It is not possible to read the ODJ file that was used to join a domain
+        So it has to always be returned as blank.
+    #>
     $returnValue = @{
         IsSingleInstance = 'Yes'
         RequestFile = ''
     }
 
-    #Output the target resource
-    $returnValue
+    return $returnValue
 } # Get-TargetResource
 
 function Set-TargetResource
@@ -74,15 +75,17 @@ function Set-TargetResource
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     } # if
 
-    # Don't need to check if the domain is already joined because
-    # Set-TargetResource wouldn't fire unless it wasn't.
+    <#
+        Don't need to check if the domain is already joined because
+        Set-TargetResource wouldn't fire unless it wasn't.
+    #>
     Join-Domain -RequestFile $RequestFile
 } # Set-TargetResource
 
 function Test-TargetResource
 {
     [CmdletBinding()]
-    [OutputType([Boolean])]
+    [OutputType([System.Boolean])]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -97,7 +100,7 @@ function Test-TargetResource
     )
 
     # Flag to signal whether settings are correct
-    [Boolean] $desiredConfigurationMatch = $true
+    [System.Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
         $($script:localizedData.CheckingOfflineDomainJoinMessage)
@@ -166,9 +169,10 @@ function Join-Domain {
         '/WINDOWSPATH'
         $ENV:SystemRoot
         '/LOCALOS')
+
     if ($LASTEXITCODE -eq 0)
     {
-       # Notify DSC that a reboot is required.
+        # Notify DSC that a reboot is required.
         $global:DSCMachineStatus = 1
     }
     else
@@ -206,14 +210,14 @@ function Get-DomainName
     param()
 
     # Use CIM to detect the domain name so that this will work on Nano Server.
-    $ComputerSystem = Get-CimInstance -ClassName win32_computersystem -Namespace root\cimv2
-    if ($ComputerSystem.Workgroup)
+    $computerSystem = Get-CimInstance -ClassName 'Win32_ComputerSystem' -Namespace root\cimv2
+    if ($computerSystem.Workgroup)
     {
         return $null
     }
     else
     {
-        $ComputerSystem.Domain
+        $computerSystem.Domain
     }
 } # function Get-DomainName
 

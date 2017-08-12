@@ -48,12 +48,12 @@ function Get-LocalizedData
 #>
 function Remove-CommonParameter
 {
-    [OutputType([hashtable])]
+    [OutputType([System.Collections.Hashtable])]
     [cmdletbinding()]
     param
     (
         [Parameter(Mandatory = $true)]
-        [hashtable]
+        [System.Collections.Hashtable]
         $Hashtable
     )
 
@@ -88,7 +88,7 @@ function Test-DscParameterState
     param
     (
         [Parameter(Mandatory = $true)]
-        [hashtable]
+        [System.Collections.Hashtable]
         $CurrentValues,
 
         [Parameter(Mandatory = $true)]

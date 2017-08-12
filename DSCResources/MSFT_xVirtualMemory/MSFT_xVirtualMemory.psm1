@@ -1,4 +1,4 @@
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope="Function")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "Function")]
 param
 (
 )
@@ -24,7 +24,7 @@ function Get-TargetResource
         $Drive,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("AutoManagePagingFile", "CustomSize", "SystemManagedSize", "NoPagingFile")]
+        [ValidateSet('AutoManagePagingFile', 'CustomSize', 'SystemManagedSize', 'NoPagingFile')]
         [System.String]
         $Type
     )
@@ -32,8 +32,8 @@ function Get-TargetResource
     Write-Verbose -Message 'Getting current page file settings'
 
     $returnValue = @{
-        Drive = [string]::Empty
-        Type = [string]::Empty
+        Drive       = [string]::Empty
+        Type        = [string]::Empty
         InitialSize = 0
         MaximumSize = 0
     }
@@ -65,7 +65,7 @@ function Get-TargetResource
     }
     else
     {
-        $returnValue.Type = "CustomSize"
+        $returnValue.Type = 'CustomSize'
     }
 
     $returnValue.Drive = $virtualMemoryInstance.Name.Substring(0, 3)
@@ -101,7 +101,7 @@ function Set-TargetResource
         $Drive,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("AutoManagePagingFile", "CustomSize", "SystemManagedSize", "NoPagingFile")]
+        [ValidateSet('AutoManagePagingFile', 'CustomSize', 'SystemManagedSize', 'NoPagingFile')]
         [System.String]
         $Type,
 
@@ -120,12 +120,12 @@ function Set-TargetResource
 
     switch ($Type)
     {
-        "AutoManagePagingFile"
+        'AutoManagePagingFile'
         {
             $setParams = @{
                 Namespace = 'root\cimv2'
-                Query = 'Select * from Win32_ComputerSystem'
-                Property = @{AutomaticManagedPageFile = $true}
+                Query     = 'Select * from Win32_ComputerSystem'
+                Property  = @{AutomaticManagedPageFile = $true}
             }
 
             Write-Verbose -Message 'Enabling AutoManagePagingFile'
@@ -135,7 +135,7 @@ function Set-TargetResource
             break
         }
 
-        "CustomSize"
+        'CustomSize'
         {
             if ($SystemInfo.AutomaticManagedPageFile)
             {
@@ -143,8 +143,8 @@ function Set-TargetResource
 
                 $setParams = @{
                     Namespace = 'root\cimv2'
-                    Query = 'Select * from Win32_ComputerSystem'
-                    Property = @{AutomaticManagedPageFile = $false}
+                    Query     = 'Select * from Win32_ComputerSystem'
+                    Property  = @{AutomaticManagedPageFile = $false}
                 }
 
                 Write-Verbose -Message 'Disabling AutoManagePagingFile'
@@ -177,8 +177,8 @@ function Set-TargetResource
             #>
             $setParams = @{
                 Namespace = 'root\cimv2'
-                Query = "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
-                Property = @{
+                Query     = "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
+                Property  = @{
                     InitialSize = $InitialSize
                     MaximumSize = $MaximumSize
                 }
@@ -191,14 +191,14 @@ function Set-TargetResource
             break
         }
 
-        "SystemManagedSize"
+        'SystemManagedSize'
         {
             if ($SystemInfo.AutomaticManagedPageFile)
             {
                 $setParams = @{
                     Namespace = 'root\cimv2'
-                    Query = 'Select * from Win32_ComputerSystem'
-                    Property = @{AutomaticManagedPageFile = $false}
+                    Query     = 'Select * from Win32_ComputerSystem'
+                    Property  = @{AutomaticManagedPageFile = $false}
                 }
 
                 Write-Verbose -Message 'Disabling AutoManagePagingFile'
@@ -228,8 +228,8 @@ function Set-TargetResource
 
             $setParams = @{
                 Namespace = 'root\cimv2'
-                Query = "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
-                Property = @{
+                Query     = "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $($driveInfo.Name.Substring(0,2))'"
+                Property  = @{
                     InitialSize = 0
                     MaximumSize = 0
                 }
@@ -242,14 +242,14 @@ function Set-TargetResource
             break
         }
 
-        "NoPagingFile"
+        'NoPagingFile'
         {
             if ($SystemInfo.AutomaticManagedPageFile)
             {
                 $setParams = @{
                     Namespace = 'root\cimv2'
-                    Query = 'Select * from Win32_ComputerSystem'
-                    Property = @{AutomaticManagedPageFile = $false}
+                    Query     = 'Select * from Win32_ComputerSystem'
+                    Property  = @{AutomaticManagedPageFile = $false}
                 }
 
                 $null = Set-CimInstance @setParams
@@ -312,7 +312,7 @@ function Test-TargetResource
         $Drive,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("AutoManagePagingFile", "CustomSize", "SystemManagedSize", "NoPagingFile")]
+        [ValidateSet('AutoManagePagingFile', 'CustomSize', 'SystemManagedSize', 'NoPagingFile')]
         [System.String]
         $Type,
 
@@ -332,13 +332,13 @@ function Test-TargetResource
 
     switch ($Type)
     {
-        "AutoManagePagingFile"
+        'AutoManagePagingFile'
         {
             $result = $systemInfo.AutomaticManagedPagefile
             break
         }
 
-        "CustomSize"
+        'CustomSize'
         {
             if ($systemInfo.AutomaticManagedPageFile)
             {
@@ -366,7 +366,7 @@ function Test-TargetResource
             break
         }
 
-        "SystemManagedSize"
+        'SystemManagedSize'
         {
             if ($SystemInfo.AutomaticManagedPageFile)
             {
@@ -394,7 +394,7 @@ function Test-TargetResource
             break
         }
 
-        "NoPagingFile"
+        'NoPagingFile'
         {
             if ($SystemInfo.AutomaticManagedPageFile)
             {
