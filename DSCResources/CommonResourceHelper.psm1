@@ -379,7 +379,7 @@ function New-InvalidOperationException
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Message,
