@@ -139,13 +139,7 @@ function Set-TargetResource
                 Set-AutoManagePaging -State Disable
             }
 
-            $driveInfo = [System.IO.DriveInfo] $Drive
-
-            if (-not $driveInfo.IsReady)
-            {
-                New-InvalidOperationException `
-                    -Message ($script:localizedData.DriveNotReadyError -f $driveInfo.Name)
-            }
+            $driveInfo = Get-DriveInfo -Drive $Drive
 
             $existingPageFileSetting = Get-PageFileSetting `
                 -Drive $($driveInfo.Name.Substring(0,2))
@@ -179,13 +173,7 @@ function Set-TargetResource
                 Set-AutoManagePaging -State Disable
             }
 
-            $driveInfo = [System.IO.DriveInfo] $Drive
-
-            if (-not $driveInfo.IsReady)
-            {
-                New-InvalidOperationException `
-                    -Message ($script:localizedData.DriveNotReadyError -f $driveInfo.Name)
-            }
+            $driveInfo = Get-DriveInfo -Drive $Drive
 
             $existingPageFileSetting = Get-PageFileSetting `
                 -Drive $($driveInfo.Name.Substring(0,2))
@@ -217,13 +205,7 @@ function Set-TargetResource
                 Set-AutoManagePaging -State Disable
             }
 
-            $driveInfo = [System.IO.DriveInfo] $Drive
-
-            if (-not $driveInfo.IsReady)
-            {
-                New-InvalidOperationException `
-                    -Message ($script:localizedData.DriveNotReadyError -f $driveInfo.Name)
-            }
+            $driveInfo = Get-DriveInfo -Drive $Drive
 
             $existingPageFileSetting = Get-PageFileSetting `
                 -Drive $($driveInfo.Name.Substring(0,2))
@@ -489,6 +471,38 @@ function New-PageFile
         -Property @{
             Name = $PageFileName
         }
+}
+
+<#
+    .SYNOPSIS
+        Gets the Drive info object for a specified
+        Drive. It will throw an exception if the drive
+        is invalid or does not exist.
+
+    .PARAMETER Drive
+        The letter of the drive to get the drive info
+        for.
+#>
+function Get-DriveInfo
+{
+    [CmdletBinding()]
+    [OutputType([System.IO.DriveInfo])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Drive
+    )
+
+    $driveInfo = [System.IO.DriveInfo] $Drive
+
+    if (-not $driveInfo.IsReady)
+    {
+        New-InvalidOperationException `
+            -Message ($script:localizedData.DriveNotReadyError -f $driveInfo.Name)
+    }
+
+    return $driveInfo
 }
 
 Export-ModuleMember -Function *-TargetResource

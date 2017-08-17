@@ -41,10 +41,16 @@ try {
             )
         }
 
-        $testDrive = 'D:'
+        $testDrive = 'K:'
         $testInitialSize = 10
         $testMaximumSize = 20
         $testPageFileName = "$testDrive\pagefile.sys"
+
+        $mockGetDriveInfo = {
+            [PSObject] @{
+                Name = "$testDrive\"
+            }
+        }
 
         $mockAutomaticPagefileEnabled = {
             [PSObject] @{
@@ -251,6 +257,26 @@ try {
         }
 
         Describe 'MSFT_xVirtualMemory\Set-TargetResource' {
+            BeforeEach {
+                <#
+                    These mocks are to handle when disk drive
+                    used for testing does not exist.
+                #>
+                Mock `
+                    -CommandName Get-DriveInfo `
+                    -ParameterFilter { $Drive -eq $testDrive } `
+                    -MockWith $mockGetDriveInfo
+
+                Mock `
+                    -CommandName Join-Path `
+                    -ParameterFilter {
+                        $Path -eq "$testDrive\" -and `
+                        $ChildPath -eq 'pagefile.sys'
+                    } `
+                    -MockWith { "$testDrive\pagefile.sys"}
+
+            }
+
             Context 'When automatic managed page file should be enabled' {
                 Mock `
                     -CommandName Get-CimInstance `
