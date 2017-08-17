@@ -144,7 +144,7 @@ function Set-TargetResource
             if (-not $driveInfo.IsReady)
             {
                 New-InvalidOperationException `
-                    -Message ($script:localizedData.DisableAutoManagePaging -f $driveInfo.Name)
+                    -Message ($script:localizedData.DriveNotReadyError -f $driveInfo.Name)
             }
 
             $existingPageFileSetting = Get-PageFileSetting `
@@ -184,7 +184,7 @@ function Set-TargetResource
             if (-not $driveInfo.IsReady)
             {
                 New-InvalidOperationException `
-                    -Message ($script:localizedData.DisableAutoManagePaging -f $driveInfo.Name)
+                    -Message ($script:localizedData.DriveNotReadyError -f $driveInfo.Name)
             }
 
             $existingPageFileSetting = Get-PageFileSetting `
@@ -222,7 +222,7 @@ function Set-TargetResource
             if (-not $driveInfo.IsReady)
             {
                 New-InvalidOperationException `
-                    -Message ($script:localizedData.DisableAutoManagePaging -f $driveInfo.Name)
+                    -Message ($script:localizedData.DriveNotReadyError -f $driveInfo.Name)
             }
 
             $existingPageFileSetting = Get-PageFileSetting `
