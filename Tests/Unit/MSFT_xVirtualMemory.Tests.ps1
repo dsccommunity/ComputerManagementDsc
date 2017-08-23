@@ -43,7 +43,10 @@ try {
             Context 'When the system is in the desired present state' {
                 BeforeEach {
                     Mock -CommandName Get-CimInstance -MockWith {
-                        [PSObject] @{ AutomaticManagedPageFile = $false; Name = 'D:\pagefile.sys' }
+                        [PSObject] @{
+                            AutomaticManagedPageFile = $false
+                            Name = 'D:\pagefile.sys'
+                        }
                     } -ModuleName $script:DSCResourceName -Verifiable
                 }
 
@@ -58,9 +61,10 @@ try {
                 BeforeEach {
                     Mock -CommandName Get-CimInstance -MockWith {
                         [PSObject] @{
-                        InitialSize = 0
-                        MaximumSize = 0
-                        Name = "C:\pagefile.sys"
+                            InitialSize = 0
+                            MaximumSize = 0
+                            AutomaticManagedPageFile = $false
+                            Name = "C:\pagefile.sys"
                         }
                     } -ModuleName $script:DSCResourceName -Verifiable
                 }
