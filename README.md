@@ -235,6 +235,13 @@ xVirtualMemory has the following properties:
 * xVirtualMemory:
   * Suppress PSScriptAnalyzer rule PSAvoidGlobalVars for
     `$global:DSCMachineStatus = 1`.
+  * Refactored shared common code into new utility functions to
+    reduce code duplication and improve testability.
+  * Moved strings into localizable strings file.
+  * Converted calls to `throw` to use `New-InvalidOperationException`
+    in CommonResourceHelper.
+  * Improved unit test coverage.
+  * Updated to meet HQRM guidelines.
 
 ### 2.0.0.0
 
