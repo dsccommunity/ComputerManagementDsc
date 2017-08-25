@@ -42,7 +42,7 @@ function Get-TargetResource
         MaximumSize = 0
     }
 
-    [bool] $isSystemManaged = (Get-CimInstance -ClassName 'Win32_ComputerSystem').AutomaticManagedPagefile
+    [System.Boolean] $isSystemManaged = (Get-CimInstance -ClassName 'Win32_ComputerSystem').AutomaticManagedPagefile
 
     if ($isSystemManaged)
     {
@@ -58,21 +58,22 @@ function Get-TargetResource
     if (-not $existingPageFileSetting)
     {
         $returnValue.Type = 'NoPagingFile'
-        return $returnValue
-    }
-
-    if ($existingPageFileSetting.InitialSize -eq 0 -and $existingPageFileSetting.MaximumSize -eq 0)
-    {
-        $returnValue.Type = 'SystemManagedSize'
     }
     else
     {
-        $returnValue.Type = 'CustomSize'
-    }
+        if ($existingPageFileSetting.InitialSize -eq 0 -and $existingPageFileSetting.MaximumSize -eq 0)
+        {
+            $returnValue.Type = 'SystemManagedSize'
+        }
+        else
+        {
+            $returnValue.Type = 'CustomSize'
+        }
 
-    $returnValue.Drive = $existingPageFileSetting.Name.Substring(0, 3)
-    $returnValue.InitialSize = $existingPageFileSetting.InitialSize
-    $returnValue.MaximumSize = $existingPageFileSetting.MaximumSize
+        $returnValue.Drive = $existingPageFileSetting.Name.Substring(0, 3)
+        $returnValue.InitialSize = $existingPageFileSetting.InitialSize
+        $returnValue.MaximumSize = $existingPageFileSetting.MaximumSize
+    }
 
     return $returnValue
 }
@@ -382,6 +383,20 @@ function Get-PageFileSetting
         -Filter "SettingID='pagefile.sys @ $Drive'"
 }
 
+<#
+    .SYNOPSIS
+        Sets a new page file name.
+
+    .PARAMETER Drive
+        The letter of the drive containing the page file
+        to change the settings of.
+
+    .PARAMETER InitialSize
+        The initial size to set the page file to.
+
+    .PARAMETER MaximumSize
+        The maximum size to set the page file to.
+#>
 function Set-PageFileSetting
 {
     [CmdletBinding()]

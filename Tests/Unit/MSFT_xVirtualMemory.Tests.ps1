@@ -125,8 +125,7 @@ try {
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter $parameterFilterComputerSystem `
-                    -MockWith $mockAutomaticPagefileEnabled `
-                    -Verifiable
+                    -MockWith $mockAutomaticPagefileEnabled
 
                 It 'Should return type set to AutoManagePagingFile' {
                     $result = Get-TargetResource @testParameters
@@ -134,8 +133,6 @@ try {
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-
                     Assert-MockCalled `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
@@ -147,13 +144,11 @@ try {
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter $parameterFilterComputerSystem `
-                    -MockWith $mockAutomaticPagefileDisabled `
-                    -Verifiable
+                    -MockWith $mockAutomaticPagefileDisabled
 
                 Mock `
                     -CommandName Get-PageFileSetting `
-                    -ParameterFilter $parameterFilterGetPageFileSetting `
-                    -Verifiable
+                    -ParameterFilter $parameterFilterGetPageFileSetting
 
                 It 'Should return type set to NoPagingFile' {
                     $result = Get-TargetResource @testParameters
@@ -161,8 +156,6 @@ try {
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-
                     Assert-MockCalled `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
@@ -179,8 +172,7 @@ try {
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter $parameterFilterComputerSystem `
-                    -MockWith $mockAutomaticPagefileDisabled `
-                    -Verifiable
+                    -MockWith $mockAutomaticPagefileDisabled
 
                 Mock `
                     -CommandName Get-PageFileSetting `
@@ -191,18 +183,15 @@ try {
                             MaximumSize = 0
                             Name        = "$testDrive\"
                         }
-                    } `
-                    -Verifiable
+                    }
 
-                It 'Should not return a valid type and drive letter' {
+                It 'Should return a expected type and drive letter' {
                     $result = Get-TargetResource @testParameters
                     $result.Type | Should Be 'SystemManagedSize'
                     $result.Drive | Should Be ([System.IO.DriveInfo] $testParameters.Drive).Name
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-
                     Assert-MockCalled `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
@@ -219,8 +208,7 @@ try {
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter $parameterFilterComputerSystem `
-                    -MockWith $mockAutomaticPagefileDisabled `
-                    -Verifiable
+                    -MockWith $mockAutomaticPagefileDisabled
 
                 Mock `
                     -CommandName Get-PageFileSetting `
@@ -231,18 +219,15 @@ try {
                             MaximumSize = 20
                             Name        = "$testDrive\"
                         }
-                    } `
-                    -Verifiable
+                    }
 
-                It 'Should not return a valid type and drive letter' {
+                It 'Should return expected type and drive letter' {
                     $result = Get-TargetResource @testParameters
                     $result.Type | Should Be 'CustomSize'
                     $result.Drive | Should Be ([System.IO.DriveInfo] $testParameters.Drive).Name
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-
                     Assert-MockCalled `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
@@ -281,15 +266,13 @@ try {
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter $parameterFilterComputerSystem `
-                    -MockWith $mockAutomaticPagefileDisabled `
-                    -Verifiable
+                    -MockWith $mockAutomaticPagefileDisabled
 
                 Mock `
                     -CommandName Set-AutoManagePaging `
-                    -ParameterFilter { $State -eq 'Enable' } `
-                    -Verifiable
+                    -ParameterFilter { $State -eq 'Enable' }
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     $testParameters = @{
                         Drive       = $testDrive
                         Type        = 'AutoManagePagingFile'
@@ -302,8 +285,6 @@ try {
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-
                     Assert-MockCalled `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
@@ -321,23 +302,19 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileEnabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileEnabled
 
                     Mock `
                         -CommandName Set-AutoManagePaging `
-                        -ParameterFilter { $State -eq 'Disable' } `
-                        -Verifiable
+                        -ParameterFilter { $State -eq 'Disable' }
 
                     Mock `
                         -CommandName Get-PageFileSetting `
-                        -ParameterFilter { $Drive -eq $testDrive } `
-                        -Verifiable
+                        -ParameterFilter { $Drive -eq $testDrive }
 
                     Mock `
                         -CommandName New-PageFile `
-                        -ParameterFilter { $PageFileName -eq $testPageFileName } `
-                        -Verifiable
+                        -ParameterFilter { $PageFileName -eq $testPageFileName }
 
                     Mock `
                         -CommandName Set-PageFileSetting `
@@ -345,10 +322,9 @@ try {
                             $Drive -eq $testDrive -and `
                             $InitialSize -eq $testInitialSize -and `
                             $MaximumSize -eq $testMaximumSize
-                        } `
-                        -Verifiable
+                        }
 
-                    It 'Should return false' {
+                    It 'Should not throw an exception' {
                         $testParameters = @{
                             Drive       = $testDrive
                             Type        = 'CustomSize'
@@ -361,8 +337,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -398,19 +372,16 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileEnabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileEnabled
 
                     Mock `
                         -CommandName Set-AutoManagePaging `
-                        -ParameterFilter { $State -eq 'Disable' } `
-                        -Verifiable
+                        -ParameterFilter { $State -eq 'Disable' }
 
                     Mock `
                         -CommandName Get-PageFileSetting `
                         -ParameterFilter { $Drive -eq $testDrive } `
-                        -MockWith $mockPageFileSetting `
-                        -Verifiable
+                        -MockWith $mockPageFileSetting
 
                     Mock `
                         -CommandName New-PageFile `
@@ -422,10 +393,9 @@ try {
                             $Drive -eq $testDrive -and `
                             $InitialSize -eq $testInitialSize -and `
                             $MaximumSize -eq $testMaximumSize
-                        } `
-                        -Verifiable
+                        }
 
-                    It 'Should return false' {
+                    It 'Should not throw an exception' {
                         $testParameters = @{
                             Drive       = $testDrive
                             Type        = 'CustomSize'
@@ -438,8 +408,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -476,32 +444,27 @@ try {
                         Mock `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
-                            -MockWith $mockAutomaticPagefileEnabled `
-                            -Verifiable
+                            -MockWith $mockAutomaticPagefileEnabled
 
                         Mock `
                             -CommandName Set-AutoManagePaging `
-                            -ParameterFilter { $State -eq 'Disable' } `
-                            -Verifiable
+                            -ParameterFilter { $State -eq 'Disable' }
 
                         Mock `
                             -CommandName Get-PageFileSetting `
-                            -ParameterFilter { $Drive -eq $testDrive } `
-                            -Verifiable
+                            -ParameterFilter { $Drive -eq $testDrive }
 
                         Mock `
                             -CommandName New-PageFile `
-                            -ParameterFilter { $PageFileName -eq $testPageFileName } `
-                            -Verifiable
+                            -ParameterFilter { $PageFileName -eq $testPageFileName }
 
                         Mock `
                             -CommandName Set-PageFileSetting `
                             -ParameterFilter {
                                 $Drive -eq $testDrive
-                            } `
-                            -Verifiable
+                            }
 
-                        It 'Should return false' {
+                        It 'Should not throw an exception' {
                             $testParameters = @{
                                 Drive       = $testDrive
                                 Type        = 'SystemManagedSize'
@@ -512,8 +475,6 @@ try {
                         }
 
                         It 'Should call the correct mocks' {
-                            Assert-VerifiableMocks
-
                             Assert-MockCalled `
                                 -CommandName Get-CimInstance `
                                 -ParameterFilter $parameterFilterComputerSystem `
@@ -548,19 +509,16 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileEnabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileEnabled
 
                     Mock `
                         -CommandName Set-AutoManagePaging `
-                        -ParameterFilter { $State -eq 'Disable' } `
-                        -Verifiable
+                        -ParameterFilter { $State -eq 'Disable' }
 
                     Mock `
                         -CommandName Get-PageFileSetting `
                         -ParameterFilter { $Drive -eq $testDrive } `
-                        -MockWith $mockPageFileSetting `
-                        -Verifiable
+                        -MockWith $mockPageFileSetting
 
                     Mock `
                         -CommandName New-PageFile `
@@ -570,10 +528,9 @@ try {
                         -CommandName Set-PageFileSetting `
                         -ParameterFilter {
                             $Drive -eq $testDrive
-                        } `
-                        -Verifiable
+                        }
 
-                    It 'Should return false' {
+                    It 'Should not throw an exception' {
                         $testParameters = @{
                             Drive       = $testDrive
                             Type        = 'SystemManagedSize'
@@ -584,8 +541,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -620,23 +575,20 @@ try {
                         Mock `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
-                            -MockWith $mockAutomaticPagefileEnabled `
-                            -Verifiable
+                            -MockWith $mockAutomaticPagefileEnabled
 
                         Mock `
                             -CommandName Set-AutoManagePaging `
-                            -ParameterFilter { $State -eq 'Disable' } `
-                            -Verifiable
+                            -ParameterFilter { $State -eq 'Disable' }
 
                         Mock `
                             -CommandName Get-PageFileSetting `
-                            -ParameterFilter { $Drive -eq $testDrive } `
-                            -Verifiable
+                            -ParameterFilter { $Drive -eq $testDrive }
 
                         Mock `
                             -CommandName Remove-CimInstance
 
-                        It 'Should return false' {
+                        It 'Should not throw an exception' {
                             $testParameters = @{
                                 Drive       = $testDrive
                                 Type        = 'NoPagingFile'
@@ -647,8 +599,6 @@ try {
                         }
 
                         It 'Should call the correct mocks' {
-                            Assert-VerifiableMocks
-
                             Assert-MockCalled `
                                 -CommandName Get-CimInstance `
                                 -ParameterFilter $parameterFilterComputerSystem `
@@ -675,25 +625,21 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileEnabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileEnabled
 
                     Mock `
                         -CommandName Set-AutoManagePaging `
-                        -ParameterFilter { $State -eq 'Disable' } `
-                        -Verifiable
+                        -ParameterFilter { $State -eq 'Disable' }
 
                     Mock `
                         -CommandName Get-PageFileSetting `
                         -ParameterFilter { $Drive -eq $testDrive } `
-                        -MockWith $mockPageFileSetting `
-                        -Verifiable
+                        -MockWith $mockPageFileSetting
 
                     Mock `
-                        -CommandName Remove-CimInstance `
-                        -Verifiable
+                        -CommandName Remove-CimInstance
 
-                    It 'Should return false' {
+                    It 'Should not throw an exception' {
                         $testParameters = @{
                             Drive       = $testDrive
                             Type        = 'NoPagingFile'
@@ -704,8 +650,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -731,12 +675,11 @@ try {
 
         Describe 'MSFT_xVirtualMemory\Test-TargetResource' {
             Context 'In desired state' {
-                Context 'With automatic managed page file is enabled' {
+                Context 'When automatic managed page file is enabled' {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileEnabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileEnabled
 
                     It 'Should return true' {
                         $testParameters = @{
@@ -752,8 +695,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -761,17 +702,15 @@ try {
                     }
                 }
 
-                Context 'With automatic managed page file is disabled and no page file set' {
+                Context 'When automatic managed page file is disabled and no page file set' {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileDisabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileDisabled
 
                     Mock `
                         -CommandName Get-PageFileSetting `
-                        -ParameterFilter $parameterFilterGetPageFileSetting `
-                        -Verifiable
+                        -ParameterFilter $parameterFilterGetPageFileSetting
 
                     It 'Should return true' {
                         $testParameters = @{
@@ -787,8 +726,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -805,8 +742,7 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileDisabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileDisabled
 
                     Mock `
                         -CommandName Get-PageFileSetting `
@@ -817,8 +753,7 @@ try {
                                 MaximumSize = 0
                                 Name        = "$testDrive\"
                             }
-                        } `
-                        -Verifiable
+                        }
 
                     It 'Should return true' {
                         $testParameters = @{
@@ -834,8 +769,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -852,8 +785,7 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileDisabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileDisabled
 
                     Mock `
                         -CommandName Get-PageFileSetting `
@@ -864,8 +796,7 @@ try {
                                 MaximumSize = $testMaximumSize
                                 Name        = "$testDrive\"
                             }
-                        } `
-                        -Verifiable
+                        }
 
                     It 'Should return true' {
                         $testParameters = @{
@@ -881,8 +812,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -901,8 +830,7 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileDisabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileDisabled
 
                     It 'Should return false' {
                         $testParameters = @{
@@ -918,8 +846,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -931,8 +857,7 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileDisabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileDisabled
 
                     Mock `
                         -CommandName Get-PageFileSetting `
@@ -943,8 +868,7 @@ try {
                                 MaximumSize = $testMaximumSize
                                 Name        = "$testDrive\"
                             }
-                        } `
-                        -Verifiable
+                        }
 
                     It 'Should return false' {
                         $testParameters = @{
@@ -960,8 +884,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -978,8 +900,7 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileDisabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileDisabled
 
                     Mock `
                         -CommandName Get-PageFileSetting `
@@ -990,8 +911,7 @@ try {
                                 MaximumSize = $testMaximumSize
                                 Name        = "$testDrive\"
                             }
-                        } `
-                        -Verifiable
+                        }
 
                     It 'Should return false' {
                         $testParameters = @{
@@ -1007,8 +927,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -1025,8 +943,7 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileDisabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileDisabled
 
                     Mock `
                         -CommandName Get-PageFileSetting `
@@ -1037,8 +954,7 @@ try {
                                 MaximumSize = $testMaximumSize
                                 Name        = "$testDrive\"
                             }
-                        } `
-                        -Verifiable
+                        }
 
                     It 'Should return false' {
                         $testParameters = @{
@@ -1054,8 +970,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -1072,8 +986,7 @@ try {
                     Mock `
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterComputerSystem `
-                        -MockWith $mockAutomaticPagefileDisabled `
-                        -Verifiable
+                        -MockWith $mockAutomaticPagefileDisabled
 
                     Mock `
                         -CommandName Get-PageFileSetting `
@@ -1084,8 +997,7 @@ try {
                                 MaximumSize = $testMaximumSize
                                 Name        = "$testDrive\"
                             }
-                        } `
-                        -Verifiable
+                        }
 
                     It 'Should return false' {
                         $testParameters = @{
@@ -1101,8 +1013,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterComputerSystem `
@@ -1127,10 +1037,9 @@ try {
                                 MaximumSize = $testMaximumSize
                                 Name        = "$testDrive\"
                             }
-                        } `
-                        -Verifiable
+                        }
 
-                    It 'Should not return the expected object' {
+                    It 'Should return the expected object' {
                         $result = Get-PageFileSetting -Drive $testDrive -Verbose
                         $result.InitialSize | Should Be $testInitialSize
                         $result.MaximumSize | Should Be $testMaximumSize
@@ -1138,8 +1047,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Get-CimInstance `
                             -ParameterFilter $parameterFilterPageFileSetting `
@@ -1152,10 +1059,9 @@ try {
                 Context "Set page file settings on drive $testDrive" {
                     Mock `
                         -CommandName Set-CimInstance `
-                        -ParameterFilter $parameterFilterSetPageFileSetting `
-                        -Verifiable
+                        -ParameterFilter $parameterFilterSetPageFileSetting
 
-                    It 'Should not throw exception' {
+                    It 'Should not throw an exception' {
                         {
                             Set-PageFileSetting `
                                 -Drive $testDrive `
@@ -1166,8 +1072,6 @@ try {
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Set-CimInstance `
                             -ParameterFilter $parameterFilterSetPageFileSetting `
@@ -1180,16 +1084,13 @@ try {
                 Context "Enable auto managed page file" {
                     Mock `
                         -CommandName Set-CimInstance `
-                        -ParameterFilter $parameterFilterEnableAutoManagePaging `
-                        -Verifiable
+                        -ParameterFilter $parameterFilterEnableAutoManagePaging
 
-                    It 'Should not throw exception' {
+                    It 'Should not throw an exception' {
                         { Set-AutoManagePaging -State Enable -Verbose } | Should Not Throw
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Set-CimInstance `
                             -ParameterFilter $parameterFilterEnableAutoManagePaging `
@@ -1200,16 +1101,13 @@ try {
                 Context "Disable auto managed page file" {
                     Mock `
                         -CommandName Set-CimInstance `
-                        -ParameterFilter $parameterFilterDisableAutoManagePaging `
-                        -Verifiable
+                        -ParameterFilter $parameterFilterDisableAutoManagePaging
 
-                    It 'Should not throw exception' {
+                    It 'Should not throw an exception' {
                         { Set-AutoManagePaging -State Disable -Verbose } | Should Not Throw
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName Set-CimInstance `
                             -ParameterFilter $parameterFilterDisableAutoManagePaging `
@@ -1222,16 +1120,13 @@ try {
                 Context "Create a new page file" {
                     Mock `
                         -CommandName New-CimInstance `
-                        -ParameterFilter $parameterFilterNewPageFileSetting `
-                        -Verifiable
+                        -ParameterFilter $parameterFilterNewPageFileSetting
 
-                    It 'Should not throw exception' {
+                    It 'Should not throw an exception' {
                         { New-PageFile -PageFileName $testPageFileName -Verbose } | Should Not Throw
                     }
 
                     It 'Should call the correct mocks' {
-                        Assert-VerifiableMocks
-
                         Assert-MockCalled `
                             -CommandName New-CimInstance `
                             -ParameterFilter $parameterFilterNewPageFileSetting `

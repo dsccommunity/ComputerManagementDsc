@@ -4,7 +4,7 @@ ConvertFrom-StringData @'
     SetAutoManagePagingMessage = {0} automatically managed page file.
     GettingPageFileSettingsMessage = Getting page file settings for drive {0}.
     SettingPageFileSettingsMessage = Setting page file settings for drive {0} with initial size of {1}MB and maximum size {2}MB.
-    NewPageFileMessage = Specifting new page file '{0}'.
+    NewPageFileMessage = Creating new page file '{0}'.
     RemovePageFileMessage = Removing existing page file '{0}'.
     DisabledPageFileMessage = Disabled page file for drive {0}.
     EnabledSystemManagedSizeMessage = Enabled system managed page file for drive {0}.
