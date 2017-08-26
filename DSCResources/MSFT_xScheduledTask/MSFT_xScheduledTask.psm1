@@ -1323,11 +1323,7 @@ function Test-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $RunOnlyIfNetworkAvailable = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $UseLocalTimezone = $false
+        $RunOnlyIfNetworkAvailable = $false
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
