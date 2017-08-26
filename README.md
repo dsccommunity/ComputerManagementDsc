@@ -202,6 +202,14 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
+* BREAKING CHANGE: xScheduledTask:
+  * Converted all Interval/Duration type parameters over to be string format
+    to prevent the Timezone the MOF file was created in from being stored.
+    This is to fix problems where MOF files are created in one timezone but
+    deployed nodes to a different timezone - See [Issue #85](https://github.com/PowerShell/xComputerManagement/issues/85)
+  * Added ConvertTo-TimeSpanFromScheduledTaskString function and refactored
+    to reduce code duplication.
+
 ### 2.1.0.0
 
 * xComputer: Changed comparison that validates if we are in the correct AD
