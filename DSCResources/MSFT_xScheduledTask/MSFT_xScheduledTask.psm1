@@ -1431,6 +1431,7 @@ function ConvertTo-TimeSpanFromStandardString
     [OutputType([System.Timespan])]
     param
     (
+        [Parameter()]
         [System.String]
         $Timespan = '00:00:00'
     )
@@ -1454,6 +1455,7 @@ function ConvertTo-TimeSpanFromScheduledTaskString
     [OutputType([System.Timespan])]
     param
     (
+        [Parameter()]
         [System.String]
         $Timespan
     )
