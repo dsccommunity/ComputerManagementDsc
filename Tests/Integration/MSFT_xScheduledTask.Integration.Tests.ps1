@@ -15,8 +15,10 @@ $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
     -TestType Integration
-
 #endregion
+
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+
 # Begin Testing
 try
 {
@@ -105,7 +107,7 @@ try
 
         Context "MOF is created in a different timezone to node MOF being applied to" {
             BeforeAll {
-                $currentTimeZoneId = (Get-TimeZone).Id
+                $currentTimeZoneId = Get-TimeZoneId
             }
 
             $CurrentConfig = 'xScheduledTaskOnceCrossTimezone'
@@ -115,14 +117,14 @@ try
             It 'Should compile the MOF without throwing in W. Australia Standard Time Timezone' {
                 {
 
-                    Set-TimeZone -Id 'W. Australia Standard Time'
+                    Set-TimeZoneId -Id 'W. Australia Standard Time'
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should Not Throw
             }
 
             It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
                 {
-                    Set-TimeZone -Id 'New Zealand Standard Time'
+                    Set-TimeZoneId -Id 'New Zealand Standard Time'
                     Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
                 } | Should Not Throw
             }
@@ -132,7 +134,7 @@ try
             }
 
             AfterAll {
-                Set-TimeZone -Id $currentTimeZoneId
+                Set-TimeZoneId -Id $currentTimeZoneId
             }
         }
     }
