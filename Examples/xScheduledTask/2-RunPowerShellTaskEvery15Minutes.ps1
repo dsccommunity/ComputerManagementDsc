@@ -23,8 +23,8 @@ Configuration Example
           ActionExecutable   = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
           ActionArguments    = "-File `"C:\scripts\my custom script.ps1`""
           ScheduleType       = 'Once'
-          RepeatInterval     = [datetime]::Today.AddMinutes(15)
-          RepetitionDuration = [datetime]::Today.AddHours(10)
+          RepeatInterval     = '00:15:00'
+          RepetitionDuration = '10:00:00'
         }
     }
 }

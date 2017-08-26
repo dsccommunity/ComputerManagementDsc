@@ -14,92 +14,152 @@ namespace xScheduledTask
 }
 '@
 
-Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'CommonResourceHelper.psm1')
+Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
+    -ChildPath 'CommonResourceHelper.psm1')
 
 <#
-.SYNOPSIS
-    Gets the current resource state
-.PARAMETER TaskName
-    The name of the task
-.PARAMETER TaskPath
-    The path to the task - defaults to the root directory
-.PARAMETER Description
-    The task description
-.PARAMETER ActionExecutable
-    The path to the .exe for this task
-.PARAMETER ActionArguments
-    The arguments to pass the executable
-.PARAMETER ActionWorkingPath
-    The working path to specify for the executable
-.PARAMETER ScheduleType
-    When should the task be executed
-.PARAMETER RepeatInterval
-    How many units (minutes, hours, days) between each run of this task?
-.PARAMETER StartTime
-    The time of day this task should start at - defaults to 12:00 AM. Not valid for AtLogon and AtStartup tasks
-.PARAMETER Ensure
-    Present if the task should exist, Absent if it should be removed
-.PARAMETER Enable
-    True if the task should be enabled, false if it should be disabled
-.PARAMETER ExecuteAsCredential
-    The credential this task should execute as. If not specified defaults to running as the local system account
-.PARAMETER DaysInterval
-    Specifies the interval between the days in the schedule. An interval of 1 produces a daily schedule. An interval of 2 produces an every-other day schedule.
-.PARAMETER RandomDelay
-    Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting.
-.PARAMETER RepetitionDuration
-    Specifies how long the repetition pattern repeats after the task starts.
-.PARAMETER DaysOfWeek
-    Specifies an array of the days of the week on which Task Scheduler runs the task.
-.PARAMETER WeeksInterval
-    Specifies the interval between the weeks in the schedule. An interval of 1 produces a weekly schedule. An interval of 2 produces an every-other week schedule.
-.PARAMETER User
-    Specifies the identifier of the user for a trigger that starts a task when a user logs on.
-.PARAMETER DisallowDemandStart
-    Indicates whether the task is prohibited to run on demand or not. Defaults to $false
-.PARAMETER DisallowHardTerminate
-    Indicates whether the task is prohibited to be terminated or not. Defaults to $false
-.PARAMETER Compatibility
-    The task compatibility level. Defaults to Vista.
-.PARAMETER AllowStartIfOnBatteries
-    Indicates whether the task should start if the machine is on batteries or not. Defaults to $false
-.PARAMETER Hidden
-    Indicates that the task is hidden in the Task Scheduler UI.
-.PARAMETER RunOnlyIfIdle
-    Indicates that Task Scheduler runs the task only when the computer is idle.
-.PARAMETER IdleWaitTimeout
-    Specifies the amount of time that Task Scheduler waits for an idle condition to occur.
-.PARAMETER NetworkName
-    Specifies the name of a network profile that Task Scheduler uses to determine if the task can run.
-    The Task Scheduler UI uses this setting for display purposes. Specify a network name if you specify the RunOnlyIfNetworkAvailable parameter.
-.PARAMETER DisallowStartOnRemoteAppSession
-    Indicates that the task does not start if the task is triggered to run in a Remote Applications Integrated Locally (RAIL) session.
-.PARAMETER StartWhenAvailable
-    Indicates that Task Scheduler can start the task at any time after its scheduled time has passed.
-.PARAMETER DontStopIfGoingOnBatteries
-    Indicates that the task does not stop if the computer switches to battery power.
-.PARAMETER WakeToRun
-    Indicates that Task Scheduler wakes the computer before it runs the task.
-.PARAMETER IdleDuration
-    Specifies the amount of time that the computer must be in an idle state before Task Scheduler runs the task.
-.PARAMETER RestartOnIdle
-    Indicates that Task Scheduler restarts the task when the computer cycles into an idle condition more than once.
-.PARAMETER DontStopOnIdleEnd
-    Indicates that Task Scheduler does not terminate the task if the idle condition ends before the task is completed.
-.PARAMETER ExecutionTimeLimit
-    Specifies the amount of time that Task Scheduler is allowed to complete the task.
-.PARAMETER MultipleInstances
-    Specifies the policy that defines how Task Scheduler handles multiple instances of the task.
-.PARAMETER Priority
-    Specifies the priority level of the task. Priority must be an integer from 0 (highest priority) to 10 (lowest priority).
-    The default value is 7. Priority levels 7 and 8 are used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.
-.PARAMETER RestartCount
-    Specifies the number of times that Task Scheduler attempts to restart the task.
-.PARAMETER RestartInterval
-    Specifies the amount of time that Task Scheduler attempts to restart the task.
-.PARAMETER RunOnlyIfNetworkAvailable
-    Indicates that Task Scheduler runs the task only when a network is available. Task Scheduler uses the NetworkID
-    parameter and NetworkName parameter that you specify in this cmdlet to determine if the network is available.
+    .SYNOPSIS
+        Tests if the current resource state matches the desired resource state
+
+    .PARAMETER TaskName
+        The name of the task
+
+    .PARAMETER TaskPath
+        The path to the task - defaults to the root directory
+
+    .PARAMETER Description
+        The task description
+
+    .PARAMETER ActionExecutable
+        The path to the .exe for this task
+
+    .PARAMETER ActionArguments
+        The arguments to pass the executable
+
+    .PARAMETER ActionWorkingPath
+        The working path to specify for the executable
+
+    .PARAMETER ScheduleType
+        When should the task be executed
+
+    .PARAMETER RepeatInterval
+        How many units (minutes, hours, days) between each run of this task?
+
+    .PARAMETER StartTime
+        The time of day this task should start at - defaults to 12:00 AM. Not valid for
+        AtLogon and AtStartup tasks
+
+    .PARAMETER Ensure
+        Present if the task should exist, Absent if it should be removed
+
+    .PARAMETER Enable
+        True if the task should be enabled, false if it should be disabled
+
+    .PARAMETER ExecuteAsCredential
+        The credential this task should execute as. If not specified defaults to running
+        as the local system account
+
+    .PARAMETER DaysInterval
+        Specifies the interval between the days in the schedule. An interval of 1 produces
+        a daily schedule. An interval of 2 produces an every-other day schedule.
+
+    .PARAMETER RandomDelay
+        Specifies a random amount of time to delay the start time of the trigger. The
+        delay time is a random time between the time the task triggers and the time that
+        you specify in this setting.
+
+    .PARAMETER RepetitionDuration
+        Specifies how long the repetition pattern repeats after the task starts.
+
+    .PARAMETER DaysOfWeek
+        Specifies an array of the days of the week on which Task Scheduler runs the task.
+
+    .PARAMETER WeeksInterval
+        Specifies the interval between the weeks in the schedule. An interval of 1 produces
+        a weekly schedule. An interval of 2 produces an every-other week schedule.
+
+    .PARAMETER User
+        Specifies the identifier of the user for a trigger that starts a task when a
+        user logs on.
+
+    .PARAMETER DisallowDemandStart
+        Indicates whether the task is prohibited to run on demand or not. Defaults
+        to $false
+
+    .PARAMETER DisallowHardTerminate
+        Indicates whether the task is prohibited to be terminated or not. Defaults
+        to $false
+
+    .PARAMETER Compatibility
+        The task compatibility level. Defaults to Vista.
+
+    .PARAMETER AllowStartIfOnBatteries
+        Indicates whether the task should start if the machine is on batteries or not.
+        Defaults to $false
+
+    .PARAMETER Hidden
+        Indicates that the task is hidden in the Task Scheduler UI.
+
+    .PARAMETER RunOnlyIfIdle
+        Indicates that Task Scheduler runs the task only when the computer is idle.
+
+    .PARAMETER IdleWaitTimeout
+        Specifies the amount of time that Task Scheduler waits for an idle condition to occur.
+
+    .PARAMETER NetworkName
+        Specifies the name of a network profile that Task Scheduler uses to determine
+        if the task can run.
+        The Task Scheduler UI uses this setting for display purposes. Specify a network
+        name if you specify the RunOnlyIfNetworkAvailable parameter.
+
+    .PARAMETER DisallowStartOnRemoteAppSession
+        Indicates that the task does not start if the task is triggered to run in a Remote
+        Applications Integrated Locally (RAIL) session.
+
+    .PARAMETER StartWhenAvailable
+        Indicates that Task Scheduler can start the task at any time after its scheduled
+        time has passed.
+
+    .PARAMETER DontStopIfGoingOnBatteries
+        Indicates that the task does not stop if the computer switches to battery power.
+
+    .PARAMETER WakeToRun
+        Indicates that Task Scheduler wakes the computer before it runs the task.
+
+    .PARAMETER IdleDuration
+        Specifies the amount of time that the computer must be in an idle state before
+        Task Scheduler runs the task.
+
+    .PARAMETER RestartOnIdle
+        Indicates that Task Scheduler restarts the task when the computer cycles into an
+        idle condition more than once.
+
+    .PARAMETER DontStopOnIdleEnd
+        Indicates that Task Scheduler does not terminate the task if the idle condition
+        ends before the task is completed.
+
+    .PARAMETER ExecutionTimeLimit
+        Specifies the amount of time that Task Scheduler is allowed to complete the task.
+
+    .PARAMETER MultipleInstances
+        Specifies the policy that defines how Task Scheduler handles multiple instances
+        of the task.
+
+    .PARAMETER Priority
+        Specifies the priority level of the task. Priority must be an integer from 0 (highest priority)
+        to 10 (lowest priority). The default value is 7. Priority levels 7 and 8 are
+        used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.
+
+    .PARAMETER RestartCount
+        Specifies the number of times that Task Scheduler attempts to restart the task.
+
+    .PARAMETER RestartInterval
+        Specifies the amount of time that Task Scheduler attempts to restart the task.
+
+    .PARAMETER RunOnlyIfNetworkAvailable
+        Indicates that Task Scheduler runs the task only when a network is available. Task
+        Scheduler uses the NetworkID parameter and NetworkName parameter that you specify
+        in this cmdlet to determine if the network is available.
 #>
 function Get-TargetResource
 {
@@ -137,8 +197,8 @@ function Get-TargetResource
         $ScheduleType,
 
         [Parameter()]
-        [System.DateTime]
-        $RepeatInterval = [System.DateTime] '00:00:00',
+        [System.String]
+        $RepeatInterval = '00:00:00',
 
         [Parameter()]
         [System.DateTime]
@@ -162,12 +222,12 @@ function Get-TargetResource
         $DaysInterval = 1,
 
         [Parameter()]
-        [System.DateTime]
-        $RandomDelay = [System.DateTime] '00:00:00',
+        [System.String]
+        $RandomDelay = '00:00:00',
 
         [Parameter()]
-        [System.DateTime]
-        $RepetitionDuration = [System.DateTime] '00:00:00',
+        [System.String]
+        $RepetitionDuration = '00:00:00',
 
         [Parameter()]
         [System.String[]]
@@ -207,8 +267,8 @@ function Get-TargetResource
         $RunOnlyIfIdle = $false,
 
         [Parameter()]
-        [System.DateTime]
-        $IdleWaitTimeout = [System.DateTime] '02:00:00',
+        [System.String]
+        $IdleWaitTimeout = '02:00:00',
 
         [Parameter()]
         [System.String]
@@ -231,8 +291,8 @@ function Get-TargetResource
         $WakeToRun = $false,
 
         [Parameter()]
-        [System.DateTime]
-        $IdleDuration = [System.DateTime] '01:00:00',
+        [System.String]
+        $IdleDuration = '01:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -243,8 +303,8 @@ function Get-TargetResource
         $DontStopOnIdleEnd = $false,
 
         [Parameter()]
-        [System.DateTime]
-        $ExecutionTimeLimit = [System.DateTime] '8:00:00',
+        [System.String]
+        $ExecutionTimeLimit = '08:00:00',
 
         [Parameter()]
         [ValidateSet('IgnoreNew', 'Parallel', 'Queue')]
@@ -260,8 +320,8 @@ function Get-TargetResource
         $RestartCount = 0,
 
         [Parameter()]
-        [System.DateTime]
-        $RestartInterval = [System.DateTime] '00:00:00',
+        [System.String]
+        $RestartInterval = '00:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -277,6 +337,7 @@ function Get-TargetResource
     if ($null -eq $task)
     {
         Write-Verbose -Message ('No task found. returning empty task {0} with Ensure = "Absent"' -f $Taskname)
+
         return @{
             TaskName = $TaskName
             ActionExecutable = $ActionExecutable
@@ -287,6 +348,7 @@ function Get-TargetResource
     else
     {
         Write-Verbose -Message ('Task {0} found in {1}. Retrieving settings, first action, first trigger and repetition settings' -f $TaskName, $TaskPath)
+
         $action = $task.Actions | Select-Object -First 1
         $trigger = $task.Triggers | Select-Object -First 1
         $settings = $task.Settings
@@ -300,6 +362,7 @@ function Get-TargetResource
                 $returnScheduleType = 'Once'
                 break
             }
+
             'MSFT_TaskDailyTrigger'
             {
                 $returnScheduleType = 'Daily'
@@ -332,190 +395,13 @@ function Get-TargetResource
 
         Write-Verbose -Message ('Detected schedule type {0} for first trigger' -f $returnScheduleType)
 
-        Write-Verbose -Message 'Calculating timespans/datetimes from trigger repetition settings'
-
-        $repInterval = $trigger.Repetition.Interval
-        $Days = $Hours = $Minutes = $Seconds = 0
-
-        if ($repInterval -match 'P(?<Days>\d{0,3})D')
-        {
-            $Days = $matches.Days
-        }
-
-        if ($repInterval -match '(?<Hours>\d{0,2})H')
-        {
-            $Hours = $matches.Hours
-        }
-
-        if ($repInterval -match '(?<Minutes>\d{0,2})M')
-        {
-            $Minutes = $matches.Minutes
-        }
-
-        if ($repInterval -match '(?<Seconds>\d{0,2})S')
-        {
-            $Seconds = $matches.Seconds
-        }
-
-        $returnInveral = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
-
-        $repDuration = $trigger.Repetition.Duration
-        $Days = $Hours = $Minutes = $Seconds = 0
-
-        if ($repDuration -match 'P(?<Days>\d{0,3})D')
-        {
-            $Days = $matches.Days
-        }
-
-        if ($repDuration -match '(?<Hours>\d{0,2})H')
-        {
-            $Hours = $matches.Hours
-        }
-
-        if ($repDuration -match '(?<Minutes>\d{0,2})M')
-        {
-            $Minutes = $matches.Minutes
-        }
-
-        if ($repDuration -match '(?<Seconds>\d{0,2})S')
-        {
-            $Seconds = $matches.Seconds
-        }
-
-        $repetitionDurationReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
-
-        $resInterval = $settings.RestartInterval
-        $Days = $Hours = $Minutes = $Seconds = 0
-
-        if ($resInterval -match 'P(?<Days>\d{0,3})D')
-        {
-            $Days = $matches.Days
-        }
-
-        if ($resInterval -match '(?<Hours>\d{0,2})H')
-        {
-            $Hours = $matches.Hours
-        }
-
-        if ($resInterval -match '(?<Minutes>\d{0,2})M')
-        {
-            $Minutes = $matches.Minutes
-        }
-
-        if ($resInterval -match '(?<Seconds>\d{0,2})S')
-        {
-            $Seconds = $matches.Seconds
-        }
-
-        $restartIntervalReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
-
-        $exeLim = $settings.ExecutionTimeLimit
-        $Days = $Hours = $Minutes = $Seconds = 0
-
-        if ($exeLim -match 'P(?<Days>\d{0,3})D')
-        {
-            $Days = $matches.Days
-        }
-
-        if ($exeLim -match '(?<Hours>\d{0,2})H')
-        {
-            $Hours = $matches.Hours
-        }
-
-        if ($exeLim -match '(?<Minutes>\d{0,2})M')
-        {
-            $Minutes = $matches.Minutes
-        }
-
-        if ($exeLim -match '(?<Seconds>\d{0,2})S')
-        {
-            $Seconds = $matches.Seconds
-        }
-
-        $executionTimeLimitReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
-
-        $idleDur = $settings.IdleSettings.IdleDuration
-        $Days = $Hours = $Minutes = $Seconds = 0
-
-        if ($idleDur -match 'P(?<Days>\d{0,3})D')
-        {
-            $Days = $matches.Days
-        }
-
-        if ($idleDur -match '(?<Hours>\d{0,2})H')
-        {
-            $Hours = $matches.Hours
-        }
-
-        if ($idleDur -match '(?<Minutes>\d{0,2})M')
-        {
-            $Minutes = $matches.Minutes
-        }
-
-        if ($idleDur -match '(?<Seconds>\d{0,2})S')
-        {
-            $Seconds = $matches.Seconds
-        }
-
-        $idleDurationReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
-
-        $idleWait = $settings.IdleSettings.IdleWaitTimeout
-        $Days = $Hours = $Minutes = $Seconds = 0
-
-        if ($idleWait -match 'P(?<Days>\d{0,3})D')
-        {
-            $Days = $matches.Days
-        }
-
-        if ($idleWait -match '(?<Hours>\d{0,2})H')
-        {
-            $Hours = $matches.Hours
-        }
-
-        if ($idleWait -match '(?<Minutes>\d{0,2})M')
-        {
-            $Minutes = $matches.Minutes
-        }
-
-        if ($idleWait -match '(?<Seconds>\d{0,2})S')
-        {
-            $Seconds = $matches.Seconds
-        }
-
-        $idleWaitTimeoutReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
-
-        $rndDelay = $trigger.RandomDelay
-        $Days = $Hours = $Minutes = $Seconds = 0
-
-        if ($rndDelay -match 'P(?<Days>\d{0,3})D')
-        {
-            $Days = $matches.Days
-        }
-
-        if ($rndDelay -match '(?<Hours>\d{0,2})H')
-        {
-            $Hours = $matches.Hours
-        }
-
-        if ($rndDelay -match '(?<Minutes>\d{0,2})M')
-        {
-            $Minutes = $matches.Minutes
-        }
-
-        if ($rndDelay -match '(?<Seconds>\d{0,2})S')
-        {
-            $Seconds = $matches.Seconds
-        }
-
-        $randomDelayReturn = New-TimeSpan -Days $Days -Hours $Hours -Minutes $Minutes -Seconds $seconds
-
-        $DaysOfWeek = @()
+        $daysOfWeek = @()
         foreach ($binaryAdductor in 1, 2, 4, 8, 16, 32, 64)
         {
-            $Day = $trigger.DaysOfWeek -band $binaryAdductor
-            if ($Day -ne 0)
+            $day = $trigger.DaysOfWeek -band $binaryAdductor
+            if ($day -ne 0)
             {
-                $DaysOfWeek += [xScheduledTask.DaysOfWeek] $Day
+                $daysOfWeek += [xScheduledTask.DaysOfWeek] $day
             }
         }
 
@@ -540,13 +426,13 @@ function Get-TargetResource
             ActionArguments = $action.Arguments
             ActionWorkingPath = $action.WorkingDirectory
             ScheduleType = $returnScheduleType
-            RepeatInterval = [System.DateTime]::Today.Add($returnInveral)
+            RepeatInterval = ConvertTo-TimeSpanFromScheduledTaskString -Timespan $trigger.Repetition.Interval
             ExecuteAsCredential = $task.Principal.UserId
             Enable = $settings.Enabled
             DaysInterval = $trigger.DaysInterval
-            RandomDelay = [System.DateTime]::Today.Add($randomDelayReturn)
-            RepetitionDuration = [System.DateTime]::Today.Add($repetitionDurationReturn)
-            DaysOfWeek = $DaysOfWeek
+            RandomDelay = ConvertTo-TimeSpanFromScheduledTaskString -Timespan $trigger.RandomDelay
+            RepetitionDuration = ConvertTo-TimeSpanFromScheduledTaskString -Timespan $trigger.Repetition.Duration
+            DaysOfWeek = $daysOfWeek
             WeeksInterval = $trigger.WeeksInterval
             User = $task.Principal.UserId
             DisallowDemandStart = -not $settings.AllowDemandStart
@@ -555,109 +441,168 @@ function Get-TargetResource
             AllowStartIfOnBatteries = -not $settings.DisallowStartIfOnBatteries
             Hidden = $settings.Hidden
             RunOnlyIfIdle = $settings.RunOnlyIfIdle
-            IdleWaitTimeout = $idleWaitTimeoutReturn
+            IdleWaitTimeout = ConvertTo-TimeSpanFromScheduledTaskString -Timespan $settings.IdleSettings.IdleWaitTimeout
             NetworkName = $settings.NetworkSettings.Name
             DisallowStartOnRemoteAppSession = $settings.DisallowStartOnRemoteAppSession
             StartWhenAvailable = $settings.StartWhenAvailable
             DontStopIfGoingOnBatteries = -not $settings.StopIfGoingOnBatteries
             WakeToRun = $settings.WakeToRun
-            IdleDuration = [System.DateTime]::Today.Add($idleDurationReturn)
+            IdleDuration = ConvertTo-TimeSpanFromScheduledTaskString -Timespan $settings.IdleSettings.IdleDuration
             RestartOnIdle = $settings.IdleSettings.RestartOnIdle
             DontStopOnIdleEnd = -not $settings.IdleSettings.StopOnIdleEnd
-            ExecutionTimeLimit = [System.DateTime]::Today.Add($executionTimeLimitReturn)
+            ExecutionTimeLimit = ConvertTo-TimeSpanFromScheduledTaskString -Timespan $settings.ExecutionTimeLimit
             MultipleInstances = $settings.MultipleInstances
             Priority = $settings.Priority
             RestartCount = $settings.RestartCount
-            RestartInterval = [System.DateTime]::Today.Add($restartIntervalReturn)
+            RestartInterval = ConvertTo-TimeSpanFromScheduledTaskString -Timespan $settings.RestartInterval
             RunOnlyIfNetworkAvailable = $settings.RunOnlyIfNetworkAvailable
         }
     }
 }
 
 <#
-.SYNOPSIS
-    Applies the desired resource state
-.PARAMETER TaskName
-    The name of the task
-.PARAMETER TaskPath
-    The path to the task - defaults to the root directory
-.PARAMETER Description
-    The task description
-.PARAMETER ActionExecutable
-    The path to the .exe for this task
-.PARAMETER ActionArguments
-    The arguments to pass the executable
-.PARAMETER ActionWorkingPath
-    The working path to specify for the executable
-.PARAMETER ScheduleType
-    When should the task be executed
-.PARAMETER RepeatInterval
-    How many units (minutes, hours, days) between each run of this task?
-.PARAMETER StartTime
-    The time of day this task should start at - defaults to 12:00 AM. Not valid for AtLogon and AtStartup tasks
-.PARAMETER Ensure
-    Present if the task should exist, Absent if it should be removed
-.PARAMETER Enable
-    True if the task should be enabled, false if it should be disabled
-.PARAMETER ExecuteAsCredential
-    The credential this task should execute as. If not specified defaults to running as the local system account
-.PARAMETER DaysInterval
-    Specifies the interval between the days in the schedule. An interval of 1 produces a daily schedule. An interval of 2 produces an every-other day schedule.
-.PARAMETER RandomDelay
-    Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting.
-.PARAMETER RepetitionDuration
-    Specifies how long the repetition pattern repeats after the task starts.
-.PARAMETER DaysOfWeek
-    Specifies an array of the days of the week on which Task Scheduler runs the task.
-.PARAMETER WeeksInterval
-    Specifies the interval between the weeks in the schedule. An interval of 1 produces a weekly schedule. An interval of 2 produces an every-other week schedule.
-.PARAMETER User
-    Specifies the identifier of the user for a trigger that starts a task when a user logs on.
-.PARAMETER DisallowDemandStart
-    Indicates whether the task is prohibited to run on demand or not. Defaults to $false
-.PARAMETER DisallowHardTerminate
-    Indicates whether the task is prohibited to be terminated or not. Defaults to $false
-.PARAMETER Compatibility
-    The task compatibility level. Defaults to Vista.
-.PARAMETER AllowStartIfOnBatteries
-    Indicates whether the task should start if the machine is on batteries or not. Defaults to $false
-.PARAMETER Hidden
-    Indicates that the task is hidden in the Task Scheduler UI.
-.PARAMETER RunOnlyIfIdle
-    Indicates that Task Scheduler runs the task only when the computer is idle.
-.PARAMETER IdleWaitTimeout
-    Specifies the amount of time that Task Scheduler waits for an idle condition to occur.
-.PARAMETER NetworkName
-    Specifies the name of a network profile that Task Scheduler uses to determine if the task can run.
-    The Task Scheduler UI uses this setting for display purposes. Specify a network name if you specify the RunOnlyIfNetworkAvailable parameter.
-.PARAMETER DisallowStartOnRemoteAppSession
-    Indicates that the task does not start if the task is triggered to run in a Remote Applications Integrated Locally (RAIL) session.
-.PARAMETER StartWhenAvailable
-    Indicates that Task Scheduler can start the task at any time after its scheduled time has passed.
-.PARAMETER DontStopIfGoingOnBatteries
-    Indicates that the task does not stop if the computer switches to battery power.
-.PARAMETER WakeToRun
-    Indicates that Task Scheduler wakes the computer before it runs the task.
-.PARAMETER IdleDuration
-    Specifies the amount of time that the computer must be in an idle state before Task Scheduler runs the task.
-.PARAMETER RestartOnIdle
-    Indicates that Task Scheduler restarts the task when the computer cycles into an idle condition more than once.
-.PARAMETER DontStopOnIdleEnd
-    Indicates that Task Scheduler does not terminate the task if the idle condition ends before the task is completed.
-.PARAMETER ExecutionTimeLimit
-    Specifies the amount of time that Task Scheduler is allowed to complete the task.
-.PARAMETER MultipleInstances
-    Specifies the policy that defines how Task Scheduler handles multiple instances of the task.
-.PARAMETER Priority
-    Specifies the priority level of the task. Priority must be an integer from 0 (highest priority) to 10 (lowest priority).
-    The default value is 7. Priority levels 7 and 8 are used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.
-.PARAMETER RestartCount
-    Specifies the number of times that Task Scheduler attempts to restart the task.
-.PARAMETER RestartInterval
-    Specifies the amount of time that Task Scheduler attempts to restart the task.
-.PARAMETER RunOnlyIfNetworkAvailable
-    Indicates that Task Scheduler runs the task only when a network is available. Task Scheduler uses the NetworkID
-    parameter and NetworkName parameter that you specify in this cmdlet to determine if the network is available.
+    .SYNOPSIS
+        Tests if the current resource state matches the desired resource state
+
+    .PARAMETER TaskName
+        The name of the task
+
+    .PARAMETER TaskPath
+        The path to the task - defaults to the root directory
+
+    .PARAMETER Description
+        The task description
+
+    .PARAMETER ActionExecutable
+        The path to the .exe for this task
+
+    .PARAMETER ActionArguments
+        The arguments to pass the executable
+
+    .PARAMETER ActionWorkingPath
+        The working path to specify for the executable
+
+    .PARAMETER ScheduleType
+        When should the task be executed
+
+    .PARAMETER RepeatInterval
+        How many units (minutes, hours, days) between each run of this task?
+
+    .PARAMETER StartTime
+        The time of day this task should start at - defaults to 12:00 AM. Not valid for
+        AtLogon and AtStartup tasks
+
+    .PARAMETER Ensure
+        Present if the task should exist, Absent if it should be removed
+
+    .PARAMETER Enable
+        True if the task should be enabled, false if it should be disabled
+
+    .PARAMETER ExecuteAsCredential
+        The credential this task should execute as. If not specified defaults to running
+        as the local system account
+
+    .PARAMETER DaysInterval
+        Specifies the interval between the days in the schedule. An interval of 1 produces
+        a daily schedule. An interval of 2 produces an every-other day schedule.
+
+    .PARAMETER RandomDelay
+        Specifies a random amount of time to delay the start time of the trigger. The
+        delay time is a random time between the time the task triggers and the time that
+        you specify in this setting.
+
+    .PARAMETER RepetitionDuration
+        Specifies how long the repetition pattern repeats after the task starts.
+
+    .PARAMETER DaysOfWeek
+        Specifies an array of the days of the week on which Task Scheduler runs the task.
+
+    .PARAMETER WeeksInterval
+        Specifies the interval between the weeks in the schedule. An interval of 1 produces
+        a weekly schedule. An interval of 2 produces an every-other week schedule.
+
+    .PARAMETER User
+        Specifies the identifier of the user for a trigger that starts a task when a
+        user logs on.
+
+    .PARAMETER DisallowDemandStart
+        Indicates whether the task is prohibited to run on demand or not. Defaults
+        to $false
+
+    .PARAMETER DisallowHardTerminate
+        Indicates whether the task is prohibited to be terminated or not. Defaults
+        to $false
+
+    .PARAMETER Compatibility
+        The task compatibility level. Defaults to Vista.
+
+    .PARAMETER AllowStartIfOnBatteries
+        Indicates whether the task should start if the machine is on batteries or not.
+        Defaults to $false
+
+    .PARAMETER Hidden
+        Indicates that the task is hidden in the Task Scheduler UI.
+
+    .PARAMETER RunOnlyIfIdle
+        Indicates that Task Scheduler runs the task only when the computer is idle.
+
+    .PARAMETER IdleWaitTimeout
+        Specifies the amount of time that Task Scheduler waits for an idle condition to occur.
+
+    .PARAMETER NetworkName
+        Specifies the name of a network profile that Task Scheduler uses to determine
+        if the task can run.
+        The Task Scheduler UI uses this setting for display purposes. Specify a network
+        name if you specify the RunOnlyIfNetworkAvailable parameter.
+
+    .PARAMETER DisallowStartOnRemoteAppSession
+        Indicates that the task does not start if the task is triggered to run in a Remote
+        Applications Integrated Locally (RAIL) session.
+
+    .PARAMETER StartWhenAvailable
+        Indicates that Task Scheduler can start the task at any time after its scheduled
+        time has passed.
+
+    .PARAMETER DontStopIfGoingOnBatteries
+        Indicates that the task does not stop if the computer switches to battery power.
+
+    .PARAMETER WakeToRun
+        Indicates that Task Scheduler wakes the computer before it runs the task.
+
+    .PARAMETER IdleDuration
+        Specifies the amount of time that the computer must be in an idle state before
+        Task Scheduler runs the task.
+
+    .PARAMETER RestartOnIdle
+        Indicates that Task Scheduler restarts the task when the computer cycles into an
+        idle condition more than once.
+
+    .PARAMETER DontStopOnIdleEnd
+        Indicates that Task Scheduler does not terminate the task if the idle condition
+        ends before the task is completed.
+
+    .PARAMETER ExecutionTimeLimit
+        Specifies the amount of time that Task Scheduler is allowed to complete the task.
+
+    .PARAMETER MultipleInstances
+        Specifies the policy that defines how Task Scheduler handles multiple instances
+        of the task.
+
+    .PARAMETER Priority
+        Specifies the priority level of the task. Priority must be an integer from 0 (highest priority)
+        to 10 (lowest priority). The default value is 7. Priority levels 7 and 8 are
+        used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.
+
+    .PARAMETER RestartCount
+        Specifies the number of times that Task Scheduler attempts to restart the task.
+
+    .PARAMETER RestartInterval
+        Specifies the amount of time that Task Scheduler attempts to restart the task.
+
+    .PARAMETER RunOnlyIfNetworkAvailable
+        Indicates that Task Scheduler runs the task only when a network is available. Task
+        Scheduler uses the NetworkID parameter and NetworkName parameter that you specify
+        in this cmdlet to determine if the network is available.
 #>
 function Set-TargetResource
 {
@@ -694,8 +639,8 @@ function Set-TargetResource
         $ScheduleType,
 
         [Parameter()]
-        [System.DateTime]
-        $RepeatInterval = [System.DateTime] '00:00:00',
+        [System.String]
+        $RepeatInterval = '00:00:00',
 
         [Parameter()]
         [System.DateTime]
@@ -719,12 +664,12 @@ function Set-TargetResource
         $DaysInterval = 1,
 
         [Parameter()]
-        [System.DateTime]
-        $RandomDelay = [System.DateTime] '00:00:00',
+        [System.String]
+        $RandomDelay = '00:00:00',
 
         [Parameter()]
-        [System.DateTime]
-        $RepetitionDuration = [System.DateTime] '00:00:00',
+        [System.String]
+        $RepetitionDuration = '00:00:00',
 
         [Parameter()]
         [System.String[]]
@@ -764,8 +709,8 @@ function Set-TargetResource
         $RunOnlyIfIdle = $false,
 
         [Parameter()]
-        [System.DateTime]
-        $IdleWaitTimeout = [System.DateTime] '02:00:00',
+        [System.String]
+        $IdleWaitTimeout = '02:00:00',
 
         [Parameter()]
         [System.String]
@@ -788,8 +733,8 @@ function Set-TargetResource
         $WakeToRun = $false,
 
         [Parameter()]
-        [System.DateTime]
-        $IdleDuration = [System.DateTime] '01:00:00',
+        [System.String]
+        $IdleDuration = '01:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -800,8 +745,8 @@ function Set-TargetResource
         $DontStopOnIdleEnd = $false,
 
         [Parameter()]
-        [System.DateTime]
-        $ExecutionTimeLimit = [System.DateTime] '8:00:00',
+        [System.String]
+        $ExecutionTimeLimit = '08:00:00',
 
         [Parameter()]
         [ValidateSet('IgnoreNew', 'Parallel', 'Queue')]
@@ -817,8 +762,8 @@ function Set-TargetResource
         $RestartCount = 0,
 
         [Parameter()]
-        [System.DateTime]
-        $RestartInterval = [System.DateTime] '00:00:00',
+        [System.String]
+        $RestartInterval = '00:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -828,13 +773,23 @@ function Set-TargetResource
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
     Write-Verbose -Message ('Entering Set-TargetResource for {0} in {1}' -f $TaskName, $TaskPath)
+
+    # Convert the strings containing time spans to Timespan Objects
+    $RepeatInterval = ConvertTo-TimeSpanFromStandardString -Timespan $RepeatInterval
+    $RandomDelay = ConvertTo-TimeSpanFromStandardString -Timespan $RandomDelay
+    $RepetitionDuration = ConvertTo-TimeSpanFromStandardString -Timespan $RepetitionDuration
+    $IdleWaitTimeout = ConvertTo-TimeSpanFromStandardString -Timespan $IdleWaitTimeout
+    $IdleDuration = ConvertTo-TimeSpanFromStandardString -Timespan $IdleDuration
+    $ExecutionTimeLimit = ConvertTo-TimeSpanFromStandardString -Timespan $ExecutionTimeLimit
+    $RestartInterval = ConvertTo-TimeSpanFromStandardString -Timespan $RestartInterval
+
     $currentValues = Get-TargetResource @PSBoundParameters
 
     if ($Ensure -eq 'Present')
     {
-        if ($RepetitionDuration.TimeOfDay -lt $RepeatInterval.TimeOfDay)
+        if ($RepetitionDuration -lt $RepeatInterval)
         {
-            $exceptionMessage = 'Repetition duration {0} is less than repetition interval {1}. Please set RepeatInterval to a value lower or equal to RepetitionDuration' -f $RepetitionDuration.TimeOfDay, $RepeatInterval.TimeOfDay
+            $exceptionMessage = 'Repetition duration {0} is less than repetition interval {1}. Please set RepeatInterval to a value lower or equal to RepetitionDuration' -f $RepetitionDuration, $RepeatInterval
             New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepeatInterval
         }
 
@@ -892,24 +847,24 @@ function Set-TargetResource
             RunOnlyIfNetworkAvailable = $RunOnlyIfNetworkAvailable
         }
 
-        if ($IdleDuration.TimeOfDay -gt [System.TimeSpan] '00:00:00')
+        if ($IdleDuration -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArgs.Add('IdleDuration', $IdleDuration.TimeOfDay)
+            $settingArgs.Add('IdleDuration', $IdleDuration)
         }
 
-        if ($IdleWaitTimeout.TimeOfDay -gt [System.TimeSpan] '00:00:00')
+        if ($IdleWaitTimeout -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArgs.Add('IdleWaitTimeout', $IdleWaitTimeout.TimeOfDay)
+            $settingArgs.Add('IdleWaitTimeout', $IdleWaitTimeout)
         }
 
-        if ($ExecutionTimeLimit.TimeOfDay -gt [System.TimeSpan] '00:00:00')
+        if ($ExecutionTimeLimit -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArgs.Add('ExecutionTimeLimit', $ExecutionTimeLimit.TimeOfDay)
+            $settingArgs.Add('ExecutionTimeLimit', $ExecutionTimeLimit)
         }
 
-        if ($RestartInterval.TimeOfDay -gt [System.TimeSpan] '00:00:00')
+        if ($RestartInterval -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArgs.Add('RestartInterval', $RestartInterval.TimeOfDay)
+            $settingArgs.Add('RestartInterval', $RestartInterval)
         }
 
         if (-not [System.String]::IsNullOrWhiteSpace($NetworkName))
@@ -919,9 +874,9 @@ function Set-TargetResource
         $setting = New-ScheduledTaskSettingsSet @settingArgs
 
         $triggerArgs = @{}
-        if ($RandomDelay.TimeOfDay -gt [System.TimeSpan]::FromSeconds(0))
+        if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0))
         {
-            $triggerArgs.Add('RandomDelay', $RandomDelay.TimeOfDay)
+            $triggerArgs.Add('RandomDelay', $RandomDelay)
         }
 
         switch ($ScheduleType)
@@ -932,6 +887,7 @@ function Set-TargetResource
                 $triggerArgs.Add('At', $StartTime)
                 break
             }
+
             'Daily'
             {
                 $triggerArgs.Add('Daily', $true)
@@ -939,6 +895,7 @@ function Set-TargetResource
                 $triggerArgs.Add('DaysInterval', $DaysInterval)
                 break
             }
+
             'Weekly'
             {
                 $triggerArgs.Add('Weekly', $true)
@@ -954,11 +911,13 @@ function Set-TargetResource
                 }
                 break
             }
+
             'AtStartup'
             {
                 $triggerArgs.Add('AtStartup', $true)
                 break
             }
+
             'AtLogOn'
             {
                 $triggerArgs.Add('AtLogOn', $true)
@@ -977,15 +936,16 @@ function Set-TargetResource
         }
 
         # To overcome the issue of not being able to set the task repetition for tasks with a schedule type other than Once
-        if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0) -and $PSVersionTable.PSVersion.Major -gt 4)
+        if ($RepeatInterval -gt (New-TimeSpan -Seconds 0) -and $PSVersionTable.PSVersion.Major -gt 4)
         {
-            if ($RepetitionDuration.TimeOfDay -le $RepeatInterval.TimeOfDay)
+            if ($RepetitionDuration -le $RepeatInterval)
             {
-                $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval.TimeOfDay, $RepetitionDuration.TimeOfDay
+                $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval, $RepetitionDuration
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
-            $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
+            $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval -RepetitionDuration $RepetitionDuration
+
             Write-Verbose -Message 'PS V5 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
 
             try
@@ -1008,16 +968,17 @@ function Set-TargetResource
 
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
 
-        if ($RepeatInterval.TimeOfDay -gt (New-TimeSpan -Seconds 0) -and ($PSVersionTable.PSVersion.Major -eq 4 -or $triggerRepetitionFailed))
+        if ($RepeatInterval -gt (New-TimeSpan -Seconds 0) -and ($PSVersionTable.PSVersion.Major -eq 4 -or $triggerRepetitionFailed))
         {
-            if ($RepetitionDuration.TimeOfDay -le $RepeatInterval.TimeOfDay)
+            if ($RepetitionDuration -le $RepeatInterval)
             {
-                $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval.TimeOfDay, $RepetitionDuration.TimeOfDay
+                $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval, $RepetitionDuration
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
-            $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval.TimeOfDay -RepetitionDuration $RepetitionDuration.TimeOfDay
+            $tempTrigger = New-ScheduledTaskTrigger -Once -At 6:6:6 -RepetitionInterval $RepeatInterval -RepetitionDuration $RepetitionDuration
             $tempTask = New-ScheduledTask -Trigger $tempTrigger -Action $action
+
             Write-Verbose -Message 'PS V4 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
 
             $scheduledTask.Triggers[0].Repetition = $tempTask.Triggers[0].Repetition
@@ -1055,89 +1016,148 @@ function Set-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Tests if the current resource state matches the desired resource state
-.PARAMETER TaskName
-    The name of the task
-.PARAMETER TaskPath
-    The path to the task - defaults to the root directory
-.PARAMETER Description
-    The task description
-.PARAMETER ActionExecutable
-    The path to the .exe for this task
-.PARAMETER ActionArguments
-    The arguments to pass the executable
-.PARAMETER ActionWorkingPath
-    The working path to specify for the executable
-.PARAMETER ScheduleType
-    When should the task be executed
-.PARAMETER RepeatInterval
-    How many units (minutes, hours, days) between each run of this task?
-.PARAMETER StartTime
-    The time of day this task should start at - defaults to 12:00 AM. Not valid for AtLogon and AtStartup tasks
-.PARAMETER Ensure
-    Present if the task should exist, Absent if it should be removed
-.PARAMETER Enable
-    True if the task should be enabled, false if it should be disabled
-.PARAMETER ExecuteAsCredential
-    The credential this task should execute as. If not specified defaults to running as the local system account
-.PARAMETER DaysInterval
-    Specifies the interval between the days in the schedule. An interval of 1 produces a daily schedule. An interval of 2 produces an every-other day schedule.
-.PARAMETER RandomDelay
-    Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting.
-.PARAMETER RepetitionDuration
-    Specifies how long the repetition pattern repeats after the task starts.
-.PARAMETER DaysOfWeek
-    Specifies an array of the days of the week on which Task Scheduler runs the task.
-.PARAMETER WeeksInterval
-    Specifies the interval between the weeks in the schedule. An interval of 1 produces a weekly schedule. An interval of 2 produces an every-other week schedule.
-.PARAMETER User
-    Specifies the identifier of the user for a trigger that starts a task when a user logs on.
-.PARAMETER DisallowDemandStart
-    Indicates whether the task is prohibited to run on demand or not. Defaults to $false
-.PARAMETER DisallowHardTerminate
-    Indicates whether the task is prohibited to be terminated or not. Defaults to $false
-.PARAMETER Compatibility
-    The task compatibility level. Defaults to Vista.
-.PARAMETER AllowStartIfOnBatteries
-    Indicates whether the task should start if the machine is on batteries or not. Defaults to $false
-.PARAMETER Hidden
-    Indicates that the task is hidden in the Task Scheduler UI.
-.PARAMETER RunOnlyIfIdle
-    Indicates that Task Scheduler runs the task only when the computer is idle.
-.PARAMETER IdleWaitTimeout
-    Specifies the amount of time that Task Scheduler waits for an idle condition to occur.
-.PARAMETER NetworkName
-    Specifies the name of a network profile that Task Scheduler uses to determine if the task can run.
-    The Task Scheduler UI uses this setting for display purposes. Specify a network name if you specify the RunOnlyIfNetworkAvailable parameter.
-.PARAMETER DisallowStartOnRemoteAppSession
-    Indicates that the task does not start if the task is triggered to run in a Remote Applications Integrated Locally (RAIL) session.
-.PARAMETER StartWhenAvailable
-    Indicates that Task Scheduler can start the task at any time after its scheduled time has passed.
-.PARAMETER DontStopIfGoingOnBatteries
-    Indicates that the task does not stop if the computer switches to battery power.
-.PARAMETER WakeToRun
-    Indicates that Task Scheduler wakes the computer before it runs the task.
-.PARAMETER IdleDuration
-    Specifies the amount of time that the computer must be in an idle state before Task Scheduler runs the task.
-.PARAMETER RestartOnIdle
-    Indicates that Task Scheduler restarts the task when the computer cycles into an idle condition more than once.
-.PARAMETER DontStopOnIdleEnd
-    Indicates that Task Scheduler does not terminate the task if the idle condition ends before the task is completed.
-.PARAMETER ExecutionTimeLimit
-    Specifies the amount of time that Task Scheduler is allowed to complete the task.
-.PARAMETER MultipleInstances
-    Specifies the policy that defines how Task Scheduler handles multiple instances of the task.
-.PARAMETER Priority
-    Specifies the priority level of the task. Priority must be an integer from 0 (highest priority) to 10 (lowest priority).
-    The default value is 7. Priority levels 7 and 8 are used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.
-.PARAMETER RestartCount
-    Specifies the number of times that Task Scheduler attempts to restart the task.
-.PARAMETER RestartInterval
-    Specifies the amount of time that Task Scheduler attempts to restart the task.
-.PARAMETER RunOnlyIfNetworkAvailable
-    Indicates that Task Scheduler runs the task only when a network is available. Task Scheduler uses the NetworkID
-    parameter and NetworkName parameter that you specify in this cmdlet to determine if the network is available.
+    .SYNOPSIS
+        Tests if the current resource state matches the desired resource state
+
+    .PARAMETER TaskName
+        The name of the task
+
+    .PARAMETER TaskPath
+        The path to the task - defaults to the root directory
+
+    .PARAMETER Description
+        The task description
+
+    .PARAMETER ActionExecutable
+        The path to the .exe for this task
+
+    .PARAMETER ActionArguments
+        The arguments to pass the executable
+
+    .PARAMETER ActionWorkingPath
+        The working path to specify for the executable
+
+    .PARAMETER ScheduleType
+        When should the task be executed
+
+    .PARAMETER RepeatInterval
+        How many units (minutes, hours, days) between each run of this task?
+
+    .PARAMETER StartTime
+        The time of day this task should start at - defaults to 12:00 AM. Not valid for
+        AtLogon and AtStartup tasks
+
+    .PARAMETER Ensure
+        Present if the task should exist, Absent if it should be removed
+
+    .PARAMETER Enable
+        True if the task should be enabled, false if it should be disabled
+
+    .PARAMETER ExecuteAsCredential
+        The credential this task should execute as. If not specified defaults to running
+        as the local system account
+
+    .PARAMETER DaysInterval
+        Specifies the interval between the days in the schedule. An interval of 1 produces
+        a daily schedule. An interval of 2 produces an every-other day schedule.
+
+    .PARAMETER RandomDelay
+        Specifies a random amount of time to delay the start time of the trigger. The
+        delay time is a random time between the time the task triggers and the time that
+        you specify in this setting.
+
+    .PARAMETER RepetitionDuration
+        Specifies how long the repetition pattern repeats after the task starts.
+
+    .PARAMETER DaysOfWeek
+        Specifies an array of the days of the week on which Task Scheduler runs the task.
+
+    .PARAMETER WeeksInterval
+        Specifies the interval between the weeks in the schedule. An interval of 1 produces
+        a weekly schedule. An interval of 2 produces an every-other week schedule.
+
+    .PARAMETER User
+        Specifies the identifier of the user for a trigger that starts a task when a
+        user logs on.
+
+    .PARAMETER DisallowDemandStart
+        Indicates whether the task is prohibited to run on demand or not. Defaults
+        to $false
+
+    .PARAMETER DisallowHardTerminate
+        Indicates whether the task is prohibited to be terminated or not. Defaults
+        to $false
+
+    .PARAMETER Compatibility
+        The task compatibility level. Defaults to Vista.
+
+    .PARAMETER AllowStartIfOnBatteries
+        Indicates whether the task should start if the machine is on batteries or not.
+        Defaults to $false
+
+    .PARAMETER Hidden
+        Indicates that the task is hidden in the Task Scheduler UI.
+
+    .PARAMETER RunOnlyIfIdle
+        Indicates that Task Scheduler runs the task only when the computer is idle.
+
+    .PARAMETER IdleWaitTimeout
+        Specifies the amount of time that Task Scheduler waits for an idle condition to occur.
+
+    .PARAMETER NetworkName
+        Specifies the name of a network profile that Task Scheduler uses to determine
+        if the task can run.
+        The Task Scheduler UI uses this setting for display purposes. Specify a network
+        name if you specify the RunOnlyIfNetworkAvailable parameter.
+
+    .PARAMETER DisallowStartOnRemoteAppSession
+        Indicates that the task does not start if the task is triggered to run in a Remote
+        Applications Integrated Locally (RAIL) session.
+
+    .PARAMETER StartWhenAvailable
+        Indicates that Task Scheduler can start the task at any time after its scheduled
+        time has passed.
+
+    .PARAMETER DontStopIfGoingOnBatteries
+        Indicates that the task does not stop if the computer switches to battery power.
+
+    .PARAMETER WakeToRun
+        Indicates that Task Scheduler wakes the computer before it runs the task.
+
+    .PARAMETER IdleDuration
+        Specifies the amount of time that the computer must be in an idle state before
+        Task Scheduler runs the task.
+
+    .PARAMETER RestartOnIdle
+        Indicates that Task Scheduler restarts the task when the computer cycles into an
+        idle condition more than once.
+
+    .PARAMETER DontStopOnIdleEnd
+        Indicates that Task Scheduler does not terminate the task if the idle condition
+        ends before the task is completed.
+
+    .PARAMETER ExecutionTimeLimit
+        Specifies the amount of time that Task Scheduler is allowed to complete the task.
+
+    .PARAMETER MultipleInstances
+        Specifies the policy that defines how Task Scheduler handles multiple instances
+        of the task.
+
+    .PARAMETER Priority
+        Specifies the priority level of the task. Priority must be an integer from 0 (highest priority)
+        to 10 (lowest priority). The default value is 7. Priority levels 7 and 8 are
+        used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.
+
+    .PARAMETER RestartCount
+        Specifies the number of times that Task Scheduler attempts to restart the task.
+
+    .PARAMETER RestartInterval
+        Specifies the amount of time that Task Scheduler attempts to restart the task.
+
+    .PARAMETER RunOnlyIfNetworkAvailable
+        Indicates that Task Scheduler runs the task only when a network is available. Task
+        Scheduler uses the NetworkID parameter and NetworkName parameter that you specify
+        in this cmdlet to determine if the network is available.
 #>
 function Test-TargetResource
 {
@@ -1175,8 +1195,8 @@ function Test-TargetResource
         $ScheduleType,
 
         [Parameter()]
-        [System.DateTime]
-        $RepeatInterval = [System.DateTime] '00:00:00',
+        [System.String]
+        $RepeatInterval = '00:00:00',
 
         [Parameter()]
         [System.DateTime]
@@ -1200,12 +1220,12 @@ function Test-TargetResource
         $DaysInterval = 1,
 
         [Parameter()]
-        [System.DateTime]
-        $RandomDelay = [System.DateTime] '00:00:00',
+        [System.String]
+        $RandomDelay = '00:00:00',
 
         [Parameter()]
-        [System.DateTime]
-        $RepetitionDuration = [System.DateTime] '00:00:00',
+        [System.String]
+        $RepetitionDuration = '00:00:00',
 
         [Parameter()]
         [System.String[]]
@@ -1245,8 +1265,8 @@ function Test-TargetResource
         $RunOnlyIfIdle = $false,
 
         [Parameter()]
-        [System.DateTime]
-        $IdleWaitTimeout = [System.DateTime] '02:00:00',
+        [System.String]
+        $IdleWaitTimeout = '02:00:00',
 
         [Parameter()]
         [System.String]
@@ -1269,8 +1289,8 @@ function Test-TargetResource
         $WakeToRun = $false,
 
         [Parameter()]
-        [System.DateTime]
-        $IdleDuration = [System.DateTime] '01:00:00',
+        [System.String]
+        $IdleDuration = '01:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -1281,8 +1301,8 @@ function Test-TargetResource
         $DontStopOnIdleEnd = $false,
 
         [Parameter()]
-        [System.DateTime]
-        $ExecutionTimeLimit = [System.DateTime] '8:00:00',
+        [System.String]
+        $ExecutionTimeLimit = '08:00:00',
 
         [Parameter()]
         [ValidateSet('IgnoreNew', 'Parallel', 'Queue')]
@@ -1298,8 +1318,8 @@ function Test-TargetResource
         $RestartCount = 0,
 
         [Parameter()]
-        [System.DateTime]
-        $RestartInterval = [System.DateTime] '00:00:00',
+        [System.String]
+        $RestartInterval = '00:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -1307,6 +1327,42 @@ function Test-TargetResource
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
+
+    # Convert the strings containing time spans to Timespan Objects
+    if ($PSBoundParameters.ContainsKey('RepeatInterval'))
+    {
+        $PSBoundParameters['RepeatInterval'] = ConvertTo-TimeSpanFromStandardString -Timespan $RepeatInterval
+    }
+
+    if ($PSBoundParameters.ContainsKey('RandomDelay'))
+    {
+        $PSBoundParameters['RandomDelay'] = ConvertTo-TimeSpanFromStandardString -Timespan $RandomDelay
+    }
+
+    if ($PSBoundParameters.ContainsKey('RepetitionDuration'))
+    {
+        $PSBoundParameters['RepetitionDuration'] = ConvertTo-TimeSpanFromStandardString -Timespan $RepetitionDuration
+    }
+
+    if ($PSBoundParameters.ContainsKey('IdleWaitTimeout'))
+    {
+        $PSBoundParameters['IdleWaitTimeout'] = ConvertTo-TimeSpanFromStandardString -Timespan $IdleWaitTimeout
+    }
+
+    if ($PSBoundParameters.ContainsKey('IdleDuration'))
+    {
+        $PSBoundParameters['IdleDuration'] = ConvertTo-TimeSpanFromStandardString -Timespan $IdleDuration
+    }
+
+    if ($PSBoundParameters.ContainsKey('ExecutionTimeLimit'))
+    {
+        $PSBoundParameters['ExecutionTimeLimit'] = ConvertTo-TimeSpanFromStandardString -Timespan $ExecutionTimeLimit
+    }
+
+    if ($PSBoundParameters.ContainsKey('RestartInterval'))
+    {
+        $PSBoundParameters['RestartInterval'] = ConvertTo-TimeSpanFromStandardString -Timespan $RestartInterval
+    }
 
     Write-Verbose -Message ('Testing scheduled task {0}' -f $TaskName)
 
@@ -1327,17 +1383,16 @@ function Test-TargetResource
 
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
-
     Write-Verbose -Message 'Testing DSC parameter state'
     return Test-DscParameterState -CurrentValues $CurrentValues -DesiredValues $desiredValues
 }
 
 <#
-.SYNOPSIS
-Helper function to convert TaskPath to the right form
+    .SYNOPSIS
+        Helper function to convert TaskPath to the right form
 
-.PARAMETER TaskPath
-The path to the task
+    .PARAMETER TaskPath
+        The path to the task
 #>
 
 function ConvertTo-NormalizedTaskPath
@@ -1358,4 +1413,77 @@ function ConvertTo-NormalizedTaskPath
     }
 
     return $TaskPath
+}
+
+<#
+    .SYNOPSIS
+        Helper function convert a standard timespan string
+        into a Timespan object.
+
+    .PARAMETER Timespan
+        The standard timespan string to convert to a Timespan
+        object.
+#>
+
+function ConvertTo-TimeSpanFromStandardString
+{
+    [CmdletBinding()]
+    [OutputType([System.Timespan])]
+    param
+    (
+        [Parameter()]
+        [System.String]
+        $Timespan = '00:00:00'
+    )
+
+    return [System.Timespan]::Parse($Timespan)
+}
+
+<#
+    .SYNOPSIS
+        Helper function convert a task schedule timespan string
+        into a Timespan object.
+
+    .PARAMETER Timespan
+        The scheduled task timespan string to convert to a Timespan
+        object.
+#>
+
+function ConvertTo-TimeSpanFromScheduledTaskString
+{
+    [CmdletBinding()]
+    [OutputType([System.Timespan])]
+    param
+    (
+        [Parameter()]
+        [System.String]
+        $Timespan
+    )
+
+    $days = 0
+    $hours = 0
+    $minutes = 0
+    $seconds = 0
+
+    if ($Timespan -match 'P(?<Days>\d{0,3})D')
+    {
+        $days = $matches.Days
+    }
+
+    if ($Timespan -match '(?<Hours>\d{0,2})H')
+    {
+        $hours = $matches.Hours
+    }
+
+    if ($Timespan -match '(?<Minutes>\d{0,2})M')
+    {
+        $minutes = $matches.Minutes
+    }
+
+    if ($Timespan -match '(?<Seconds>\d{0,2})S')
+    {
+        $seconds = $matches.Seconds
+    }
+
+    return New-TimeSpan -Days $days -Hours $hours -Minutes $minutes -Seconds $seconds
 }
