@@ -588,6 +588,11 @@ try
                     ScheduleType = 'Once'
                     RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                    RandomDelay = (New-TimeSpan -Minutes 4).ToString()
+                    IdleWaitTimeout = (New-TimeSpan -Minutes 5).ToString()
+                    IdleDuration = (New-TimeSpan -Minutes 6).ToString()
+                    ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
+                    RestartInterval = (New-TimeSpan -Minutes 8).ToString()
                     Enable = $true
                     Verbose = $True
                 }
@@ -604,12 +609,19 @@ try
                                     Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
+                                RandomDelay = "PT$([System.Timespan]::Parse($testParams.RandomDelay).TotalMinutes)M"
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
                             })
                         Settings = @(@{
                                 Enabled = $true
+                                IdleSettings = @{
+                                    IdleWaitTimeout = "PT$([System.Timespan]::Parse($testParams.IdleWaitTimeout).TotalMinutes)M"
+                                    IdleDuration = "PT$([System.Timespan]::Parse($testParams.IdleDuration).TotalMinutes)M"
+                                }
+                                ExecutionTimeLimit = "PT$([System.Timespan]::Parse($testParams.ExecutionTimeLimit).TotalMinutes)M"
+                                RestartInterval = "PT$([System.Timespan]::Parse($testParams.RestartInterval).TotalMinutes)M"
                             })
                         Principal = @{
                             UserId = 'SYSTEM'
@@ -784,6 +796,67 @@ try
 
                 It 'should not add backslash' {
                     ConvertTo-NormalizedTaskPath -TaskPath '\Test\'| Should Be '\Test\'
+                }
+            }
+
+            Context 'A scheduled task exists and is configured with the wrong interval & duration parameters' {
+                $testParams = @{
+                    TaskName = 'Test task'
+                    TaskPath = '\Test\'
+                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType = 'Once'
+                    RepeatInterval = (New-TimeSpan -Minutes 20).ToString()
+                    RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
+                    RandomDelay = (New-TimeSpan -Minutes 4).ToString()
+                    IdleWaitTimeout = (New-TimeSpan -Minutes 5).ToString()
+                    IdleDuration = (New-TimeSpan -Minutes 6).ToString()
+                    ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
+                    RestartInterval = (New-TimeSpan -Minutes 8).ToString()
+                    Verbose = $True
+                }
+
+                Mock Get-ScheduledTask { return @{
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                                Arguments = $testParams.Arguments
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                }
+                                RandomDelay = "PT$([System.Timespan]::Parse($testParams.RandomDelay).TotalMinutes)M"
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Settings = @{
+                            IdleSettings = @{
+                                IdleWaitTimeout = "PT$([System.Timespan]::Parse($testParams.IdleWaitTimeout).TotalMinutes + 1)M"
+                                IdleDuration = "PT$([System.Timespan]::Parse($testParams.IdleDuration).TotalMinutes + 1)M"
+                            }
+                            ExecutionTimeLimit = "PT$([System.Timespan]::Parse($testParams.ExecutionTimeLimit).TotalMinutes + 1)M"
+                            RestartInterval = "PT$([System.Timespan]::Parse($testParams.RestartInterval).TotalMinutes + 1)M"
+                        }
+                        Principal = @{
+                            UserId = 'SYSTEM'
+                        }
+                    } }
+
+                It 'should return present from the get method' {
+                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                }
+
+                It 'should return false from the test method' {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+
+                It 'should update the scheduled task in the set method' {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
                 }
             }
         }
