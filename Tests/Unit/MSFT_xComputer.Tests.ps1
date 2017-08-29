@@ -128,8 +128,8 @@ try
                 }
                 It 'Should return false if description is same as specified' {
                     Mock Get-CimInstance {[PSCustomObject]@{Description = 'This is not my computer'}}
-                    Test-TargetResource -Name $env:COMPUTERNAME -Description "This is my computer" | Should Be $true
-                    Test-TargetResource -Name 'localhost' -Description "This is my computer" | Should Be $true
+                    Test-TargetResource -Name $env:COMPUTERNAME -Description "This is my computer" | Should Be $false
+                    Test-TargetResource -Name 'localhost' -Description "This is my computer" | Should Be $false
                 }
             }
             Context "$($Global:DSCResourceName)\Get-TargetResource" {
@@ -284,7 +284,7 @@ try
                     {Set-TargetResource -Name "ThisIsBad<>"} | Should Throw
                 }
                 It 'Changes computer description'{
-                    #Mock Get-CimInstance {[PSCustomObject]@{Description = 'This is not my computer'}}
+                    Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso';Workgroup='Contoso';PartOfDomain=$false}}
                     Set-TargetResource -Name $env:COMPUTERNAME -Description = 'This is my computer'
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly 1 -Scope It
                 }
