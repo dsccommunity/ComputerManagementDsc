@@ -139,7 +139,7 @@ try
                 It 'Should return a hashtable containing Name, DomainName, JoinOU, CurrentOU, Credential, UnjoinCredential, WorkGroupName and Description' {
                     $Result = Get-TargetResource -Name $env:COMPUTERNAME
                     $Result.GetType().Fullname | Should Be 'System.Collections.Hashtable'
-                    $Result.Keys | Sort-Object | Should Be @('Credential', 'CurrentOU', 'DomainName', 'JoinOU', 'Name',  'UnjoinCredential', 'WorkGroupName', 'Description')
+                    $Result.Keys | Sort-Object | Should Be @('Credential', 'CurrentOU', 'Description', 'DomainName', 'JoinOU', 'Name',  'UnjoinCredential', 'WorkGroupName')
                 }
                 It 'Throws if name is to long' {
                     {Get-TargetResource -Name "ThisNameIsTooLong"} | Should Throw
@@ -284,7 +284,7 @@ try
                     {Set-TargetResource -Name "ThisIsBad<>"} | Should Throw
                 }
                 It 'Changes computer description'{
-                    Mock Get-CimInstance {[PSCustomObject]@{Description = 'This is not my computer'}}
+                    #Mock Get-CimInstance {[PSCustomObject]@{Description = 'This is not my computer'}}
                     Set-TargetResource -Name $env:COMPUTERNAME -Description = 'This is my computer'
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly 1 -Scope It
                 }
