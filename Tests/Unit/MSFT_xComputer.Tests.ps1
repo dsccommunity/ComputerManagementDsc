@@ -283,10 +283,17 @@ try
                 It 'Throws if name contains illigal characters' {
                     {Set-TargetResource -Name "ThisIsBad<>"} | Should Throw
                 }
-                It 'Changes computer description'{
+                It 'Changes computer description in a workgroup'{
                     Mock Get-ComputerDomain {''}
                     Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso';Workgroup='Contoso';PartOfDomain=$false}}
-                    Set-TargetResource -Name $env:COMPUTERNAME -WorkGroupName 'Contoso' -Description = 'This is my computer'
+                    Set-TargetResource -Name $env:COMPUTERNAME -WorkGroupName 'Contoso' -Description = 'This is my computer' | Should BeNullOrEmpty
+                    Assert-MockCalled -CommandName Set-CimInstance -Exactly 1 -Scope It
+                }
+                It 'Changes computer description in a domain'{
+                    Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso.com';Workgroup='Contoso.com';PartOfDomain=$true}}
+                    Mock Get-ComputerDomain {'contoso.com'}
+                    Set-TargetResource -Name $Env:ComputerName | Should BeNullOrEmpty
+                    Set-TargetResource -Name $env:COMPUTERNAME -DomainName 'Contoso.com' -Credential $Credential -UnjoinCredential $Credential  -Description = 'This is my computer' | Should BeNullOrEmpty
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly 1 -Scope It
                 }
             }
