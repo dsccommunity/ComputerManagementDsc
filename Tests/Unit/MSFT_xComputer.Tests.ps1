@@ -286,8 +286,8 @@ try
                 }
                 It 'Changes computer description in a workgroup'{
                     Mock Get-ComputerDomain {''}
-                    Mock Get-WMIObject {[PSCustomObject]@{Workgroup='Contoso';PartOfDomain=$false}}
-                    Set-TargetResource -Name $env:COMPUTERNAME -WorkGroupName 'Contoso' -Description = 'This is my computer' | Should BeNullOrEmpty
+                    Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso';Workgroup='Contoso';PartOfDomain=$false}}
+                    Set-TargetResource -Name $env:COMPUTERNAME -Description = 'This is my computer' | Should BeNullOrEmpty
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly 1 -Scope It
                 }
                 It 'Changes computer description in a domain'{
@@ -295,7 +295,7 @@ try
                     Mock Get-ComputerDomain {'contoso.com'}
                     Set-TargetResource -Name $Env:ComputerName | Should BeNullOrEmpty
                     Set-TargetResource -Name $env:COMPUTERNAME -DomainName 'Contoso.com' -Credential $Credential -UnjoinCredential $Credential  -Description = 'This is my computer' | Should BeNullOrEmpty
-                    Assert-MockCalled -CommandName Set-CimInstance -Exactly 1 -Scope It
+                    Assert-MockCalled -CommandName Set-CimInstance -Exactly 2 -Scope It
                 }
             }
         }
