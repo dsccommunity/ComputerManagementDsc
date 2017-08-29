@@ -284,6 +284,7 @@ try
                     {Set-TargetResource -Name "ThisIsBad<>"} | Should Throw
                 }
                 It 'Changes computer description'{
+                    Mock Get-ComputerDomain {''}
                     Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso';Workgroup='Contoso';PartOfDomain=$false}}
                     Set-TargetResource -Name $env:COMPUTERNAME -Description = 'This is my computer'
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly 1 -Scope It
