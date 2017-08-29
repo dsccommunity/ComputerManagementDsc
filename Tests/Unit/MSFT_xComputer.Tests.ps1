@@ -121,16 +121,25 @@ try
                 It 'Should not Throw if name is localhost' {
                     {Test-TargetResource -Name "localhost"} | Should Not Throw
                 }
-
+                It 'Should return true if description is same as specified' {
+                    Mock Get-CimInstance {[PSCustomObject]@{Description = 'This is my computer'}}
+                    Test-TargetResource -Name $env:COMPUTERNAME -Description "This is my computer" | Should Be $true
+                    Test-TargetResource -Name 'localhost' -Description "This is my computer" | Should Be $true
+                }
+                It 'Should return false if description is same as specified' {
+                    Mock Get-CimInstance {[PSCustomObject]@{Description = 'This is not my computer'}}
+                    Test-TargetResource -Name $env:COMPUTERNAME -Description "This is my computer" | Should Be $true
+                    Test-TargetResource -Name 'localhost' -Description "This is my computer" | Should Be $true
+                }
             }
             Context "$($Global:DSCResourceName)\Get-TargetResource" {
                 It 'should not throw' {
                     {Get-TargetResource -Name $env:COMPUTERNAME} | Should Not Throw
                 }
-                It 'Should return a hashtable containing Name, DomainName, JoinOU, CurrentOU, Credential, UnjoinCredential and WorkGroupName' {
+                It 'Should return a hashtable containing Name, DomainName, JoinOU, CurrentOU, Credential, UnjoinCredential, WorkGroupName and Description' {
                     $Result = Get-TargetResource -Name $env:COMPUTERNAME
                     $Result.GetType().Fullname | Should Be 'System.Collections.Hashtable'
-                    $Result.Keys | Sort-Object | Should Be @('Credential', 'CurrentOU', 'DomainName', 'JoinOU', 'Name',  'UnjoinCredential', 'WorkGroupName')
+                    $Result.Keys | Sort-Object | Should Be @('Credential', 'CurrentOU', 'DomainName', 'JoinOU', 'Name',  'UnjoinCredential', 'WorkGroupName', 'Description')
                 }
                 It 'Throws if name is to long' {
                     {Get-TargetResource -Name "ThisNameIsTooLong"} | Should Throw
@@ -273,6 +282,11 @@ try
                 }
                 It 'Throws if name contains illigal characters' {
                     {Set-TargetResource -Name "ThisIsBad<>"} | Should Throw
+                }
+                It 'Changes computer description'{
+                    Mock Get-CimInstance {[PSCustomObject]@{Description = 'This is not my computer'}}
+                    Set-TargetResource -Name $env:COMPUTERNAME -Description = 'This is my computer'
+                    Assert-MockCalled -CommandName Set-CimInstance -Exactly 1 -Scope It
                 }
             }
         }
