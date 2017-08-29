@@ -151,6 +151,7 @@ try
             Context "$($Global:DSCResourceName)\Set-TargetResource" {
                 Mock Rename-Computer {}
                 Mock Add-Computer {}
+                Mock Set-CimInstance {}
                 It 'Throws if both DomainName and WorkGroupName are specified' {
                     {Set-TargetResource -Name $Env:ComputerName -DomainName 'contoso.com' -WorkGroupName 'workgroup'} | Should Throw
                     Assert-MockCalled -CommandName Rename-Computer -Exactly 0 -Scope It
@@ -285,7 +286,7 @@ try
                 }
                 It 'Changes computer description in a workgroup'{
                     Mock Get-ComputerDomain {''}
-                    Mock Get-WMIObject {[PSCustomObject]@{Domain = 'Contoso';Workgroup='Contoso';PartOfDomain=$false}}
+                    Mock Get-WMIObject {[PSCustomObject]@{Workgroup='Contoso';PartOfDomain=$false}}
                     Set-TargetResource -Name $env:COMPUTERNAME -WorkGroupName 'Contoso' -Description = 'This is my computer' | Should BeNullOrEmpty
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly 1 -Scope It
                 }
