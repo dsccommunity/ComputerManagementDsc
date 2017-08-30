@@ -8,4 +8,5 @@ class MSFT_xComputer : OMI_BaseResource
     [write,EmbeddedInstance("MSFT_Credential")] String Credential;
     [write,EmbeddedInstance("MSFT_Credential")] String UnjoinCredential;
     [write] string WorkGroupName;
+    [write] string Description;
 };

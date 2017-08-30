@@ -33,7 +33,11 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        $WorkGroupName
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description
     )
 
     Write-Verbose -Message "Getting computer state for '$($Name)'."
@@ -64,6 +68,7 @@ function Get-TargetResource
         Credential       = [ciminstance]$convertToCimCredential
         UnjoinCredential = [ciminstance]$convertToCimUnjoinCredential
         WorkGroupName    = (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup
+        Description      = (Get-CimInstance -Class 'Win32_OperatingSystem').Description
     }
 
     $returnValue
@@ -98,7 +103,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $WorkGroupName
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description
     )
 
     Assert-DomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
@@ -107,6 +116,11 @@ function Set-TargetResource
     {
         $Name = $env:COMPUTERNAME
     }
+
+    Write-Verbose -message "Setting description to '$($Description)'."
+    $Win32_OperatingSystem = Get-CimInstance -ClassName Win32_OperatingSystem
+    $Win32_OperatingSystem.Description = $Description
+    Set-CimInstance -InputObject $Win32_OperatingSystem
 
     if ($Credential)
     {
@@ -274,13 +288,23 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $WorkGroupName
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description
     )
 
     Write-Verbose -Message 'Validate desired Name is a valid name'
 
     Write-Verbose -Message 'Checking if computer name is correct'
     if (($Name -ne 'localhost') -and ($Name -ne $env:COMPUTERNAME))
+    {
+        return $false
+    }
+
+    Write-Verbose -Message 'Checking if description is corerect'
+    if ($Description -ne (Get-CimInstance -Class 'Win32_OperatingSystem').Description)
     {
         return $false
     }
