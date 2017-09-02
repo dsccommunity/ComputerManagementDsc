@@ -53,7 +53,7 @@ xComputer resource has following properties:
 * Credential: Credential to be used to join or leave domain
 * CurrentOU: A read-only property that specifies the organizational unit that
   the computer account is currently in
-* Description: The local computer descrption
+* Description: The value assigned here will be as the local computer description
 
 ### xComputer Examples
 
