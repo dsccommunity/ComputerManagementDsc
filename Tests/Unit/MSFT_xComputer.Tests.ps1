@@ -469,7 +469,7 @@ try
                             PartOfDomain=$false
                         }
                     }
-                    Set-TargetResource -Name $env:COMPUTERNAME -Description 'This is my computer' -DomainName "" | Should BeNullOrEmpty
+                    Set-TargetResource -Name $env:COMPUTERNAME -Description 'This is my computer' -DomainName '' | Should BeNullOrEmpty
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1 -Scope It
                 }
                 It 'Changes computer description in a domain'{
