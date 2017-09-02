@@ -117,10 +117,10 @@ function Set-TargetResource
         $Name = $env:COMPUTERNAME
     }
 
-    Write-Verbose -message "Setting description to '$($Description)'."
-    $Win32_OperatingSystem = Get-CimInstance -ClassName Win32_OperatingSystem
-    $Win32_OperatingSystem.Description = $Description
-    Set-CimInstance -InputObject $Win32_OperatingSystem
+    Write-Verbose -Message "Setting computer description to '$($Description)'."
+    $win32OperatingSystemCimInstance = Get-CimInstance -ClassName Win32_OperatingSystem
+    $win32OperatingSystemCimInstance.Description = $Description
+    Set-CimInstance -InputObject $win32OperatingSystemCimInstance
 
     if ($Credential)
     {
@@ -304,6 +304,7 @@ function Test-TargetResource
     }
 
     Write-Verbose -Message 'Checking if description is corerect'
+
     if ($Description -ne (Get-CimInstance -Class 'Win32_OperatingSystem').Description)
     {
         return $false
