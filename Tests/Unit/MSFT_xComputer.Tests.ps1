@@ -31,10 +31,12 @@ try
             $SecPassword = New-Object -Type SecureString
             $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $SecPassword
             $NotComputerName = if ($env:COMPUTERNAME -ne 'othername')
-            {'othername'
+            {
+                'othername'
             }
             else
-            {'name'
+            {
+                'name'
             }
 
             Context "$($Global:DSCResourceName)\Test-TargetResource" {
@@ -59,7 +61,9 @@ try
                             PartOfDomain = $true
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {'contoso.com'}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        'contoso.com'
+                    }
                     Test-TargetResource -Name $Env:ComputerName -DomainName 'Contoso.com' -Credential $Credential | Should Be $true
                 }
                 It 'Should return True if Workgroup name is same as specified' {
@@ -70,7 +74,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'workgroup' | Should Be $true
                 }
                 It 'Should return True if ComputerName and Domain name is same as specified' {
@@ -95,7 +101,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'workgroup' | Should Be $true
                     Test-TargetResource -Name 'localhost' -WorkGroupName 'workgroup' | Should Be $true
                 }
@@ -107,7 +115,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Test-TargetResource -Name $Env:ComputerName | Should Be $true
                     Test-TargetResource -Name 'localhost' | Should Be $true
                     Mock -CommandName Get-WmiObject {
@@ -131,7 +141,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Test-TargetResource -Name $NotComputerName | Should Be $false
                     Mock -CommandName Get-WmiObject -MockWith {
                         [PSCustomObject] @{
@@ -140,7 +152,9 @@ try
                             PartOfDomain = $true
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {'contoso.com'}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        'contoso.com'
+                    }
                     Test-TargetResource -Name $NotComputerName | Should Be $false
                 }
                 It 'Should return False if Domain name is not same as specified' {
@@ -165,7 +179,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Test-TargetResource -Name $Env:ComputerName -WorkGroupName 'NOTworkgroup' | Should Be $false
                     Test-TargetResource -Name 'localhost' -WorkGroupName 'NOTworkgroup' | Should Be $false
                 }
@@ -177,7 +193,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Test-TargetResource -Name $NotComputerName -WorkGroupName 'workgroup' | Should Be $false
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
@@ -199,7 +217,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Test-TargetResource -Name $Env:ComputerName -DomainName 'contoso.com' -Credential $Credential | Should Be $false
                     Test-TargetResource -Name 'localhost' -DomainName 'contoso.com' -Credential $Credential | Should Be $false
                 }
@@ -331,7 +351,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Set-TargetResource -Name $NotComputerName -DomainName 'Contoso.com' -Credential $Credential | Should BeNullOrEmpty
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter {$DomainName -and $NewName}
@@ -345,7 +367,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Set-TargetResource -Name $NotComputerName -DomainName 'Contoso.com' -JoinOU 'OU=Computers,DC=contoso,DC=com' -Credential $Credential | Should BeNullOrEmpty
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter {$DomainName -and $NewName}
@@ -359,7 +383,9 @@ try
                             PartOfDomain = $false
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Set-TargetResource -Name $NotComputerName -WorkGroupName 'adventure-works' | Should BeNullOrEmpty
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter {$WorkGroupName -and $NewName}
@@ -441,7 +467,9 @@ try
                             PartOfDomain = $true
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Set-TargetResource -Name $Env:ComputerName -WorkGroupName 'Contoso' -UnjoinCredential $Credential | Should BeNullOrEmpty
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter {$NewName}
@@ -456,7 +484,9 @@ try
                             PartOfDomain = $true
                         }
                     }
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Set-TargetResource -Name 'localhost' -WorkGroupName 'Contoso' -UnjoinCredential $Credential | Should BeNullOrEmpty
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter {$NewName}
@@ -479,7 +509,9 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It
                 }
                 It 'Changes only ComputerName in Workgroup' {
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
                             Domain       = 'Contoso';
@@ -498,7 +530,9 @@ try
                     {Set-TargetResource -Name "ThisIsBad<>"} | Should Throw
                 }
                 It 'Changes computer description in a workgroup' {
-                    Mock -CommandName Get-ComputerDomain -MockWith {''}
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
                     Mock -CommandName Get-WMIObject {
                         [PSCustomObject] @{
                             Domain       = 'Contoso';
