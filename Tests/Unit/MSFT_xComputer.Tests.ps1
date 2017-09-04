@@ -556,7 +556,7 @@ try
                     }
                     Set-TargetResource -Name $env:ComputerName | Should BeNullOrEmpty
                     Set-TargetResource -Name $env:COMPUTERNAME -DomainName 'Contoso.com' -Credential $Credential -UnjoinCredential $Credential  -Description 'This is my computer' | Should BeNullOrEmpty
-                    Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 2 -Scope It
+                    Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1 -Scope It
                 }
             }
         }
