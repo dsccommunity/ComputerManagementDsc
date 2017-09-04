@@ -117,11 +117,13 @@ function Set-TargetResource
         $Name = $env:COMPUTERNAME
     }
 
-    Write-Verbose -Message "Setting computer description to '$($Description)'."
-    $win32OperatingSystemCimInstance = Get-CimInstance -ClassName Win32_OperatingSystem
-    $win32OperatingSystemCimInstance.Description = $Description
-    Set-CimInstance -InputObject $win32OperatingSystemCimInstance
-
+    if ($PSBoundParameters.ContainsKey('Description'))
+    {
+        Write-Verbose -Message "Setting computer description to '$($Description)'."
+        $win32OperatingSystemCimInstance = Get-CimInstance -ClassName Win32_OperatingSystem
+        $win32OperatingSystemCimInstance.Description = $Description
+        Set-CimInstance -InputObject $win32OperatingSystemCimInstance
+    }
     if ($Credential)
     {
         if ($DomainName)
@@ -303,13 +305,14 @@ function Test-TargetResource
         return $false
     }
 
-    Write-Verbose -Message 'Checking if description is corerect'
-
-    if ($Description -ne (Get-CimInstance -Class 'Win32_OperatingSystem').Description)
+    if ($PSBoundParameters.ContainsKey('Description'))
     {
-        return $false
+        Write-Verbose -Message 'Checking if description is corerect'
+        if ($Description -ne (Get-CimInstance -Class 'Win32_OperatingSystem').Description)
+        {
+            return $false
+        }
     }
-
     Assert-DomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
 
     if ($DomainName)
