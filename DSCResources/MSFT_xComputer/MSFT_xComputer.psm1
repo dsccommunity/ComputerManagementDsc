@@ -33,7 +33,11 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        $WorkGroupName
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description
     )
 
     Write-Verbose -Message "Getting computer state for '$($Name)'."
@@ -64,6 +68,7 @@ function Get-TargetResource
         Credential       = [ciminstance]$convertToCimCredential
         UnjoinCredential = [ciminstance]$convertToCimUnjoinCredential
         WorkGroupName    = (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup
+        Description      = (Get-CimInstance -Class 'Win32_OperatingSystem').Description
     }
 
     $returnValue
@@ -98,7 +103,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $WorkGroupName
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description
     )
 
     Assert-DomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
@@ -106,6 +115,14 @@ function Set-TargetResource
     if ($Name -eq 'localhost')
     {
         $Name = $env:COMPUTERNAME
+    }
+
+    if ($PSBoundParameters.ContainsKey('Description'))
+    {
+        Write-Verbose -Message "Setting computer description to '$($Description)'."
+        $win32OperatingSystemCimInstance = Get-CimInstance -ClassName Win32_OperatingSystem
+        $win32OperatingSystemCimInstance.Description = $Description
+        Set-CimInstance -InputObject $win32OperatingSystemCimInstance
     }
 
     if ($Credential)
@@ -274,7 +291,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $WorkGroupName
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description
     )
 
     Write-Verbose -Message 'Validate desired Name is a valid name'
@@ -283,6 +304,15 @@ function Test-TargetResource
     if (($Name -ne 'localhost') -and ($Name -ne $env:COMPUTERNAME))
     {
         return $false
+    }
+
+    if ($PSBoundParameters.ContainsKey('Description'))
+    {
+        Write-Verbose -Message 'Checking if description is corerect'
+        if ($Description -ne (Get-CimInstance -Class 'Win32_OperatingSystem').Description)
+        {
+            return $false
+        }
     }
 
     Assert-DomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName

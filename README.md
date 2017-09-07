@@ -53,6 +53,7 @@ xComputer resource has following properties:
 * Credential: Credential to be used to join or leave domain
 * CurrentOU: A read-only property that specifies the organizational unit that
   the computer account is currently in
+* Description: The value assigned here will be set as the local computer description
 
 ### xComputer Examples
 
@@ -61,6 +62,7 @@ xComputer resource has following properties:
 * [Set the Name while staying on the Domain](/Examples/xComputer/3-RenameComputerInDomain.ps1)
 * [Set the Name while staying on the Workgroup](/Examples/xComputer/4-RenameComputerInWorkgroup.ps1)
 * [Switch from a Domain to a Workgroup](/Examples/xComputer/5-UnjoinDomainAndJoinWorkgroup.ps1)
+* [Set a Description for the Workstation](/Examples/xComputer/6-SetComputerDescriptionInWorkgroup.ps1)
 
 ## xOfflineDomainJoin
 
@@ -201,6 +203,9 @@ xVirtualMemory has the following properties:
 ## Versions
 
 ### Unreleased
+
+* xComputer: Added parameter to set the local computer description along with documentation
+ and unit tests for this change.
 
 ### 2.1.0.0
 
