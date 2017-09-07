@@ -124,6 +124,7 @@ function Set-TargetResource
         $win32OperatingSystemCimInstance.Description = $Description
         Set-CimInstance -InputObject $win32OperatingSystemCimInstance
     }
+
     if ($Credential)
     {
         if ($DomainName)
@@ -313,6 +314,7 @@ function Test-TargetResource
             return $false
         }
     }
+
     Assert-DomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
 
     if ($DomainName)
