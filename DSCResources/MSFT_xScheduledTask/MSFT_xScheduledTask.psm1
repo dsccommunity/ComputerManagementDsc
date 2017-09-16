@@ -939,45 +939,55 @@ function Set-TargetResource
             New-InvalidOperationException -Message 'Error creating new scheduled task trigger' -ErrorRecord $_
         }
 
-        <#
-            To overcome the issue of not being able to set the task repetition for tasks
-            with a schedule type other than Once a temporary 'Once' task trigger is created
-            with the repetition values set. The repetition object is then copied from the
-            temporary task trigger into the actual task trigger.
-        #>
-        $tempTriggerArgs = @{
-            Once               = $true
-            At                 = '6:6:6'
-            RepetitionInterval = $RepeatInterval
-        }
-
-        if ($RepeatInterval -gt [System.Timespan]::Parse('0:0:0') -and $PSVersionTable.PSVersion.Major -gt 4)
+        if ($RepeatInterval -gt [System.Timespan]::Parse('0:0:0'))
         {
+            # A repetition pattern is required so create it and attach it to the trigger object
+            Write-Verbose -Message ('Configuring trigger repetition')
+
             if ($RepetitionDuration -le $RepeatInterval)
             {
                 $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval, $RepetitionDuration
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
-            try
+            switch ($trigger.GetType().FullName)
             {
-                Write-Verbose -Message 'Creating PS V5 temporary trigger'
-
-                $tempTriggerArgsClone = $tempTriggerArgs.Clone()
-                if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
+                'Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger'
                 {
-                    $tempTriggerArgsClone.Add('RepetitionDuration', $RepetitionDuration)
+                    # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
+                    Write-Verbose -Message ('Setting repetition for trigger in Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger object')
+
+                    $trigger.RepeatInterval = $RepeatInterval
+                    $trigger.RepetitionDuration = $RepetitionDuration
                 }
 
-                $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgsClone
+                'Microsoft.Management.Infrastructure.CimInstance'
+                {
+                    # This is the type of trigger object returned in Windows Server 2016/Windows 10 and above
+                    Write-Verbose -Message ('Creating MSFT_TaskRepetitionPattern CIM instance to set repetition in trigger')
 
-                Write-Verbose -Message 'PS V5 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
+                    # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
+                    $tempTriggerArgs = @{
+                        Once               = $true
+                        At                 = '6:6:6'
+                        RepetitionInterval = $RepeatInterval
+                    }
 
-                $trigger.Repetition = $tempTrigger.Repetition
-            }
-            catch
-            {
-                $triggerRepetitionFailed = $true
+                    if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
+                    {
+                        $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
+                    }
+
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
+
+                    $trigger.Repetition = $tempTrigger.Repetition
+                }
+
+                default
+                {
+                    New-InvalidOperationException `
+                        -Message ('Trigger object that was created was of unexpected type {0}' -f $trigger.GetType().FullName)
+                }
             }
         }
 
@@ -990,34 +1000,6 @@ function Set-TargetResource
         Write-Verbose -Message ('Creating new scheduled task {0}' -f $TaskName)
 
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
-
-        if ($RepeatInterval -gt [System.Timespan]::Parse('0:0:0') -and ($PSVersionTable.PSVersion.Major -eq 4 -or $triggerRepetitionFailed))
-        {
-            if ($RepetitionDuration -le $RepeatInterval)
-            {
-                $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval, $RepetitionDuration
-                New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
-            }
-
-            Write-Verbose -Message 'Creating PS V4 temporary trigger'
-
-            $tempTriggerArgsClone = $tempTriggerArgs.Clone()
-            if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
-            {
-                $tempTriggerArgsClone.Add('RepetitionDuration', $RepetitionDuration)
-            }
-            else
-            {
-                $tempTriggerArgsClone.Add('RepetitionDuration', $null)
-            }
-
-            $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgsClone
-            $tempTask = New-ScheduledTask -Trigger $tempTrigger -Action $action
-
-            Write-Verbose -Message 'PS V4 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
-
-            $scheduledTask.Triggers[0].Repetition = $tempTask.Triggers[0].Repetition
-        }
 
         if (-not [System.String]::IsNullOrWhiteSpace($Description))
         {
