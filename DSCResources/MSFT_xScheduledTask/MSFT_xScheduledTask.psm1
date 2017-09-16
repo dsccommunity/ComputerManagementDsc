@@ -951,11 +951,6 @@ function Set-TargetResource
             RepetitionInterval = $RepeatInterval
         }
 
-        if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
-        {
-            $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
-        }
-
         if ($RepeatInterval -gt [System.Timespan]::Parse('0:0:0') -and $PSVersionTable.PSVersion.Major -gt 4)
         {
             if ($RepetitionDuration -le $RepeatInterval)
@@ -964,14 +959,20 @@ function Set-TargetResource
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
-            Write-Verbose -Message 'Creating PS V5 temporary trigger'
-
-            $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
-
-            Write-Verbose -Message 'PS V5 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
-
             try
             {
+                Write-Verbose -Message 'Creating PS V5 temporary trigger'
+
+                $tempTriggerArgsClone = $tempTriggerArgs.Clone()
+                if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
+                {
+                    $tempTriggerArgsClone.Add('RepetitionDuration', $RepetitionDuration)
+                }
+
+                $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgsClone
+
+                Write-Verbose -Message 'PS V5 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
+
                 $trigger.Repetition = $tempTrigger.Repetition
             }
             catch
@@ -1000,7 +1001,17 @@ function Set-TargetResource
 
             Write-Verbose -Message 'Creating PS V4 temporary trigger'
 
-            $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
+            $tempTriggerArgsClone = $tempTriggerArgs.Clone()
+            if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
+            {
+                $tempTriggerArgsClone.Add('RepetitionDuration', $RepetitionDuration)
+            }
+            else
+            {
+                $tempTriggerArgsClone.Add('RepetitionDuration', $null)
+            }
+
+            $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgsClone
             $tempTask = New-ScheduledTask -Trigger $tempTrigger -Action $action
 
             Write-Verbose -Message 'PS V4 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
