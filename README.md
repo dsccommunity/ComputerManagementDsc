@@ -80,7 +80,7 @@ resource that can only be used once in a configuration and has following propert
 
 xScheduledTask resource is used to define basic recurring scheduled tasks on the
 local computer.
-Tasks are created to run indefinitely based on the schedule defined.
+Tasks are created to run based on the schedule defined.
 xScheduledTask has the following properties:
 
 * TaskName: The name of the task
@@ -108,7 +108,7 @@ xScheduledTask has the following properties:
   trigger. The delay time is a random time between the time the task triggers
   and the time that you specify in this setting.
 * RepetitionDuration: Specifies how long the repetition pattern repeats after
-  the task starts.
+  the task starts. May be set to `Indefinitely` to specify an indefinite duration.
 * DaysOfWeek: Specifies an array of the days of the week on which Task Scheduler
   runs the task.
 * WeeksInterval: Specifies the interval between the weeks in the schedule. An
@@ -167,8 +167,9 @@ xScheduledTask has the following properties:
 
 ### xScheduledTask Examples
 
-* [Create five different scheduled tasks that run PowerShell](/Examples/xScheduledTask/1-CreateScheduledTasks.ps1)
-* [Run a PowerShell script every 15 minutes on a server](/Examples/xScheduledTask/2-RunPowerShellTaskEvery15Minutes.ps1)
+* [Create six different scheduled tasks that run PowerShell](/Examples/xScheduledTask/1-CreateScheduledTasks.ps1)
+* [Run a PowerShell script every 15 minutes for 4 days on a server](/Examples/xScheduledTask/2-RunPowerShellTaskEvery15Minutes.ps1)
+* [Run a PowerShell script every 15 minutes Indefinitely on a server](/Examples/xScheduledTask/3-3-RunPowerShellTaskEvery15MinutesIndefinitely.ps1)
 
 ## xPowerPlan
 
@@ -213,6 +214,7 @@ xVirtualMemory has the following properties:
     deployed nodes to a different timezone - See [Issue #85](https://github.com/PowerShell/xComputerManagement/issues/85)
   * Added ConvertTo-TimeSpanFromScheduledTaskString function and refactored
     to reduce code duplication.
+  * Added support for setting repetition duration to `Indefinitely`.
 
 ### 2.1.0.0
 

@@ -29,11 +29,12 @@ try
     Describe $Global:DSCResourceName {
 
         $contexts = @{
-            Once      = 'xScheduledTaskOnce'
-            Daily     = 'xScheduledTaskDaily'
-            Weekly    = 'xScheduledTaskWeekly'
-            AtLogon   = 'xScheduledTaskLogon'
-            AtStartup = 'xScheduledTaskStartup'
+            Once              = 'xScheduledTaskOnce'
+            Daily             = 'xScheduledTaskDaily'
+            DailyIndefinitely = 'xScheduledTaskDailyIndefinitely'
+            Weekly            = 'xScheduledTaskWeekly'
+            AtLogon           = 'xScheduledTaskLogon'
+            AtStartup         = 'xScheduledTaskStartup'
         }
 
         foreach ($contextInfo in $contexts.GetEnumerator())
@@ -51,7 +52,7 @@ try
 
                 It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
                     } | Should Not Throw
                 }
 
@@ -73,7 +74,7 @@ try
 
                 It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
                     } | Should Not Throw
                 }
 
@@ -95,7 +96,7 @@ try
 
                 It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
                     } | Should Not Throw
                 }
 

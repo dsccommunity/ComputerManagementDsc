@@ -66,6 +66,28 @@ Configuration xScheduledTaskDailyAdd
     }
 }
 
+Configuration xScheduledTaskDailyIndefinitelyAdd
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskDailyAdd
+        {
+            TaskName = 'Test task Daily Indefinitely'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType = 'Daily'
+            DaysInterval = 1
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = 'Indefinitely'
+            RestartCount = 2
+            RestartInterval = '00:05:00'
+            RunOnlyIfNetworkAvailable = $true
+            WakeToRun = $true
+        }
+    }
+}
+
 Configuration xScheduledTaskWeeklyAdd
 {
     Import-DscResource -ModuleName xComputerManagement
@@ -159,6 +181,25 @@ Configuration xScheduledTaskDailyMod
     }
 }
 
+Configuration xScheduledTaskDailyIndefinitelyMod
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskDailyMod
+        {
+            TaskName = 'Test task Daily Indefinitely'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType = 'Daily'
+            DaysInterval = 2
+            RepeatInterval = '00:30:00'
+            RepetitionDuration = '10.00:00:00'
+            Enable = $false
+        }
+    }
+}
+
 Configuration xScheduledTaskWeeklyMod
 {
     Import-DscResource -ModuleName xComputerManagement
@@ -239,6 +280,26 @@ Configuration xScheduledTaskDailyDel
         xScheduledTask xScheduledTaskDailyDel
         {
             TaskName = 'Test task Daily'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType = 'Daily'
+            DaysInterval = 2
+            RepeatInterval = '00:30:00'
+            RepetitionDuration = '08:00:00'
+            Enable = $false
+            Ensure = 'Absent'
+        }
+    }
+}
+
+Configuration xScheduledTaskDailyIndefinitelyDel
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskDailyDel
+        {
+            TaskName = 'Test task Daily Indefinitely'
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Daily'
