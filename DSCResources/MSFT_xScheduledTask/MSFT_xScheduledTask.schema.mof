@@ -15,7 +15,7 @@ class MSFT_xScheduledTask : OMI_BaseResource
     [Write, Description("The credential this task should execute as. If not specified defaults to running as the local system account"), EmbeddedInstance("MSFT_Credential")] string ExecuteAsCredential;
     [Write, Description("Specifies the interval between the days in the schedule. An interval of 1 produces a daily schedule. An interval of 2 produces an every-other day schedule.")] Uint32 DaysInterval;
     [Write, Description("Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting.")] String RandomDelay;
-    [Write, Description("Specifies how long the repetition pattern repeats after the task starts.")] String RepetitionDuration;
+    [Write, Description("Specifies how long the repetition pattern repeats after the task starts. May be set to `Indefinitely` to specify an indefinite duration.")] String RepetitionDuration;
     [Write, Description("Specifies an array of the days of the week on which Task Scheduler runs the task.")] String DaysOfWeek[];
     [Write, Description("Specifies the interval between the weeks in the schedule. An interval of 1 produces a weekly schedule. An interval of 2 produces an every-other week schedule.")] Uint32 WeeksInterval;
     [Write, Description("Specifies the identifier of the user for a trigger that starts a task when a user logs on.")] String User;

@@ -3,6 +3,7 @@
     This example creates five tasks with the following schedules that start a new powershell process
         - Once at 00:00 repeating every 15 minutes for 8 hours
         - Daily at 00:00 repeating every 15 minutes for 8 hours
+        - Daily at 00:00 repeating every 15 minutes indefinitely
         - Weekly at 00:00 repeating every 15 minutes for 8 hours on Mon, Wed, Sat
         - At logon repeating every 15 minutes for 8 hours
         - At startup repeating every 15 minutes for 8 hours
@@ -45,6 +46,21 @@ Configuration Example
             DaysInterval = 1
             RepeatInterval = '00:15:00'
             RepetitionDuration = '08:00:00'
+            RestartCount = 2
+            RestartInterval = '00:05:00'
+            RunOnlyIfNetworkAvailable = $true
+            WakeToRun = $true
+        }
+
+        xScheduledTask xScheduledTaskDailyIndefinitelyAdd
+        {
+            TaskName = 'Test task Daily'
+            TaskPath = '\MyTasks'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType = 'Daily'
+            DaysInterval = 1
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = 'Indefinitely'
             RestartCount = 2
             RestartInterval = '00:05:00'
             RunOnlyIfNetworkAvailable = $true
