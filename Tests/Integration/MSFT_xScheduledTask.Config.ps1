@@ -5,7 +5,7 @@ Configuration xScheduledTaskOnceCrossTimezone
     {
         xScheduledTask xScheduledTaskOnceAdd
         {
-            TaskName = 'Test task once'
+            TaskName = 'Test task once cross timezone'
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Once'

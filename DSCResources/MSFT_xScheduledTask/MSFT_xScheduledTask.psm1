@@ -776,13 +776,13 @@ function Set-TargetResource
     Write-Verbose -Message ('Entering Set-TargetResource for {0} in {1}' -f $TaskName, $TaskPath)
 
     # Convert the strings containing time spans to Timespan Objects
-    $RepeatInterval = ConvertTo-TimeSpanFromTimespanString -Timespan $RepeatInterval
-    $RandomDelay = ConvertTo-TimeSpanFromTimespanString -Timespan $RandomDelay
-    $RepetitionDuration = ConvertTo-TimeSpanFromTimespanString -Timespan $RepetitionDuration -AllowIndefinitely
-    $IdleWaitTimeout = ConvertTo-TimeSpanFromTimespanString -Timespan $IdleWaitTimeout
-    $IdleDuration = ConvertTo-TimeSpanFromTimespanString -Timespan $IdleDuration
-    $ExecutionTimeLimit = ConvertTo-TimeSpanFromTimespanString -Timespan $ExecutionTimeLimit
-    $RestartInterval = ConvertTo-TimeSpanFromTimespanString -Timespan $RestartInterval
+    [System.Timespan] $RepeatInterval = ConvertTo-TimeSpanFromTimespanString -Timespan $RepeatInterval
+    [System.Timespan] $RandomDelay = ConvertTo-TimeSpanFromTimespanString -Timespan $RandomDelay
+    [System.Timespan] $RepetitionDuration = ConvertTo-TimeSpanFromTimespanString -Timespan $RepetitionDuration -AllowIndefinitely
+    [System.Timespan] $IdleWaitTimeout = ConvertTo-TimeSpanFromTimespanString -Timespan $IdleWaitTimeout
+    [System.Timespan] $IdleDuration = ConvertTo-TimeSpanFromTimespanString -Timespan $IdleDuration
+    [System.Timespan] $ExecutionTimeLimit = ConvertTo-TimeSpanFromTimespanString -Timespan $ExecutionTimeLimit
+    [System.Timespan] $RestartInterval = ConvertTo-TimeSpanFromTimespanString -Timespan $RestartInterval
 
     $currentValues = Get-TargetResource @PSBoundParameters
 
@@ -1413,7 +1413,7 @@ function Test-TargetResource
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
     Write-Verbose -Message 'Testing DSC parameter state'
-    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues -Verbose
+    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues
 }
 
 <#
