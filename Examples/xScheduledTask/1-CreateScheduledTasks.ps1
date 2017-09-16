@@ -54,7 +54,7 @@ Configuration Example
 
         xScheduledTask xScheduledTaskDailyIndefinitelyAdd
         {
-            TaskName = 'Test task Daily'
+            TaskName = 'Test task Daily Indefinitely'
             TaskPath = '\MyTasks'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Daily'
