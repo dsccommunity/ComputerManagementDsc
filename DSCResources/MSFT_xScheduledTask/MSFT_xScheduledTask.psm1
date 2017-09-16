@@ -964,6 +964,8 @@ function Set-TargetResource
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
+            Write-Verbose -Message 'Creating PS V5 temporary trigger'
+
             $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
 
             Write-Verbose -Message 'PS V5 Copying values from temporary trigger to property Repetition of $trigger.Repetition'
@@ -995,6 +997,8 @@ function Set-TargetResource
                 $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval, $RepetitionDuration
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
+
+            Write-Verbose -Message 'Creating PS V4 temporary trigger'
 
             $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
             $tempTask = New-ScheduledTask -Trigger $tempTrigger -Action $action
