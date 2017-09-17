@@ -939,9 +939,6 @@ function Set-TargetResource
             New-InvalidOperationException -Message 'Error creating new scheduled task trigger' -ErrorRecord $_
         }
 
-        # Set up the repetition for the trigger
-        $applyTriggerAfterRegister = $false
-
         if ($RepeatInterval -gt [System.Timespan]::Parse('0:0:0'))
         {
             # A repetition pattern is required so create it and attach it to the trigger object
@@ -953,37 +950,46 @@ function Set-TargetResource
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
+            $tempTriggerArgs = @{
+                Once               = $true
+                At                 = '6:6:6'
+                RepetitionInterval = $RepeatInterval
+            }
+
+            Write-Verbose -Message ('Creating MSFT_TaskRepetitionPattern CIM instance to configure repetition in trigger')
+
             switch ($trigger.GetType().FullName)
             {
                 'Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger'
                 {
-                    <#
-                        This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below.
-                        The repetition settings for triggers on this OS should be set after the task has been registered.
-                    #>
-                    $applyTriggerAfterRegister = $true
+                    # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
+                    Write-Verbose -Message ('Creating temporary task and trigger to get MSFT_TaskRepetitionPattern CIM instance')
+
+                    $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
+
+                    # Create a temporary trigger and task and copy the repetition CIM object from the temporary task
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
+                    $tempTask = New-ScheduledTask -Action $action -Trigger $tempTrigger
+
+                    # Store the repetition settings
+                    $repetition = $tempTask.Triggers[0].Repetition
                 }
 
                 'Microsoft.Management.Infrastructure.CimInstance'
                 {
                     # This is the type of trigger object returned in Windows Server 2016/Windows 10 and above
-                    Write-Verbose -Message ('Creating MSFT_TaskRepetitionPattern CIM instance to set repetition in trigger')
-
-                    # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
-                    $tempTriggerArgs = @{
-                        Once               = $true
-                        At                 = '6:6:6'
-                        RepetitionInterval = $RepeatInterval
-                    }
+                    Write-Verbose -Message ('Creating temporary trigger to get MSFT_TaskRepetitionPattern CIM instance')
 
                     if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
                     {
                         $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
                     }
 
+                    # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
                     $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
 
-                    $trigger.Repetition = $tempTrigger.Repetition
+                    # Store the repetition settings
+                    $repetition = $tempTrigger.Repetition
                 }
 
                 default
@@ -1003,6 +1009,12 @@ function Set-TargetResource
         Write-Verbose -Message ('Creating new scheduled task {0}' -f $TaskName)
 
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
+
+        if ($repetition)
+        {
+            Write-Verbose -Message ('Setting repetition trigger settings on task {0}' -f $TaskName)
+            $scheduledTask.Triggers[0].Repetition = $repetition
+        }
 
         if (-not [System.String]::IsNullOrWhiteSpace($Description))
         {
@@ -1028,17 +1040,6 @@ function Set-TargetResource
         Write-Verbose -Message ('Registering the scheduled task {0}' -f $TaskName)
 
         $null = Register-ScheduledTask @registerArgs
-
-        if ($applyTriggerAfterRegister)
-        {
-            # This should be performed on Windows Server 2012 R2/Windows 8.1 and below
-            Write-Verbose -Message ('Setting repetition for trigger after task {0} has been registered' -f $TaskName)
-
-            $trigger.RepetitionInterval = $RepeatInterval
-            $trigger.RepetitionDuration = $RepetitionDuration
-
-            Set-ScheduledTask -TaskName $taskName -TaskPath $taskPath -Trigger $trigger
-        }
     }
 
     if ($Ensure -eq 'Absent')
