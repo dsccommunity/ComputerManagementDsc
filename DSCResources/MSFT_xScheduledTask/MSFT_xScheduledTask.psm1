@@ -950,6 +950,12 @@ function Set-TargetResource
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
+            $tempTriggerArgs = @{
+                Once               = $true
+                At                 = '6:6:6'
+                RepetitionInterval = $RepeatInterval
+            }
+
             switch ($trigger.GetType().FullName)
             {
                 'Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger'
@@ -957,8 +963,12 @@ function Set-TargetResource
                     # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
                     Write-Verbose -Message ('Setting repetition for trigger in Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger object')
 
-                    $trigger.RepetitionInterval = $RepeatInterval
-                    $trigger.RepetitionDuration = $RepetitionDuration
+                    $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
+
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
+                    $tempTask = New-ScheduledTask -Trigger $tempTrigger -Action $action
+
+                    $trigger.Repetition = $tempTask.Triggers[0].Repetition
                 }
 
                 'Microsoft.Management.Infrastructure.CimInstance'
@@ -967,12 +977,6 @@ function Set-TargetResource
                     Write-Verbose -Message ('Creating MSFT_TaskRepetitionPattern CIM instance to set repetition in trigger')
 
                     # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
-                    $tempTriggerArgs = @{
-                        Once               = $true
-                        At                 = '6:6:6'
-                        RepetitionInterval = $RepeatInterval
-                    }
-
                     if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
                     {
                         $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
@@ -998,6 +1002,8 @@ function Set-TargetResource
         }
 
         Write-Verbose -Message ('Creating new scheduled task {0}' -f $TaskName)
+
+        Write-Verbose -Message ('Trigger:' -f ($Trigger | Format-List * | Out-String))
 
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
 
