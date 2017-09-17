@@ -1410,7 +1410,7 @@ function Test-TargetResource
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
     Write-Verbose -Message 'Testing DSC parameter state'
-    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues
+    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues -Verbose
 }
 
 <#
