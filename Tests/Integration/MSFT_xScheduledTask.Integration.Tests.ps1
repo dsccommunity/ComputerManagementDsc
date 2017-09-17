@@ -15,46 +15,49 @@ $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
     -TestType Integration
-
 #endregion
+
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+
 # Begin Testing
 try
 {
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Global:DSCResourceName).config.ps1"
     . $ConfigFile
-    
+
     #region Pester Tests
     Describe $Global:DSCResourceName {
 
         $contexts = @{
-            Once      = 'xScheduledTaskOnce'
-            Daily     = 'xScheduledTaskDaily'
-            Weekly    = 'xScheduledTaskWeekly'
-            AtLogon   = 'xScheduledTaskLogon'
-            AtStartup = 'xScheduledTaskStartup'
+            Once              = 'xScheduledTaskOnce'
+            Daily             = 'xScheduledTaskDaily'
+            DailyIndefinitely = 'xScheduledTaskDailyIndefinitely'
+            Weekly            = 'xScheduledTaskWeekly'
+            AtLogon           = 'xScheduledTaskLogon'
+            AtStartup         = 'xScheduledTaskStartup'
         }
-        
+
         foreach ($contextInfo in $contexts.GetEnumerator())
         {
             Context "[$($contextInfo.Key)] No scheduled task exists but it should" {
                 $CurrentConfig = '{0}Add' -f $contextInfo.Value
                 $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
                 $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
-            
-                It 'should compile and apply the MOF without throwing' {
+
+                It 'Should compile the MOF without throwing' {
                     {
                         . $CurrentConfig -OutputPath $ConfigDir
                     } | Should Not Throw
                 }
-            
-                It 'should apply the MOF correctly' {
+
+                It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
                     } | Should Not Throw
                 }
-            
-                It 'should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+
+                It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true
                 }
             }
 
@@ -62,21 +65,21 @@ try
                 $CurrentConfig = '{0}Mod' -f $contextInfo.Value
                 $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
                 $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
-            
-                It 'should compile and apply the MOF without throwing' {
+
+                It 'Should compile the MOF without throwing' {
                     {
                         . $CurrentConfig -OutputPath $ConfigDir
                     } | Should Not Throw
                 }
-            
-                It 'should apply the MOF correctly' {
+
+                It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
                     } | Should Not Throw
                 }
-            
-                It 'should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+
+                It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true
                 }
             }
 
@@ -84,22 +87,55 @@ try
                 $CurrentConfig = '{0}Del' -f $contextInfo.Value
                 $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
                 $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
-            
-                It 'should compile and apply the MOF without throwing' {
+
+                It 'Should compile the MOF without throwing' {
                     {
                         . $CurrentConfig -OutputPath $ConfigDir
                     } | Should Not Throw
                 }
-            
-                It 'should apply the MOF correctly' {
+
+                It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Force
+                        Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
                     } | Should Not Throw
                 }
-            
-                It 'should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+
+                It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true
                 }
+            }
+        }
+
+        Context "MOF is created in a different timezone to node MOF being applied to" {
+            BeforeAll {
+                $currentTimeZoneId = Get-TimeZoneId
+            }
+
+            $CurrentConfig = 'xScheduledTaskOnceCrossTimezone'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile the MOF without throwing in W. Australia Standard Time Timezone' {
+                {
+
+                    Set-TimeZoneId -Id 'W. Australia Standard Time'
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should Not Throw
+            }
+
+            It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
+                {
+                    Set-TimeZoneId -Id 'New Zealand Standard Time'
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
+                } | Should Not Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true
+            }
+
+            AfterAll {
+                Set-TimeZoneId -Id $currentTimeZoneId
             }
         }
     }
@@ -107,7 +143,7 @@ try
 finally
 {
     #region FOOTER
-    
+
     # Remove any traces of the created tasks
     Get-ScheduledTask -TaskPath '\xComputerManagement\' -ErrorAction SilentlyContinue | Unregister-ScheduledTask -ErrorAction SilentlyContinue -Confirm:$false
 
@@ -115,7 +151,7 @@ finally
     $scheduler.Connect()
     $rootFolder = $scheduler.GetFolder('\')
     $rootFolder.DeleteFolder('xComputerManagement', 0)
-    
+
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }

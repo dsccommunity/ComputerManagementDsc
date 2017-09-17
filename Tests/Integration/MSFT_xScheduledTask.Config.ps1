@@ -1,3 +1,26 @@
+Configuration xScheduledTaskOnceCrossTimezone
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskOnceAdd
+        {
+            TaskName = 'Test task once cross timezone'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType = 'Once'
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = '23:00:00'
+            ActionWorkingPath = (Get-Location).Path
+            Enable = $true
+            RandomDelay = '01:00:00'
+            DisallowHardTerminate = $true
+            RunOnlyIfIdle = $false
+            Priority = 9
+        }
+    }
+}
+
 Configuration xScheduledTaskOnceAdd
 {
     Import-DscResource -ModuleName xComputerManagement
@@ -9,11 +32,11 @@ Configuration xScheduledTaskOnceAdd
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Once'
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = '08:00:00'
             ActionWorkingPath = (Get-Location).Path
             Enable = $true
-            RandomDelay = [datetime]::Today.AddMinutes(60)
+            RandomDelay = '01:00:00'
             DisallowHardTerminate = $true
             RunOnlyIfIdle = $false
             Priority = 9
@@ -33,10 +56,32 @@ Configuration xScheduledTaskDailyAdd
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Daily'
             DaysInterval = 1
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = '08:00:00'
             RestartCount = 2
-            RestartInterval = [datetime]::Today.AddMinutes(5)
+            RestartInterval = '00:05:00'
+            RunOnlyIfNetworkAvailable = $true
+            WakeToRun = $true
+        }
+    }
+}
+
+Configuration xScheduledTaskDailyIndefinitelyAdd
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskDailyAdd
+        {
+            TaskName = 'Test task Daily Indefinitely'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType = 'Daily'
+            DaysInterval = 1
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = 'Indefinitely'
+            RestartCount = 2
+            RestartInterval = '00:05:00'
             RunOnlyIfNetworkAvailable = $true
             WakeToRun = $true
         }
@@ -56,8 +101,8 @@ Configuration xScheduledTaskWeeklyAdd
             ScheduleType = 'Weekly'
             WeeksInterval = 1
             DaysOfWeek = 'Monday', 'Wednesday', 'Saturday'
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = '08:00:00'
             AllowStartIfOnBatteries = $true
             Compatibility = 'Win8'
             Hidden = $true
@@ -76,8 +121,8 @@ Configuration xScheduledTaskLogonAdd
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtLogOn'
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = '08:00:00'
         }
     }
 }
@@ -93,8 +138,8 @@ Configuration xScheduledTaskStartupAdd
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtStartup'
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = '08:00:00'
         }
     }
 }
@@ -110,8 +155,8 @@ Configuration xScheduledTaskOnceMod
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Once'
-            RepeatInterval = [datetime]::Today.AddMinutes(20)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:20:00'
+            RepetitionDuration = '08:00:00'
             DisallowDemandStart = $true
         }
     }
@@ -129,8 +174,27 @@ Configuration xScheduledTaskDailyMod
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Daily'
             DaysInterval = 2
-            RepeatInterval = [datetime]::Today.AddMinutes(30)            
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:30:00'
+            RepetitionDuration = '08:00:00'
+            Enable = $false
+        }
+    }
+}
+
+Configuration xScheduledTaskDailyIndefinitelyMod
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskDailyMod
+        {
+            TaskName = 'Test task Daily Indefinitely'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType = 'Daily'
+            DaysInterval = 2
+            RepeatInterval = '00:30:00'
+            RepetitionDuration = '10.00:00:00'
             Enable = $false
         }
     }
@@ -149,8 +213,8 @@ Configuration xScheduledTaskWeeklyMod
             ScheduleType = 'Weekly'
             WeeksInterval = 1
             DaysOfWeek = 'Monday', 'Thursday', 'Saturday'
-            RepeatInterval = [datetime]::Today.AddMinutes(40)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:40:00'
+            RepetitionDuration = '08:00:00'
         }
     }
 }
@@ -166,8 +230,8 @@ Configuration xScheduledTaskLogonMod
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtStartup'
-            RepeatInterval = [datetime]::Today.AddMinutes(12)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:12:00'
+            RepetitionDuration = '08:00:00'
         }
     }
 }
@@ -183,8 +247,8 @@ Configuration xScheduledTaskStartupMod
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtLogOn'
-            RepeatInterval = [datetime]::Today.AddMinutes(10)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:10:00'
+            RepetitionDuration = '08:00:00'
         }
     }
 }
@@ -200,8 +264,8 @@ Configuration xScheduledTaskOnceDel
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Once'
-            RepeatInterval = [datetime]::Today.AddMinutes(20)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:20:00'
+            RepetitionDuration = '08:00:00'
             DisallowDemandStart = $true
             Ensure = 'Absent'
         }
@@ -220,8 +284,28 @@ Configuration xScheduledTaskDailyDel
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Daily'
             DaysInterval = 2
-            RepeatInterval = [datetime]::Today.AddMinutes(30)            
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:30:00'
+            RepetitionDuration = '08:00:00'
+            Enable = $false
+            Ensure = 'Absent'
+        }
+    }
+}
+
+Configuration xScheduledTaskDailyIndefinitelyDel
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskDailyDel
+        {
+            TaskName = 'Test task Daily Indefinitely'
+            TaskPath = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType = 'Daily'
+            DaysInterval = 2
+            RepeatInterval = '00:30:00'
+            RepetitionDuration = '08:00:00'
             Enable = $false
             Ensure = 'Absent'
         }
@@ -241,8 +325,8 @@ Configuration xScheduledTaskWeeklyDel
             ScheduleType = 'Weekly'
             WeeksInterval = 1
             DaysOfWeek = 'Monday', 'Thursday', 'Saturday'
-            RepeatInterval = [datetime]::Today.AddMinutes(40)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:40:00'
+            RepetitionDuration = '08:00:00'
             Ensure = 'Absent'
         }
     }
@@ -259,8 +343,8 @@ Configuration xScheduledTaskLogonDel
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtStartup'
-            RepeatInterval = [datetime]::Today.AddMinutes(12)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:12:00'
+            RepetitionDuration = '08:00:00'
             Ensure = 'Absent'
         }
     }
@@ -277,8 +361,8 @@ Configuration xScheduledTaskStartupDel
             TaskPath = '\xComputerManagement\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtLogOn'
-            RepeatInterval = [datetime]::Today.AddMinutes(10)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:10:00'
+            RepetitionDuration = '08:00:00'
             Ensure = 'Absent'
         }
     }
