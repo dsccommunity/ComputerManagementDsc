@@ -939,6 +939,9 @@ function Set-TargetResource
             New-InvalidOperationException -Message 'Error creating new scheduled task trigger' -ErrorRecord $_
         }
 
+        # Set up the repetition for the trigger
+        $applyTriggerAfterRegister = $false
+
         if ($RepeatInterval -gt [System.Timespan]::Parse('0:0:0'))
         {
             # A repetition pattern is required so create it and attach it to the trigger object
@@ -950,25 +953,15 @@ function Set-TargetResource
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
-            $tempTriggerArgs = @{
-                Once               = $true
-                At                 = '6:6:6'
-                RepetitionInterval = $RepeatInterval
-            }
-
             switch ($trigger.GetType().FullName)
             {
                 'Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger'
                 {
-                    # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
-                    Write-Verbose -Message ('Setting repetition for trigger in Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger object')
-
-                    $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
-
-                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
-                    $tempTask = New-ScheduledTask -Trigger $tempTrigger -Action $action
-
-                    $trigger.Repetition = $tempTask.Triggers[0].Repetition
+                    <#
+                        This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below.
+                        The repetition settings for triggers on this OS should be set after the task has been registered.
+                    #>
+                    $applyTriggerAfterRegister = $true
                 }
 
                 'Microsoft.Management.Infrastructure.CimInstance'
@@ -977,6 +970,12 @@ function Set-TargetResource
                     Write-Verbose -Message ('Creating MSFT_TaskRepetitionPattern CIM instance to set repetition in trigger')
 
                     # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
+                    $tempTriggerArgs = @{
+                        Once               = $true
+                        At                 = '6:6:6'
+                        RepetitionInterval = $RepeatInterval
+                    }
+
                     if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
                     {
                         $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
@@ -1003,8 +1002,6 @@ function Set-TargetResource
 
         Write-Verbose -Message ('Creating new scheduled task {0}' -f $TaskName)
 
-        Write-Verbose -Message ('Trigger:' -f ($Trigger | Format-List * | Out-String))
-
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
 
         if (-not [System.String]::IsNullOrWhiteSpace($Description))
@@ -1028,12 +1025,26 @@ function Set-TargetResource
             $registerArgs.Add('User', 'NT AUTHORITY\SYSTEM')
         }
 
+        Write-Verbose -Message ('Registering the scheduled task {0}' -f $TaskName)
+
         $null = Register-ScheduledTask @registerArgs
+
+        if ($applyTriggerAfterRegister)
+        {
+            # This should be performed on Windows Server 2012 R2/Windows 8.1 and below
+            Write-Verbose -Message ('Setting repetition for trigger after task {0} has been registered' -f $TaskName)
+
+            $trigger.RepetitionInterval = $RepeatInterval
+            $trigger.RepetitionDuration = $RepetitionDuration
+
+            Set-ScheduledTask -TaskName $taskName -Trigger $trigger
+        }
     }
 
     if ($Ensure -eq 'Absent')
     {
-        Write-Verbose -Message ('Removing scheduled task {0}' -f $TaskName)
+        Write-Verbose -Message ('Removing the scheduled task {0}' -f $TaskName)
+
         Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
     }
 }

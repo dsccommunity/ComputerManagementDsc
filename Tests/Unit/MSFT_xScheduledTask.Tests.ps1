@@ -33,9 +33,11 @@ try
 
     InModuleScope $Global:DSCResourceName {
         Describe $Global:DSCResourceName {
-            Mock -CommandName Register-ScheduledTask { }
-            Mock -CommandName Set-ScheduledTask { }
-            Mock -CommandName Unregister-ScheduledTask { }
+            BeforeAll {
+                Mock -CommandName Register-ScheduledTask { }
+                Mock -CommandName Set-ScheduledTask { }
+                Mock -CommandName Unregister-ScheduledTask { }
+            }
 
             Context 'No scheduled task exists, but it should' {
                 $testParams = @{
