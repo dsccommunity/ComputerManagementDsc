@@ -1037,7 +1037,7 @@ function Set-TargetResource
             $trigger.RepetitionInterval = $RepeatInterval
             $trigger.RepetitionDuration = $RepetitionDuration
 
-            Set-ScheduledTask -TaskName $taskName -Trigger $trigger
+            Set-ScheduledTask -TaskName $taskName -TaskPath $taskPath -Trigger $trigger
         }
     }
 
