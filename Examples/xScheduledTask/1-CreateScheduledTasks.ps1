@@ -3,6 +3,7 @@
     This example creates five tasks with the following schedules that start a new powershell process
         - Once at 00:00 repeating every 15 minutes for 8 hours
         - Daily at 00:00 repeating every 15 minutes for 8 hours
+        - Daily at 00:00 repeating every 15 minutes indefinitely
         - Weekly at 00:00 repeating every 15 minutes for 8 hours on Mon, Wed, Sat
         - At logon repeating every 15 minutes for 8 hours
         - At startup repeating every 15 minutes for 8 hours
@@ -26,11 +27,11 @@ Configuration Example
             TaskPath = '\MyTasks'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Once'
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = '08:00:00'
             ActionWorkingPath = (Get-Location).Path
             Enable = $true
-            RandomDelay = [datetime]::Today.AddMinutes(60)
+            RandomDelay = '01:00:00'
             DisallowHardTerminate = $true
             RunOnlyIfIdle = $false
             Priority = 9
@@ -43,10 +44,25 @@ Configuration Example
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'Daily'
             DaysInterval = 1
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = '08:00:00'
             RestartCount = 2
-            RestartInterval = [datetime]::Today.AddMinutes(5)
+            RestartInterval = '00:05:00'
+            RunOnlyIfNetworkAvailable = $true
+            WakeToRun = $true
+        }
+
+        xScheduledTask xScheduledTaskDailyIndefinitelyAdd
+        {
+            TaskName = 'Test task Daily Indefinitely'
+            TaskPath = '\MyTasks'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType = 'Daily'
+            DaysInterval = 1
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = 'Indefinitely'
+            RestartCount = 2
+            RestartInterval = '00:05:00'
             RunOnlyIfNetworkAvailable = $true
             WakeToRun = $true
         }
@@ -59,8 +75,8 @@ Configuration Example
             ScheduleType = 'Weekly'
             WeeksInterval = 1
             DaysOfWeek = 'Monday','Wednesday','Saturday'
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '00:15:00'
+            RepetitionDuration = '08:00:00'
             AllowStartIfOnBatteries = $true
             Compatibility = 'Win8'
             Hidden = $true
@@ -72,18 +88,18 @@ Configuration Example
             TaskPath = '\MyTasks'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtLogOn'
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '08:00:00'
+            RepetitionDuration = '08:00:00'
         }
-  
+
         xScheduledTask xScheduledTaskStartupAdd
         {
             TaskName = 'Test task Startup'
             TaskPath = '\MyTasks'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType = 'AtStartup'
-            RepeatInterval = [datetime]::Today.AddMinutes(15)
-            RepetitionDuration = [datetime]::Today.AddHours(8)
+            RepeatInterval = '08:00:00'
+            RepetitionDuration = '08:00:00'
         }
     }
 }
