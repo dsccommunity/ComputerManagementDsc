@@ -957,7 +957,7 @@ function Set-TargetResource
                     # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
                     Write-Verbose -Message ('Setting repetition for trigger in Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger object')
 
-                    $trigger.RepeatInterval = $RepeatInterval
+                    $trigger.RepetitionInterval = $RepeatInterval
                     $trigger.RepetitionDuration = $RepetitionDuration
                 }
 
