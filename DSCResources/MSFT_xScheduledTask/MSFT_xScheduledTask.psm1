@@ -1489,12 +1489,12 @@ function ConvertTo-TimeSpanFromTimeSpanString
         $AllowIndefinitely
     )
 
-    if ($AllowIndefinitely -eq $True -and $TimeSpan -eq 'Indefinitely')
+    if ($AllowIndefinitely -eq $True -and $TimeSpanString -eq 'Indefinitely')
     {
         return [System.TimeSpan]::MaxValue
     }
 
-    return [System.TimeSpan]::Parse($TimeSpan)
+    return [System.TimeSpan]::Parse($TimeSpanString)
 }
 
 <#
