@@ -812,23 +812,23 @@ function Set-TargetResource
             New-InvalidArgumentException -Message $exceptionMessage -ArgumentName DaysOfWeek
         }
 
-        $actionArguments = @{
+        $actionParameters = @{
             Execute = $ActionExecutable
         }
 
         if ($ActionArguments)
         {
-            $actionArguments.Add('Argument', $ActionArguments)
+            $actionParameters.Add('Argument', $ActionArguments)
         }
 
         if ($ActionWorkingPath)
         {
-            $actionArguments.Add('WorkingDirectory', $ActionWorkingPath)
+            $actionParameters.Add('WorkingDirectory', $ActionWorkingPath)
         }
 
-        $action = New-ScheduledTaskAction @actionArguments
+        $action = New-ScheduledTaskAction @actionParameters
 
-        $settingArguments = @{
+        $settingParameters = @{
             DisallowDemandStart             = $DisallowDemandStart
             DisallowHardTerminate           = $DisallowHardTerminate
             Compatibility                   = $Compatibility
@@ -850,89 +850,89 @@ function Set-TargetResource
 
         if ($IdleDuration -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArguments.Add('IdleDuration', $IdleDuration)
+            $settingParameters.Add('IdleDuration', $IdleDuration)
         }
 
         if ($IdleWaitTimeout -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArguments.Add('IdleWaitTimeout', $IdleWaitTimeout)
+            $settingParameters.Add('IdleWaitTimeout', $IdleWaitTimeout)
         }
 
         if ($ExecutionTimeLimit -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArguments.Add('ExecutionTimeLimit', $ExecutionTimeLimit)
+            $settingParameters.Add('ExecutionTimeLimit', $ExecutionTimeLimit)
         }
 
         if ($RestartInterval -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArguments.Add('RestartInterval', $RestartInterval)
+            $settingParameters.Add('RestartInterval', $RestartInterval)
         }
 
         if (-not [System.String]::IsNullOrWhiteSpace($NetworkName))
         {
-            $setting.Add('NetworkName', $NetworkName)
+            $settingParameters.Add('NetworkName', $NetworkName)
         }
 
-        $setting = New-ScheduledTaskSettingsSet @settingArguments
+        $setting = New-ScheduledTaskSettingsSet @settingParameters
 
-        $triggerArguments = @{}
+        $triggerParameters = @{}
 
         if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0))
         {
-            $triggerArguments.Add('RandomDelay', $RandomDelay)
+            $triggerParameters.Add('RandomDelay', $RandomDelay)
         }
 
         switch ($ScheduleType)
         {
             'Once'
             {
-                $triggerArguments.Add('Once', $true)
-                $triggerArguments.Add('At', $StartTime)
+                $triggerParameters.Add('Once', $true)
+                $triggerParameters.Add('At', $StartTime)
                 break
             }
 
             'Daily'
             {
-                $triggerArguments.Add('Daily', $true)
-                $triggerArguments.Add('At', $StartTime)
-                $triggerArguments.Add('DaysInterval', $DaysInterval)
+                $triggerParameters.Add('Daily', $true)
+                $triggerParameters.Add('At', $StartTime)
+                $triggerParameters.Add('DaysInterval', $DaysInterval)
                 break
             }
 
             'Weekly'
             {
-                $triggerArguments.Add('Weekly', $true)
-                $triggerArguments.Add('At', $StartTime)
+                $triggerParameters.Add('Weekly', $true)
+                $triggerParameters.Add('At', $StartTime)
                 if ($DaysOfWeek.Count -gt 0)
                 {
-                    $triggerArguments.Add('DaysOfWeek', $DaysOfWeek)
+                    $triggerParameters.Add('DaysOfWeek', $DaysOfWeek)
                 }
 
                 if ($WeeksInterval -gt 0)
                 {
-                    $triggerArguments.Add('WeeksInterval', $WeeksInterval)
+                    $triggerParameters.Add('WeeksInterval', $WeeksInterval)
                 }
                 break
             }
 
             'AtStartup'
             {
-                $triggerArguments.Add('AtStartup', $true)
+                $triggerParameters.Add('AtStartup', $true)
                 break
             }
 
             'AtLogOn'
             {
-                $triggerArguments.Add('AtLogOn', $true)
+                $triggerParameters.Add('AtLogOn', $true)
                 if (-not [System.String]::IsNullOrWhiteSpace($User))
                 {
-                    $triggerArguments.Add('User', $User)
+                    $triggerParameters.Add('User', $User)
                 }
                 break
             }
         }
 
-        $trigger = New-ScheduledTaskTrigger @triggerArguments -ErrorAction SilentlyContinue
+        $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
 
         if (-not $trigger)
         {
@@ -951,7 +951,7 @@ function Set-TargetResource
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
-            $tempTriggerArguments = @{
+            $temptriggerParameters = @{
                 Once               = $true
                 At                 = '6:6:6'
                 RepetitionInterval = $RepeatInterval
@@ -966,10 +966,10 @@ function Set-TargetResource
                     # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
                     Write-Verbose -Message ('Creating temporary task and trigger to get MSFT_TaskRepetitionPattern CIM instance.')
 
-                    $tempTriggerArguments.Add('RepetitionDuration', $RepetitionDuration)
+                    $tempTriggerParameters.Add('RepetitionDuration', $RepetitionDuration)
 
                     # Create a temporary trigger and task and copy the repetition CIM object from the temporary task
-                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArguments
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerParameters
                     $tempTask = New-ScheduledTask -Action $action -Trigger $tempTrigger
 
                     # Store the repetition settings
@@ -983,11 +983,11 @@ function Set-TargetResource
 
                     if ($RepetitionDuration -gt [System.TimeSpan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.TimeSpan]::MaxValue)
                     {
-                        $tempTriggerArguments.Add('RepetitionDuration', $RepetitionDuration)
+                        $tempTriggerParameters.Add('RepetitionDuration', $RepetitionDuration)
                     }
 
                     # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
-                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArguments
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerParameters
 
                     # Store the repetition settings
                     $repetition = $tempTrigger.Repetition
