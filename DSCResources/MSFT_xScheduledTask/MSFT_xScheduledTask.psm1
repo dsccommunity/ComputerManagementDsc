@@ -330,13 +330,13 @@ function Get-TargetResource
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
-    Write-Verbose -Message ('Retrieving existing task ({0} in {1})' -f $TaskName, $TaskPath)
+    Write-Verbose -Message ('Retrieving existing task ({0} in {1}).' -f $TaskName, $TaskPath)
 
     $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
 
     if ($null -eq $task)
     {
-        Write-Verbose -Message ('No task found. returning empty task {0} with Ensure = "Absent"' -f $Taskname)
+        Write-Verbose -Message ('No task found. returning empty task {0} with Ensure = "Absent".' -f $Taskname)
 
         return @{
             TaskName         = $TaskName
@@ -347,7 +347,7 @@ function Get-TargetResource
     }
     else
     {
-        Write-Verbose -Message ('Task {0} found in {1}. Retrieving settings, first action, first trigger and repetition settings' -f $TaskName, $TaskPath)
+        Write-Verbose -Message ('Task {0} found in {1}. Retrieving settings, first action, first trigger and repetition settings.' -f $TaskName, $TaskPath)
 
         $action = $task.Actions | Select-Object -First 1
         $trigger = $task.Triggers | Select-Object -First 1
@@ -392,7 +392,7 @@ function Get-TargetResource
             }
         }
 
-        Write-Verbose -Message ('Detected schedule type {0} for first trigger' -f $returnScheduleType)
+        Write-Verbose -Message ('Detected schedule type {0} for first trigger.' -f $returnScheduleType)
 
         $daysOfWeek = @()
 
@@ -427,12 +427,12 @@ function Get-TargetResource
             ActionArguments                 = $action.Arguments
             ActionWorkingPath               = $action.WorkingDirectory
             ScheduleType                    = $returnScheduleType
-            RepeatInterval                  = ConvertTo-TimeSpanStringFromScheduledTaskString -Timespan $trigger.Repetition.Interval
+            RepeatInterval                  = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Interval
             ExecuteAsCredential             = $task.Principal.UserId
             Enable                          = $settings.Enabled
             DaysInterval                    = $trigger.DaysInterval
-            RandomDelay                     = ConvertTo-TimeSpanStringFromScheduledTaskString -Timespan $trigger.RandomDelay
-            RepetitionDuration              = ConvertTo-TimeSpanStringFromScheduledTaskString -Timespan $trigger.Repetition.Duration -AllowIndefinitely
+            RandomDelay                     = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.RandomDelay
+            RepetitionDuration              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Duration -AllowIndefinitely
             DaysOfWeek                      = $daysOfWeek
             WeeksInterval                   = $trigger.WeeksInterval
             User                            = $task.Principal.UserId
@@ -442,20 +442,20 @@ function Get-TargetResource
             AllowStartIfOnBatteries         = -not $settings.DisallowStartIfOnBatteries
             Hidden                          = $settings.Hidden
             RunOnlyIfIdle                   = $settings.RunOnlyIfIdle
-            IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -Timespan $settings.IdleSettings.IdleWaitTimeout
+            IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.IdleWaitTimeout
             NetworkName                     = $settings.NetworkSettings.Name
             DisallowStartOnRemoteAppSession = $settings.DisallowStartOnRemoteAppSession
             StartWhenAvailable              = $settings.StartWhenAvailable
             DontStopIfGoingOnBatteries      = -not $settings.StopIfGoingOnBatteries
             WakeToRun                       = $settings.WakeToRun
-            IdleDuration                    = ConvertTo-TimeSpanStringFromScheduledTaskString -Timespan $settings.IdleSettings.IdleDuration
+            IdleDuration                    = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.IdleDuration
             RestartOnIdle                   = $settings.IdleSettings.RestartOnIdle
             DontStopOnIdleEnd               = -not $settings.IdleSettings.StopOnIdleEnd
-            ExecutionTimeLimit              = ConvertTo-TimeSpanStringFromScheduledTaskString -Timespan $settings.ExecutionTimeLimit
+            ExecutionTimeLimit              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.ExecutionTimeLimit
             MultipleInstances               = $settings.MultipleInstances
             Priority                        = $settings.Priority
             RestartCount                    = $settings.RestartCount
-            RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -Timespan $settings.RestartInterval
+            RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.RestartInterval
             RunOnlyIfNetworkAvailable       = $settings.RunOnlyIfNetworkAvailable
         }
     }
@@ -773,16 +773,16 @@ function Set-TargetResource
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
-    Write-Verbose -Message ('Entering Set-TargetResource for {0} in {1}' -f $TaskName, $TaskPath)
+    Write-Verbose -Message ('Entering Set-TargetResource for {0} in {1}.' -f $TaskName, $TaskPath)
 
-    # Convert the strings containing time spans to Timespan Objects
-    [System.Timespan] $RepeatInterval = ConvertTo-TimeSpanFromTimespanString -Timespan $RepeatInterval
-    [System.Timespan] $RandomDelay = ConvertTo-TimeSpanFromTimespanString -Timespan $RandomDelay
-    [System.Timespan] $RepetitionDuration = ConvertTo-TimeSpanFromTimespanString -Timespan $RepetitionDuration -AllowIndefinitely
-    [System.Timespan] $IdleWaitTimeout = ConvertTo-TimeSpanFromTimespanString -Timespan $IdleWaitTimeout
-    [System.Timespan] $IdleDuration = ConvertTo-TimeSpanFromTimespanString -Timespan $IdleDuration
-    [System.Timespan] $ExecutionTimeLimit = ConvertTo-TimeSpanFromTimespanString -Timespan $ExecutionTimeLimit
-    [System.Timespan] $RestartInterval = ConvertTo-TimeSpanFromTimespanString -Timespan $RestartInterval
+    # Convert the strings containing time spans to TimeSpan Objects
+    [System.TimeSpan] $RepeatInterval = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RepeatInterval
+    [System.TimeSpan] $RandomDelay = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RandomDelay
+    [System.TimeSpan] $RepetitionDuration = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RepetitionDuration -AllowIndefinitely
+    [System.TimeSpan] $IdleWaitTimeout = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $IdleWaitTimeout
+    [System.TimeSpan] $IdleDuration = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $IdleDuration
+    [System.TimeSpan] $ExecutionTimeLimit = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $ExecutionTimeLimit
+    [System.TimeSpan] $RestartInterval = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval
 
     $currentValues = Get-TargetResource @PSBoundParameters
 
@@ -790,45 +790,45 @@ function Set-TargetResource
     {
         if ($RepetitionDuration -lt $RepeatInterval)
         {
-            $exceptionMessage = 'Repetition duration {0} is less than repetition interval {1}. Please set RepeatInterval to a value lower or equal to RepetitionDuration' -f $RepetitionDuration, $RepeatInterval
+            $exceptionMessage = 'Repetition duration {0} is less than repetition interval {1}. Please set RepeatInterval to a value lower or equal to RepetitionDuration.' -f $RepetitionDuration, $RepeatInterval
             New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepeatInterval
         }
 
         if ($ScheduleType -eq 'Daily' -and $DaysInterval -eq 0)
         {
-            $exceptionMessage = 'Schedules of the type Daily must have a DaysInterval greater than 0 (value entered: {0})' -f $DaysInterval
+            $exceptionMessage = 'Schedules of the type Daily must have a DaysInterval greater than 0 (value entered: {0}).' -f $DaysInterval
             New-InvalidArgumentException -Message $exceptionMessage -ArgumentName DaysInterval
         }
 
         if ($ScheduleType -eq 'Weekly' -and $WeeksInterval -eq 0)
         {
-            $exceptionMessage = 'Schedules of the type Weekly must have a WeeksInterval greater than 0 (value entered: {0})' -f $WeeksInterval
+            $exceptionMessage = 'Schedules of the type Weekly must have a WeeksInterval greater than 0 (value entered: {0}).' -f $WeeksInterval
             New-InvalidArgumentException -Message $exceptionMessage -ArgumentName WeeksInterval
         }
 
         if ($ScheduleType -eq 'Weekly' -and $DaysOfWeek.Count -eq 0)
         {
-            $exceptionMessage = 'Schedules of the type Weekly must have at least one weekday selected'
+            $exceptionMessage = 'Schedules of the type Weekly must have at least one weekday selected.'
             New-InvalidArgumentException -Message $exceptionMessage -ArgumentName DaysOfWeek
         }
 
-        $actionArgs = @{
+        $actionArguments = @{
             Execute = $ActionExecutable
         }
 
         if ($ActionArguments)
         {
-            $actionArgs.Add('Argument', $ActionArguments)
+            $actionArguments.Add('Argument', $ActionArguments)
         }
 
         if ($ActionWorkingPath)
         {
-            $actionArgs.Add('WorkingDirectory', $ActionWorkingPath)
+            $actionArguments.Add('WorkingDirectory', $ActionWorkingPath)
         }
 
-        $action = New-ScheduledTaskAction @actionArgs
+        $action = New-ScheduledTaskAction @actionArguments
 
-        $settingArgs = @{
+        $settingArguments = @{
             DisallowDemandStart             = $DisallowDemandStart
             DisallowHardTerminate           = $DisallowHardTerminate
             Compatibility                   = $Compatibility
@@ -850,22 +850,22 @@ function Set-TargetResource
 
         if ($IdleDuration -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArgs.Add('IdleDuration', $IdleDuration)
+            $settingArguments.Add('IdleDuration', $IdleDuration)
         }
 
         if ($IdleWaitTimeout -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArgs.Add('IdleWaitTimeout', $IdleWaitTimeout)
+            $settingArguments.Add('IdleWaitTimeout', $IdleWaitTimeout)
         }
 
         if ($ExecutionTimeLimit -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArgs.Add('ExecutionTimeLimit', $ExecutionTimeLimit)
+            $settingArguments.Add('ExecutionTimeLimit', $ExecutionTimeLimit)
         }
 
         if ($RestartInterval -gt [System.TimeSpan] '00:00:00')
         {
-            $settingArgs.Add('RestartInterval', $RestartInterval)
+            $settingArguments.Add('RestartInterval', $RestartInterval)
         }
 
         if (-not [System.String]::IsNullOrWhiteSpace($NetworkName))
@@ -873,102 +873,103 @@ function Set-TargetResource
             $setting.Add('NetworkName', $NetworkName)
         }
 
-        $setting = New-ScheduledTaskSettingsSet @settingArgs
+        $setting = New-ScheduledTaskSettingsSet @settingArguments
 
-        $triggerArgs = @{}
+        $triggerArguments = @{}
 
         if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0))
         {
-            $triggerArgs.Add('RandomDelay', $RandomDelay)
+            $triggerArguments.Add('RandomDelay', $RandomDelay)
         }
 
         switch ($ScheduleType)
         {
             'Once'
             {
-                $triggerArgs.Add('Once', $true)
-                $triggerArgs.Add('At', $StartTime)
+                $triggerArguments.Add('Once', $true)
+                $triggerArguments.Add('At', $StartTime)
                 break
             }
 
             'Daily'
             {
-                $triggerArgs.Add('Daily', $true)
-                $triggerArgs.Add('At', $StartTime)
-                $triggerArgs.Add('DaysInterval', $DaysInterval)
+                $triggerArguments.Add('Daily', $true)
+                $triggerArguments.Add('At', $StartTime)
+                $triggerArguments.Add('DaysInterval', $DaysInterval)
                 break
             }
 
             'Weekly'
             {
-                $triggerArgs.Add('Weekly', $true)
-                $triggerArgs.Add('At', $StartTime)
+                $triggerArguments.Add('Weekly', $true)
+                $triggerArguments.Add('At', $StartTime)
                 if ($DaysOfWeek.Count -gt 0)
                 {
-                    $triggerArgs.Add('DaysOfWeek', $DaysOfWeek)
+                    $triggerArguments.Add('DaysOfWeek', $DaysOfWeek)
                 }
 
                 if ($WeeksInterval -gt 0)
                 {
-                    $triggerArgs.Add('WeeksInterval', $WeeksInterval)
+                    $triggerArguments.Add('WeeksInterval', $WeeksInterval)
                 }
                 break
             }
 
             'AtStartup'
             {
-                $triggerArgs.Add('AtStartup', $true)
+                $triggerArguments.Add('AtStartup', $true)
                 break
             }
 
             'AtLogOn'
             {
-                $triggerArgs.Add('AtLogOn', $true)
+                $triggerArguments.Add('AtLogOn', $true)
                 if (-not [System.String]::IsNullOrWhiteSpace($User))
                 {
-                    $triggerArgs.Add('User', $User)
+                    $triggerArguments.Add('User', $User)
                 }
                 break
             }
         }
 
-        $trigger = New-ScheduledTaskTrigger @triggerArgs -ErrorAction SilentlyContinue
+        $trigger = New-ScheduledTaskTrigger @triggerArguments -ErrorAction SilentlyContinue
 
         if (-not $trigger)
         {
-            New-InvalidOperationException -Message 'Error creating new scheduled task trigger' -ErrorRecord $_
+            $exceptionMessage = 'Error creating new scheduled task trigger.'
+            New-InvalidOperationException -Message $exceptionMessage -ErrorRecord $_
         }
 
-        if ($RepeatInterval -gt [System.Timespan]::Parse('0:0:0'))
+        if ($RepeatInterval -gt [System.TimeSpan]::Parse('0:0:0'))
         {
             # A repetition pattern is required so create it and attach it to the trigger object
-            Write-Verbose -Message ('Configuring trigger repetition')
+            Write-Verbose -Message ('Configuring trigger repetition.')
 
             if ($RepetitionDuration -le $RepeatInterval)
             {
-                $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}' -f $RepeatInterval, $RepetitionDuration
+                $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}.' -f $RepeatInterval, $RepetitionDuration
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
-            $tempTriggerArgs = @{
+            $tempTriggerArguments = @{
                 Once               = $true
                 At                 = '6:6:6'
                 RepetitionInterval = $RepeatInterval
             }
 
-            Write-Verbose -Message ('Creating MSFT_TaskRepetitionPattern CIM instance to configure repetition in trigger')
+            Write-Verbose -Message ('Creating MSFT_TaskRepetitionPattern CIM instance to configure repetition in trigger.')
 
             switch ($trigger.GetType().FullName)
             {
                 'Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger'
                 {
                     # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
-                    Write-Verbose -Message ('Creating temporary task and trigger to get MSFT_TaskRepetitionPattern CIM instance')
+                    Write-Verbose -Message ('Creating temporary task and trigger to get MSFT_TaskRepetitionPattern CIM instance.')
 
-                    $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
+                    $tempTriggerArguments.Add('RepetitionDuration', $RepetitionDuration)
 
                     # Create a temporary trigger and task and copy the repetition CIM object from the temporary task
-                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArguments
                     $tempTask = New-ScheduledTask -Action $action -Trigger $tempTrigger
 
                     # Store the repetition settings
@@ -978,15 +979,15 @@ function Set-TargetResource
                 'Microsoft.Management.Infrastructure.CimInstance'
                 {
                     # This is the type of trigger object returned in Windows Server 2016/Windows 10 and above
-                    Write-Verbose -Message ('Creating temporary trigger to get MSFT_TaskRepetitionPattern CIM instance')
+                    Write-Verbose -Message ('Creating temporary trigger to get MSFT_TaskRepetitionPattern CIM instance.')
 
-                    if ($RepetitionDuration -gt [System.Timespan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.Timespan]::MaxValue)
+                    if ($RepetitionDuration -gt [System.TimeSpan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.TimeSpan]::MaxValue)
                     {
-                        $tempTriggerArgs.Add('RepetitionDuration', $RepetitionDuration)
+                        $tempTriggerArguments.Add('RepetitionDuration', $RepetitionDuration)
                     }
 
                     # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
-                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArgs
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerArguments
 
                     # Store the repetition settings
                     $repetition = $tempTrigger.Repetition
@@ -995,24 +996,24 @@ function Set-TargetResource
                 default
                 {
                     New-InvalidOperationException `
-                        -Message ('Trigger object that was created was of unexpected type {0}' -f $trigger.GetType().FullName)
+                        -Message ('Trigger object that was created was of unexpected type {0}.' -f $trigger.GetType().FullName)
                 }
             }
         }
 
         if ($currentValues.Ensure -eq 'Present')
         {
-            Write-Verbose -Message ('Removing previous scheduled task {0}' -f $TaskName)
+            Write-Verbose -Message ('Removing previous scheduled task {0}.' -f $TaskName)
             $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
         }
 
-        Write-Verbose -Message ('Creating new scheduled task {0}' -f $TaskName)
+        Write-Verbose -Message ('Creating new scheduled task {0}.' -f $TaskName)
 
         $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
 
         if ($repetition)
         {
-            Write-Verbose -Message ('Setting repetition trigger settings on task {0}' -f $TaskName)
+            Write-Verbose -Message ('Setting repetition trigger settings on task {0}.' -f $TaskName)
             $scheduledTask.Triggers[0].Repetition = $repetition
         }
 
@@ -1021,7 +1022,7 @@ function Set-TargetResource
             $scheduledTask.Description = $Description
         }
 
-        $registerArgs = @{
+        $registerArguments = @{
             TaskName    = $TaskName
             TaskPath    = $TaskPath
             InputObject = $scheduledTask
@@ -1029,22 +1030,22 @@ function Set-TargetResource
 
         if ($PSBoundParameters.ContainsKey('ExecuteAsCredential') -eq $true)
         {
-            $registerArgs.Add('User', $ExecuteAsCredential.UserName)
-            $registerArgs.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
+            $registerArguments.Add('User', $ExecuteAsCredential.UserName)
+            $registerArguments.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
         }
         else
         {
-            $registerArgs.Add('User', 'NT AUTHORITY\SYSTEM')
+            $registerArguments.Add('User', 'NT AUTHORITY\SYSTEM')
         }
 
-        Write-Verbose -Message ('Registering the scheduled task {0}' -f $TaskName)
+        Write-Verbose -Message ('Registering the scheduled task {0}.' -f $TaskName)
 
-        $null = Register-ScheduledTask @registerArgs
+        $null = Register-ScheduledTask @registerArguments
     }
 
     if ($Ensure -eq 'Absent')
     {
-        Write-Verbose -Message ('Removing the scheduled task {0}' -f $TaskName)
+        Write-Verbose -Message ('Removing the scheduled task {0}.' -f $TaskName)
 
         Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
     }
@@ -1363,21 +1364,21 @@ function Test-TargetResource
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
-    # Convert the strings containing time spans to Timespan Objects
+    # Convert the strings containing time spans to TimeSpan Objects
     if ($PSBoundParameters.ContainsKey('RepeatInterval'))
     {
-        $PSBoundParameters['RepeatInterval'] = (ConvertTo-TimeSpanFromTimespanString -Timespan $RepeatInterval).ToString()
+        $PSBoundParameters['RepeatInterval'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RepeatInterval).ToString()
     }
 
     if ($PSBoundParameters.ContainsKey('RandomDelay'))
     {
-        $PSBoundParameters['RandomDelay'] = (ConvertTo-TimeSpanFromTimespanString -Timespan $RandomDelay).ToString()
+        $PSBoundParameters['RandomDelay'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RandomDelay).ToString()
     }
 
     if ($PSBoundParameters.ContainsKey('RepetitionDuration'))
     {
-        $RepetitionDuration = ConvertTo-TimeSpanFromTimespanString -Timespan $RepetitionDuration -AllowIndefinitely
-        if ($RepetitionDuration -eq [System.Timespan]::MaxValue)
+        $RepetitionDuration = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RepetitionDuration -AllowIndefinitely
+        if ($RepetitionDuration -eq [System.TimeSpan]::MaxValue)
         {
             $PSBoundParameters['RepetitionDuration'] = 'Indefinitely'
         }
@@ -1390,22 +1391,22 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('IdleWaitTimeout'))
     {
-        $PSBoundParameters['IdleWaitTimeout'] = (ConvertTo-TimeSpanFromTimespanString -Timespan $IdleWaitTimeout).ToString()
+        $PSBoundParameters['IdleWaitTimeout'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $IdleWaitTimeout).ToString()
     }
 
     if ($PSBoundParameters.ContainsKey('IdleDuration'))
     {
-        $PSBoundParameters['IdleDuration'] = (ConvertTo-TimeSpanFromTimespanString -Timespan $IdleDuration).ToString()
+        $PSBoundParameters['IdleDuration'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $IdleDuration).ToString()
     }
 
     if ($PSBoundParameters.ContainsKey('ExecutionTimeLimit'))
     {
-        $PSBoundParameters['ExecutionTimeLimit'] = (ConvertTo-TimeSpanFromTimespanString -Timespan $ExecutionTimeLimit).ToString()
+        $PSBoundParameters['ExecutionTimeLimit'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $ExecutionTimeLimit).ToString()
     }
 
     if ($PSBoundParameters.ContainsKey('RestartInterval'))
     {
-        $PSBoundParameters['RestartInterval'] = (ConvertTo-TimeSpanFromTimespanString -Timespan $RestartInterval).ToString()
+        $PSBoundParameters['RestartInterval'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval).ToString()
     }
 
     Write-Verbose -Message ('Testing scheduled task {0}' -f $TaskName)
@@ -1421,13 +1422,13 @@ function Test-TargetResource
 
     if ($null -eq $currentValues)
     {
-        Write-Verbose -Message 'Current values were null'
+        Write-Verbose -Message 'Current values were null.'
         return $false
     }
 
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
-    Write-Verbose -Message 'Testing DSC parameter state'
+    Write-Verbose -Message 'Testing DSC parameter state.'
     return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues
 }
 
@@ -1461,54 +1462,54 @@ function ConvertTo-NormalizedTaskPath
 <#
     .SYNOPSIS
         Helper function convert a standard timespan string
-        into a Timespan object. It can support returning the
+        into a TimeSpan object. It can support returning the
         maximum timespan if the AllowIndefinitely switch is set
         and the timespan is set to 'indefinte'.
 
-    .PARAMETER Timespan
-        The standard timespan string to convert to a Timespan
+    .PARAMETER TimeSpan
+        The standard timespan string to convert to a TimeSpan
         object.
 
     .PARAMETER AllowIndefinitely
         Allow the keyword 'Indefinitely' to be translated into
         the maximum valid timespan.
 #>
-function ConvertTo-TimeSpanFromTimespanString
+function ConvertTo-TimeSpanFromTimeSpanString
 {
     [CmdletBinding()]
-    [OutputType([System.Timespan])]
+    [OutputType([System.TimeSpan])]
     param
     (
         [Parameter()]
         [System.String]
-        $Timespan = '00:00:00',
+        $TimeSpanString = '00:00:00',
 
         [Parameter()]
         [Switch]
         $AllowIndefinitely
     )
 
-    if ($AllowIndefinitely -eq $True -and $Timespan -eq 'Indefinitely')
+    if ($AllowIndefinitely -eq $True -and $TimeSpan -eq 'Indefinitely')
     {
-        return [System.Timespan]::MaxValue
+        return [System.TimeSpan]::MaxValue
     }
 
-    return [System.Timespan]::Parse($Timespan)
+    return [System.TimeSpan]::Parse($TimeSpan)
 }
 
 <#
     .SYNOPSIS
         Helper function convert a task schedule timespan string
-        into a Timespan string. If AllowIndefinitely is set to
-        true and the Timespan string is empty then return
+        into a TimeSpan string. If AllowIndefinitely is set to
+        true and the TimeSpan string is empty then return
         'Indefinitely'.
 
-    .PARAMETER Timespan
-        The scheduled task timespan string to convert to a Timespan
+    .PARAMETER TimeSpan
+        The scheduled task timespan string to convert to a TimeSpan
         string.
 
     .PARAMETER AllowIndefinitely
-        Allow an empty Timespan to return the keyword 'Indefinitely'.
+        Allow an empty TimeSpan to return the keyword 'Indefinitely'.
 
 #>
 function ConvertTo-TimeSpanStringFromScheduledTaskString
@@ -1519,7 +1520,7 @@ function ConvertTo-TimeSpanStringFromScheduledTaskString
     (
         [Parameter()]
         [System.String]
-        $Timespan,
+        $TimeSpan,
 
         [Parameter()]
         [Switch]
@@ -1527,29 +1528,29 @@ function ConvertTo-TimeSpanStringFromScheduledTaskString
     )
 
     # If AllowIndefinitely is true and the timespan is empty then return Indefinitely
-    if ($AllowIndefinitely -eq $true -and [String]::IsNullOrEmpty($Timespan))
+    if ($AllowIndefinitely -eq $true -and [String]::IsNullOrEmpty($TimeSpan))
     {
         return 'Indefinitely'
     }
 
     $days = $hours = $minutes = $seconds = 0
 
-    if ($Timespan -match 'P(?<Days>\d{0,3})D')
+    if ($TimeSpan -match 'P(?<Days>\d{0,3})D')
     {
         $days = $matches.Days
     }
 
-    if ($Timespan -match '(?<Hours>\d{0,2})H')
+    if ($TimeSpan -match '(?<Hours>\d{0,2})H')
     {
         $hours = $matches.Hours
     }
 
-    if ($Timespan -match '(?<Minutes>\d{0,2})M')
+    if ($TimeSpan -match '(?<Minutes>\d{0,2})M')
     {
         $minutes = $matches.Minutes
     }
 
-    if ($Timespan -match '(?<Seconds>\d{0,2})S')
+    if ($TimeSpan -match '(?<Seconds>\d{0,2})S')
     {
         $seconds = $matches.Seconds
     }

@@ -34,9 +34,9 @@ try
     InModuleScope $Global:DSCResourceName {
         Describe $Global:DSCResourceName {
             BeforeAll {
-                Mock -CommandName Register-ScheduledTask { }
-                Mock -CommandName Set-ScheduledTask { }
-                Mock -CommandName Unregister-ScheduledTask { }
+                Mock -CommandName Register-ScheduledTask
+                Mock -CommandName Set-ScheduledTask
+                Mock -CommandName Unregister-ScheduledTask
             }
 
             Context 'No scheduled task exists, but it should' {
@@ -52,8 +52,9 @@ try
 
                 Mock -CommandName Get-ScheduledTask { return $null }
 
-                It 'Should return absent from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Absent'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Absent'
                 }
 
                 It 'Should return false from the test method' {
@@ -85,8 +86,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalMinutes)M"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalMinutes)M"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -97,8 +98,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -123,8 +125,9 @@ try
 
                 Mock -CommandName Get-ScheduledTask { return $null }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Absent'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Absent'
                 }
 
                 It 'Should return true from the test method' {
@@ -152,7 +155,7 @@ try
                         Triggers = @(@{
                                 Repetition = @{
                                     Duration = ''
-                                    Interval = "PT$(([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes) + 1)M"
+                                    Interval = "PT$(([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes) + 1)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -163,8 +166,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -197,8 +201,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalMinutes)M"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalMinutes)M"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -209,8 +213,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
@@ -237,8 +242,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$(([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours))H"
-                                    Interval = "PT$(([System.Timespan]::Parse($testParams.RepeatInterval).TotalHours) + 1)H"
+                                    Duration = "PT$(([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours))H"
+                                    Interval = "PT$(([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalHours) + 1)H"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -249,8 +254,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -283,8 +289,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalHours)H"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalHours)H"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -295,8 +301,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
@@ -334,8 +341,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -376,8 +384,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
@@ -405,8 +414,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -417,8 +426,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -454,7 +464,7 @@ try
                         Triggers = @(@{
                                 Repetition = @{
                                     Duration = $null
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -465,8 +475,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -501,8 +512,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -513,8 +524,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -549,8 +561,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -564,8 +576,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -606,10 +619,10 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
-                                RandomDelay = "PT$([System.Timespan]::Parse($testParams.RandomDelay).TotalMinutes)M"
+                                RandomDelay = "PT$([System.TimeSpan]::Parse($testParams.RandomDelay).TotalMinutes)M"
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
@@ -617,19 +630,20 @@ try
                         Settings = @(@{
                                 Enabled = $true
                                 IdleSettings = @{
-                                    IdleWaitTimeout = "PT$([System.Timespan]::Parse($testParams.IdleWaitTimeout).TotalMinutes)M"
-                                    IdleDuration = "PT$([System.Timespan]::Parse($testParams.IdleDuration).TotalMinutes)M"
+                                    IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParams.IdleWaitTimeout).TotalMinutes)M"
+                                    IdleDuration = "PT$([System.TimeSpan]::Parse($testParams.IdleDuration).TotalMinutes)M"
                                 }
-                                ExecutionTimeLimit = "PT$([System.Timespan]::Parse($testParams.ExecutionTimeLimit).TotalMinutes)M"
-                                RestartInterval = "PT$([System.Timespan]::Parse($testParams.RestartInterval).TotalMinutes)M"
+                                ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParams.ExecutionTimeLimit).TotalMinutes)M"
+                                RestartInterval = "PT$([System.TimeSpan]::Parse($testParams.RestartInterval).TotalMinutes)M"
                             })
                         Principal = @{
                             UserId = 'SYSTEM'
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
@@ -658,8 +672,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -673,8 +687,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
@@ -703,8 +718,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -718,8 +733,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -753,8 +769,8 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -768,8 +784,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
@@ -824,29 +841,30 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours + 1)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes + 1)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours + 1)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes + 1)M"
                                 }
-                                RandomDelay = "PT$([System.Timespan]::Parse($testParams.RandomDelay).TotalMinutes + 1)M"
+                                RandomDelay = "PT$([System.TimeSpan]::Parse($testParams.RandomDelay).TotalMinutes + 1)M"
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
                             })
                         Settings = @{
                             IdleSettings = @{
-                                IdleWaitTimeout = "PT$([System.Timespan]::Parse($testParams.IdleWaitTimeout).TotalMinutes)M"
-                                IdleDuration = "PT$([System.Timespan]::Parse($testParams.IdleDuration).TotalMinutes)M"
+                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParams.IdleWaitTimeout).TotalMinutes)M"
+                                IdleDuration = "PT$([System.TimeSpan]::Parse($testParams.IdleDuration).TotalMinutes)M"
                             }
-                            ExecutionTimeLimit = "PT$([System.Timespan]::Parse($testParams.ExecutionTimeLimit).TotalMinutes)M"
-                            RestartInterval = "PT$([System.Timespan]::Parse($testParams.RestartInterval).TotalMinutes)M"
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParams.ExecutionTimeLimit).TotalMinutes)M"
+                            RestartInterval = "PT$([System.TimeSpan]::Parse($testParams.RestartInterval).TotalMinutes)M"
                         }
                         Principal = @{
                             UserId = 'SYSTEM'
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -885,29 +903,30 @@ try
                             })
                         Triggers = @(@{
                                 Repetition = @{
-                                    Duration = "PT$([System.Timespan]::Parse($testParams.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
-                                RandomDelay = "PT$([System.Timespan]::Parse($testParams.RandomDelay).TotalMinutes)M"
+                                RandomDelay = "PT$([System.TimeSpan]::Parse($testParams.RandomDelay).TotalMinutes)M"
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
                             })
                         Settings = @{
                             IdleSettings = @{
-                                IdleWaitTimeout = "PT$([System.Timespan]::Parse($testParams.IdleWaitTimeout).TotalMinutes + 1)M"
-                                IdleDuration = "PT$([System.Timespan]::Parse($testParams.IdleDuration).TotalMinutes + 1)M"
+                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParams.IdleWaitTimeout).TotalMinutes + 1)M"
+                                IdleDuration = "PT$([System.TimeSpan]::Parse($testParams.IdleDuration).TotalMinutes + 1)M"
                             }
-                            ExecutionTimeLimit = "PT$([System.Timespan]::Parse($testParams.ExecutionTimeLimit).TotalMinutes)M"
-                            RestartInterval = "PT$([System.Timespan]::Parse($testParams.RestartInterval).TotalMinutes)M"
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParams.ExecutionTimeLimit).TotalMinutes)M"
+                            RestartInterval = "PT$([System.TimeSpan]::Parse($testParams.RestartInterval).TotalMinutes)M"
                         }
                         Principal = @{
                             UserId = 'SYSTEM'
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -942,7 +961,7 @@ try
                         Triggers = @(@{
                                 Repetition = @{
                                     Duration = "PT4H"
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -953,9 +972,8 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
+                It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParams
-                    $result.Ensure | Should Be 'Present'
                     $result.Ensure | Should Be 'Present'
                 }
 
@@ -991,7 +1009,7 @@ try
                         Triggers = @(@{
                                 Repetition = @{
                                     Duration = ""
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -1002,8 +1020,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
@@ -1038,7 +1057,7 @@ try
                         Triggers = @(@{
                                 Repetition = @{
                                     Duration = ""
-                                    Interval = "PT$([System.Timespan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
@@ -1049,8 +1068,9 @@ try
                         }
                     } }
 
-                It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
                 }
 
                 It 'Should return true from the test method' {

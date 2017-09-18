@@ -167,9 +167,14 @@ xScheduledTask has the following properties:
 
 ### xScheduledTask Examples
 
-* [Create six different scheduled tasks that run PowerShell](/Examples/xScheduledTask/1-CreateScheduledTasks.ps1)
-* [Run a PowerShell script every 15 minutes for 4 days on a server](/Examples/xScheduledTask/2-RunPowerShellTaskEvery15Minutes.ps1)
-* [Run a PowerShell script every 15 minutes Indefinitely on a server](/Examples/xScheduledTask/3-3-RunPowerShellTaskEvery15MinutesIndefinitely.ps1)
+* [Create a task that starts PowerShell once every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/1-CreateScheduledTaskOnce.ps1)
+* [Create a task that starts PowerShell daily every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/2-CreateScheduledTaskDaily.ps1)
+* [Create a task that starts PowerShell daily every 15 minutes from 00:00 indefinitely](/Examples/xScheduledTask/3-CreateScheduledTasksDailyIndefinitely.ps1)
+* [Create a task that starts PowerShell weekly on Mon, Wed, Sat every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/4-CreateScheduledTasksWeekly.ps1)
+* [Create a task that starts PowerShell at logon and runs every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/5-CreateScheduledTasksAtLogon.ps1)
+* [Create a task that starts PowerShell at startup and runs every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/6-CreateScheduledTasksAtStartup.ps1)
+* [Run a PowerShell script every 15 minutes for 4 days on a server](/Examples/xScheduledTask/7-RunPowerShellTaskEvery15Minutes.ps1)
+* [Run a PowerShell script every 15 minutes indefinitely on a server](/Examples/xScheduledTask/8-RunPowerShellTaskEvery15MinutesIndefinitely.ps1)
 
 ## xPowerPlan
 
