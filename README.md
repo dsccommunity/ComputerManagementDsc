@@ -80,7 +80,7 @@ resource that can only be used once in a configuration and has following propert
 
 xScheduledTask resource is used to define basic recurring scheduled tasks on the
 local computer.
-Tasks are created to run indefinitely based on the schedule defined.
+Tasks are created to run based on the schedule defined.
 xScheduledTask has the following properties:
 
 * TaskName: The name of the task
@@ -108,7 +108,7 @@ xScheduledTask has the following properties:
   trigger. The delay time is a random time between the time the task triggers
   and the time that you specify in this setting.
 * RepetitionDuration: Specifies how long the repetition pattern repeats after
-  the task starts.
+  the task starts. May be set to `Indefinitely` to specify an indefinite duration.
 * DaysOfWeek: Specifies an array of the days of the week on which Task Scheduler
   runs the task.
 * WeeksInterval: Specifies the interval between the weeks in the schedule. An
@@ -167,8 +167,14 @@ xScheduledTask has the following properties:
 
 ### xScheduledTask Examples
 
-* [Create five different scheduled tasks that run PowerShell](/Examples/xScheduledTask/1-CreateScheduledTasks.ps1)
-* [Run a PowerShell script every 15 minutes on a server](/Examples/xScheduledTask/2-RunPowerShellTaskEvery15Minutes.ps1)
+* [Create a task that starts PowerShell once every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/1-CreateScheduledTaskOnce.ps1)
+* [Create a task that starts PowerShell daily every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/2-CreateScheduledTaskDaily.ps1)
+* [Create a task that starts PowerShell daily every 15 minutes from 00:00 indefinitely](/Examples/xScheduledTask/3-CreateScheduledTasksDailyIndefinitely.ps1)
+* [Create a task that starts PowerShell weekly on Monday, Wednesday and Saturday every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/4-CreateScheduledTasksWeekly.ps1)
+* [Create a task that starts PowerShell at logon and runs every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/5-CreateScheduledTasksAtLogon.ps1)
+* [Create a task that starts PowerShell at startup and runs every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/6-CreateScheduledTasksAtStartup.ps1)
+* [Run a PowerShell script every 15 minutes for 4 days on a server](/Examples/xScheduledTask/7-RunPowerShellTaskEvery15Minutes.ps1)
+* [Run a PowerShell script every 15 minutes indefinitely on a server](/Examples/xScheduledTask/8-RunPowerShellTaskEvery15MinutesIndefinitely.ps1)
 
 ## xPowerPlan
 
@@ -206,6 +212,14 @@ xVirtualMemory has the following properties:
 
 * xComputer: Added parameter to set the local computer description along with documentation
  and unit tests for this change.
+* BREAKING CHANGE: xScheduledTask:
+  * Converted all Interval/Duration type parameters over to be string format
+    to prevent the Timezone the MOF file was created in from being stored.
+    This is to fix problems where MOF files are created in one timezone but
+    deployed nodes to a different timezone - See [Issue #85](https://github.com/PowerShell/xComputerManagement/issues/85)
+  * Added ConvertTo-TimeSpanFromScheduledTaskString function and refactored
+    to reduce code duplication.
+  * Added support for setting repetition duration to `Indefinitely`.
 
 ### 2.1.0.0
 
