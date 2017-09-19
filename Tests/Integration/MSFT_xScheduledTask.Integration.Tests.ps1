@@ -134,6 +134,22 @@ try
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true
             }
 
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $CurrentConfig}
+                $current.TaskName              | Should Be 'Test task once cross timezone'
+                $current.TaskPath              | Should Be '\xComputerManagement\'
+                $current.ActionExecutable      | Should Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                $current.ScheduleType          | Should Be 'Once'
+                $current.RepeatInterval        | Should Be '00:15:00'
+                $current.RepetitionDuration    | Should Be '23:00:00'
+                $current.ActionWorkingPath     | Should Be (Get-Location).Path
+                $current.Enable                | Should Be $true
+                $current.RandomDelay           | Should Be '01:00:00'
+                $current.DisallowHardTerminate | Should Be $true
+                $current.RunOnlyIfIdle         | Should Be $false
+                $current.Priority              | Should Be 9
+            }
+
             AfterAll {
                 Set-TimeZoneId -Id $currentTimeZoneId
             }

@@ -951,7 +951,7 @@ function Set-TargetResource
                 New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
             }
 
-            $temptriggerParameters = @{
+            $tempTriggerParameters = @{
                 Once               = $true
                 At                 = '6:6:6'
                 RepetitionInterval = $RepeatInterval
