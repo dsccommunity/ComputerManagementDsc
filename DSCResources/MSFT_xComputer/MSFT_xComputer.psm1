@@ -331,7 +331,6 @@ function Set-TargetResource
 
         if ($WorkGroupName)
         {
-
             if ($WorkGroupName -eq (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup)
             {
                 # Same workgroup, new computer name
