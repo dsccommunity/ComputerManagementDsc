@@ -1,5 +1,5 @@
-$Global:DSCModuleName = 'xComputerManagement'
-$Global:DSCResourceName = 'MSFT_xComputer'
+$script:DSCModuleName = 'xComputerManagement'
+$script:DSCResourceName = 'MSFT_xComputer'
 
 # Unit Test Template Version: 1.2.0
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -22,9 +22,10 @@ try
 {
     #region Pester Tests
 
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
+        $script:DSCResourceName = 'MSFT_xComputer'
 
-        Describe $Global:DSCResourceName {
+        Describe $script:DSCResourceName {
             # A real password isn't needed here - use this next line to avoid triggering PSSA rule
             $securePassword = New-Object -Type SecureString
             $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
@@ -37,7 +38,7 @@ try
                 'name'
             }
 
-            Context "$($Global:DSCResourceName)\Test-TargetResource" {
+            Context "$($script:DSCResourceName)\Test-TargetResource" {
                 Mock -CommandName Get-WMIObject -MockWith {
                     [PSCustomObject] @{
                         DomainName = 'ContosoLtd'
@@ -432,7 +433,7 @@ try
                 }
             }
 
-            Context "$($Global:DSCResourceName)\Get-TargetResource" {
+            Context "$($script:DSCResourceName)\Get-TargetResource" {
                 It 'should not throw' {
                     {
                         Get-TargetResource `
@@ -467,7 +468,7 @@ try
                 }
             }
 
-            Context "$($Global:DSCResourceName)\Set-TargetResource" {
+            Context "$($script:DSCResourceName)\Set-TargetResource" {
                 Mock -CommandName Rename-Computer
                 Mock -CommandName Add-Computer
                 Mock -CommandName Set-CimInstance

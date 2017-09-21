@@ -2,8 +2,8 @@
 param(
 )
 
-$Global:DSCModuleName      = 'xComputerManagement'
-$Global:DSCResourceName    = 'MSFT_xScheduledTask'
+$script:DSCModuleName      = 'xComputerManagement'
+$script:DSCResourceName    = 'MSFT_xScheduledTask'
 
 # Unit Test Template Version: 1.2.0
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -29,8 +29,10 @@ try
 {
     #region Pester Tests
 
-    InModuleScope $Global:DSCResourceName {
-        Describe $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
+        $script:DSCResourceName = 'MSFT_xScheduledTask'
+
+        Describe $script:DSCResourceName {
             BeforeAll {
                 Mock -CommandName Register-ScheduledTask
                 Mock -CommandName Set-ScheduledTask
