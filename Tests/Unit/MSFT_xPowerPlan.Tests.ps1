@@ -1,5 +1,5 @@
-$script:DSCModuleName      = 'xComputerManagement' 
-$script:DSCResourceName    = 'MSFT_xPowerPlan' 
+$script:DSCModuleName      = 'xComputerManagement'
+$script:DSCResourceName    = 'MSFT_xPowerPlan'
 
 #region HEADER
 
@@ -16,8 +16,7 @@ Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
-    -TestType Unit 
-
+    -TestType Unit
 #endregion HEADER
 
 function Invoke-TestCleanup {
@@ -34,11 +33,11 @@ try
                 Name = 'High performance'
             }
         }
-        
+
         Context 'When the system is in the desired present state' {
             BeforeEach {
                 Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object | 
+                    return New-Object Object |
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
                 } -ModuleName $script:DSCResourceName -Verifiable
             }
@@ -53,7 +52,7 @@ try
         Context 'When the system is not in the desired present state' {
             BeforeEach {
                 Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object | 
+                    return New-Object Object |
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
                 } -ModuleName $script:DSCResourceName -Verifiable
             }
@@ -64,7 +63,7 @@ try
                 $result.Name | Should Be $null
             }
         }
-    
+
         Context 'When the Get-CimInstance cannot retrive information about power plans' {
             BeforeEach {
                 Mock -CommandName Get-CimInstance -MockWith {
@@ -152,7 +151,7 @@ try
         Context 'When the system is in the desired present state' {
             BeforeEach {
                 Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object | 
+                    return New-Object Object |
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
                 } -ModuleName $script:DSCResourceName -Verifiable
             }
@@ -165,7 +164,7 @@ try
         Context 'When the system is not in the desired state' {
             BeforeEach {
                 Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object | 
+                    return New-Object Object |
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
                 } -ModuleName $script:DSCResourceName -Verifiable
             }
