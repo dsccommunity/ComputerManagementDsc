@@ -9,7 +9,6 @@ ConvertFrom-StringData @'
     JoinedWorkgroupMessage = Added computer to workgroup '{0}'.
     CredentialsNotSpecifiedError = Must to specify credentials with domain.
     TestingComputerStateMessage = Testing computer state for '{0}'.
-    CheckingComputerNameMessage = Checking if computer name is {0}.
     CheckingComputerDescriptionMessage = Checking if computer description is '{0}'.
     CheckingDomainMemberMessage = Checking if the machine is a member of domain '{0}'.
     CheckingNotDomainMemberMessage = Checking if the machine is a not a member of a domain.

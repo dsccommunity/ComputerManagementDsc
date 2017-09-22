@@ -55,7 +55,7 @@ try
 
                     {
                         Test-TargetResource `
-                            -Name $Env:ComputerName `
+                            -Name $env:COMPUTERNAME `
                             -DomainName 'contoso.com' `
                             -WorkGroupName 'workgroup' `
                             -Verbose
@@ -69,7 +69,7 @@ try
 
                     {
                         Test-TargetResource `
-                            -Name $Env:ComputerName `
+                            -Name $env:COMPUTERNAME `
                             -DomainName 'contoso.com' `
                             -Verbose
                     } | Should Throw $errorRecord
@@ -89,7 +89,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -DomainName 'Contoso.com' `
                         -Credential $credential `
                         -Verbose | Should Be $true
@@ -109,7 +109,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -WorkGroupName 'workgroup' `
                         -Verbose | Should Be $true
                 }
@@ -128,7 +128,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -DomainName 'contoso.com' `
                         -Credential $credential `
                         -Verbose | Should Be $true
@@ -154,7 +154,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -WorkGroupName 'workgroup' `
                         -Verbose | Should Be $true
 
@@ -178,7 +178,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -Verbose | Should Be $true
 
                     Test-TargetResource `
@@ -198,7 +198,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -Verbose | Should Be $true
 
                     Test-TargetResource `
@@ -254,7 +254,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -DomainName 'adventure-works.com' `
                         -Credential $credential `
                         -Verbose | Should Be $false
@@ -280,7 +280,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -WorkGroupName 'NOTworkgroup' `
                         -Verbose | Should Be $false
 
@@ -341,7 +341,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -DomainName 'contoso.com' `
                         -Credential $credential `
                         -Verbose | Should Be $false
@@ -367,7 +367,7 @@ try
                     }
 
                     Test-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -WorkGroupName 'Contoso' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
@@ -384,7 +384,7 @@ try
                 It 'Throws if name is to long' {
                     {
                         Test-TargetResource `
-                            -Name "ThisNameIsTooLong" `
+                            -Name 'ThisNameIsTooLong' `
                             -Verbose
                     } | Should Throw
                 }
@@ -392,7 +392,7 @@ try
                 It 'Throws if name contains illegal characters' {
                     {
                         Test-TargetResource `
-                            -Name "ThisIsBad<>" `
+                            -Name 'ThisIsBad<>' `
                             -Verbose
                     } | Should Throw
                 }
@@ -400,7 +400,7 @@ try
                 It 'Should not Throw if name is localhost' {
                     {
                         Test-TargetResource `
-                            -Name "localhost" `
+                            -Name 'localhost' `
                             -Verbose
                     } | Should Not Throw
                 }
@@ -463,7 +463,7 @@ try
                 It 'Throws if name is to long' {
                     {
                         Get-TargetResource `
-                            -Name "ThisNameIsTooLong" `
+                            -Name 'ThisNameIsTooLong' `
                             -Verbose
                     } | Should Throw
                 }
@@ -471,7 +471,7 @@ try
                 It 'Throws if name contains illegal characters' {
                     {
                         Get-TargetResource `
-                            -Name "ThisIsBad<>" `
+                            -Name 'ThisIsBad<>' `
                             -Verbose
                     } | Should Throw
                 }
@@ -488,7 +488,7 @@ try
 
                     {
                         Set-TargetResource `
-                            -Name $Env:ComputerName `
+                            -Name $env:COMPUTERNAME `
                             -DomainName 'contoso.com' `
                             -WorkGroupName 'workgroup' `
                             -Verbose
@@ -505,7 +505,7 @@ try
 
                     {
                         Set-TargetResource `
-                            -Name $Env:ComputerName `
+                            -Name $env:COMPUTERNAME `
                             -DomainName 'contoso.com' `
                             -Verbose
                     } | Should Throw $errorRecord
@@ -675,7 +675,7 @@ try
                     }
 
                     Set-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -DomainName 'adventure-works.com' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
@@ -727,7 +727,7 @@ try
                     }
 
                     Set-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -DomainName 'adventure-works.com' `
                         -JoinOU 'OU=Computers,DC=contoso,DC=com' `
                         -Credential $credential `
@@ -781,7 +781,7 @@ try
                     }
 
                     Set-TargetResource `
-                        -Name $Env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -WorkGroupName 'Contoso' `
                         -UnjoinCredential $credential `
                         -Verbose | Should BeNullOrEmpty
@@ -863,7 +863,7 @@ try
                 It 'Throws if name is to long' {
                     {
                         Set-TargetResource `
-                            -Name "ThisNameIsTooLong" `
+                            -Name 'ThisNameIsTooLong' `
                             -Verbose
                     } | Should Throw
                 }
@@ -871,7 +871,7 @@ try
                 It 'Throws if name contains illegal characters' {
                     {
                         Set-TargetResource `
-                            -Name "ThisIsBad<>" `
+                            -Name 'ThisIsBad<>' `
                             -Verbose
                     } | Should Throw
                 }
@@ -912,7 +912,7 @@ try
                     }
 
                     Set-TargetResource `
-                        -Name $env:ComputerName `
+                        -Name $env:COMPUTERNAME `
                         -Verbose | Should BeNullOrEmpty
 
                     Set-TargetResource `

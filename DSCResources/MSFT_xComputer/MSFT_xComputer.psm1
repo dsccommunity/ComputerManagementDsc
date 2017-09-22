@@ -1,4 +1,4 @@
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "Function")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope = 'Function')]
 param
 (
 )
@@ -441,8 +441,6 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingComputerStateMessage -f $Name)
 
-    Write-Verbose -Message ($script:localizedData.CheckingComputerNameMessage -f $Name)
-
     if (($Name -ne 'localhost') -and ($Name -ne $env:COMPUTERNAME))
     {
         return $false
@@ -490,7 +488,7 @@ function Test-TargetResource
         }
         catch
         {
-            Write-Verbose -Message ($script:localizedData.CheckingNotDomainMemberMessage -f $DomainName)
+            Write-Verbose -Message ($script:localizedData.CheckingNotDomainMemberMessage)
 
             return $false
         }
@@ -545,7 +543,7 @@ function Assert-DomainOrWorkGroup
         Returns the domain the computer is joined to.
 
     .PARAMETER NetBios
-        Specifies if the Net Bios name is returned instead of
+        Specifies if the NetBIOS name is returned instead of
         the fully qualified domain name.
 #>
 function Get-ComputerDomain
