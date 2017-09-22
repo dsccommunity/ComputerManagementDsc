@@ -2,6 +2,8 @@
 $script:DSCModuleName      = 'xComputerManagement'
 $script:DSCResourceName    = 'MSFT_xVirtualMemory'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+
 # Unit Test Template Version: 1.2.0
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
@@ -15,7 +17,6 @@ $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName  `
     -TestType Unit
-
 #endregion HEADER
 
 function Invoke-TestSetup {

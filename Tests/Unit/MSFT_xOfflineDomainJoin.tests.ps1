@@ -1,37 +1,38 @@
-$Global:DSCModuleName      = 'xComputerManagement'
-$Global:DSCResourceName    = 'MSFT_xOfflineDomainJoin'
+$script:DSCModuleName      = 'xComputerManagement'
+$script:DSCResourceName    = 'MSFT_xOfflineDomainJoin'
 
-#region HEADER
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+
+# Unit Test Template Version: 1.2.0
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
-else
-{
-    & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
-}
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+
+Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Global:DSCModuleName `
-    -DSCResourceName $Global:DSCResourceName `
-    -TestType Unit 
-#endregion
+    -DSCModuleName $script:DSCModuleName `
+    -DSCResourceName $script:DSCResourceName `
+    -TestType Unit
+#endregion HEADER
 
 # Begin Testing
 try
 {
     #region Pester Tests
 
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
+        $script:DSCResourceName = 'MSFT_xOfflineDomainJoin'
 
         $TestOfflineDomainJoin = @{
             IsSingleInstance = 'Yes'
             RequestFile = 'C:\ODJRequest.txt'
         }
 
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+        Describe "$($script:DSCResourceName)\Get-TargetResource" {
 
             It 'should return the correct values' {
                 $Result = Get-TargetResource `
@@ -42,7 +43,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
+        Describe "$($script:DSCResourceName)\Set-TargetResource" {
             Mock Test-Path -MockWith { return $True }
             Mock Join-Domain
 
@@ -77,8 +78,8 @@ try
                 }
             }
         }
-        
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
+
+        Describe "$($script:DSCResourceName)\Test-TargetResource" {
             Mock Test-Path -MockWith { return $True }
             Mock Get-DomainName -MockWith { return $null }
 
@@ -126,8 +127,8 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Join-Domain" {
-            Mock djoin.exe -MockWith { $Global:LASTEXITCODE = 0; return "OK" }
+        Describe "$($script:DSCResourceName)\Join-Domain" {
+            Mock djoin.exe -MockWith { $script:LASTEXITCODE = 0; return "OK" }
 
             Context 'Domain Join successful' {
                 It 'should not throw' {
@@ -138,7 +139,7 @@ try
                 }
             }
 
-            Mock djoin.exe -MockWith { $Global:LASTEXITCODE = 99; return "ERROR" }
+            Mock djoin.exe -MockWith { $script:LASTEXITCODE = 99; return "ERROR" }
 
             Context 'Domain Join successful' {
                 $errorId = 'DjoinError'

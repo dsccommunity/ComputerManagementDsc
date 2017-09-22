@@ -1,6 +1,8 @@
 $script:DSCModuleName = 'xComputerManagement'
 $script:DSCResourceName = 'MSFT_xComputer'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+
 # Unit Test Template Version: 1.2.0
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
@@ -48,22 +50,29 @@ try
                 }
 
                 It 'Throws if both DomainName and WorkGroupName are specified' {
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.DomainNameAndWorkgroupNameError)
+
                     {
                         Test-TargetResource `
                             -Name $Env:ComputerName `
                             -DomainName 'contoso.com' `
                             -WorkGroupName 'workgroup' `
                             -Verbose
-                    } | Should Throw
+                    } | Should Throw $errorRecord
                 }
 
                 It 'Throws if Domain is specified without Credentials' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.CredentialsNotSpecifiedError) `
+                        -ArgumentName 'Credentials'
+
                     {
                         Test-TargetResource `
                             -Name $Env:ComputerName `
                             -DomainName 'contoso.com' `
                             -Verbose
-                    } | Should Throw
+                    } | Should Throw $errorRecord
                 }
 
                 It 'Should return True if Domain name is same as specified' {
@@ -474,25 +483,32 @@ try
                 Mock -CommandName Set-CimInstance
 
                 It 'Throws if both DomainName and WorkGroupName are specified' {
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.DomainNameAndWorkgroupNameError)
+
                     {
                         Set-TargetResource `
                             -Name $Env:ComputerName `
                             -DomainName 'contoso.com' `
                             -WorkGroupName 'workgroup' `
                             -Verbose
-                    } | Should Throw
+                    } | Should Throw $errorRecord
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It
                 }
 
                 It 'Throws if Domain is specified without Credentials' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.CredentialsNotSpecifiedError) `
+                        -ArgumentName 'Credentials'
+
                     {
                         Set-TargetResource `
                             -Name $Env:ComputerName `
                             -DomainName 'contoso.com' `
                             -Verbose
-                    } | Should Throw
+                    } | Should Throw $errorRecord
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It

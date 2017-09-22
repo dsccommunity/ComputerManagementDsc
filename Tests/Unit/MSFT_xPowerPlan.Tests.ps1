@@ -1,7 +1,7 @@
 $script:DSCModuleName      = 'xComputerManagement'
 $script:DSCResourceName    = 'MSFT_xPowerPlan'
 
-#region HEADER
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 # Unit Test Template Version: 1.2.0
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
