@@ -45,15 +45,16 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 xComputer resource has following properties:
 
-* Name: The desired computer name
-* DomainName: The name of the domain to join
+* Name: The desired computer name.
+* DomainName: The name of the domain to join.
 * JoinOU: The distinguished name of the organizational unit that the computer
-  account will be created in
-* WorkGroupName: The name of the workgroup
-* Credential: Credential to be used to join or leave domain
+  account will be created in.
+* WorkGroupName: The name of the workgroup.
+* Credential: Credential to be used to join a domain.
+* UnjoinCredential: Credential to be used to leave a domain.
 * CurrentOU: A read-only property that specifies the organizational unit that
-  the computer account is currently in
-* Description: The value assigned here will be set as the local computer description
+  the computer account is currently in.
+* Description: The value assigned here will be set as the local computer description.
 
 ### xComputer Examples
 
@@ -220,6 +221,9 @@ xVirtualMemory has the following properties:
   * Added ConvertTo-TimeSpanFromScheduledTaskString function and refactored
     to reduce code duplication.
   * Added support for setting repetition duration to `Indefinitely`.
+* xComputer:
+  * Moved strings to localization file.
+  * Updated to meet HQRM guidelines.
 
 ### 2.1.0.0
 
