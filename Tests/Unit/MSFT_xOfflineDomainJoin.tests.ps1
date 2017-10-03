@@ -52,8 +52,8 @@ try
                 }
 
                 It 'Should do call all the mocks' {
-                    Assert-MockCalled Test-Path -Times 1
-                    Assert-MockCalled Join-Domain -Times 1
+                    Assert-MockCalled -CommandName Test-Path -Exactly -Times 1
+                    Assert-MockCalled -CommandName Join-Domain -Exactly -Times 1
                 }
             }
 
@@ -70,8 +70,8 @@ try
                 }
 
                 It 'Should do call all the mocks' {
-                    Assert-MockCalled Test-Path -Times 1
-                    Assert-MockCalled Join-Domain -Times 0
+                    Assert-MockCalled -CommandName Test-Path -Exactly -Times 1
+                    Assert-MockCalled -CommandName Join-Domain -Exactly -Times 0
                 }
             }
         }
@@ -86,8 +86,8 @@ try
                 }
 
                 It 'Should do call all the mocks' {
-                    Assert-MockCalled Test-Path -Times 1
-                    Assert-MockCalled Get-DomainName -Times 1
+                    Assert-MockCalled -CommandName Test-Path -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-DomainName -Exactly -Times 1
                 }
             }
 
@@ -100,8 +100,8 @@ try
                 }
 
                 It 'Should do call all the mocks' {
-                    Assert-MockCalled Test-Path -Times 1
-                    Assert-MockCalled Get-DomainName -Times 1
+                    Assert-MockCalled -CommandName Test-Path -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-DomainName -Exactly -Times 1
                 }
             }
 
@@ -118,8 +118,8 @@ try
                 }
 
                 It 'Should do call all the mocks' {
-                    Assert-MockCalled Test-Path -Times 1
-                    Assert-MockCalled Get-DomainName -Times 0
+                    Assert-MockCalled -CommandName Test-Path -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-DomainName -Exactly -Times 0
                 }
             }
         }
@@ -133,7 +133,7 @@ try
                 }
 
                 It 'Should do call all the mocks' {
-                    Assert-MockCalled djoin.exe -Times 1
+                    Assert-MockCalled -CommandName djoin.exe -Exactly -Times 1
                 }
             }
 
@@ -148,7 +148,7 @@ try
                 }
 
                 It 'Should do call all the mocks' {
-                    Assert-MockCalled djoin.exe -Times 1
+                    Assert-MockCalled -CommandName djoin.exe -Exactly -Times 1
                 }
             }
         }
