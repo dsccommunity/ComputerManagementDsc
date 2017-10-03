@@ -23,7 +23,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Pester Tests
-
     InModuleScope $script:DSCResourceName {
         $script:DSCResourceName = 'MSFT_xOfflineDomainJoin'
 
@@ -33,8 +32,7 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Get-TargetResource" {
-
-            It 'should return the correct values' {
+            It 'Should return the correct values' {
                 $Result = Get-TargetResource `
                     @TestOfflineDomainJoin
 
@@ -44,35 +42,33 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
-            Mock Test-Path -MockWith { return $True }
-            Mock Join-Domain
-
             Context 'Domain is not joined' {
-                It 'should not throw exception' {
+                Mock -CommandName Test-Path -MockWith { return $True }
+                Mock -CommandName Join-Domain
+
+                It 'Should not throw exception' {
                     { Set-TargetResource @TestOfflineDomainJoin } | Should Not Throw
                 }
+
                 It 'Should do call all the mocks' {
                     Assert-MockCalled Test-Path -Times 1
                     Assert-MockCalled Join-Domain -Times 1
                 }
             }
 
-            Mock Test-Path -MockWith { return $False }
-
             Context 'ODJ Request file is not found' {
-                It 'should throw RequestFileNotFoundError exception' {
-                    $errorId = 'RequestFileNotFoundError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::ObjectNotFound
-                    $errorMessage = $($LocalizedData.RequestFileNotFoundError) `
-                        -f $TestOfflineDomainJoin.RequestFile
-                    $exception = New-Object -TypeName System.ArgumentException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
+                Mock -CommandName Test-Path -MockWith { return $False }
+                Mock -CommandName Join-Domain
+
+                It 'Should throw expected exception' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.RequestFileNotFoundError -f $TestOfflineDomainJoin.RequestFile) `
+                        -ArgumentName 'RequestFile'
 
                     { Test-TargetResource @TestOfflineDomainJoin } | Should Throw $errorRecord
                 }
-                It 'should do call all the mocks' {
+
+                It 'Should do call all the mocks' {
                     Assert-MockCalled Test-Path -Times 1
                     Assert-MockCalled Join-Domain -Times 0
                 }
@@ -80,46 +76,46 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
-            Mock Test-Path -MockWith { return $True }
-            Mock Get-DomainName -MockWith { return $null }
-
             Context 'Domain is not joined' {
-                It 'should return false' {
+                Mock -CommandName Test-Path -MockWith { return $True }
+                Mock -CommandName Get-DomainName -MockWith { return $null }
+
+                It 'Should return false' {
                     Test-TargetResource @TestOfflineDomainJoin | should be $false
                 }
+
                 It 'Should do call all the mocks' {
                     Assert-MockCalled Test-Path -Times 1
                     Assert-MockCalled Get-DomainName -Times 1
                 }
             }
-
-            Mock Get-DomainName -MockWith { return 'contoso.com' }
 
             Context 'Domain is already joined' {
-                It 'should return false' {
+                Mock -CommandName Test-Path -MockWith { return $True }
+                Mock -CommandName Get-DomainName -MockWith { return 'contoso.com' }
+
+                It 'Should return false' {
                     Test-TargetResource @TestOfflineDomainJoin | should be $true
                 }
+
                 It 'Should do call all the mocks' {
                     Assert-MockCalled Test-Path -Times 1
                     Assert-MockCalled Get-DomainName -Times 1
                 }
             }
 
-            Mock Test-Path -MockWith { return $False }
-
             Context 'ODJ Request file is not found' {
-                It 'should throw RequestFileNotFoundError exception' {
-                    $errorId = 'RequestFileNotFoundError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::ObjectNotFound
-                    $errorMessage = $($LocalizedData.RequestFileNotFoundError) `
-                        -f $TestOfflineDomainJoin.RequestFile
-                    $exception = New-Object -TypeName System.ArgumentException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
+                Mock -CommandName Test-Path -MockWith { return $False }
+                Mock -CommandName Get-DomainName -MockWith { return 'contoso.com' }
+
+                It 'Should throw expected exception' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.RequestFileNotFoundError -f $TestOfflineDomainJoin.RequestFile) `
+                        -ArgumentName 'RequestFile'
 
                     { Test-TargetResource @TestOfflineDomainJoin } | Should Throw $errorRecord
                 }
+
                 It 'Should do call all the mocks' {
                     Assert-MockCalled Test-Path -Times 1
                     Assert-MockCalled Get-DomainName -Times 0
@@ -128,32 +124,28 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Join-Domain" {
-            Mock djoin.exe -MockWith { $script:LASTEXITCODE = 0; return "OK" }
-
             Context 'Domain Join successful' {
-                It 'should not throw' {
+                Mock -CommandName djoin.exe -MockWith { $script:LASTEXITCODE = 0; return "OK" }
+
+                It 'Should not throw' {
                     { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should Not Throw
                 }
+
                 It 'Should do call all the mocks' {
                     Assert-MockCalled djoin.exe -Times 1
                 }
             }
 
-            Mock djoin.exe -MockWith { $script:LASTEXITCODE = 99; return "ERROR" }
-
             Context 'Domain Join successful' {
-                $errorId = 'DjoinError'
-                $errorCategory = [System.Management.Automation.ErrorCategory]::ObjectNotFound
-                $errorMessage = $($LocalizedData.DjoinError) `
-                    -f 99
-                $exception = New-Object -TypeName System.ArgumentException `
-                    -ArgumentList $errorMessage
-                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                    -ArgumentList $exception, $errorId, $errorCategory, $null
+                Mock -CommandName djoin.exe -MockWith { $script:LASTEXITCODE = 99; return "ERROR" }
 
-                It 'should not throw' {
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message $($LocalizedData.DjoinError -f 99)
+
+                It 'Should not throw' {
                     { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should Throw $errorRecord
                 }
+
                 It 'Should do call all the mocks' {
                     Assert-MockCalled djoin.exe -Times 1
                 }

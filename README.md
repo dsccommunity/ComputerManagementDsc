@@ -211,6 +211,9 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
+* xOfflineDomainJoin:
+  * Updated to meet HQRM guidelines.
+
 ### 3.0.0.0
 
 * xComputer: Added parameter to set the local computer description along with documentation
@@ -233,7 +236,6 @@ xVirtualMemory has the following properties:
   * Converted calls to `throw` to use `New-InvalidOperationException`
     in CommonResourceHelper.
   * Improved unit test coverage.
-  * Updated to meet HQRM guidelines.
 
 ### 2.1.0.0
 
