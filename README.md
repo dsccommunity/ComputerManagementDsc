@@ -236,6 +236,7 @@ xVirtualMemory has the following properties:
   * Converted calls to `throw` to use `New-InvalidOperationException`
     in CommonResourceHelper.
   * Improved unit test coverage.
+  * Updated to meet HQRM guidelines.
 
 ### 2.1.0.0
 
