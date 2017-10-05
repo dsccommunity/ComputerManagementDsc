@@ -211,6 +211,8 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
+### 3.0.0.0
+
 * xComputer: Added parameter to set the local computer description along with documentation
  and unit tests for this change.
 * BREAKING CHANGE: xScheduledTask:
