@@ -1,8 +1,38 @@
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "Function")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope = 'Function')]
 param
 (
 )
 
+Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
+    -ChildPath 'CommonResourceHelper.psm1')
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xComputer'
+
+<#
+    .SYNOPSIS
+        Gets the current state of the computer.
+
+    .PARAMETER Name
+        The desired computer name.
+
+    .PARAMETER DomainName
+        The name of the domain to join.
+
+    .PARAMETER JoinOU
+        The distinguished name of the organizational unit that the computer
+        account will be created in.
+
+    .PARAMETER Credential
+        Credential to be used to join a domain.
+
+    .PARAMETER UnjoinCredential
+        Credential to be used to leave a domain.
+
+    .PARAMETER WorkGroupName
+        The name of the workgroup.
+
+    .PARAMETER Description
+        The value assigned here will be set as the local computer description.
+#>
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -33,10 +63,14 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        $WorkGroupName
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description
     )
 
-    Write-Verbose -Message "Getting computer state for '$($Name)'."
+    Write-Verbose -Message ($script:localizedData.GettingComputerStateMessage -f $Name)
 
     $convertToCimCredential = New-CimInstance `
         -ClassName MSFT_Credential `
@@ -51,7 +85,7 @@ function Get-TargetResource
         -ClassName MSFT_Credential `
         -Property @{
             Username = [System.String] $UnjoinCredential.UserName
-            Password = [System.String]$null
+            Password = [System.String] $null
         } `
         -Namespace root/microsoft/windows/desiredstateconfiguration `
         -ClientOnly
@@ -61,14 +95,41 @@ function Get-TargetResource
         DomainName       = Get-ComputerDomain
         JoinOU           = $JoinOU
         CurrentOU        = Get-ComputerOU
-        Credential       = [ciminstance]$convertToCimCredential
-        UnjoinCredential = [ciminstance]$convertToCimUnjoinCredential
+        Credential       = [ciminstance] $convertToCimCredential
+        UnjoinCredential = [ciminstance] $convertToCimUnjoinCredential
         WorkGroupName    = (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup
+        Description      = (Get-CimInstance -Class 'Win32_OperatingSystem').Description
     }
 
-    $returnValue
+    return $returnValue
 }
 
+<#
+    .SYNOPSIS
+        Sets the current state of the computer.
+
+    .PARAMETER Name
+        The desired computer name.
+
+    .PARAMETER DomainName
+        The name of the domain to join.
+
+    .PARAMETER JoinOU
+        The distinguished name of the organizational unit that the computer
+        account will be created in.
+
+    .PARAMETER Credential
+        Credential to be used to join a domain.
+
+    .PARAMETER UnjoinCredential
+        Credential to be used to leave a domain.
+
+    .PARAMETER WorkGroupName
+        The name of the workgroup.
+
+    .PARAMETER Description
+        The value assigned here will be set as the local computer description.
+#>
 function Set-TargetResource
 {
     [CmdletBinding()]
@@ -98,14 +159,28 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $WorkGroupName
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description
     )
+
+    Write-Verbose -Message ($script:localizedData.SettingComputerStateMessage -f $Name)
 
     Assert-DomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
 
     if ($Name -eq 'localhost')
     {
         $Name = $env:COMPUTERNAME
+    }
+
+    if ($PSBoundParameters.ContainsKey('Description'))
+    {
+        Write-Verbose -Message ($script:localizedData.SettingComputerDescriptionMessage -f $Description)
+        $win32OperatingSystemCimInstance = Get-CimInstance -ClassName Win32_OperatingSystem
+        $win32OperatingSystemCimInstance.Description = $Description
+        Set-CimInstance -InputObject $win32OperatingSystemCimInstance
     }
 
     if ($Credential)
@@ -116,7 +191,7 @@ function Set-TargetResource
             {
                 # Rename the computer, but stay joined to the domain.
                 Rename-Computer -NewName $Name -DomainCredential $Credential -Force
-                Write-Verbose -Message "Renamed computer to '$($Name)'."
+                Write-Verbose -Message ($script:localizedData.RenamedComputerMessage -f $Name)
             }
             else
             {
@@ -125,40 +200,67 @@ function Set-TargetResource
                     # Rename the computer, and join it to the domain.
                     if ($UnjoinCredential)
                     {
-                        Add-Computer -DomainName $DomainName -Credential $Credential -NewName $Name -UnjoinDomainCredential $UnjoinCredential -Force
+                        Add-Computer `
+                            -DomainName $DomainName `
+                            -Credential $Credential `
+                            -NewName $Name `
+                            -UnjoinDomainCredential $UnjoinCredential `
+                            -Force
                     }
                     else
                     {
                         if ($JoinOU)
                         {
-                            Add-Computer -DomainName $DomainName -Credential $Credential -NewName $Name -OUPath $JoinOU -Force
+                            Add-Computer `
+                                -DomainName $DomainName `
+                                -Credential $Credential `
+                                -NewName $Name `
+                                -OUPath $JoinOU `
+                                -Force
                         }
                         else
                         {
-                            Add-Computer -DomainName $DomainName -Credential $Credential -NewName $Name -Force
+                            Add-Computer `
+                                -DomainName $DomainName `
+                                -Credential $Credential `
+                                -NewName $Name `
+                                -Force
                         }
                     }
-                    Write-Verbose -Message "Renamed computer to '$($Name)' and added to the domain '$($DomainName)."
+
+                    Write-Verbose -Message ($script:localizedData.RenamedComputerAndJoinedDomainMessage -f $Name,$DomainName)
                 }
                 else
                 {
                     # Same computer name, and join it to the domain.
                     if ($UnjoinCredential)
                     {
-                        Add-Computer -DomainName $DomainName -Credential $Credential -UnjoinDomainCredential $UnjoinCredential -Force
+                        Add-Computer `
+                            -DomainName $DomainName `
+                            -Credential $Credential `
+                            -UnjoinDomainCredential $UnjoinCredential `
+                            -Force
                     }
                     else
                     {
                         if ($JoinOU)
                         {
-                            Add-Computer -DomainName $DomainName -Credential $Credential -OUPath $JoinOU -Force
+                            Add-Computer `
+                                -DomainName $DomainName `
+                                -Credential $Credential `
+                                -OUPath $JoinOU `
+                                -Force
                         }
                         else
                         {
-                            Add-Computer -DomainName $DomainName -Credential $Credential -Force
+                            Add-Computer `
+                                -DomainName $DomainName `
+                                -Credential $Credential `
+                                -Force
                         }
                     }
-                    Write-Verbose -Message "Added computer to domain '$($DomainName)."
+
+                    Write-Verbose -Message ($script:localizedData.JoinedDomainMessage -f $DomainName)
                 }
             }
         }
@@ -167,22 +269,33 @@ function Set-TargetResource
             if ($WorkGroupName -eq (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup)
             {
                 # Rename the computer, but stay in the same workgroup.
-                Rename-Computer -NewName $Name
-                Write-Verbose -Message "Renamed computer to '$($Name)'."
+                Rename-Computer `
+                    -NewName $Name
+
+                Write-Verbose -Message ($script:localizedData.RenamedComputerMessage -f $Name)
             }
             else
             {
                 if ($Name -ne $env:COMPUTERNAME)
                 {
                     # Rename the computer, and join it to the workgroup.
-                    Add-Computer -NewName $Name -Credential $Credential -WorkgroupName $WorkGroupName -Force
-                    Write-Verbose -Message "Renamed computer to '$($Name)' and addded to workgroup '$($WorkGroupName)'."
+                    Add-Computer `
+                        -NewName $Name `
+                        -Credential $Credential `
+                        -WorkgroupName $WorkGroupName `
+                        -Force
+
+                    Write-Verbose -Message ($script:localizedData.RenamedComputerAndJoinedWorkgroupMessage -f $Name,$WorkGroupName)
                 }
                 else
                 {
                     # Same computer name, and join it to the workgroup.
-                    Add-Computer -WorkGroupName $WorkGroupName -Credential $Credential -Force
-                    Write-Verbose -Message "Added computer to workgroup '$($WorkGroupName)'."
+                    Add-Computer `
+                        -WorkGroupName $WorkGroupName `
+                        -Credential $Credential `
+                        -Force
+
+                    Write-Verbose -Message ($script:localizedData.JoinedWorkgroupMessage -f $WorkGroupName)
                 }
             }
         }
@@ -190,13 +303,20 @@ function Set-TargetResource
         {
             if (Get-ComputerDomain)
             {
-                Rename-Computer -NewName $Name -DomainCredential $Credential -Force
-                Write-Verbose -Message "Renamed computer to '$($Name)'."
+                Rename-Computer `
+                    -NewName $Name `
+                    -DomainCredential $Credential `
+                    -Force
+
+                Write-Verbose -Message ($script:localizedData.RenamedComputerMessage -f $Name)
             }
             else
             {
-                Rename-Computer -NewName $Name -Force
-                Write-Verbose -Message "Renamed computer to '$($Name)'."
+                Rename-Computer `
+                    -NewName $Name `
+                    -Force
+
+                Write-Verbose -Message ($script:localizedData.RenamedComputerMessage -f $Name)
             }
         }
     }
@@ -204,30 +324,40 @@ function Set-TargetResource
     {
         if ($DomainName)
         {
-            throw 'Missing domain join credentials.'
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.CredentialsNotSpecifiedError) `
+                -ArgumentName 'Credentials'
         }
+
         if ($WorkGroupName)
         {
-
             if ($WorkGroupName -eq (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup)
             {
                 # Same workgroup, new computer name
-                Rename-Computer -NewName $Name -force
-                Write-Verbose -Message "Renamed computer to '$($Name)'."
+                Rename-Computer `
+                    -NewName $Name `
+                    -Force
+
+                Write-Verbose -Message ($script:localizedData.RenamedComputerMessage -f $Name)
             }
             else
             {
                 if ($name -ne $env:COMPUTERNAME)
                 {
                     # New workgroup, new computer name
-                    Add-Computer -WorkgroupName $WorkGroupName -NewName $Name
-                    Write-Verbose -Message "Renamed computer to '$($Name)' and added to workgroup '$($WorkGroupName)'."
+                    Add-Computer `
+                        -WorkgroupName $WorkGroupName `
+                        -NewName $Name
+
+                    Write-Verbose -Message ($script:localizedData.RenamedComputerAndJoinedWorkgroupMessage -f $Name,$WorkGroupName)
                 }
                 else
                 {
                     # New workgroup, same computer name
-                    Add-Computer -WorkgroupName $WorkGroupName
-                    Write-Verbose -Message "Added computer to workgroup '$($WorkGroupName)'."
+                    Add-Computer `
+                        -WorkgroupName $WorkGroupName
+
+                    Write-Verbose -Message ($script:localizedData.JoinedWorkgroupMessage -f $WorkGroupName)
                 }
             }
         }
@@ -235,8 +365,10 @@ function Set-TargetResource
         {
             if ($Name -ne $env:COMPUTERNAME)
             {
-                Rename-Computer -NewName $Name
-                Write-Verbose -Message "Renamed computer to '$($Name)'."
+                Rename-Computer `
+                    -NewName $Name
+
+                Write-Verbose -Message ($script:localizedData.RenamedComputerMessage -f $Name)
             }
         }
     }
@@ -244,6 +376,32 @@ function Set-TargetResource
     $global:DSCMachineStatus = 1
 }
 
+<#
+    .SYNOPSIS
+        Tests the current state of the computer.
+
+    .PARAMETER Name
+        The desired computer name.
+
+    .PARAMETER DomainName
+        The name of the domain to join.
+
+    .PARAMETER JoinOU
+        The distinguished name of the organizational unit that the computer
+        account will be created in.
+
+    .PARAMETER Credential
+        Credential to be used to join a domain.
+
+    .PARAMETER UnjoinCredential
+        Credential to be used to leave a domain.
+
+    .PARAMETER WorkGroupName
+        The name of the workgroup.
+
+    .PARAMETER Description
+        The value assigned here will be set as the local computer description.
+#>
 function Test-TargetResource
 {
     [CmdletBinding()]
@@ -274,15 +432,28 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $WorkGroupName
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description
     )
 
-    Write-Verbose -Message 'Validate desired Name is a valid name'
+    Write-Verbose -Message ($script:localizedData.TestingComputerStateMessage -f $Name)
 
-    Write-Verbose -Message 'Checking if computer name is correct'
     if (($Name -ne 'localhost') -and ($Name -ne $env:COMPUTERNAME))
     {
         return $false
+    }
+
+    if ($PSBoundParameters.ContainsKey('Description'))
+    {
+        Write-Verbose -Message ($script:localizedData.CheckingComputerDescriptionMessage -f $Description)
+
+        if ($Description -ne (Get-CimInstance -Class 'Win32_OperatingSystem').Description)
+        {
+            return $false
+        }
     }
 
     Assert-DomainOrWorkGroup -DomainName $DomainName -WorkGroupName $WorkGroupName
@@ -291,12 +462,14 @@ function Test-TargetResource
     {
         if (-not ($Credential))
         {
-            throw 'Need to specify credentials with domain'
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.CredentialsNotSpecifiedError) `
+                -ArgumentName 'Credentials'
         }
 
         try
         {
-            Write-Verbose "Checking if the machine is a member of $DomainName."
+            Write-Verbose -Message ($script:localizedData.CheckingDomainMemberMessage -f $DomainName)
 
             if ($DomainName.Contains('.'))
             {
@@ -315,14 +488,14 @@ function Test-TargetResource
         }
         catch
         {
-            Write-Verbose 'The machine is not a domain member.'
+            Write-Verbose -Message ($script:localizedData.CheckingNotDomainMemberMessage)
 
             return $false
         }
     }
     elseif ($WorkGroupName)
     {
-        Write-Verbose -Message "Checking if workgroup name is $WorkGroupName"
+        Write-Verbose -Message ($script:localizedData.CheckingWorkgroupMemberMessage -f $WorkGroupName)
 
         return ($WorkGroupName -eq (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup)
     }
@@ -333,17 +506,50 @@ function Test-TargetResource
     }
 }
 
-function Assert-DomainOrWorkGroup($DomainName, $WorkGroupName)
+<#
+    .SYNOPSIS
+        Throws an exception if both the domain name and workgroup
+        name is set.
+
+    .PARAMETER DomainName
+        The name of the domain to join.
+
+    .PARAMETER WorkGroupName
+        The name of the workgroup.
+#>
+function Assert-DomainOrWorkGroup
 {
+    [CmdletBinding()]
+    param
+    (
+        [Parameter()]
+        [System.String]
+        $DomainName,
+
+        [Parameter()]
+        [System.String]
+        $WorkGroupName
+    )
+
     if ($DomainName -and $WorkGroupName)
     {
-        throw 'Only DomainName or WorkGroupName can be specified at once.'
+        New-InvalidOperationException `
+            -Message ($script:localizedData.DomainNameAndWorkgroupNameError)
     }
 }
 
+<#
+    .SYNOPSIS
+        Returns the domain the computer is joined to.
+
+    .PARAMETER NetBios
+        Specifies if the NetBIOS name is returned instead of
+        the fully qualified domain name.
+#>
 function Get-ComputerDomain
 {
     [CmdletBinding()]
+    [OutputType([System.String])]
     param
     (
         [Parameter()]
@@ -361,16 +567,27 @@ function Get-ComputerDomain
         {
             $domainName = ([System.DirectoryServices.ActiveDirectory.Domain]::GetComputerDomain()).Name
         }
+
         return $domainName
     }
     catch [System.Management.Automation.MethodInvocationException]
     {
-        Write-Debug 'This machine is not a domain member.'
+        Write-Verbose -Message ($script:localizedData.ComputerNotInDomainMessage)
     }
 }
 
+<#
+    .SYNOPSIS
+        Gets the organisation unit in the domain that the
+        computer account exists in.
+#>
 function Get-ComputerOU
 {
+    [CmdletBinding()]
+    param
+    (
+    )
+
     $ou = $null
 
     if (Get-ComputerDomain)
