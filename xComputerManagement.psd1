@@ -62,7 +62,14 @@ PrivateData = @{
 * xComputer:
   * Moved strings to localization file.
   * Updated to meet HQRM guidelines.
-
+* xVirtualMemory:
+  * Refactored shared common code into new utility functions to
+    reduce code duplication and improve testability.
+  * Moved strings into localizable strings file.
+  * Converted calls to `throw` to use `New-InvalidOperationException`
+    in CommonResourceHelper.
+  * Improved unit test coverage.
+  * Updated to meet HQRM guidelines.
 '
 
     } # End of PSData hashtable
