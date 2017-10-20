@@ -13,9 +13,11 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xOfflineDomainJoin
 
     .PARAMETER IsSingleInstance
         Specifies the resource is a single instance, the value must be 'Yes'.
+        This value is Not used in Get-TargetResource.
 
     .PARAMETER RequestFile
         The full path to the Offline Domain Join Request file to use.
+        This value is not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {

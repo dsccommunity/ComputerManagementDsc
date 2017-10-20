@@ -26,25 +26,28 @@ try
     InModuleScope $script:DSCResourceName {
         $script:DSCResourceName = 'MSFT_xOfflineDomainJoin'
 
-        $TestOfflineDomainJoin = @{
+        $testOfflineDomainJoin = @{
             IsSingleInstance = 'Yes'
             RequestFile      = 'C:\ODJRequest.txt'
-            Verbose          = $True
+            Verbose          = $true
         }
 
         Describe "$($script:DSCResourceName)\Get-TargetResource" {
             It 'Should return the correct values' {
-                $Result = Get-TargetResource `
+                $result = Get-TargetResource `
                     @TestOfflineDomainJoin
 
-                $Result.IsSingleInstance       | Should Be $TestOfflineDomainJoin.IsSingleInstance
-                $Result.RequestFile            | Should Be ''
+                $result.IsSingleInstance       | Should Be $testOfflineDomainJoin.IsSingleInstance
+                $result.RequestFile            | Should Be ''
             }
         }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
             Context 'Domain is not joined' {
-                Mock -CommandName Test-Path -MockWith { return $True }
+                Mock -CommandName Test-Path -MockWith {
+                    return $true
+                }
+
                 Mock -CommandName Join-Domain
 
                 It 'Should not throw exception' {
@@ -58,12 +61,15 @@ try
             }
 
             Context 'ODJ Request file is not found' {
-                Mock -CommandName Test-Path -MockWith { return $False }
+                Mock -CommandName Test-Path -MockWith {
+                    return $false
+                }
+
                 Mock -CommandName Join-Domain
 
                 It 'Should throw expected exception' {
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.RequestFileNotFoundError -f $TestOfflineDomainJoin.RequestFile) `
+                        -Message ($LocalizedData.RequestFileNotFoundError -f $testOfflineDomainJoin.RequestFile) `
                         -ArgumentName 'RequestFile'
 
                     { Test-TargetResource @TestOfflineDomainJoin } | Should Throw $errorRecord
@@ -78,8 +84,13 @@ try
 
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
             Context 'Domain is not joined' {
-                Mock -CommandName Test-Path -MockWith { return $True }
-                Mock -CommandName Get-DomainName -MockWith { return $null }
+                Mock -CommandName Test-Path -MockWith {
+                    return $true
+                }
+
+                Mock -CommandName Get-DomainName -MockWith {
+                    return $null
+                }
 
                 It 'Should return false' {
                     Test-TargetResource @TestOfflineDomainJoin | should be $false
@@ -92,8 +103,13 @@ try
             }
 
             Context 'Domain is already joined' {
-                Mock -CommandName Test-Path -MockWith { return $True }
-                Mock -CommandName Get-DomainName -MockWith { return 'contoso.com' }
+                Mock -CommandName Test-Path -MockWith {
+                    return $true
+                }
+
+                Mock -CommandName Get-DomainName -MockWith {
+                    return 'contoso.com'
+                }
 
                 It 'Should return false' {
                     Test-TargetResource @TestOfflineDomainJoin | should be $true
@@ -106,12 +122,17 @@ try
             }
 
             Context 'ODJ Request file is not found' {
-                Mock -CommandName Test-Path -MockWith { return $False }
-                Mock -CommandName Get-DomainName -MockWith { return 'contoso.com' }
+                Mock -CommandName Test-Path -MockWith {
+                    return $false
+                }
+
+                Mock -CommandName Get-DomainName -MockWith {
+                    return 'contoso.com'
+                }
 
                 It 'Should throw expected exception' {
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.RequestFileNotFoundError -f $TestOfflineDomainJoin.RequestFile) `
+                        -Message ($LocalizedData.RequestFileNotFoundError -f $testOfflineDomainJoin.RequestFile) `
                         -ArgumentName 'RequestFile'
 
                     { Test-TargetResource @TestOfflineDomainJoin } | Should Throw $errorRecord
@@ -126,7 +147,10 @@ try
 
         Describe "$($script:DSCResourceName)\Join-Domain" {
             Context 'Domain Join successful' {
-                Mock -CommandName djoin.exe -MockWith { $script:LASTEXITCODE = 0; return "OK" }
+                Mock -CommandName djoin.exe -MockWith {
+                    $script:LASTEXITCODE = 0
+                    return "OK"
+                }
 
                 It 'Should not throw' {
                     { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should Not Throw
@@ -138,7 +162,10 @@ try
             }
 
             Context 'Domain Join successful' {
-                Mock -CommandName djoin.exe -MockWith { $script:LASTEXITCODE = 99; return "ERROR" }
+                Mock -CommandName djoin.exe -MockWith {
+                    $script:LASTEXITCODE = 99
+                    return "ERROR"
+                }
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message $($LocalizedData.DjoinError -f 99)
