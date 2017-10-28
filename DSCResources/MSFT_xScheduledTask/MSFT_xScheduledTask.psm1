@@ -475,8 +475,8 @@ function Get-TargetResource
             RestartCount                    = $settings.RestartCount
             RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.RestartInterval
             RunOnlyIfNetworkAvailable       = $settings.RunOnlyIfNetworkAvailable
-            RunLevel                        = $task.Principal.RunLevel
-            LogonType                       = $task.Principal.LogonType
+            RunLevel                        = [String] $task.Principal.RunLevel
+            LogonType                       = [String] $task.Principal.LogonType
         }
     }
 }
@@ -1063,26 +1063,38 @@ function Set-TargetResource
             $registerArguments.Add('User', $username)
         }
 
-        # Prepare the principal arguments
-        $principalArguments = @{
-            Id     = 'Author'
-            UserId = $username
+        $scheduledTaskArguments = @{
+            Action = $action
+            Trigger = $trigger
+            Settings = $setting
         }
 
-        # Set the Run Level if defined
-        if ($PSBoundParameters.ContainsKey('RunLevel'))
+        if ($PSBoundParameters.ContainsKey('RunLevel') -or $PSBoundParameters.ContainsKey('LogonType'))
         {
-            $principalArguments.Add('RunLevel', $RunLevel)
-        }
+            # Prepare the principal arguments
+            $principalArguments = @{
+                Id     = 'Author'
+                UserId = $username
+            }
 
-        # Set the LogonType if specified
-        if ($PSBoundParameters.ContainsKey('LogonType'))
-        {
-            $principalArguments.Add('LogonType', $LogonType)
-        }
+            # Set the Run Level if defined
+            if ($PSBoundParameters.ContainsKey('RunLevel'))
+            {
+                $principalArguments.Add('RunLevel', $RunLevel)
+            }
 
-        # Create the principal object
-        $principal = New-ScheduledTaskPrincipal @principalArguments
+            # Set the LogonType if specified
+            if ($PSBoundParameters.ContainsKey('LogonType'))
+            {
+                $principalArguments.Add('LogonType', $LogonType)
+            }
+
+            # Create the principal object
+            Write-Verbose -Message ('Creating scheduled task principal.')
+            $principal = New-ScheduledTaskPrincipal @principalArguments
+
+            $scheduledTaskArguments.Add('Principal', $principal)
+        }
 
         if ($currentValues.Ensure -eq 'Present')
         {
@@ -1093,7 +1105,7 @@ function Set-TargetResource
         Write-Verbose -Message ('Creating new scheduled task {0}.' -f $TaskName)
 
         # Create the scheduled task object
-        $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting -Principal $principal
+        $scheduledTask = New-ScheduledTask @scheduledTaskArguments
 
         if ($repetition)
         {
@@ -1474,7 +1486,6 @@ function Test-TargetResource
         {
             $PSBoundParameters['RepetitionDuration'] = $RepetitionDuration.ToString()
         }
-
     }
 
     if ($PSBoundParameters.ContainsKey('IdleWaitTimeout'))
@@ -1514,10 +1525,17 @@ function Test-TargetResource
         return $false
     }
 
+    if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
+    {
+        # The password of the execution credential can not be compared
+        $username = $ExecuteAsCredential.UserName
+        $PSBoundParameters['ExecuteAsCredential'] = $username
+    }
+
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
     Write-Verbose -Message 'Testing DSC parameter state.'
-    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues
+    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues -Verbose
 }
 
 <#

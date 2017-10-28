@@ -149,16 +149,18 @@ Configuration xScheduledTaskExecuteAsAdd
     Import-DscResource -ModuleName xComputerManagement
     node 'localhost'
     {
-        $executeAsCredential = New-Object System.Management.Automation.PSCredential ($ENV:USERNAME, (ConvertTo-SecureString -String '' -AsPlainText -Force))
+        $executeAsCredential = New-Object `
+            -TypeName System.Management.Automation.PSCredential `
+            -ArgumentList ($ENV:USERNAME, (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
 
-        xScheduledTask xScheduledTaskOnceAdd
+         xScheduledTask xScheduledTaskOnceAdd
         {
             TaskName           = 'Test task Logon'
             TaskPath           = '\xComputerManagement\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType       = 'AtLogOn'
             ExecuteAsCredential = $executeAsCredential
-            LogonType          = 'S4U'
+            LogonType          = 'Interactive'
             RunLevel           = 'Highest'
         }
     }
@@ -278,16 +280,12 @@ Configuration xScheduledTaskExecuteAsMod
     Import-DscResource -ModuleName xComputerManagement
     node 'localhost'
     {
-        $executeAsCredential = New-Object System.Management.Automation.PSCredential ($ENV:USERNAME, (ConvertTo-SecureString -String '' -AsPlainText -Force))
-
-        xScheduledTask xScheduledTaskOnceAdd
+        xScheduledTask xScheduledTaskOnceMod
         {
             TaskName           = 'Test task Logon'
             TaskPath           = '\xComputerManagement\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType       = 'AtLogOn'
-            ExecuteAsCredential = $executeAsCredential
-            LogonType          = 'Interactive'
             RunLevel           = 'Limited'
         }
     }
@@ -413,17 +411,12 @@ Configuration xScheduledTaskExecuteAsDel
     Import-DscResource -ModuleName xComputerManagement
     node 'localhost'
     {
-        $executeAsCredential = New-Object System.Management.Automation.PSCredential ($ENV:USERNAME, (ConvertTo-SecureString -String '' -AsPlainText -Force))
-
-        xScheduledTask xScheduledTaskOnceAdd
+        xScheduledTask xScheduledTaskOnceDel
         {
             TaskName           = 'Test task Logon'
             TaskPath           = '\xComputerManagement\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType       = 'AtLogOn'
-            ExecuteAsCredential = $executeAsCredential
-            LogonType          = 'Interactive'
-            RunLevel           = 'Limited'
             Ensure             = 'Absent'
         }
     }
