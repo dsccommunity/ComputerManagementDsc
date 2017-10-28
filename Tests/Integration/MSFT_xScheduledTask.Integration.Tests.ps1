@@ -35,6 +35,7 @@ try
             Weekly            = 'xScheduledTaskWeekly'
             AtLogon           = 'xScheduledTaskLogon'
             AtStartup         = 'xScheduledTaskStartup'
+            ExecuteAs         = 'xScheduledTaskExecuteAs'
         }
 
         foreach ($contextInfo in $contexts.GetEnumerator())

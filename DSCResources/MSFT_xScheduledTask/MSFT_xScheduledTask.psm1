@@ -160,6 +160,14 @@ Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
         Indicates that Task Scheduler runs the task only when a network is available. Task
         Scheduler uses the NetworkID parameter and NetworkName parameter that you specify
         in this cmdlet to determine if the network is available.
+
+    .PARAMETER RunLevel
+        Specifies the level of user rights that Task Scheduler uses to run the tasks that
+        are associated with the principal. Defaults to 'Limited'.
+
+    .PARAMETER LogonType
+        Specifies the security logon method that Task Scheduler uses to run the tasks that
+        are associated with the principal.
 #>
 function Get-TargetResource
 {
@@ -325,7 +333,17 @@ function Get-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $RunOnlyIfNetworkAvailable = $false
+        $RunOnlyIfNetworkAvailable = $false,
+
+        [Parameter()]
+        [ValidateSet('Limited','Highest')]
+        [System.String]
+        $RunLevel = 'Limited',
+
+        [Parameter()]
+        [ValidateSet('Group','Interactive','InteractiveOrPassword','None','Password','S4U','ServiceAccount')]
+        [System.String]
+        $LogonType
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
@@ -457,6 +475,8 @@ function Get-TargetResource
             RestartCount                    = $settings.RestartCount
             RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.RestartInterval
             RunOnlyIfNetworkAvailable       = $settings.RunOnlyIfNetworkAvailable
+            RunLevel                        = $task.Principal.RunLevel
+            LogonType                       = $task.Principal.LogonType
         }
     }
 }
@@ -603,7 +623,15 @@ function Get-TargetResource
     .PARAMETER RunOnlyIfNetworkAvailable
         Indicates that Task Scheduler runs the task only when a network is available. Task
         Scheduler uses the NetworkID parameter and NetworkName parameter that you specify
-        in this cmdlet to determine if the network is available.
+        in this cmdlet to determine if the network is available.\
+
+    .PARAMETER RunLevel
+        Specifies the level of user rights that Task Scheduler uses to run the tasks that
+        are associated with the principal. Defaults to 'Limited'.
+
+    .PARAMETER LogonType
+        Specifies the security logon method that Task Scheduler uses to run the tasks that
+        are associated with the principal.
 #>
 function Set-TargetResource
 {
@@ -768,7 +796,17 @@ function Set-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $RunOnlyIfNetworkAvailable = $false
+        $RunOnlyIfNetworkAvailable = $false,
+
+        [Parameter()]
+        [ValidateSet('Limited','Highest')]
+        [System.String]
+        $RunLevel = 'Limited',
+
+        [Parameter()]
+        [ValidateSet('Group','Interactive','InteractiveOrPassword','None','Password','S4U','ServiceAccount')]
+        [System.String]
+        $LogonType
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
@@ -1001,6 +1039,51 @@ function Set-TargetResource
             }
         }
 
+        # Prepare the register arguments
+        $registerArguments = @{
+            TaskName    = $TaskName
+            TaskPath    = $TaskPath
+        }
+
+        if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
+        {
+            $username = $ExecuteAsCredential.UserName
+            $registerArguments.Add('User', $username)
+
+            # Only set the password if the LogonType is not interactive or S4U
+            if ($LogonType -notin ('Interactive','S4U'))
+            {
+                $registerArguments.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
+            }
+        }
+        else
+        {
+            # The LogonType will be ignored if specified when
+            $username = 'NT AUTHORITY\SYSTEM'
+            $registerArguments.Add('User', $username)
+        }
+
+        # Prepare the principal arguments
+        $principalArguments = @{
+            Id     = 'Author'
+            UserId = $username
+        }
+
+        # Set the Run Level if defined
+        if ($PSBoundParameters.ContainsKey('RunLevel'))
+        {
+            $principalArguments.Add('RunLevel', $RunLevel)
+        }
+
+        # Set the LogonType if specified
+        if ($PSBoundParameters.ContainsKey('LogonType'))
+        {
+            $principalArguments.Add('LogonType', $LogonType)
+        }
+
+        # Create the principal object
+        $principal = New-ScheduledTaskPrincipal @principalArguments
+
         if ($currentValues.Ensure -eq 'Present')
         {
             Write-Verbose -Message ('Removing previous scheduled task {0}.' -f $TaskName)
@@ -1009,7 +1092,8 @@ function Set-TargetResource
 
         Write-Verbose -Message ('Creating new scheduled task {0}.' -f $TaskName)
 
-        $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting
+        # Create the scheduled task object
+        $scheduledTask = New-ScheduledTask -Action $action -Trigger $trigger -Settings $setting -Principal $principal
 
         if ($repetition)
         {
@@ -1022,24 +1106,10 @@ function Set-TargetResource
             $scheduledTask.Description = $Description
         }
 
-        $registerArguments = @{
-            TaskName    = $TaskName
-            TaskPath    = $TaskPath
-            InputObject = $scheduledTask
-        }
-
-        if ($PSBoundParameters.ContainsKey('ExecuteAsCredential') -eq $true)
-        {
-            $registerArguments.Add('User', $ExecuteAsCredential.UserName)
-            $registerArguments.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
-        }
-        else
-        {
-            $registerArguments.Add('User', 'NT AUTHORITY\SYSTEM')
-        }
-
         Write-Verbose -Message ('Registering the scheduled task {0}.' -f $TaskName)
 
+        # Register the scheduled task
+        $registerArguments.Add('InputObject', $scheduledTask)
         $null = Register-ScheduledTask @registerArguments
     }
 
@@ -1194,6 +1264,14 @@ function Set-TargetResource
         Indicates that Task Scheduler runs the task only when a network is available. Task
         Scheduler uses the NetworkID parameter and NetworkName parameter that you specify
         in this cmdlet to determine if the network is available.
+
+    .PARAMETER RunLevel
+        Specifies the level of user rights that Task Scheduler uses to run the tasks that
+        are associated with the principal. Defaults to 'Limited'.
+
+    .PARAMETER LogonType
+        Specifies the security logon method that Task Scheduler uses to run the tasks that
+        are associated with the principal.
 #>
 function Test-TargetResource
 {
@@ -1359,7 +1437,17 @@ function Test-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $RunOnlyIfNetworkAvailable = $false
+        $RunOnlyIfNetworkAvailable = $false,
+
+        [Parameter()]
+        [ValidateSet('Limited','Highest')]
+        [System.String]
+        $RunLevel = 'Limited',
+
+        [Parameter()]
+        [ValidateSet('Group','Interactive','InteractiveOrPassword','None','Password','S4U','ServiceAccount')]
+        [System.String]
+        $LogonType
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath

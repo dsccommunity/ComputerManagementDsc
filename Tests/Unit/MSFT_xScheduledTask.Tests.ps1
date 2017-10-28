@@ -444,6 +444,106 @@ try
                 }
             }
 
+            Context 'A scheduled task exists and is configured with the wrong logon type' {
+                $testParams = @{
+                    TaskName = 'Test task'
+                    TaskPath = '\Test\'
+                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType = 'Once'
+                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                    ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
+                    LogonType = 'S4U'
+                    Verbose = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask { return @{
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'DEMO\RightUser'
+                            LogonType = 'Password'
+                        }
+                    } }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+
+                It 'Should update the scheduled task in the set method' {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                }
+            }
+
+            Context 'A scheduled task exists and is configured with the wrong run level' {
+                $testParams = @{
+                    TaskName = 'Test task'
+                    TaskPath = '\Test\'
+                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType = 'Once'
+                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                    ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
+                    RunLevel = 'Highest'
+                    Verbose = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask { return @{
+                        TaskName = $testParams.TaskName
+                        TaskPath = $testParams.TaskPath
+                        Actions = @(@{
+                                Execute = $testParams.ActionExecutable
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParams.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParams.RepeatInterval).TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Principal = @{
+                            UserId = 'DEMO\RightUser'
+                            RunLevel = 'Limited'
+                        }
+                    } }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParams
+                    $result.Ensure | Should Be 'Present'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+
+                It 'Should update the scheduled task in the set method' {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                }
+            }
+
             Context 'A scheduled task exists and is configured with the wrong working directory' {
                 $testParams = @{
                     TaskName = 'Test task'

@@ -19,11 +19,11 @@ Configuration Example
     {
         xScheduledTask xScheduledTaskLogonAdd
         {
-            TaskName = 'Test task Logon'
-            TaskPath = '\MyTasks'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'AtLogOn'
-            RepeatInterval = '00:15:00'
+            TaskName           = 'Test task Logon'
+            TaskPath           = '\MyTasks'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'AtLogOn'
+            RepeatInterval     = '00:15:00'
             RepetitionDuration = '08:00:00'
         }
     }
