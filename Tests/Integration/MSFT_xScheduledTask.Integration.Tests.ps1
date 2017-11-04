@@ -56,13 +56,20 @@ try
 
                 It 'Should compile the MOF without throwing' {
                     {
-                        . $currentConfig -OutputPath $configDir -ConfigurationData $configData
+                        . $currentConfig `
+                            -OutputPath $configDir `
+                            -ConfigurationData $configData
                     } | Should Not Throw
                 }
 
                 It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $configDir -Wait -Force -Verbose
+                        Start-DscConfiguration `
+                            -Path $configDir `
+                            -Wait `
+                            -Force `
+                            -Verbose `
+                            -ErrorAction Stop
                     } | Should Not Throw
                 }
 
@@ -78,13 +85,20 @@ try
 
                 It 'Should compile the MOF without throwing' {
                     {
-                        . $currentConfig -OutputPath $configDir -ConfigurationData $configData
+                        . $currentConfig `
+                            -OutputPath $configDir `
+                            -ConfigurationData $configData
                     } | Should Not Throw
                 }
 
                 It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $configDir -Wait -Force -Verbose
+                        Start-DscConfiguration `
+                            -Path $configDir `
+                            -Wait `
+                            -Force `
+                            -Verbose `
+                            -ErrorAction Stop
                     } | Should Not Throw
                 }
 
@@ -100,13 +114,20 @@ try
 
                 It 'Should compile the MOF without throwing' {
                     {
-                        . $currentConfig -OutputPath $configDir -ConfigurationData $configData
+                        . $currentConfig `
+                            -OutputPath $configDir `
+                            -ConfigurationData $configData
                     } | Should Not Throw
                 }
 
                 It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $configDir -Wait -Force -Verbose
+                        Start-DscConfiguration `
+                            -Path $configDir `
+                            -Wait `
+                            -Force `
+                            -Verbose `
+                            -ErrorAction Stop
                     } | Should Not Throw
                 }
 
@@ -129,14 +150,20 @@ try
                 {
 
                     Set-TimeZoneId -Id 'W. Australia Standard Time'
-                    . $currentConfig -OutputPath $configDir
+                    . $currentConfig `
+                        -OutputPath $configDir
                 } | Should Not Throw
             }
 
             It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
                 {
                     Set-TimeZoneId -Id 'New Zealand Standard Time'
-                    Start-DscConfiguration -Path $configDir -Wait -Force -Verbose
+                    Start-DscConfiguration `
+                        -Path $configDir `
+                        -Wait `
+                        -Force `
+                        -Verbose `
+                        -ErrorAction Stop
                 } | Should Not Throw
             }
 

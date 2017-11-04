@@ -336,12 +336,12 @@ function Get-TargetResource
         $RunOnlyIfNetworkAvailable = $false,
 
         [Parameter()]
-        [ValidateSet('Limited','Highest')]
+        [ValidateSet('Limited', 'Highest')]
         [System.String]
         $RunLevel = 'Limited',
 
         [Parameter()]
-        [ValidateSet('Group','Interactive','InteractiveOrPassword','None','Password','S4U','ServiceAccount')]
+        [ValidateSet('Group', 'Interactive', 'InteractiveOrPassword', 'None', 'Password', 'S4U', 'ServiceAccount')]
         [System.String]
         $LogonType
     )
@@ -799,12 +799,12 @@ function Set-TargetResource
         $RunOnlyIfNetworkAvailable = $false,
 
         [Parameter()]
-        [ValidateSet('Limited','Highest')]
+        [ValidateSet('Limited', 'Highest')]
         [System.String]
         $RunLevel = 'Limited',
 
         [Parameter()]
-        [ValidateSet('Group','Interactive','InteractiveOrPassword','None','Password','S4U','ServiceAccount')]
+        [ValidateSet('Group', 'Interactive', 'InteractiveOrPassword', 'None', 'Password', 'S4U', 'ServiceAccount')]
         [System.String]
         $LogonType
     )
@@ -1041,8 +1041,8 @@ function Set-TargetResource
 
         # Prepare the register arguments
         $registerArguments = @{
-            TaskName    = $TaskName
-            TaskPath    = $TaskPath
+            TaskName = $TaskName
+            TaskPath = $TaskPath
         }
 
         if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
@@ -1050,62 +1050,72 @@ function Set-TargetResource
             $username = $ExecuteAsCredential.UserName
             $registerArguments.Add('User', $username)
 
-            # Only set the password if the LogonType is not interactive or S4U
-            if ($LogonType -notin ('Interactive','S4U'))
+            # If the LogonType is not specified then set it to password
+            if ([String]::IsNullOrEmpty($LogonType))
             {
+                $LogonType = 'Password'
+            }
+
+            if ($LogonType -notin ('Interactive', 'S4U'))
+            {
+                # Only set the password if the LogonType is not interactive or S4U
                 $registerArguments.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
             }
         }
         else
         {
-            # The LogonType will be ignored if specified when
             $username = 'NT AUTHORITY\SYSTEM'
             $registerArguments.Add('User', $username)
+            $LogonType = 'ServiceAccount'
         }
+
+        # Set the LogonType if specified
+        if ([String]::IsNullOrEmpty($LogonType))
+        {
+            $LogonType = 'None'
+        }
+
+        # Prepare the principal arguments
+        $principalArguments = @{
+            Id        = 'Author'
+            UserId    = $username
+            LogonType = $LogonType
+        }
+
+        # Set the Run Level if defined
+        if ($PSBoundParameters.ContainsKey('RunLevel'))
+        {
+            $principalArguments.Add('RunLevel', $RunLevel)
+        }
+
+        # Create the principal object
+        Write-Verbose -Message ('Creating scheduled task principal for account "{0}" using logon type "{1}".' -f $username, $LogonType)
+        $principal = New-ScheduledTaskPrincipal @principalArguments
 
         $scheduledTaskArguments = @{
-            Action = $action
-            Trigger = $trigger
-            Settings = $setting
-        }
-
-        if ($PSBoundParameters.ContainsKey('RunLevel') -or $PSBoundParameters.ContainsKey('LogonType'))
-        {
-            # Prepare the principal arguments
-            $principalArguments = @{
-                Id     = 'Author'
-                UserId = $username
-            }
-
-            # Set the Run Level if defined
-            if ($PSBoundParameters.ContainsKey('RunLevel'))
-            {
-                $principalArguments.Add('RunLevel', $RunLevel)
-            }
-
-            # Set the LogonType if specified
-            if ($PSBoundParameters.ContainsKey('LogonType'))
-            {
-                $principalArguments.Add('LogonType', $LogonType)
-            }
-
-            # Create the principal object
-            Write-Verbose -Message ('Creating scheduled task principal.')
-            $principal = New-ScheduledTaskPrincipal @principalArguments
-
-            $scheduledTaskArguments.Add('Principal', $principal)
+            Action    = $action
+            Trigger   = $trigger
+            Settings  = $setting
+            Principal = $principal
         }
 
         if ($currentValues.Ensure -eq 'Present')
         {
             Write-Verbose -Message ('Removing previous scheduled task {0}.' -f $TaskName)
-            $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
+            $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false -ErrorAction Stop
         }
 
         Write-Verbose -Message ('Creating new scheduled task {0}.' -f $TaskName)
 
         # Create the scheduled task object
-        $scheduledTask = New-ScheduledTask @scheduledTaskArguments
+        try
+        {
+            $scheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
+        }
+        catch
+        {
+            Write-Verbose -Message ('Error creating scheduled task "{0}"' -f $_) -Verbose
+        }
 
         if ($repetition)
         {
@@ -1118,18 +1128,18 @@ function Set-TargetResource
             $scheduledTask.Description = $Description
         }
 
-        Write-Verbose -Message ('Registering the scheduled task {0}.' -f $TaskName)
-
         # Register the scheduled task
         $registerArguments.Add('InputObject', $scheduledTask)
-        $null = Register-ScheduledTask @registerArguments
+
+        Write-Verbose -Message ('Registering the scheduled task {0}.' -f $TaskName)
+        $null = Register-ScheduledTask @registerArguments -ErrorAction Stop
     }
 
     if ($Ensure -eq 'Absent')
     {
         Write-Verbose -Message ('Removing the scheduled task {0}.' -f $TaskName)
 
-        Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false
+        Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false -ErrorAction Stop
     }
 }
 
@@ -1452,12 +1462,12 @@ function Test-TargetResource
         $RunOnlyIfNetworkAvailable = $false,
 
         [Parameter()]
-        [ValidateSet('Limited','Highest')]
+        [ValidateSet('Limited', 'Highest')]
         [System.String]
         $RunLevel = 'Limited',
 
         [Parameter()]
-        [ValidateSet('Group','Interactive','InteractiveOrPassword','None','Password','S4U','ServiceAccount')]
+        [ValidateSet('Group', 'Interactive', 'InteractiveOrPassword', 'None', 'Password', 'S4U', 'ServiceAccount')]
         [System.String]
         $LogonType
     )
@@ -1535,7 +1545,7 @@ function Test-TargetResource
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
     Write-Verbose -Message 'Testing DSC parameter state.'
-    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues -Verbose
+    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues
 }
 
 <#
