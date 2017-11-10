@@ -35,13 +35,13 @@ try
             Weekly            = 'xScheduledTaskWeekly'
             AtLogon           = 'xScheduledTaskLogon'
             AtStartup         = 'xScheduledTaskStartup'
-            ExecuteAs          = 'xScheduledTaskExecuteAs'
+            ExecuteAs         = 'xScheduledTaskExecuteAs'
         }
 
         $configData = @{
             AllNodes = @(
                 @{
-                    NodeName = 'localhost'
+                    NodeName                    = 'localhost'
                     PSDscAllowPlainTextPassword = $true
                 }
             )
