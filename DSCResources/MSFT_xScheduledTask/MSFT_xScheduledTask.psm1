@@ -1108,14 +1108,7 @@ function Set-TargetResource
         Write-Verbose -Message ('Creating new scheduled task {0}.' -f $TaskName)
 
         # Create the scheduled task object
-        try
-        {
-            $scheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
-        }
-        catch
-        {
-            Write-Verbose -Message ('Error creating scheduled task "{0}"' -f $_) -Verbose
-        }
+        $scheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
 
         if ($repetition)
         {
