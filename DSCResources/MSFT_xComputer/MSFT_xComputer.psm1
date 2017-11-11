@@ -578,7 +578,14 @@ function Get-ComputerDomain
         }
         else
         {
-            $domainName = ([System.DirectoryServices.ActiveDirectory.Domain]::GetComputerDomain()).Name
+            if((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain -eq $true)
+            {
+                $domainName = (Get-WmiObject -Class Win32_ComputerSystem).Domain
+            }
+            else
+            {
+                $domainName = $null
+            }
         }
 
         return $domainName
