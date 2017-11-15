@@ -211,6 +211,8 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
+### 3.1.0.0
+
 * xOfflineDomainJoin:
   * Updated to meet HQRM guidelines.
 

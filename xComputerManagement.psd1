@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '3.0.0.0'
+ModuleVersion = '3.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,33 +49,16 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* xComputer: Added parameter to set the local computer description along with documentation
- and unit tests for this change.
-* BREAKING CHANGE: xScheduledTask:
-  * Converted all Interval/Duration type parameters over to be string format
-    to prevent the Timezone the MOF file was created in from being stored.
-    This is to fix problems where MOF files are created in one timezone but
-    deployed nodes to a different timezone - See [Issue 85](https://github.com/PowerShell/xComputerManagement/issues/85)
-  * Added ConvertTo-TimeSpanFromScheduledTaskString function and refactored
-    to reduce code duplication.
-  * Added support for setting repetition duration to `Indefinitely`.
-* xComputer:
-  * Moved strings to localization file.
+        ReleaseNotes = '* xOfflineDomainJoin:
   * Updated to meet HQRM guidelines.
-* xVirtualMemory:
-  * Refactored shared common code into new utility functions to
-    reduce code duplication and improve testability.
-  * Moved strings into localizable strings file.
-  * Converted calls to `throw` to use `New-InvalidOperationException`
-    in CommonResourceHelper.
-  * Improved unit test coverage.
-  * Updated to meet HQRM guidelines.
+
 '
 
     } # End of PSData hashtable
 
 } # End of PrivateData hashtable
 }
+
 
 
 
