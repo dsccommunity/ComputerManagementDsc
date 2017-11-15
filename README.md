@@ -211,6 +211,11 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
+### 3.1.0.0
+
+* xOfflineDomainJoin:
+  * Updated to meet HQRM guidelines.
+
 ### 3.0.0.0
 
 * xComputer: Added parameter to set the local computer description along with documentation
