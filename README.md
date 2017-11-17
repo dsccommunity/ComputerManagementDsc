@@ -223,6 +223,7 @@ xVirtualMemory has the following properties:
   * Applied autoformatting to examples to improve readability.
   * Added LogonType and RunLevel parameters for controlling
     task execution.
+  * Correct `Assert-VerifiableMocks` to `Assert-VerifiableMock`
 
 ### 3.0.0.0
 
