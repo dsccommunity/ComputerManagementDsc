@@ -165,6 +165,10 @@ xScheduledTask has the following properties:
   when a network is available. Task Scheduler uses the NetworkID parameter and
   NetworkName parameter that you specify in this cmdlet to determine if the
   network is available.
+* RunLevel: Specifies the level of user rights that Task Scheduler uses to run the
+  tasks that are associated with the principal. Defaults to 'Limited'.
+* LogonType: Specifies the security logon method that Task Scheduler uses to run
+  the tasks that are associated with the principal.
 
 ### xScheduledTask Examples
 
@@ -176,6 +180,8 @@ xScheduledTask has the following properties:
 * [Create a task that starts PowerShell at startup and runs every 15 minutes from 00:00 for 8 hours](/Examples/xScheduledTask/6-CreateScheduledTasksAtStartup.ps1)
 * [Run a PowerShell script every 15 minutes for 4 days on a server](/Examples/xScheduledTask/7-RunPowerShellTaskEvery15Minutes.ps1)
 * [Run a PowerShell script every 15 minutes indefinitely on a server](/Examples/xScheduledTask/8-RunPowerShellTaskEvery15MinutesIndefinitely.ps1)
+* [Run a PowerShell script once as a specified user with highest privileges](/Examples/xScheduledTask/9-RunPowerShellTaskOnceAsUserWithHighestPriveleges.ps1)
+* [Run a PowerShell script once as a specified user only when the user is logged on](/Examples/xScheduledTask/10-RunPowerShellTaskOnceAsUserInteractiveOnly.ps1)
 
 ## xPowerPlan
 
@@ -215,6 +221,11 @@ xVirtualMemory has the following properties:
 
 * xOfflineDomainJoin:
   * Updated to meet HQRM guidelines.
+* xScheduledTask:
+  * Applied autoformatting to examples to improve readability.
+  * Added LogonType and RunLevel parameters for controlling
+    task execution.
+  * Correct `Assert-VerifiableMocks` to `Assert-VerifiableMock`
 
 ### 3.0.0.0
 

@@ -21,17 +21,17 @@ Configuration Example
     {
         xScheduledTask xScheduledTaskWeeklyAdd
         {
-            TaskName = 'Test task Weekly'
-            TaskPath = '\MyTasks'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Weekly'
-            WeeksInterval = 1
-            DaysOfWeek = 'Monday','Wednesday','Saturday'
-            RepeatInterval = '00:15:00'
-            RepetitionDuration = '08:00:00'
+            TaskName                = 'Test task Weekly'
+            TaskPath                = '\MyTasks'
+            ActionExecutable        = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType            = 'Weekly'
+            WeeksInterval           = 1
+            DaysOfWeek              = 'Monday', 'Wednesday', 'Saturday'
+            RepeatInterval          = '00:15:00'
+            RepetitionDuration      = '08:00:00'
             AllowStartIfOnBatteries = $true
-            Compatibility = 'Win8'
-            Hidden = $true
+            Compatibility           = 'Win8'
+            Hidden                  = $true
         }
     }
 }
