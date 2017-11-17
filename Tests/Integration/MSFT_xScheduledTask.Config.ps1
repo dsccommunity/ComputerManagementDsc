@@ -153,15 +153,15 @@ Configuration xScheduledTaskExecuteAsAdd
             -TypeName System.Management.Automation.PSCredential `
             -ArgumentList ($ENV:USERNAME, (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
 
-         xScheduledTask xScheduledTaskOnceAdd
+        xScheduledTask xScheduledTaskOnceAdd
         {
-            TaskName           = 'Test task Logon'
-            TaskPath           = '\xComputerManagement\'
-            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType       = 'AtLogOn'
+            TaskName            = 'Test task Logon'
+            TaskPath            = '\xComputerManagement\'
+            ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType        = 'AtLogOn'
             ExecuteAsCredential = $executeAsCredential
-            LogonType          = 'Interactive'
-            RunLevel           = 'Highest'
+            LogonType           = 'Interactive'
+            RunLevel            = 'Highest'
         }
     }
 }
@@ -282,11 +282,11 @@ Configuration xScheduledTaskExecuteAsMod
     {
         xScheduledTask xScheduledTaskOnceMod
         {
-            TaskName           = 'Test task Logon'
-            TaskPath           = '\xComputerManagement\'
-            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType       = 'AtLogOn'
-            RunLevel           = 'Limited'
+            TaskName         = 'Test task Logon'
+            TaskPath         = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType     = 'AtLogOn'
+            RunLevel         = 'Limited'
         }
     }
 }
@@ -413,11 +413,11 @@ Configuration xScheduledTaskExecuteAsDel
     {
         xScheduledTask xScheduledTaskOnceDel
         {
-            TaskName           = 'Test task Logon'
-            TaskPath           = '\xComputerManagement\'
-            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType       = 'AtLogOn'
-            Ensure             = 'Absent'
+            TaskName         = 'Test task Logon'
+            TaskPath         = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType     = 'AtLogOn'
+            Ensure           = 'Absent'
         }
     }
 }

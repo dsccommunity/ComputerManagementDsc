@@ -19,155 +19,174 @@ Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
 
 <#
     .SYNOPSIS
-        Tests if the current resource state matches the desired resource state
+        Tests if the current resource state matches the desired resource state.
 
     .PARAMETER TaskName
-        The name of the task
+        The name of the task.
 
     .PARAMETER TaskPath
-        The path to the task - defaults to the root directory
+        The path to the task - defaults to the root directory.
 
     .PARAMETER Description
-        The task description
+        The task description. Not used in Get-TargetResource.
 
     .PARAMETER ActionExecutable
-        The path to the .exe for this task
+        The path to the .exe for this task.
 
     .PARAMETER ActionArguments
-        The arguments to pass the executable
+        The arguments to pass the executable. Not used in Get-TargetResource.
 
     .PARAMETER ActionWorkingPath
-        The working path to specify for the executable
+        The working path to specify for the executable. Not used in Get-TargetResource.
 
     .PARAMETER ScheduleType
-        When should the task be executed
+        When should the task be executed.
 
     .PARAMETER RepeatInterval
         How many units (minutes, hours, days) between each run of this task?
+        Not used in Get-TargetResource.
 
     .PARAMETER StartTime
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
-        AtLogon and AtStartup tasks
+        AtLogon and AtStartup tasks. Not used in Get-TargetResource.
 
     .PARAMETER Ensure
-        Present if the task should exist, Absent if it should be removed
+        Present if the task should exist, Absent if it should be removed.
 
     .PARAMETER Enable
-        True if the task should be enabled, false if it should be disabled
+        True if the task should be enabled, false if it should be disabled.
+        Not used in Get-TargetResource.
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
-        as the local system account
+        as the local system account.
+        Not used in Get-TargetResource.
 
     .PARAMETER DaysInterval
         Specifies the interval between the days in the schedule. An interval of 1 produces
         a daily schedule. An interval of 2 produces an every-other day schedule.
+        Not used in Get-TargetResource.
 
     .PARAMETER RandomDelay
         Specifies a random amount of time to delay the start time of the trigger. The
         delay time is a random time between the time the task triggers and the time that
-        you specify in this setting.
+        you specify in this setting. Not used in Get-TargetResource.
 
     .PARAMETER RepetitionDuration
         Specifies how long the repetition pattern repeats after the task starts.
+        Not used in Get-TargetResource.
 
     .PARAMETER DaysOfWeek
         Specifies an array of the days of the week on which Task Scheduler runs the task.
+        Not used in Get-TargetResource.
 
     .PARAMETER WeeksInterval
         Specifies the interval between the weeks in the schedule. An interval of 1 produces
         a weekly schedule. An interval of 2 produces an every-other week schedule.
+        Not used in Get-TargetResource.
 
     .PARAMETER User
         Specifies the identifier of the user for a trigger that starts a task when a
-        user logs on.
+        user logs on. Not used in Get-TargetResource.
 
     .PARAMETER DisallowDemandStart
         Indicates whether the task is prohibited to run on demand or not. Defaults
-        to $false
+        to $false. Not used in Get-TargetResource.
 
     .PARAMETER DisallowHardTerminate
         Indicates whether the task is prohibited to be terminated or not. Defaults
         to $false
 
     .PARAMETER Compatibility
-        The task compatibility level. Defaults to Vista.
+        The task compatibility level. Defaults to Vista. Not used in
+        Get-TargetResource.
 
     .PARAMETER AllowStartIfOnBatteries
         Indicates whether the task should start if the machine is on batteries or not.
-        Defaults to $false
+        Defaults to $false. Not used in Get-TargetResource.
 
     .PARAMETER Hidden
         Indicates that the task is hidden in the Task Scheduler UI.
+        Not used in Get-TargetResource.
 
     .PARAMETER RunOnlyIfIdle
         Indicates that Task Scheduler runs the task only when the computer is idle.
+        Not used in Get-TargetResource.
 
     .PARAMETER IdleWaitTimeout
         Specifies the amount of time that Task Scheduler waits for an idle condition to occur.
+        Not used in Get-TargetResource.
 
     .PARAMETER NetworkName
         Specifies the name of a network profile that Task Scheduler uses to determine
         if the task can run.
         The Task Scheduler UI uses this setting for display purposes. Specify a network
-        name if you specify the RunOnlyIfNetworkAvailable parameter.
+        name if you specify the RunOnlyIfNetworkAvailable parameter. Not used in
+        Get-TargetResource.
 
     .PARAMETER DisallowStartOnRemoteAppSession
         Indicates that the task does not start if the task is triggered to run in a Remote
-        Applications Integrated Locally (RAIL) session.
+        Applications Integrated Locally (RAIL) session. Not used in Get-TargetResource.
 
     .PARAMETER StartWhenAvailable
         Indicates that Task Scheduler can start the task at any time after its scheduled
-        time has passed.
+        time has passed. Not used in Get-TargetResource.
 
     .PARAMETER DontStopIfGoingOnBatteries
         Indicates that the task does not stop if the computer switches to battery power.
+        Not used in Get-TargetResource.
 
     .PARAMETER WakeToRun
         Indicates that Task Scheduler wakes the computer before it runs the task.
+        Not used in Get-TargetResource.
 
     .PARAMETER IdleDuration
         Specifies the amount of time that the computer must be in an idle state before
-        Task Scheduler runs the task.
+        Task Scheduler runs the task. Not used in Get-TargetResource.
 
     .PARAMETER RestartOnIdle
         Indicates that Task Scheduler restarts the task when the computer cycles into an
-        idle condition more than once.
+        idle condition more than once. Not used in Get-TargetResource.
 
     .PARAMETER DontStopOnIdleEnd
         Indicates that Task Scheduler does not terminate the task if the idle condition
-        ends before the task is completed.
+        ends before the task is completed. Not used in Get-TargetResource.
 
     .PARAMETER ExecutionTimeLimit
         Specifies the amount of time that Task Scheduler is allowed to complete the task.
+        Not used in Get-TargetResource.
 
     .PARAMETER MultipleInstances
         Specifies the policy that defines how Task Scheduler handles multiple instances
-        of the task.
+        of the task. Not used in Get-TargetResource.
 
     .PARAMETER Priority
         Specifies the priority level of the task. Priority must be an integer from 0 (highest priority)
         to 10 (lowest priority). The default value is 7. Priority levels 7 and 8 are
         used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.
+        Not used in Get-TargetResource.
 
     .PARAMETER RestartCount
         Specifies the number of times that Task Scheduler attempts to restart the task.
+        Not used in Get-TargetResource.
 
     .PARAMETER RestartInterval
         Specifies the amount of time that Task Scheduler attempts to restart the task.
+        Not used in Get-TargetResource.
 
     .PARAMETER RunOnlyIfNetworkAvailable
         Indicates that Task Scheduler runs the task only when a network is available. Task
         Scheduler uses the NetworkID parameter and NetworkName parameter that you specify
-        in this cmdlet to determine if the network is available.
+        in this cmdlet to determine if the network is available. Not used in Get-TargetResource.
 
     .PARAMETER RunLevel
         Specifies the level of user rights that Task Scheduler uses to run the tasks that
-        are associated with the principal. Defaults to 'Limited'.
+        are associated with the principal. Defaults to 'Limited'. Not used in
+        Get-TargetResource.
 
     .PARAMETER LogonType
         Specifies the security logon method that Task Scheduler uses to run the tasks that
-        are associated with the principal.
+        are associated with the principal. Not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {
@@ -483,45 +502,45 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-        Tests if the current resource state matches the desired resource state
+        Tests if the current resource state matches the desired resource state.
 
     .PARAMETER TaskName
-        The name of the task
+        The name of the task.
 
     .PARAMETER TaskPath
-        The path to the task - defaults to the root directory
+        The path to the task - defaults to the root directory.
 
     .PARAMETER Description
-        The task description
+        The task description.
 
     .PARAMETER ActionExecutable
-        The path to the .exe for this task
+        The path to the .exe for this task.
 
     .PARAMETER ActionArguments
-        The arguments to pass the executable
+        The arguments to pass the executable.
 
     .PARAMETER ActionWorkingPath
-        The working path to specify for the executable
+        The working path to specify for the executable.
 
     .PARAMETER ScheduleType
-        When should the task be executed
+        When should the task be executed.
 
     .PARAMETER RepeatInterval
         How many units (minutes, hours, days) between each run of this task?
 
     .PARAMETER StartTime
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
-        AtLogon and AtStartup tasks
+        AtLogon and AtStartup tasks.
 
     .PARAMETER Ensure
-        Present if the task should exist, Absent if it should be removed
+        Present if the task should exist, Absent if it should be removed.
 
     .PARAMETER Enable
-        True if the task should be enabled, false if it should be disabled
+        True if the task should be enabled, false if it should be disabled.
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
-        as the local system account
+        as the local system account.
 
     .PARAMETER DaysInterval
         Specifies the interval between the days in the schedule. An interval of 1 produces
@@ -548,18 +567,18 @@ function Get-TargetResource
 
     .PARAMETER DisallowDemandStart
         Indicates whether the task is prohibited to run on demand or not. Defaults
-        to $false
+        to $false.
 
     .PARAMETER DisallowHardTerminate
         Indicates whether the task is prohibited to be terminated or not. Defaults
-        to $false
+        to $false.
 
     .PARAMETER Compatibility
         The task compatibility level. Defaults to Vista.
 
     .PARAMETER AllowStartIfOnBatteries
         Indicates whether the task should start if the machine is on batteries or not.
-        Defaults to $false
+        Defaults to $false.
 
     .PARAMETER Hidden
         Indicates that the task is hidden in the Task Scheduler UI.
@@ -1069,12 +1088,6 @@ function Set-TargetResource
             $LogonType = 'ServiceAccount'
         }
 
-        # Set the LogonType if specified
-        if ([String]::IsNullOrEmpty($LogonType))
-        {
-            $LogonType = 'None'
-        }
-
         # Prepare the principal arguments
         $principalArguments = @{
             Id        = 'Author'
@@ -1138,45 +1151,45 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-        Tests if the current resource state matches the desired resource state
+        Tests if the current resource state matches the desired resource state.
 
     .PARAMETER TaskName
-        The name of the task
+        The name of the task.
 
     .PARAMETER TaskPath
-        The path to the task - defaults to the root directory
+        The path to the task - defaults to the root directory.
 
     .PARAMETER Description
-        The task description
+        The task description.
 
     .PARAMETER ActionExecutable
-        The path to the .exe for this task
+        The path to the .exe for this task.
 
     .PARAMETER ActionArguments
-        The arguments to pass the executable
+        The arguments to pass the executable.
 
     .PARAMETER ActionWorkingPath
-        The working path to specify for the executable
+        The working path to specify for the executable.
 
     .PARAMETER ScheduleType
-        When should the task be executed
+        When should the task be executed.
 
     .PARAMETER RepeatInterval
         How many units (minutes, hours, days) between each run of this task?
 
     .PARAMETER StartTime
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
-        AtLogon and AtStartup tasks
+        AtLogon and AtStartup tasks.
 
     .PARAMETER Ensure
-        Present if the task should exist, Absent if it should be removed
+        Present if the task should exist, Absent if it should be removed.
 
     .PARAMETER Enable
-        True if the task should be enabled, false if it should be disabled
+        True if the task should be enabled, false if it should be disabled.
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
-        as the local system account
+        as the local system account.
 
     .PARAMETER DaysInterval
         Specifies the interval between the days in the schedule. An interval of 1 produces
@@ -1203,18 +1216,18 @@ function Set-TargetResource
 
     .PARAMETER DisallowDemandStart
         Indicates whether the task is prohibited to run on demand or not. Defaults
-        to $false
+        to $false.
 
     .PARAMETER DisallowHardTerminate
         Indicates whether the task is prohibited to be terminated or not. Defaults
-        to $false
+        to $false.
 
     .PARAMETER Compatibility
         The task compatibility level. Defaults to Vista.
 
     .PARAMETER AllowStartIfOnBatteries
         Indicates whether the task should start if the machine is on batteries or not.
-        Defaults to $false
+        Defaults to $false.
 
     .PARAMETER Hidden
         Indicates that the task is hidden in the Task Scheduler UI.

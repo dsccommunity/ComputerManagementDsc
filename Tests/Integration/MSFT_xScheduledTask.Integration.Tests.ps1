@@ -185,6 +185,7 @@ try
                 $current.DisallowHardTerminate | Should Be $true
                 $current.RunOnlyIfIdle         | Should Be $false
                 $current.Priority              | Should Be 9
+                $current.RunLevel              | Should Be 'Highest'
             }
 
             AfterAll {
