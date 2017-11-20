@@ -213,9 +213,9 @@ xVirtualMemory has the following properties:
 
 * xOfflineDomainJoin:
   * Updated to meet HQRM guidelines.
-
-* xComputer
-  * Resolved bug in Get-ComputerDomain where LocalSystem doesn't have rights to the domain
+* xComputer:
+  * Resolved bug in Get-ComputerDomain where LocalSystem doesn't have
+  rights to the domain
 
 ### 3.0.0.0
 
