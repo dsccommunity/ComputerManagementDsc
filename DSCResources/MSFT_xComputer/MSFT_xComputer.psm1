@@ -578,9 +578,10 @@ function Get-ComputerDomain
         }
         else
         {
-            if((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain -eq $true)
+            $domainInfo = Get-CimInstance -Class Win32_ComputerSystem
+            if ($domainInfo.PartOfDomain -eq $true)
             {
-                $domainName = (Get-WmiObject -Class Win32_ComputerSystem).Domain
+                $domainName = $domainInfo.Domain
             }
             else
             {

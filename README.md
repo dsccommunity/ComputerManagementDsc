@@ -247,8 +247,9 @@ xVirtualMemory has the following properties:
     task execution.
   * Correct `Assert-VerifiableMocks` to `Assert-VerifiableMock`
 
-* xComputer
-  * Resolved bug in Get-ComputerDomain where LocalSystem doesn't have rights to the domain
+* xComputer:
+  * Resolved bug in Get-ComputerDomain where LocalSystem doesn't have
+  rights to the domain
 
 ### 3.0.0.0
 
