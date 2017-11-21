@@ -572,21 +572,21 @@ function Get-ComputerDomain
 
     try
     {
-        if ($NetBios)
+        $domainInfo = Get-CimInstance -ClassName Win32_ComputerSystem
+        if ($domainInfo.PartOfDomain -eq $true)
         {
-            $domainName = $ENV:USERDOMAIN
-        }
-        else
-        {
-            $domainInfo = Get-CimInstance -Class Win32_ComputerSystem
-            if ($domainInfo.PartOfDomain -eq $true)
+            if ($NetBios)
             {
-                $domainName = $domainInfo.Domain
+                $domainName = (Get-Item -Path Env:\USERDOMAIN).Value
             }
             else
             {
-                $domainName = $null
+                $domainName = $domainInfo.Domain
             }
+        }
+        else
+        {
+            $domainName = ""
         }
 
         return $domainName
