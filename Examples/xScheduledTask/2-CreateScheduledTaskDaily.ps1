@@ -21,17 +21,17 @@ Configuration Example
     {
         xScheduledTask xScheduledTaskDailyAdd
         {
-            TaskName = 'Test task Daily'
-            TaskPath = '\MyTasks'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Daily'
-            DaysInterval = 1
-            RepeatInterval = '00:15:00'
-            RepetitionDuration = '08:00:00'
-            RestartCount = 2
-            RestartInterval = '00:05:00'
+            TaskName                  = 'Test task Daily'
+            TaskPath                  = '\MyTasks'
+            ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType              = 'Daily'
+            DaysInterval              = 1
+            RepeatInterval            = '00:15:00'
+            RepetitionDuration        = '08:00:00'
+            RestartCount              = 2
+            RestartInterval           = '00:05:00'
             RunOnlyIfNetworkAvailable = $true
-            WakeToRun = $true
+            WakeToRun                 = $true
         }
     }
 }

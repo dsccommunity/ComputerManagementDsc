@@ -88,7 +88,7 @@ try
             }
         }
 
-        Assert-VerifiableMocks
+        Assert-VerifiableMock
     }
 
     Describe "$($script:DSCResourceName)\Set-TargetResource" {
@@ -137,7 +137,7 @@ try
             }
         }
 
-        Assert-VerifiableMocks
+        Assert-VerifiableMock
     }
 
     Describe "$($script:DSCResourceName)\Test-TargetResource" {
@@ -174,7 +174,7 @@ try
             }
         }
 
-        Assert-VerifiableMocks
+        Assert-VerifiableMock
     }
 }
 finally

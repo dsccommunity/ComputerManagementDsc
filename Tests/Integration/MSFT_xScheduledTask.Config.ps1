@@ -5,18 +5,18 @@ Configuration xScheduledTaskOnceCrossTimezone
     {
         xScheduledTask xScheduledTaskOnceAdd
         {
-            TaskName = 'Test task once cross timezone'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Once'
-            RepeatInterval = '00:15:00'
-            RepetitionDuration = '23:00:00'
-            ActionWorkingPath = (Get-Location).Path
-            Enable = $true
-            RandomDelay = '01:00:00'
+            TaskName              = 'Test task once cross timezone'
+            TaskPath              = '\xComputerManagement\'
+            ActionExecutable      = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType          = 'Once'
+            RepeatInterval        = '00:15:00'
+            RepetitionDuration    = '23:00:00'
+            ActionWorkingPath     = (Get-Location).Path
+            Enable                = $true
+            RandomDelay           = '01:00:00'
             DisallowHardTerminate = $true
-            RunOnlyIfIdle = $false
-            Priority = 9
+            RunOnlyIfIdle         = $false
+            Priority              = 9
         }
     }
 }
@@ -28,18 +28,18 @@ Configuration xScheduledTaskOnceAdd
     {
         xScheduledTask xScheduledTaskOnceAdd
         {
-            TaskName = 'Test task once'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Once'
-            RepeatInterval = '00:15:00'
-            RepetitionDuration = '08:00:00'
-            ActionWorkingPath = (Get-Location).Path
-            Enable = $true
-            RandomDelay = '01:00:00'
+            TaskName              = 'Test task once'
+            TaskPath              = '\xComputerManagement\'
+            ActionExecutable      = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType          = 'Once'
+            RepeatInterval        = '00:15:00'
+            RepetitionDuration    = '08:00:00'
+            ActionWorkingPath     = (Get-Location).Path
+            Enable                = $true
+            RandomDelay           = '01:00:00'
             DisallowHardTerminate = $true
-            RunOnlyIfIdle = $false
-            Priority = 9
+            RunOnlyIfIdle         = $false
+            Priority              = 9
         }
     }
 }
@@ -51,17 +51,17 @@ Configuration xScheduledTaskDailyAdd
     {
         xScheduledTask xScheduledTaskDailyAdd
         {
-            TaskName = 'Test task Daily'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Daily'
-            DaysInterval = 1
-            RepeatInterval = '00:15:00'
-            RepetitionDuration = '08:00:00'
-            RestartCount = 2
-            RestartInterval = '00:05:00'
+            TaskName                  = 'Test task Daily'
+            TaskPath                  = '\xComputerManagement\'
+            ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType              = 'Daily'
+            DaysInterval              = 1
+            RepeatInterval            = '00:15:00'
+            RepetitionDuration        = '08:00:00'
+            RestartCount              = 2
+            RestartInterval           = '00:05:00'
             RunOnlyIfNetworkAvailable = $true
-            WakeToRun = $true
+            WakeToRun                 = $true
         }
     }
 }
@@ -73,17 +73,17 @@ Configuration xScheduledTaskDailyIndefinitelyAdd
     {
         xScheduledTask xScheduledTaskDailyAdd
         {
-            TaskName = 'Test task Daily Indefinitely'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Daily'
-            DaysInterval = 1
-            RepeatInterval = '00:15:00'
-            RepetitionDuration = 'Indefinitely'
-            RestartCount = 2
-            RestartInterval = '00:05:00'
+            TaskName                  = 'Test task Daily Indefinitely'
+            TaskPath                  = '\xComputerManagement\'
+            ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType              = 'Daily'
+            DaysInterval              = 1
+            RepeatInterval            = '00:15:00'
+            RepetitionDuration        = 'Indefinitely'
+            RestartCount              = 2
+            RestartInterval           = '00:05:00'
             RunOnlyIfNetworkAvailable = $true
-            WakeToRun = $true
+            WakeToRun                 = $true
         }
     }
 }
@@ -95,17 +95,17 @@ Configuration xScheduledTaskWeeklyAdd
     {
         xScheduledTask xScheduledTaskWeeklyAdd
         {
-            TaskName = 'Test task Weekly'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Weekly'
-            WeeksInterval = 1
-            DaysOfWeek = 'Monday', 'Wednesday', 'Saturday'
-            RepeatInterval = '00:15:00'
-            RepetitionDuration = '08:00:00'
+            TaskName                = 'Test task Weekly'
+            TaskPath                = '\xComputerManagement\'
+            ActionExecutable        = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType            = 'Weekly'
+            WeeksInterval           = 1
+            DaysOfWeek              = 'Monday', 'Wednesday', 'Saturday'
+            RepeatInterval          = '00:15:00'
+            RepetitionDuration      = '08:00:00'
             AllowStartIfOnBatteries = $true
-            Compatibility = 'Win8'
-            Hidden = $true
+            Compatibility           = 'Win8'
+            Hidden                  = $true
         }
     }
 }
@@ -117,11 +117,11 @@ Configuration xScheduledTaskLogonAdd
     {
         xScheduledTask xScheduledTaskOnceAdd
         {
-            TaskName = 'Test task Logon'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'AtLogOn'
-            RepeatInterval = '00:15:00'
+            TaskName           = 'Test task Logon'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'AtLogOn'
+            RepeatInterval     = '00:15:00'
             RepetitionDuration = '08:00:00'
         }
     }
@@ -134,12 +134,34 @@ Configuration xScheduledTaskStartupAdd
     {
         xScheduledTask xScheduledTaskOnceAdd
         {
-            TaskName = 'Test task Startup'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'AtStartup'
-            RepeatInterval = '00:15:00'
+            TaskName           = 'Test task Startup'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'AtStartup'
+            RepeatInterval     = '00:15:00'
             RepetitionDuration = '08:00:00'
+        }
+    }
+}
+
+Configuration xScheduledTaskExecuteAsAdd
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        $executeAsCredential = New-Object `
+            -TypeName System.Management.Automation.PSCredential `
+            -ArgumentList ($ENV:USERNAME, (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
+
+        xScheduledTask xScheduledTaskOnceAdd
+        {
+            TaskName            = 'Test task Logon'
+            TaskPath            = '\xComputerManagement\'
+            ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType        = 'AtLogOn'
+            ExecuteAsCredential = $executeAsCredential
+            LogonType           = 'Interactive'
+            RunLevel            = 'Highest'
         }
     }
 }
@@ -151,12 +173,12 @@ Configuration xScheduledTaskOnceMod
     {
         xScheduledTask xScheduledTaskOnceMod
         {
-            TaskName = 'Test task once'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Once'
-            RepeatInterval = '00:20:00'
-            RepetitionDuration = '08:00:00'
+            TaskName            = 'Test task once'
+            TaskPath            = '\xComputerManagement\'
+            ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType        = 'Once'
+            RepeatInterval      = '00:20:00'
+            RepetitionDuration  = '08:00:00'
             DisallowDemandStart = $true
         }
     }
@@ -169,14 +191,14 @@ Configuration xScheduledTaskDailyMod
     {
         xScheduledTask xScheduledTaskDailyMod
         {
-            TaskName = 'Test task Daily'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Daily'
-            DaysInterval = 2
-            RepeatInterval = '00:30:00'
+            TaskName           = 'Test task Daily'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'Daily'
+            DaysInterval       = 2
+            RepeatInterval     = '00:30:00'
             RepetitionDuration = '08:00:00'
-            Enable = $false
+            Enable             = $false
         }
     }
 }
@@ -188,14 +210,14 @@ Configuration xScheduledTaskDailyIndefinitelyMod
     {
         xScheduledTask xScheduledTaskDailyMod
         {
-            TaskName = 'Test task Daily Indefinitely'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Daily'
-            DaysInterval = 2
-            RepeatInterval = '00:30:00'
+            TaskName           = 'Test task Daily Indefinitely'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'Daily'
+            DaysInterval       = 2
+            RepeatInterval     = '00:30:00'
             RepetitionDuration = '10.00:00:00'
-            Enable = $false
+            Enable             = $false
         }
     }
 }
@@ -207,13 +229,13 @@ Configuration xScheduledTaskWeeklyMod
     {
         xScheduledTask xScheduledTaskWeeklyMod
         {
-            TaskName = 'Test task Weekly'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Weekly'
-            WeeksInterval = 1
-            DaysOfWeek = 'Monday', 'Thursday', 'Saturday'
-            RepeatInterval = '00:40:00'
+            TaskName           = 'Test task Weekly'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'Weekly'
+            WeeksInterval      = 1
+            DaysOfWeek         = 'Monday', 'Thursday', 'Saturday'
+            RepeatInterval     = '00:40:00'
             RepetitionDuration = '08:00:00'
         }
     }
@@ -226,11 +248,11 @@ Configuration xScheduledTaskLogonMod
     {
         xScheduledTask xScheduledTaskOnceMod
         {
-            TaskName = 'Test task Logon'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'AtStartup'
-            RepeatInterval = '00:12:00'
+            TaskName           = 'Test task Logon'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'AtStartup'
+            RepeatInterval     = '00:12:00'
             RepetitionDuration = '08:00:00'
         }
     }
@@ -243,12 +265,28 @@ Configuration xScheduledTaskStartupMod
     {
         xScheduledTask xScheduledTaskOnceMod
         {
-            TaskName = 'Test task Startup'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'AtLogOn'
-            RepeatInterval = '00:10:00'
+            TaskName           = 'Test task Startup'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'AtLogOn'
+            RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
+        }
+    }
+}
+
+Configuration xScheduledTaskExecuteAsMod
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskOnceMod
+        {
+            TaskName         = 'Test task Logon'
+            TaskPath         = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType     = 'AtLogOn'
+            RunLevel         = 'Limited'
         }
     }
 }
@@ -260,14 +298,14 @@ Configuration xScheduledTaskOnceDel
     {
         xScheduledTask xScheduledTaskOnceDel
         {
-            TaskName = 'Test task once'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Once'
-            RepeatInterval = '00:20:00'
-            RepetitionDuration = '08:00:00'
+            TaskName            = 'Test task once'
+            TaskPath            = '\xComputerManagement\'
+            ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType        = 'Once'
+            RepeatInterval      = '00:20:00'
+            RepetitionDuration  = '08:00:00'
             DisallowDemandStart = $true
-            Ensure = 'Absent'
+            Ensure              = 'Absent'
         }
     }
 }
@@ -279,15 +317,15 @@ Configuration xScheduledTaskDailyDel
     {
         xScheduledTask xScheduledTaskDailyDel
         {
-            TaskName = 'Test task Daily'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Daily'
-            DaysInterval = 2
-            RepeatInterval = '00:30:00'
+            TaskName           = 'Test task Daily'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'Daily'
+            DaysInterval       = 2
+            RepeatInterval     = '00:30:00'
             RepetitionDuration = '08:00:00'
-            Enable = $false
-            Ensure = 'Absent'
+            Enable             = $false
+            Ensure             = 'Absent'
         }
     }
 }
@@ -299,15 +337,15 @@ Configuration xScheduledTaskDailyIndefinitelyDel
     {
         xScheduledTask xScheduledTaskDailyDel
         {
-            TaskName = 'Test task Daily Indefinitely'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Daily'
-            DaysInterval = 2
-            RepeatInterval = '00:30:00'
+            TaskName           = 'Test task Daily Indefinitely'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'Daily'
+            DaysInterval       = 2
+            RepeatInterval     = '00:30:00'
             RepetitionDuration = '08:00:00'
-            Enable = $false
-            Ensure = 'Absent'
+            Enable             = $false
+            Ensure             = 'Absent'
         }
     }
 }
@@ -319,15 +357,15 @@ Configuration xScheduledTaskWeeklyDel
     {
         xScheduledTask xScheduledTaskWeeklyDel
         {
-            TaskName = 'Test task Weekly'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'Weekly'
-            WeeksInterval = 1
-            DaysOfWeek = 'Monday', 'Thursday', 'Saturday'
-            RepeatInterval = '00:40:00'
+            TaskName           = 'Test task Weekly'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'Weekly'
+            WeeksInterval      = 1
+            DaysOfWeek         = 'Monday', 'Thursday', 'Saturday'
+            RepeatInterval     = '00:40:00'
             RepetitionDuration = '08:00:00'
-            Ensure = 'Absent'
+            Ensure             = 'Absent'
         }
     }
 }
@@ -339,13 +377,13 @@ Configuration xScheduledTaskLogonDel
     {
         xScheduledTask xScheduledTaskLogonDel
         {
-            TaskName = 'Test task Logon'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'AtStartup'
-            RepeatInterval = '00:12:00'
+            TaskName           = 'Test task Logon'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'AtStartup'
+            RepeatInterval     = '00:12:00'
             RepetitionDuration = '08:00:00'
-            Ensure = 'Absent'
+            Ensure             = 'Absent'
         }
     }
 }
@@ -357,13 +395,29 @@ Configuration xScheduledTaskStartupDel
     {
         xScheduledTask xScheduledTaskStartupDel
         {
-            TaskName = 'Test task Startup'
-            TaskPath = '\xComputerManagement\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType = 'AtLogOn'
-            RepeatInterval = '00:10:00'
+            TaskName           = 'Test task Startup'
+            TaskPath           = '\xComputerManagement\'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'AtLogOn'
+            RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
-            Ensure = 'Absent'
+            Ensure             = 'Absent'
+        }
+    }
+}
+
+Configuration xScheduledTaskExecuteAsDel
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskOnceDel
+        {
+            TaskName         = 'Test task Logon'
+            TaskPath         = '\xComputerManagement\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType     = 'AtLogOn'
+            Ensure           = 'Absent'
         }
     }
 }

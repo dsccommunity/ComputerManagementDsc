@@ -40,4 +40,6 @@ class MSFT_xScheduledTask : OMI_BaseResource
     [Write, Description("Specifies the number of times that Task Scheduler attempts to restart the task.")] Uint32 RestartCount;
     [Write, Description("Specifies the amount of time that Task Scheduler attempts to restart the task.")] String RestartInterval;
     [Write, Description("Indicates that Task Scheduler runs the task only when a network is available. Task Scheduler uses the NetworkID parameter and NetworkName parameter that you specify in this cmdlet to determine if the network is available.")] Boolean RunOnlyIfNetworkAvailable;
+    [Write, Description("Specifies the level of user rights that Task Scheduler uses to run the tasks that are associated with the principal. Defaults to 'Limited'."), ValueMap{"Limited","Highest"}, Values{"Limited","Highest"}] String RunLevel;
+    [Write, Description("Specifies the security logon method that Task Scheduler uses to run the tasks that are associated with the principal."), ValueMap{"Group","Interactive","InteractiveOrPassword","None","Password","S4U","ServiceAccount"}, Values{"Group","Interactive","InteractiveOrPassword","None","Password","S4U","ServiceAccount"}] String LogonType;
 };

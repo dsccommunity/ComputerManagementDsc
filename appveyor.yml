@@ -7,7 +7,7 @@ install:
 
     - ps: |
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
-        Invoke-AppveyorInstallTask
+        Invoke-AppveyorInstallTask -PesterMaximumVersion 4.0.8
 
 #---------------------------------#
 #      build configuration        #
