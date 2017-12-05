@@ -37,6 +37,7 @@ try
             $testParameters = @{
                 IsSingleInstance = 'Yes'
                 Name             = 'High performance'
+                Verbose          = $true
             }
         }
 
@@ -119,6 +120,7 @@ try
             $testParameters = @{
                 IsSingleInstance = 'Yes'
                 Name             = 'High performance'
+                Verbose          = $true
             }
 
             Mock `
@@ -187,6 +189,7 @@ try
             $testParameters = @{
                 IsSingleInstance = 'Yes'
                 Name             = 'High performance'
+                Verbose          = $true
             }
         }
 
