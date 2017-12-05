@@ -1,14 +1,14 @@
-$script:DSCModuleName      = 'xComputerManagement'
-$script:DSCResourceName    = 'MSFT_xPowerPlan'
+$script:DSCModuleName = 'xComputerManagement'
+$script:DSCResourceName = 'MSFT_xPowerPlan'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 # Unit Test Template Version: 1.2.0
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -19,27 +19,37 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Unit
 #endregion HEADER
 
-function Invoke-TestCleanup {
+function Invoke-TestCleanup
+{
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
 }
 
 # Begin Testing
 try
 {
+    # Assign the localized data from the module into a local variable
+    $LocalizedData = InModuleScope $script:DSCResourceName {
+         $LocalizedData
+    }
+
     Describe "$($script:DSCResourceName)\Get-TargetResource" {
         BeforeEach {
             $testParameters = @{
                 IsSingleInstance = 'Yes'
-                Name = 'High performance'
+                Name             = 'High performance'
             }
         }
 
         Context 'When the system is in the desired present state' {
             BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith {
                     return New-Object Object |
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
-                } -ModuleName $script:DSCResourceName -Verifiable
+                } `
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
             It 'Should return the same values as passed as parameters' {
@@ -51,10 +61,14 @@ try
 
         Context 'When the system is not in the desired present state' {
             BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith {
                     return New-Object Object |
                         Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
-                } -ModuleName $script:DSCResourceName -Verifiable
+                } `
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
             It 'Should not return any plan name' {
@@ -66,25 +80,34 @@ try
 
         Context 'When the Get-CimInstance cannot retrive information about power plans' {
             BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
-                    throw
-                } -ModuleName $script:DSCResourceName -Verifiable
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { throw } `
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
-            It 'Should throw the correct error' {
-                { Get-TargetResource @testParameters } | Should Throw 'Could not get the Common Information Model (CIM) instances of class Win32_PowerPlan'
+            It 'Should throw the expected error' {
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.PowerPlanCIMError -f 'Win32_PowerPlan')
+
+                { Get-TargetResource @testParameters } | Should Throw $errorRecord
             }
         }
 
         Context 'When the preferred plan does not exist' {
             BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
-                    return $null
-                } -ModuleName $script:DSCResourceName -Verifiable
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
-            It 'Should throw saying it was not able to find the plan High performance' {
-                { Get-TargetResource @testParameters } | Should Throw "Unable to find the power plan 'High performance'."
+            It 'Should throw the expected error' {
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.PowerPlanNotFound -f $testParameters.Name)
+
+                { Get-TargetResource @testParameters } | Should Throw $errorRecord
             }
         }
 
@@ -95,45 +118,64 @@ try
         BeforeEach {
             $testParameters = @{
                 IsSingleInstance = 'Yes'
-                Name = 'High performance'
+                Name             = 'High performance'
             }
 
-            Mock -CommandName Invoke-CimMethod -MockWith {} -ModuleName $script:DSCResourceName -Verifiable
+            Mock `
+                -CommandName Invoke-CimMethod `
+                -ModuleName $script:DSCResourceName `
+                -Verifiable
 
-            Mock -CommandName Get-CimInstance -MockWith {
-                return New-Object -TypeName Microsoft.Management.Infrastructure.CimInstance -ArgumentList @('Win32_PowerPlan','dummyNamespace')
-            } -ModuleName $script:DSCResourceName -Verifiable
+            Mock `
+                -CommandName Get-CimInstance `
+                -MockWith {
+                    return New-Object `
+                        -TypeName Microsoft.Management.Infrastructure.CimInstance `
+                        -ArgumentList @('Win32_PowerPlan', 'dummyNamespace')
+                } `
+                -ModuleName $script:DSCResourceName `
+                -Verifiable
         }
 
         Context 'When the system is not in the desired present state' {
             It 'Should call the mocked function Invoke-CimMethod exactly once' {
                 Set-TargetResource @testParameters
 
-                Assert-MockCalled -CommandName Invoke-CimMethod -Exactly 1 -Scope It -ModuleName $script:DSCResourceName
+                Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 1 -Scope It -ModuleName $script:DSCResourceName
             }
         }
 
         Context 'When the Get-CimInstance cannot retrive information about power plans' {
             BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
-                    throw
-                } -ModuleName $script:DSCResourceName -Verifiable
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { throw } `
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
-            It 'Should throw the correct error' {
-                { Set-TargetResource @testParameters } | Should Throw 'Could not get the Common Information Model (CIM) instances of class Win32_PowerPlan'
+            It 'Should throw the expected error' {
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.PowerPlanCIMError -f 'Win32_PowerPlan')
+
+                { Set-TargetResource @testParameters } | Should Throw $errorRecord
             }
         }
 
         Context 'When the Invoke-CimMethod throws an error' {
             BeforeEach {
-                Mock -CommandName Invoke-CimMethod -MockWith {
-                    throw 'Failed to set value'
-                } -ModuleName $script:DSCResourceName -Verifiable
+                Mock `
+                    -CommandName Invoke-CimMethod `
+                    -MockWith { throw 'Failed to set value' } `
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
             It 'Should catch the correct error thrown by Invoke-CimMethod' {
-                { Set-TargetResource @testParameters } | Should Throw "Unable to set the power plan 'High performance' to the active plan. Error message: Failed to set value"
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.PowerPlanWasUnableToBeSet -f $testParameters.Name, 'Failed to set value')
+
+                { Set-TargetResource @testParameters } | Should Throw $errorRecord
             }
         }
 
@@ -144,16 +186,20 @@ try
         BeforeEach {
             $testParameters = @{
                 IsSingleInstance = 'Yes'
-                Name = 'High performance'
+                Name             = 'High performance'
             }
         }
 
         Context 'When the system is in the desired present state' {
             BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object |
-                        Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
-                } -ModuleName $script:DSCResourceName -Verifiable
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith {
+                        return New-Object Object |
+                            Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
+                    } `
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
             It 'Should return the the state as present ($true)' {
@@ -163,10 +209,14 @@ try
 
         Context 'When the system is not in the desired state' {
             BeforeEach {
-                Mock -CommandName Get-CimInstance -MockWith {
-                    return New-Object Object |
-                        Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
-                } -ModuleName $script:DSCResourceName -Verifiable
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith {
+                        return New-Object Object |
+                            Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
+                    } `
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
             It 'Should return the the state as absent ($false)' {
