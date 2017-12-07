@@ -217,6 +217,10 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
+* xScheduledTask:
+  * Enable Execution Time Limit of task to be set to indefinite
+    by setting `ExecutionTimeLimit` to '00:00:00' - See [Issue #115](https://github.com/PowerShell/xComputerManagement/issues/115)
+
 ### 3.1.0.0
 
 * xOfflineDomainJoin:

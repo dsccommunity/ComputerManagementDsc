@@ -697,6 +697,60 @@ try
 
             }
 
+            Context 'A scheduled task is enabled without an execution time limit and but has an execution time limit set' {
+                $testParameters = @{
+                    TaskName = 'Test task'
+                    TaskPath = '\Test\'
+                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType = 'Once'
+                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                    ExecutionTimeLimit = (New-TimeSpan -Seconds 0).ToString()
+                    Enable = $true
+                    Verbose = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask { return @{
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions = @(@{
+                                Execute = $testParameters.ActionExecutable
+                                Arguments = $testParameters.Arguments
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Settings = @(@{
+                                Enabled = $true
+                                ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalSeconds + 60)S"
+                            })
+                        Principal = @{
+                            UserId = 'SYSTEM'
+                        }
+                    } }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Ensure | Should Be 'Present'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should Be $false
+                }
+
+                It 'Should update the scheduled task in the set method' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                }
+            }
+
             Context 'A scheduled task is enabled and has the correct settings' {
                 $testParameters = @{
                     TaskName = 'Test task'

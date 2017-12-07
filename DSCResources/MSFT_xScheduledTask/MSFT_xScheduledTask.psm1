@@ -915,7 +915,7 @@ function Set-TargetResource
             $settingParameters.Add('IdleWaitTimeout', $IdleWaitTimeout)
         }
 
-        if ($ExecutionTimeLimit -gt [System.TimeSpan] '00:00:00')
+        if ($PSBoundParameters.ContainsKey('ExecutionTimeLimit'))
         {
             $settingParameters.Add('ExecutionTimeLimit', $ExecutionTimeLimit)
         }

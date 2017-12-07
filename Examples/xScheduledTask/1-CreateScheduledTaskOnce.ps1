@@ -4,7 +4,8 @@
     task folder 'MyTasks' that starts a new powershell process once at 00:00 repeating
     every 15 minutes for 8 hours. The task is delayed by a random amount up to 1 hour
     each time. The task will run even if the previous task is still running and it
-    will prevent hard termintaing of the previously running task instance.
+    will prevent hard termintaing of the previously running task instance. The task
+    execution will have no time limit.
 #>
 Configuration Example
 {
@@ -27,6 +28,7 @@ Configuration Example
             ScheduleType          = 'Once'
             RepeatInterval        = '00:15:00'
             RepetitionDuration    = '08:00:00'
+            ExecutionTimeLimit    = '00:00:00'
             ActionWorkingPath     = (Get-Location).Path
             Enable                = $true
             RandomDelay           = '01:00:00'
