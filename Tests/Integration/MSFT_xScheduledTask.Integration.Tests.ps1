@@ -186,6 +186,7 @@ try
                 $current.RunOnlyIfIdle         | Should Be $false
                 $current.Priority              | Should Be 9
                 $current.RunLevel              | Should Be 'Limited'
+                $current.ExecutionTimeLimit    | Should Be '00:00:00'
             }
 
             AfterAll {
