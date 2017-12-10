@@ -573,7 +573,7 @@ function Get-ComputerDomain
         }
         else
         {
-            $domainName = ""
+            $domainName = ''
         }
 
         return $domainName

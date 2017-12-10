@@ -928,15 +928,15 @@ try
             }
 
             Context "$($script:DSCResourceName)\Get-ComputerDomain" {
-                It "returns domain netbios or DNS name if domain member" {
-                    Mock -CommandName Get-CimInstance -ParameterFilter {$ClassName -eq "Win32_ComputerSystem"} -MockWith {
+                It 'Returns domain netbios or DNS name if domain member' {
+                    Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
                         [PSCustomObject] @{
                             Domain       = 'contoso.com';
                             PartOfDomain = $true
                         }
                     }
 
-                    Mock -CommandName Get-Item -ParameterFilter {$Path -eq "Env:\USERDOMAIN"} -MockWith {
+                    Mock -CommandName Get-Item -ParameterFilter { $Path -eq 'Env:\USERDOMAIN' } -MockWith {
                         [PSCustomObject] @{
                             Value = 'CONTOSO'
                         }
@@ -946,27 +946,27 @@ try
                         netbios = $true
                     }
 
-                    Get-ComputerDomain @getComputerDomainParameters | Should Be "CONTOSO"
+                    Get-ComputerDomain @getComputerDomainParameters | Should Be 'CONTOSO'
 
                     $getComputerDomainParameters = @{
                         netbios = $false
                     }
 
-                    Get-ComputerDomain @getComputerDomainParameters | Should Be "contoso.com"
+                    Get-ComputerDomain @getComputerDomainParameters | Should Be 'contoso.com'
 
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 2 -Scope It
                     Assert-MockCalled -CommandName Get-Item -Exactly -Times 1 -Scope It
                 }
 
-                It "returns nothing if in a workgroup" {
-                    Mock -CommandName Get-CimInstance -ParameterFilter {$ClassName -eq "Win32_ComputerSystem"} -MockWith {
+                It 'Returns nothing if in a workgroup' {
+                    Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
                         [PSCustomObject] @{
                             Domain       = 'WORKGROUP';
                             PartOfDomain = $false
                         }
                     }
 
-                    Mock -CommandName Get-Item -ParameterFilter {$Path -eq "Env:\USERDOMAIN"} -MockWith {
+                    Mock -CommandName Get-Item -ParameterFilter { $Path -eq 'Env:\USERDOMAIN' } -MockWith {
                         [PSCustomObject] @{
                             Value = 'Computer1'
                         }
@@ -976,27 +976,27 @@ try
                         netbios = $true
                     }
 
-                    Get-ComputerDomain @getComputerDomainParameters | Should Be ""
+                    Get-ComputerDomain @getComputerDomainParameters | Should Be ''
 
                     $getComputerDomainParameters = @{
                         netbios = $false
                     }
 
-                    Get-ComputerDomain @getComputerDomainParameters | Should Be ""
+                    Get-ComputerDomain @getComputerDomainParameters | Should Be ''
 
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 2 -Scope It
                     Assert-MockCalled -CommandName Get-Item -Exactly -Times 0 -Scope It
                 }
 
                 It "returns domain DNS name when netbios not specified" {
-                    Mock -CommandName Get-CimInstance -ParameterFilter {$ClassName -eq "Win32_ComputerSystem"} -MockWith {
+                    Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
                         [PSCustomObject] @{
                             Domain       = 'contoso.com';
                             PartOfDomain = $true
                         }
                     }
 
-                    Mock -CommandName Get-Item -ParameterFilter {$Path -eq "Env:\USERDOMAIN"} -MockWith {
+                    Mock -CommandName Get-Item -ParameterFilter { $Path -eq 'Env:\USERDOMAIN' } -MockWith {
                         [PSCustomObject] @{
                             Value = 'CONTOSO'
                         }
