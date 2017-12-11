@@ -179,8 +179,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -267,8 +267,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -354,8 +354,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -439,8 +439,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -490,8 +490,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -541,8 +541,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -590,8 +590,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -639,8 +639,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -691,8 +691,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
 
             }
@@ -746,8 +746,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -902,8 +902,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -1031,8 +1031,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -1093,8 +1093,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -1141,8 +1141,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -1189,8 +1189,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Times 1
+                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
+                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
