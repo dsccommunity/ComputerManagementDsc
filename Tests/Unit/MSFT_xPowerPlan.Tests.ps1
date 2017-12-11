@@ -90,7 +90,7 @@ try
 
             It 'Should throw the expected error' {
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.PowerPlanCIMError -f 'Win32_PowerPlan')
+                    -Message ($LocalizedData.PowerPlanCimError -f 'Win32_PowerPlan')
 
                 { Get-TargetResource @testParameters } | Should Throw $errorRecord
             }
@@ -158,7 +158,7 @@ try
 
             It 'Should throw the expected error' {
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.PowerPlanCIMError -f 'Win32_PowerPlan')
+                    -Message ($LocalizedData.PowerPlanCimError -f 'Win32_PowerPlan')
 
                 { Set-TargetResource @testParameters } | Should Throw $errorRecord
             }

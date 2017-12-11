@@ -46,7 +46,7 @@ function Get-TargetResource
     catch
     {
         New-InvalidOperationException `
-            -Message ($script:localizedData.PowerPlanCIMError -f $getCimInstanceArguments.Class)
+            -Message ($script:localizedData.PowerPlanCimError -f $getCimInstanceArguments.Class)
     }
 
     if ($plan)
@@ -119,7 +119,7 @@ function Set-TargetResource
     catch
     {
         New-InvalidOperationException `
-            -Message ($script:localizedData.PowerPlanCIMError -f $getCimInstanceArguments.Class)
+            -Message ($script:localizedData.PowerPlanCimError -f $getCimInstanceArguments.Class)
     }
 
     try

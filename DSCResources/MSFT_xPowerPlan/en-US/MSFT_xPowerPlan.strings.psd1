@@ -7,5 +7,5 @@ ConvertFrom-StringData @'
     PowerPlanIsBeingActivated = Activating power plan '{0}'.
     PowerPlanIsBeingValidated = Validating power plan '{0}'.
     PowerPlanWasUnableToBeSet = Unable to set the power plan '{0}' to the active plan. Error message: {1}
-    PowerPlanCIMError = Could not get the Common Information Model (CIM) instances of class '{0}'.
+    PowerPlanCimError = Could not get the Common Information Model (CIM) instances of class '{0}'.
 '@
