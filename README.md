@@ -217,6 +217,11 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
+* xPowerPlan:
+  * Updated to meet HQRM guidelines.
+  * Converted calls to `throw` to use `New-InvalidOperationException`
+    in CommonResourceHelper.
+
 ### 3.1.0.0
 
 * xOfflineDomainJoin:
