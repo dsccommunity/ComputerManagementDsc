@@ -17,6 +17,7 @@ Configuration xScheduledTaskOnceCrossTimezone
             DisallowHardTerminate = $true
             RunOnlyIfIdle         = $false
             Priority              = 9
+            ExecutionTimeLimit    = '00:00:00'
         }
     }
 }
@@ -40,6 +41,7 @@ Configuration xScheduledTaskOnceAdd
             DisallowHardTerminate = $true
             RunOnlyIfIdle         = $false
             Priority              = 9
+            ExecutionTimeLimit    = '00:00:00'
         }
     }
 }
@@ -180,6 +182,7 @@ Configuration xScheduledTaskOnceMod
             RepeatInterval      = '00:20:00'
             RepetitionDuration  = '08:00:00'
             DisallowDemandStart = $true
+            ExecutionTimeLimit  = '02:00:00'
         }
     }
 }

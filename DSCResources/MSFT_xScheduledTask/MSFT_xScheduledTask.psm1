@@ -915,7 +915,7 @@ function Set-TargetResource
             $settingParameters.Add('IdleWaitTimeout', $IdleWaitTimeout)
         }
 
-        if ($ExecutionTimeLimit -gt [System.TimeSpan] '00:00:00')
+        if ($PSBoundParameters.ContainsKey('ExecutionTimeLimit'))
         {
             $settingParameters.Add('ExecutionTimeLimit', $ExecutionTimeLimit)
         }
@@ -931,6 +931,17 @@ function Set-TargetResource
         }
 
         $setting = New-ScheduledTaskSettingsSet @settingParameters
+
+        <#
+            On Windows Server 2012 R2 setting a blank timespan for ExecutionTimeLimit
+            does not result in the PT0S timespan value being set. So set this
+            if it has not been set.
+        #>
+        if ($PSBoundParameters.ContainsKey('ExecutionTimeLimit') -and `
+            [System.String]::IsNullOrEmpty($setting.ExecutionTimeLimit))
+        {
+            $setting.ExecutionTimeLimit = 'PT0S'
+        }
 
         $triggerParameters = @{}
 
