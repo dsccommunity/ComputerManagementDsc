@@ -8,7 +8,6 @@ $script:localizedData = Get-LocalizedData `
     -ResourceName 'ComputerManagementDsc.Common' `
     -ResourcePath $PSScriptRoot
 
-
 <#
     .SYNOPSIS
         Removes common parameters from a hashtable
