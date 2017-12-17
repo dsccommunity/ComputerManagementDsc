@@ -988,7 +988,7 @@ try
                     Assert-MockCalled -CommandName Get-Item -Exactly -Times 0 -Scope It
                 }
 
-                It "returns domain DNS name when netbios not specified" {
+                It 'Returns domain DNS name when netbios not specified' {
                     Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
                         [PSCustomObject] @{
                             Domain       = 'contoso.com';
