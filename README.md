@@ -224,6 +224,11 @@ xVirtualMemory has the following properties:
   * Updated to meet HQRM guidelines.
   * Converted calls to `throw` to use `New-InvalidOperationException`
     in CommonResourceHelper.
+* Move Common Resource Helper functions into modules folder.
+* Changed resources to use Common Resource Helper functions.
+* Moved strings for Common Resource Helper functions into separate
+  strings file.
+* Added unit tests for Common Helper functions.
 
 ### 3.1.0.0
 

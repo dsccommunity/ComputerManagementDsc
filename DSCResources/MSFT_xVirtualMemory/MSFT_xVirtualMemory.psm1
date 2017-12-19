@@ -3,9 +3,22 @@ param
 (
 )
 
-Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
-    -ChildPath 'CommonResourceHelper.psm1')
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xVirtualMemory'
+$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
+
+# Import the ComputerManagementDsc Common Modules
+Import-Module -Name (Join-Path -Path $modulePath `
+        -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
+            -ChildPath 'ComputerManagementDsc.Common.psm1'))
+
+# Import the ComputerManagementDsc Resource Helper Module
+Import-Module -Name (Join-Path -Path $modulePath `
+        -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
+            -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xVirtualMemory' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
     .SYNOPSIS
