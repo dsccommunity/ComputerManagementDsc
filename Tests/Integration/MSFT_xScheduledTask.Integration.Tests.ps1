@@ -35,73 +35,104 @@ try
             Weekly            = 'xScheduledTaskWeekly'
             AtLogon           = 'xScheduledTaskLogon'
             AtStartup         = 'xScheduledTaskStartup'
+            ExecuteAs         = 'xScheduledTaskExecuteAs'
+        }
+
+        $configData = @{
+            AllNodes = @(
+                @{
+                    NodeName                    = 'localhost'
+                    PSDscAllowPlainTextPassword = $true
+                }
+            )
         }
 
         foreach ($contextInfo in $contexts.GetEnumerator())
         {
             Context "[$($contextInfo.Key)] No scheduled task exists but it should" {
-                $CurrentConfig = '{0}Add' -f $contextInfo.Value
-                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
-                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+                $currentConfig = '{0}Add' -f $contextInfo.Value
+                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
                 It 'Should compile the MOF without throwing' {
                     {
-                        . $CurrentConfig -OutputPath $ConfigDir
+                        . $currentConfig `
+                            -OutputPath $configDir `
+                            -ConfigurationData $configData
                     } | Should Not Throw
                 }
 
                 It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
+                        Start-DscConfiguration `
+                            -Path $configDir `
+                            -Wait `
+                            -Force `
+                            -Verbose `
+                            -ErrorAction Stop
                     } | Should Not Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
                 }
             }
 
             Context "[$($contextInfo.Key)] A scheduled task exists with the wrong settings" {
-                $CurrentConfig = '{0}Mod' -f $contextInfo.Value
-                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
-                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+                $currentConfig = '{0}Mod' -f $contextInfo.Value
+                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
                 It 'Should compile the MOF without throwing' {
                     {
-                        . $CurrentConfig -OutputPath $ConfigDir
+                        . $currentConfig `
+                            -OutputPath $configDir `
+                            -ConfigurationData $configData
                     } | Should Not Throw
                 }
 
                 It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
+                        Start-DscConfiguration `
+                            -Path $configDir `
+                            -Wait `
+                            -Force `
+                            -Verbose `
+                            -ErrorAction Stop
                     } | Should Not Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
                 }
             }
 
             Context "[$($contextInfo.Key)] A scheduled tasks exists but it should not" {
-                $CurrentConfig = '{0}Del' -f $contextInfo.Value
-                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
-                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+                $currentConfig = '{0}Del' -f $contextInfo.Value
+                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
                 It 'Should compile the MOF without throwing' {
                     {
-                        . $CurrentConfig -OutputPath $ConfigDir
+                        . $currentConfig `
+                            -OutputPath $configDir `
+                            -ConfigurationData $configData
                     } | Should Not Throw
                 }
 
                 It 'Should apply the MOF correctly' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
+                        Start-DscConfiguration `
+                            -Path $configDir `
+                            -Wait `
+                            -Force `
+                            -Verbose `
+                            -ErrorAction Stop
                     } | Should Not Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
                 }
             }
         }
@@ -111,31 +142,37 @@ try
                 $currentTimeZoneId = Get-TimeZoneId
             }
 
-            $CurrentConfig = 'xScheduledTaskOnceCrossTimezone'
-            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
-            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+            $currentConfig = 'xScheduledTaskOnceCrossTimezone'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
             It 'Should compile the MOF without throwing in W. Australia Standard Time Timezone' {
                 {
 
                     Set-TimeZoneId -Id 'W. Australia Standard Time'
-                    . $CurrentConfig -OutputPath $ConfigDir
+                    . $currentConfig `
+                        -OutputPath $configDir
                 } | Should Not Throw
             }
 
             It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
                 {
                     Set-TimeZoneId -Id 'New Zealand Standard Time'
-                    Start-DscConfiguration -Path $ConfigDir -Wait -Force -Verbose
+                    Start-DscConfiguration `
+                        -Path $configDir `
+                        -Wait `
+                        -Force `
+                        -Verbose `
+                        -ErrorAction Stop
                 } | Should Not Throw
             }
 
             It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
             }
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $CurrentConfig}
+                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
                 $current.TaskName              | Should Be 'Test task once cross timezone'
                 $current.TaskPath              | Should Be '\xComputerManagement\'
                 $current.ActionExecutable      | Should Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
@@ -148,6 +185,8 @@ try
                 $current.DisallowHardTerminate | Should Be $true
                 $current.RunOnlyIfIdle         | Should Be $false
                 $current.Priority              | Should Be 9
+                $current.RunLevel              | Should Be 'Limited'
+                $current.ExecutionTimeLimit    | Should Be '00:00:00'
             }
 
             AfterAll {

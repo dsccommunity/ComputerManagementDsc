@@ -1,6 +1,19 @@
-Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
-                               -ChildPath 'CommonResourceHelper.psm1')
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xPowerPlan'
+$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
+
+# Import the ComputerManagementDsc Common Modules
+Import-Module -Name (Join-Path -Path $modulePath `
+        -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
+            -ChildPath 'ComputerManagementDsc.Common.psm1'))
+
+# Import the ComputerManagementDsc Resource Helper Module
+Import-Module -Name (Join-Path -Path $modulePath `
+        -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
+            -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xPowerPlan' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
     .SYNOPSIS
@@ -33,19 +46,20 @@ function Get-TargetResource
         $Name
     )
 
-    $arguments = @{
-        Name = 'root\cimv2\power'
-        Class = 'Win32_PowerPlan'
+    $getCimInstanceArguments = @{
+        Name   = 'root\cimv2\power'
+        Class  = 'Win32_PowerPlan'
         Filter = "ElementName = '$Name'"
     }
 
     try
     {
-        $plan = Get-CimInstance @arguments
+        $plan = Get-CimInstance @getCimInstanceArguments
     }
     catch
     {
-        throw ($script:localizedData.PowerPlanCIMError -f $($arguments.Class) )
+        New-InvalidOperationException `
+            -Message ($script:localizedData.PowerPlanCimError -f $getCimInstanceArguments.Class)
     }
 
     if ($plan)
@@ -63,12 +77,13 @@ function Get-TargetResource
     }
     else
     {
-        throw ($script:localizedData.PowerPlanNotFound -f $Name)
+        New-InvalidOperationException `
+            -Message ($script:localizedData.PowerPlanNotFound -f $Name)
     }
 
     return @{
         IsSingleInstance = $IsSingleInstance
-        Name = $activePlanName
+        Name             = $activePlanName
     }
 }
 
@@ -104,19 +119,20 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingActivated -f $Name)
 
-    $arguments = @{
-        Name = 'root\cimv2\power'
-        Class = 'Win32_PowerPlan'
+    $getCimInstanceArguments = @{
+        Name   = 'root\cimv2\power'
+        Class  = 'Win32_PowerPlan'
         Filter = "ElementName = '$Name'"
     }
 
     try
     {
-        $plan = Get-CimInstance @arguments
+        $plan = Get-CimInstance @getCimInstanceArguments
     }
     catch
     {
-        throw ($script:localizedData.PowerPlanCIMError -f $($arguments.Class) )
+        New-InvalidOperationException `
+            -Message ($script:localizedData.PowerPlanCimError -f $getCimInstanceArguments.Class)
     }
 
     try
@@ -125,7 +141,8 @@ function Set-TargetResource
     }
     catch
     {
-        throw ($script:localizedData.PowerPlanWasUnableToBeSet -f $Name, $($_.Exception.Message))
+        New-InvalidOperationException `
+            -Message ($script:localizedData.PowerPlanWasUnableToBeSet -f $Name, $_.Exception.Message)
     }
 }
 
@@ -165,6 +182,7 @@ function Test-TargetResource
     Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingValidated -f $Name)
 
     $getTargetResourceResult = Get-TargetResource -IsSingleInstance $IsSingleInstance -Name $Name
+
     if ($getTargetResourceResult.Name -eq $Name)
     {
         $returnValue = $true
