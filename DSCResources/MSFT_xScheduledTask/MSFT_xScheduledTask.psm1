@@ -28,7 +28,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
 
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_xVirtualMemory' `
+    -ResourceName 'MSFT_xScheduledTask' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
