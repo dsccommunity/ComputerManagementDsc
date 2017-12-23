@@ -26,6 +26,11 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
             -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
 
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xVirtualMemory' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+
 <#
     .SYNOPSIS
         Tests if the current resource state matches the desired resource state.
@@ -376,13 +381,13 @@ function Get-TargetResource
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
-    Write-Verbose -Message ('Retrieving existing task ({0} in {1}).' -f $TaskName, $TaskPath)
+    Write-Verbose -Message ($script:localizedData.GetScheduledTaskMessage -f $TaskName, $TaskPath)
 
     $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
 
     if ($null -eq $task)
     {
-        Write-Verbose -Message ('No task found. returning empty task {0} with Ensure = "Absent".' -f $Taskname)
+        Write-Verbose -Message ($script:localizedData.TaskNotFoundMessage -f $TaskName, $TaskPath)
 
         return @{
             TaskName         = $TaskName
@@ -393,7 +398,7 @@ function Get-TargetResource
     }
     else
     {
-        Write-Verbose -Message ('Task {0} found in {1}. Retrieving settings, first action, first trigger and repetition settings.' -f $TaskName, $TaskPath)
+        Write-Verbose -Message ($script:localizedData.TaskFoundMessage -f $TaskName, $TaskPath)
 
         $action = $task.Actions | Select-Object -First 1
         $trigger = $task.Triggers | Select-Object -First 1
@@ -434,11 +439,13 @@ function Get-TargetResource
 
             default
             {
-                New-InvalidArgumentException -Message "Trigger type $_ not recognized." -ArgumentName CimClassName
+                New-InvalidArgumentException `
+                    -Message ($script:localizedData.TriggerTypeError -f $trigger.CimClass.CimClassName) `
+                    -ArgumentName CimClassName
             }
         }
 
-        Write-Verbose -Message ('Detected schedule type {0} for first trigger.' -f $returnScheduleType)
+        Write-Verbose -Message ($script:localizedData.DetectedScheduleTypeMessage -f $returnScheduleType)
 
         $daysOfWeek = @()
 
@@ -839,7 +846,7 @@ function Set-TargetResource
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
-    Write-Verbose -Message ('Entering Set-TargetResource for {0} in {1}.' -f $TaskName, $TaskPath)
+    Write-Verbose -Message ($script:localizedData.SetScheduledTaskMessage -f $TaskName, $TaskPath)
 
     # Convert the strings containing time spans to TimeSpan Objects
     [System.TimeSpan] $RepeatInterval = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RepeatInterval
@@ -856,26 +863,30 @@ function Set-TargetResource
     {
         if ($RepetitionDuration -lt $RepeatInterval)
         {
-            $exceptionMessage = 'Repetition duration {0} is less than repetition interval {1}. Please set RepeatInterval to a value lower or equal to RepetitionDuration.' -f $RepetitionDuration, $RepeatInterval
-            New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepeatInterval
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.RepetitionDurationLessThanIntervalError -f $RepetitionDuration, $RepeatInterval) `
+                -ArgumentName RepeatInterval
         }
 
         if ($ScheduleType -eq 'Daily' -and $DaysInterval -eq 0)
         {
-            $exceptionMessage = 'Schedules of the type Daily must have a DaysInterval greater than 0 (value entered: {0}).' -f $DaysInterval
-            New-InvalidArgumentException -Message $exceptionMessage -ArgumentName DaysInterval
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.DaysIntervalError -f $DaysInterval) `
+                -ArgumentName DaysInterval
         }
 
         if ($ScheduleType -eq 'Weekly' -and $WeeksInterval -eq 0)
         {
-            $exceptionMessage = 'Schedules of the type Weekly must have a WeeksInterval greater than 0 (value entered: {0}).' -f $WeeksInterval
-            New-InvalidArgumentException -Message $exceptionMessage -ArgumentName WeeksInterval
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.WeeksIntervalError -f $WeeksInterval) `
+                -ArgumentName WeeksInterval
         }
 
         if ($ScheduleType -eq 'Weekly' -and $DaysOfWeek.Count -eq 0)
         {
-            $exceptionMessage = 'Schedules of the type Weekly must have at least one weekday selected.'
-            New-InvalidArgumentException -Message $exceptionMessage -ArgumentName DaysOfWeek
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.WeekDayMissingError) `
+                -ArgumentName DaysOfWeek
         }
 
         $actionParameters = @{
@@ -947,7 +958,7 @@ function Set-TargetResource
             if it has not been set.
         #>
         if ($PSBoundParameters.ContainsKey('ExecutionTimeLimit') -and `
-            [System.String]::IsNullOrEmpty($setting.ExecutionTimeLimit))
+                [System.String]::IsNullOrEmpty($setting.ExecutionTimeLimit))
         {
             $setting.ExecutionTimeLimit = 'PT0S'
         }
@@ -965,6 +976,7 @@ function Set-TargetResource
             {
                 $triggerParameters.Add('Once', $true)
                 $triggerParameters.Add('At', $StartTime)
+
                 break
             }
 
@@ -973,6 +985,7 @@ function Set-TargetResource
                 $triggerParameters.Add('Daily', $true)
                 $triggerParameters.Add('At', $StartTime)
                 $triggerParameters.Add('DaysInterval', $DaysInterval)
+
                 break
             }
 
@@ -980,6 +993,7 @@ function Set-TargetResource
             {
                 $triggerParameters.Add('Weekly', $true)
                 $triggerParameters.Add('At', $StartTime)
+
                 if ($DaysOfWeek.Count -gt 0)
                 {
                     $triggerParameters.Add('DaysOfWeek', $DaysOfWeek)
@@ -989,22 +1003,26 @@ function Set-TargetResource
                 {
                     $triggerParameters.Add('WeeksInterval', $WeeksInterval)
                 }
+
                 break
             }
 
             'AtStartup'
             {
                 $triggerParameters.Add('AtStartup', $true)
+
                 break
             }
 
             'AtLogOn'
             {
                 $triggerParameters.Add('AtLogOn', $true)
+
                 if (-not [System.String]::IsNullOrWhiteSpace($User))
                 {
                     $triggerParameters.Add('User', $User)
                 }
+
                 break
             }
         }
@@ -1013,19 +1031,21 @@ function Set-TargetResource
 
         if (-not $trigger)
         {
-            $exceptionMessage = 'Error creating new scheduled task trigger.'
-            New-InvalidOperationException -Message $exceptionMessage -ErrorRecord $_
+            New-InvalidOperationException `
+                -Message ($script:localizedData.TriggerCreationError) `
+                -ErrorRecord $_
         }
 
         if ($RepeatInterval -gt [System.TimeSpan]::Parse('0:0:0'))
         {
             # A repetition pattern is required so create it and attach it to the trigger object
-            Write-Verbose -Message ('Configuring trigger repetition.')
+            Write-Verbose -Message ($script:localizedData.ConfigureTriggerRepetitionMessage)
 
             if ($RepetitionDuration -le $RepeatInterval)
             {
-                $exceptionMessage = 'Repetition interval is set to {0} but repetition duration is {1}.' -f $RepeatInterval, $RepetitionDuration
-                New-InvalidArgumentException -Message $exceptionMessage -ArgumentName RepetitionDuration
+                New-InvalidArgumentException `
+                    -Message ($script:localizedData.RepetitionIntervalError -f $RepeatInterval, $RepetitionDuration) `
+                    -ArgumentName RepetitionDuration
             }
 
             $tempTriggerParameters = @{
@@ -1034,14 +1054,14 @@ function Set-TargetResource
                 RepetitionInterval = $RepeatInterval
             }
 
-            Write-Verbose -Message ('Creating MSFT_TaskRepetitionPattern CIM instance to configure repetition in trigger.')
+            Write-Verbose -Message ($script:localizedData.CreateRepetitionPatternMessage)
 
             switch ($trigger.GetType().FullName)
             {
                 'Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger'
                 {
                     # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
-                    Write-Verbose -Message ('Creating temporary task and trigger to get MSFT_TaskRepetitionPattern CIM instance.')
+                    Write-Verbose -Message ($script:localizedData.CreateTemporaryTaskMessage)
 
                     $tempTriggerParameters.Add('RepetitionDuration', $RepetitionDuration)
 
@@ -1056,7 +1076,7 @@ function Set-TargetResource
                 'Microsoft.Management.Infrastructure.CimInstance'
                 {
                     # This is the type of trigger object returned in Windows Server 2016/Windows 10 and above
-                    Write-Verbose -Message ('Creating temporary trigger to get MSFT_TaskRepetitionPattern CIM instance.')
+                    Write-Verbose -Message ($script:localizedData.CreateTemporaryTriggerMessage)
 
                     if ($RepetitionDuration -gt [System.TimeSpan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.TimeSpan]::MaxValue)
                     {
@@ -1073,7 +1093,7 @@ function Set-TargetResource
                 default
                 {
                     New-InvalidOperationException `
-                        -Message ('Trigger object that was created was of unexpected type {0}.' -f $trigger.GetType().FullName)
+                        -Message ($script:localizedData.TriggerUnexpectedTypeError -f $trigger.GetType().FullName)
                 }
             }
         }
@@ -1122,7 +1142,8 @@ function Set-TargetResource
         }
 
         # Create the principal object
-        Write-Verbose -Message ('Creating scheduled task principal for account "{0}" using logon type "{1}".' -f $username, $LogonType)
+        Write-Verbose -Message ($script:localizedData.CreateScheduledTaskPrincipalMessage -f $username, $LogonType)
+
         $principal = New-ScheduledTaskPrincipal @principalArguments
 
         $scheduledTaskArguments = @{
@@ -1134,18 +1155,18 @@ function Set-TargetResource
 
         if ($currentValues.Ensure -eq 'Present')
         {
-            Write-Verbose -Message ('Removing previous scheduled task {0}.' -f $TaskName)
+            Write-Verbose -Message ($script:localizedData.RemovePreviousScheduledTaskMessage -f $TaskName, $TaskPath)
             $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false -ErrorAction Stop
         }
 
-        Write-Verbose -Message ('Creating new scheduled task {0}.' -f $TaskName)
+        Write-Verbose -Message ($script:localizedData.CreateNewScheduledTaskMessage -f $TaskName, $TaskPath)
 
         # Create the scheduled task object
         $scheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
 
         if ($repetition)
         {
-            Write-Verbose -Message ('Setting repetition trigger settings on task {0}.' -f $TaskName)
+            Write-Verbose -Message ($script:localizedData.SetRepetitionTriggerMessage -f $TaskName, $TaskPath)
             $scheduledTask.Triggers[0].Repetition = $repetition
         }
 
@@ -1157,13 +1178,13 @@ function Set-TargetResource
         # Register the scheduled task
         $registerArguments.Add('InputObject', $scheduledTask)
 
-        Write-Verbose -Message ('Registering the scheduled task {0}.' -f $TaskName)
+        Write-Verbose -Message ($script:localizedData.RegisterScheduledTaskMessage -f $TaskName, $TaskPath)
         $null = Register-ScheduledTask @registerArguments -ErrorAction Stop
     }
 
     if ($Ensure -eq 'Absent')
     {
-        Write-Verbose -Message ('Removing the scheduled task {0}.' -f $TaskName)
+        Write-Verbose -Message ($script:localizedData.RemoveScheduledTaskMessage -f $TaskName, $TaskPath)
 
         Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false -ErrorAction Stop
     }
@@ -1500,6 +1521,8 @@ function Test-TargetResource
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
+    Write-Verbose -Message ($script:localizedData.TestScheduledTaskMessage -f $TaskName, $TaskPath)
+
     # Convert the strings containing time spans to TimeSpan Objects
     if ($PSBoundParameters.ContainsKey('RepeatInterval'))
     {
@@ -1544,11 +1567,9 @@ function Test-TargetResource
         $PSBoundParameters['RestartInterval'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval).ToString()
     }
 
-    Write-Verbose -Message ('Testing scheduled task {0}' -f $TaskName)
-
     $currentValues = Get-TargetResource @PSBoundParameters
 
-    Write-Verbose -Message 'Current values retrieved'
+    Write-Verbose -Message ($script:localizedData.GetCurrentTaskValuesMessage)
 
     if ($Ensure -eq 'Absent' -and $currentValues.Ensure -eq 'Absent')
     {
@@ -1557,7 +1578,8 @@ function Test-TargetResource
 
     if ($null -eq $currentValues)
     {
-        Write-Verbose -Message 'Current values were null.'
+        Write-Verbose -Message ($script:localizedData.CurrentTaskValuesNullMessage)
+
         return $false
     }
 
@@ -1570,7 +1592,9 @@ function Test-TargetResource
 
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
-    Write-Verbose -Message 'Testing DSC parameter state.'
+
+    Write-Verbose -Message ($script:localizedData.TestingDscParameterStateMessage)
+
     return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues
 }
 
