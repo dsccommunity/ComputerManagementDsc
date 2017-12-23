@@ -6,8 +6,8 @@ ConvertFrom-StringData @'
     DetectedScheduleTypeMessage = Detected schedule type '{0}' for first trigger.
     SetScheduledTaskMessage = Setting scheduled task '{0}' in '{1}'.
     RepetitionDurationLessThanIntervalError = Repetition duration '{0}' is less than repetition interval '{1}'. Please set RepeatInterval to a value lower or equal to RepetitionDuration.
-    DaysIntervalError = DaysInterval must be greater than 0 for Daily schedules. DaysInterval specified is '{0}'.
-    WeeksIntervalError = WeeksInterval must be greater than 0 for Weekly schedules. WeeksInterval specified is '{0}'.
+    DaysIntervalError = DaysInterval must be greater than zero (0) for Daily schedules. DaysInterval specified is '{0}'.
+    WeeksIntervalError = WeeksInterval must be greater than zero (0) for Weekly schedules. WeeksInterval specified is '{0}'.
     WeekDayMissingError = At least one weekday must be selected for Weekly schedule.
     TriggerCreationError = Error creating new scheduled task trigger.
     ConfigureTriggerRepetitionMessage = Configuring trigger repetition.
