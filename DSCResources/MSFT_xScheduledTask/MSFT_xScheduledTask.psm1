@@ -510,8 +510,8 @@ function Get-TargetResource
             RestartCount                    = $settings.RestartCount
             RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.RestartInterval
             RunOnlyIfNetworkAvailable       = $settings.RunOnlyIfNetworkAvailable
-            RunLevel                        = [String] $task.Principal.RunLevel
-            LogonType                       = [String] $task.Principal.LogonType
+            RunLevel                        = [System.String] $task.Principal.RunLevel
+            LogonType                       = [System.String] $task.Principal.LogonType
         }
     }
 }
@@ -1110,7 +1110,7 @@ function Set-TargetResource
             $registerArguments.Add('User', $username)
 
             # If the LogonType is not specified then set it to password
-            if ([String]::IsNullOrEmpty($LogonType))
+            if ([System.String]::IsNullOrEmpty($LogonType))
             {
                 $LogonType = 'Password'
             }
@@ -1156,6 +1156,7 @@ function Set-TargetResource
         if ($currentValues.Ensure -eq 'Present')
         {
             Write-Verbose -Message ($script:localizedData.RemovePreviousScheduledTaskMessage -f $TaskName, $TaskPath)
+
             $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false -ErrorAction Stop
         }
 
@@ -1167,6 +1168,7 @@ function Set-TargetResource
         if ($repetition)
         {
             Write-Verbose -Message ($script:localizedData.SetRepetitionTriggerMessage -f $TaskName, $TaskPath)
+
             $scheduledTask.Triggers[0].Repetition = $repetition
         }
 
@@ -1179,6 +1181,7 @@ function Set-TargetResource
         $registerArguments.Add('InputObject', $scheduledTask)
 
         Write-Verbose -Message ($script:localizedData.RegisterScheduledTaskMessage -f $TaskName, $TaskPath)
+
         $null = Register-ScheduledTask @registerArguments -ErrorAction Stop
     }
 
@@ -1694,7 +1697,7 @@ function ConvertTo-TimeSpanStringFromScheduledTaskString
     )
 
     # If AllowIndefinitely is true and the timespan is empty then return Indefinitely
-    if ($AllowIndefinitely -eq $true -and [String]::IsNullOrEmpty($TimeSpan))
+    if ($AllowIndefinitely -eq $true -and [System.String]::IsNullOrEmpty($TimeSpan))
     {
         return 'Indefinitely'
     }
