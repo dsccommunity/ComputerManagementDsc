@@ -217,11 +217,16 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
+* xScheduledTask:
+  * Fix error message when trigger type is unknown - See [Issue #121](https://github.com/PowerShell/xComputerManagement/issues/121).
+  * Moved strings into separate strings file.
+  * Updated to meet HQRM guidelines.
+
 ### 3.2.0.0
 
 * xScheduledTask:
   * Enable Execution Time Limit of task to be set to indefinite
-    by setting `ExecutionTimeLimit` to '00:00:00' - See [Issue #115](https://github.com/PowerShell/xComputerManagement/issues/115)
+    by setting `ExecutionTimeLimit` to '00:00:00' - See [Issue #115](https://github.com/PowerShell/xComputerManagement/issues/115).
 * xPowerPlan:
   * Updated to meet HQRM guidelines.
   * Converted calls to `throw` to use `New-InvalidOperationException`
