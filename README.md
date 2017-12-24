@@ -221,6 +221,9 @@ xVirtualMemory has the following properties:
   * Fix error message when trigger type is unknown - See [Issue #121](https://github.com/PowerShell/xComputerManagement/issues/121).
   * Moved strings into separate strings file.
   * Updated to meet HQRM guidelines.
+* xComputer:
+  * Resolved bug in Get-ComputerDomain where LocalSystem doesn't have
+  rights to the domain
 
 ### 3.2.0.0
 
@@ -246,10 +249,6 @@ xVirtualMemory has the following properties:
   * Added LogonType and RunLevel parameters for controlling
     task execution.
   * Correct `Assert-VerifiableMocks` to `Assert-VerifiableMock`
-
-* xComputer:
-  * Resolved bug in Get-ComputerDomain where LocalSystem doesn't have
-  rights to the domain
 
 ### 3.0.0.0
 
