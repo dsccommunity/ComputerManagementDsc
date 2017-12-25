@@ -59,7 +59,7 @@ try
                         . $currentConfig `
                             -OutputPath $configDir `
                             -ConfigurationData $configData
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should apply the MOF correctly' {
@@ -70,11 +70,11 @@ try
                             -Force `
                             -Verbose `
                             -ErrorAction Stop
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -be $true
                 }
             }
 
@@ -88,7 +88,7 @@ try
                         . $currentConfig `
                             -OutputPath $configDir `
                             -ConfigurationData $configData
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should apply the MOF correctly' {
@@ -99,11 +99,11 @@ try
                             -Force `
                             -Verbose `
                             -ErrorAction Stop
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -be $true
                 }
             }
 
@@ -117,7 +117,7 @@ try
                         . $currentConfig `
                             -OutputPath $configDir `
                             -ConfigurationData $configData
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should apply the MOF correctly' {
@@ -128,11 +128,11 @@ try
                             -Force `
                             -Verbose `
                             -ErrorAction Stop
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -be $true
                 }
             }
         }
@@ -152,7 +152,7 @@ try
                     Set-TimeZoneId -Id 'W. Australia Standard Time'
                     . $currentConfig `
                         -OutputPath $configDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
@@ -164,29 +164,29 @@ try
                         -Force `
                         -Verbose `
                         -ErrorAction Stop
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -be $true
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
-                $current.TaskName              | Should Be 'Test task once cross timezone'
-                $current.TaskPath              | Should Be '\xComputerManagement\'
-                $current.ActionExecutable      | Should Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                $current.ScheduleType          | Should Be 'Once'
-                $current.RepeatInterval        | Should Be '00:15:00'
-                $current.RepetitionDuration    | Should Be '23:00:00'
-                $current.ActionWorkingPath     | Should Be (Get-Location).Path
-                $current.Enable                | Should Be $true
-                $current.RandomDelay           | Should Be '01:00:00'
-                $current.DisallowHardTerminate | Should Be $true
-                $current.RunOnlyIfIdle         | Should Be $false
-                $current.Priority              | Should Be 9
-                $current.RunLevel              | Should Be 'Limited'
-                $current.ExecutionTimeLimit    | Should Be '00:00:00'
+                $current.TaskName              | Should -Be 'Test task once cross timezone'
+                $current.TaskPath              | Should -Be '\xComputerManagement\'
+                $current.ActionExecutable      | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                $current.ScheduleType          | Should -Be 'Once'
+                $current.RepeatInterval        | Should -Be '00:15:00'
+                $current.RepetitionDuration    | Should -Be '23:00:00'
+                $current.ActionWorkingPath     | Should -Be (Get-Location).Path
+                $current.Enable                | Should -Be $true
+                $current.RandomDelay           | Should -Be '01:00:00'
+                $current.DisallowHardTerminate | Should -Be $true
+                $current.RunOnlyIfIdle         | Should -Be $false
+                $current.Priority              | Should -Be 9
+                $current.RunLevel              | Should -Be 'Limited'
+                $current.ExecutionTimeLimit    | Should -Be '00:00:00'
             }
 
             AfterAll {

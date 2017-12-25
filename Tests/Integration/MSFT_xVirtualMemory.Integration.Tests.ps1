@@ -35,17 +35,17 @@ try
             It "should compile a MOF file without error" {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
             
             It "should apply the MOF correctly" {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -be $true 
             }
         }
 
@@ -57,17 +57,17 @@ try
             It "should compile a MOF file without error" {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
             
             It "should apply the MOF correctly" {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -be $true 
             }
         }
 
@@ -79,17 +79,17 @@ try
             It "should compile a MOF file without error" {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
             
             It "should apply the MOF correctly" {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -be $true 
             }
         }
 
@@ -101,17 +101,17 @@ try
             It "should compile a MOF file without error" {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
             
             It "should apply the MOF correctly" {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
             
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -be $true 
             }
         }
     }

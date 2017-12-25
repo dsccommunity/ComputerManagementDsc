@@ -223,7 +223,8 @@ xVirtualMemory has the following properties:
   * Updated to meet HQRM guidelines.
 * xComputer:
   * Resolved bug in Get-ComputerDomain where LocalSystem doesn't have
-  rights to the domain
+    rights to the domain.
+* Updated tests to meet Pester V4 guidelines - See [Issue #106](https://github.com/PowerShell/xComputerManagement/issues/106).
 
 ### 3.2.0.0
 

@@ -37,8 +37,8 @@ try
                 $result = Get-TargetResource `
                     @TestOfflineDomainJoin
 
-                $result.IsSingleInstance       | Should Be $testOfflineDomainJoin.IsSingleInstance
-                $result.RequestFile            | Should Be ''
+                $result.IsSingleInstance       | Should -Be $testOfflineDomainJoin.IsSingleInstance
+                $result.RequestFile            | Should -Be ''
             }
         }
 
@@ -51,7 +51,7 @@ try
                 Mock -CommandName Join-Domain
 
                 It 'Should not throw exception' {
-                    { Set-TargetResource @TestOfflineDomainJoin } | Should Not Throw
+                    { Set-TargetResource @TestOfflineDomainJoin } | Should -Not -Throw
                 }
 
                 It 'Should do call all the mocks' {
@@ -72,7 +72,7 @@ try
                         -Message ($LocalizedData.RequestFileNotFoundError -f $testOfflineDomainJoin.RequestFile) `
                         -ArgumentName 'RequestFile'
 
-                    { Test-TargetResource @TestOfflineDomainJoin } | Should Throw $errorRecord
+                    { Test-TargetResource @TestOfflineDomainJoin } | Should -Throw $errorRecord
                 }
 
                 It 'Should do call all the mocks' {
@@ -93,7 +93,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestOfflineDomainJoin | should be $false
+                    Test-TargetResource @TestOfflineDomainJoin | should -be $false
                 }
 
                 It 'Should do call all the mocks' {
@@ -112,7 +112,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestOfflineDomainJoin | should be $true
+                    Test-TargetResource @TestOfflineDomainJoin | should -be $true
                 }
 
                 It 'Should do call all the mocks' {
@@ -135,7 +135,7 @@ try
                         -Message ($LocalizedData.RequestFileNotFoundError -f $testOfflineDomainJoin.RequestFile) `
                         -ArgumentName 'RequestFile'
 
-                    { Test-TargetResource @TestOfflineDomainJoin } | Should Throw $errorRecord
+                    { Test-TargetResource @TestOfflineDomainJoin } | Should -Throw $errorRecord
                 }
 
                 It 'Should do call all the mocks' {
@@ -153,7 +153,7 @@ try
                 }
 
                 It 'Should not throw' {
-                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should Not Throw
+                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should -Not -Throw
                 }
 
                 It 'Should do call all the mocks' {
@@ -171,7 +171,7 @@ try
                     -Message $($LocalizedData.DjoinError -f 99)
 
                 It 'Should not throw' {
-                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should Throw $errorRecord
+                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should -Throw $errorRecord
                 }
 
                 It 'Should do call all the mocks' {

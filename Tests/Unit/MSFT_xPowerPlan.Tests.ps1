@@ -55,8 +55,8 @@ try
 
             It 'Should return the same values as passed as parameters' {
                 $result = Get-TargetResource @testParameters
-                $result.IsSingleInstance | Should Be 'Yes'
-                $result.Name | Should Be $testParameters.Name
+                $result.IsSingleInstance | Should -Be 'Yes'
+                $result.Name | Should -Be $testParameters.Name
             }
         }
 
@@ -74,8 +74,8 @@ try
 
             It 'Should not return any plan name' {
                 $result = Get-TargetResource @testParameters
-                $result.IsSingleInstance | Should Be 'Yes'
-                $result.Name | Should Be $null
+                $result.IsSingleInstance | Should -Be 'Yes'
+                $result.Name | Should -Be $null
             }
         }
 
@@ -92,7 +92,7 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.PowerPlanCimError -f 'Win32_PowerPlan')
 
-                { Get-TargetResource @testParameters } | Should Throw $errorRecord
+                { Get-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
 
@@ -108,7 +108,7 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.PowerPlanNotFound -f $testParameters.Name)
 
-                { Get-TargetResource @testParameters } | Should Throw $errorRecord
+                { Get-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
 
@@ -160,7 +160,7 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.PowerPlanCimError -f 'Win32_PowerPlan')
 
-                { Set-TargetResource @testParameters } | Should Throw $errorRecord
+                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
 
@@ -177,7 +177,7 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.PowerPlanWasUnableToBeSet -f $testParameters.Name, 'Failed to set value')
 
-                { Set-TargetResource @testParameters } | Should Throw $errorRecord
+                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
 
@@ -206,7 +206,7 @@ try
             }
 
             It 'Should return the the state as present ($true)' {
-                Test-TargetResource @testParameters | Should Be $true
+                Test-TargetResource @testParameters | Should -Be $true
             }
         }
 
@@ -223,7 +223,7 @@ try
             }
 
             It 'Should return the the state as absent ($false)' {
-                Test-TargetResource @testParameters | Should Be $false
+                Test-TargetResource @testParameters | Should -Be $false
             }
         }
 
