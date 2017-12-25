@@ -221,6 +221,9 @@ xVirtualMemory has the following properties:
   * Fix error message when trigger type is unknown - See [Issue #121](https://github.com/PowerShell/xComputerManagement/issues/121).
   * Moved strings into separate strings file.
   * Updated to meet HQRM guidelines.
+* xComputer:
+  * Resolved bug in Get-ComputerDomain where LocalSystem doesn't have
+  rights to the domain
 
 ### 3.2.0.0
 
