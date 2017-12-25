@@ -74,7 +74,7 @@ try
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
                 }
             }
 
@@ -103,7 +103,7 @@ try
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
                 }
             }
 
@@ -132,7 +132,7 @@ try
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
                 }
             }
         }
@@ -168,7 +168,7 @@ try
             }
 
             It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -be $true
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
             }
 
             It 'Should have set the resource and all the parameters should match' {

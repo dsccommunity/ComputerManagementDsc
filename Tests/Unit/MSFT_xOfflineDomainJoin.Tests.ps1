@@ -93,7 +93,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestOfflineDomainJoin | should -be $false
+                    Test-TargetResource @TestOfflineDomainJoin | Should -Be $false
                 }
 
                 It 'Should do call all the mocks' {
@@ -112,7 +112,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestOfflineDomainJoin | should -be $true
+                    Test-TargetResource @TestOfflineDomainJoin | Should -Be $true
                 }
 
                 It 'Should do call all the mocks' {
