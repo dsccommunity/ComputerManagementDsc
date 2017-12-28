@@ -56,11 +56,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Absent'
+                    $result.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should create the scheduled task in the set method' {
@@ -102,11 +102,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should remove the scheduled task in the set method' {
@@ -129,11 +129,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Absent'
+                    $result.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should Be $true
+                    Test-TargetResource @testParameters | Should -Be $true
                 }
             }
 
@@ -170,11 +170,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -217,11 +217,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should Be $true
+                    Test-TargetResource @testParameters | Should -Be $true
                 }
             }
 
@@ -258,11 +258,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -305,11 +305,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should Be $true
+                    Test-TargetResource @testParameters | Should -Be $true
                 }
             }
 
@@ -345,11 +345,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -388,11 +388,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should Be $true
+                    Test-TargetResource @testParameters | Should -Be $true
                 }
             }
 
@@ -430,11 +430,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -480,12 +480,12 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
-                    $result.LogonType | Should Be 'Password'
+                    $result.Ensure | Should -Be 'Present'
+                    $result.LogonType | Should -Be 'Password'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -531,12 +531,12 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
-                    $result.RunLevel | Should Be 'Limited'
+                    $result.Ensure | Should -Be 'Present'
+                    $result.RunLevel | Should -Be 'Limited'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -581,11 +581,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -630,11 +630,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -682,11 +682,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -737,11 +737,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -801,11 +801,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should Be $true
+                    Test-TargetResource @testParameters | Should -Be $true
                 }
             }
 
@@ -847,11 +847,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should Be $true
+                    Test-TargetResource @testParameters | Should -Be $true
                 }
             }
 
@@ -893,11 +893,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -944,33 +944,33 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should Be $true
+                    Test-TargetResource @testParameters | Should -Be $true
                 }
             }
 
             Context 'A scheduled task path is root or custom' -Fixture {
                 It 'Should return backslash' {
-                    ConvertTo-NormalizedTaskPath -TaskPath '\'| Should Be '\'
+                    ConvertTo-NormalizedTaskPath -TaskPath '\'| Should -Be '\'
                 }
 
                 It 'Should add backslash at the end' {
-                    ConvertTo-NormalizedTaskPath -TaskPath '\Test'| Should Be '\Test\'
+                    ConvertTo-NormalizedTaskPath -TaskPath '\Test'| Should -Be '\Test\'
                 }
 
                 It 'Should add backslash at the beginning' {
-                    ConvertTo-NormalizedTaskPath -TaskPath 'Test\'| Should Be '\Test\'
+                    ConvertTo-NormalizedTaskPath -TaskPath 'Test\'| Should -Be '\Test\'
                 }
 
                 It 'Should add backslash at the beginning and at the end' {
-                    ConvertTo-NormalizedTaskPath -TaskPath 'Test'| Should Be '\Test\'
+                    ConvertTo-NormalizedTaskPath -TaskPath 'Test'| Should -Be '\Test\'
                 }
 
                 It 'Should not add backslash' {
-                    ConvertTo-NormalizedTaskPath -TaskPath '\Test\'| Should Be '\Test\'
+                    ConvertTo-NormalizedTaskPath -TaskPath '\Test\'| Should -Be '\Test\'
                 }
             }
 
@@ -1022,11 +1022,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1084,11 +1084,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1132,11 +1132,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1180,11 +1180,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should Be $false
+                    Test-TargetResource @testParameters | Should -Be $false
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1228,11 +1228,11 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Ensure | Should Be 'Present'
+                    $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should Be $true
+                    Test-TargetResource @testParameters | Should -Be $true
                 }
             }
         }
