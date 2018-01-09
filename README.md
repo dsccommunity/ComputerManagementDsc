@@ -217,6 +217,12 @@ xVirtualMemory has the following properties:
 
 ### Unreleased
 
+* BREAKING CHANGE: xScheduledTask:
+  * Add support to disable built-in scheduled tasks - See [Issue #74](https://github.com/PowerShell/xComputerManagement/issues/74).
+  * Breaking change because `Get-TargetResource` no longer outputs
+    `ActionExecutable` and `ScheduleType` properties when the scheduled
+    task does not exist. It will also include `TaskPath` in output when
+    scheduled task does not exist.
 * xScheduledTask:
   * Fix error message when trigger type is unknown - See [Issue #121](https://github.com/PowerShell/xComputerManagement/issues/121).
   * Moved strings into separate strings file.

@@ -115,6 +115,94 @@ try
                 }
             }
 
+            Context 'A built-in scheduled task exists and is enabled, but it should be disabled' {
+                $testParameters = @{
+                    TaskName = 'Test task'
+                    TaskPath = '\Test\'
+                    Enable = $false
+                    Verbose = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask { return @{
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions = @(@{
+                                Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT15M"
+                                    Interval = "PT15M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Settings = @(@{
+                            Enabled = $true
+                        })
+                    } }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Enable | Should -Be $true
+                    $result.Ensure | Should -Be 'Present'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                It 'Should remove the scheduled task in the set method' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
+                }
+            }
+
+            Context 'A built-in scheduled task exists, but it should be absent' {
+                $testParameters = @{
+                    TaskName = 'Test task'
+                    TaskPath = '\Test\'
+                    Ensure = 'Absent'
+                    Verbose = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask { return @{
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions = @(@{
+                                Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                            })
+                        Triggers = @(@{
+                                Repetition = @{
+                                    Duration = "PT15M"
+                                    Interval = "PT15M"
+                                }
+                                CimClass = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            })
+                        Settings = @(@{
+                            Enabled = $true
+                        })
+                    } }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Enable | Should -Be $true
+                    $result.Ensure | Should -Be 'Present'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                It 'Should remove the scheduled task in the set method' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled Unregister-ScheduledTask -Exactly -Times 1
+                }
+            }
+
             Context 'A scheduled task doesnt exist, and it should not' {
                 $testParameters = @{
                     TaskName = 'Test task'

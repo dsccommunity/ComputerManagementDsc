@@ -193,6 +193,85 @@ try
                 Set-TimeZoneId -Id $currentTimeZoneId
             }
         }
+
+        # Simulate a "built-in" scheduled task
+        $action = New-ScheduledTaskAction -Execute 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+        $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date)
+        $task = New-ScheduledTask -Action $action -Trigger $trigger
+        Register-ScheduledTask -InputObject $task -TaskName 'Test task builtin' -TaskPath = '\xComputerManagement\'
+
+        Context "Built-in task needs to be disabled" {
+            $currentConfig = 'xScheduledTaskDisableBuiltIn'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+
+            It 'Should compile the MOF without throwing' {
+                {
+                    . $currentConfig `
+                        -OutputPath $configDir `
+                        -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration `
+                        -Path $configDir `
+                        -Wait `
+                        -Force `
+                        -Verbose `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
+                $current.TaskName              | Should -Be 'Test task builtin'
+                $current.TaskPath              | Should -Be '\xComputerManagement\'
+                $current.Enable                | Should -Be $false
+            }
+        }
+
+        Context "Built-in task needs to be removed" {
+            $currentConfig = 'xScheduledTaskRemoveBuiltIn'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+
+
+            It 'Should compile the MOF without throwing' {
+                {
+                    . $currentConfig `
+                        -OutputPath $configDir `
+                        -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration `
+                        -Path $configDir `
+                        -Wait `
+                        -Force `
+                        -Verbose `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
+                $current.TaskName              | Should -Be 'Test task builtin'
+                $current.TaskPath              | Should -Be '\xComputerManagement\'
+                $current.Ensure                | Should -Be 'Absent'
+            }
+        }
     }
 }
 finally

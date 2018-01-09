@@ -220,7 +220,7 @@ function Get-TargetResource
         [System.String]
         $Description,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         $ActionExecutable,
 
@@ -232,7 +232,7 @@ function Get-TargetResource
         [System.String]
         $ActionWorkingPath,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
         $ScheduleType,
@@ -390,10 +390,9 @@ function Get-TargetResource
         Write-Verbose -Message ($script:localizedData.TaskNotFoundMessage -f $TaskName, $TaskPath)
 
         return @{
-            TaskName         = $TaskName
-            ActionExecutable = $ActionExecutable
-            Ensure           = 'Absent'
-            ScheduleType     = $ScheduleType
+            TaskName = $TaskName
+            TaskPath = $task.TaskPath
+            Ensure   = 'Absent'
         }
     }
     else
@@ -685,7 +684,7 @@ function Set-TargetResource
         [System.String]
         $Description,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         $ActionExecutable,
 
@@ -697,7 +696,7 @@ function Set-TargetResource
         [System.String]
         $ActionWorkingPath,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
         $ScheduleType,
@@ -1363,7 +1362,7 @@ function Test-TargetResource
         [System.String]
         $Description,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         $ActionExecutable,
 
@@ -1375,7 +1374,7 @@ function Test-TargetResource
         [System.String]
         $ActionWorkingPath,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
         $ScheduleType,

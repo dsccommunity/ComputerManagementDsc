@@ -424,3 +424,31 @@ Configuration xScheduledTaskExecuteAsDel
         }
     }
 }
+
+Configuration xScheduledTaskDisableBuiltIn
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskDisableBuiltIn
+        {
+            TaskName              = 'Test task builtin'
+            TaskPath              = '\xComputerManagement\'
+            Enable                = $false
+        }
+    }
+}
+
+Configuration xScheduledTaskRemoveBuiltIn
+{
+    Import-DscResource -ModuleName xComputerManagement
+    node 'localhost'
+    {
+        xScheduledTask xScheduledTaskRemoveBuiltIn
+        {
+            TaskName              = 'Test task builtin'
+            TaskPath              = '\xComputerManagement\'
+            Ensure                = 'Absent'
+        }
+    }
+}

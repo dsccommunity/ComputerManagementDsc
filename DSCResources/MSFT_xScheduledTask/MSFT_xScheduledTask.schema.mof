@@ -4,10 +4,10 @@ class MSFT_xScheduledTask : OMI_BaseResource
     [Key, Description("The name of the task")] string TaskName;
     [Write, Description("The path to the task - defaults to the root directory")] string TaskPath;
     [Write, Description("The task description")] string Description;
-    [Required, Description("The path to the .exe for this task")] string ActionExecutable;
+    [Write, Description("The path to the .exe for this task")] string ActionExecutable;
     [Write, Description("The arguments to pass the executable")] string ActionArguments;
     [Write, Description("The working path to specify for the executable")] string ActionWorkingPath;
-    [Required, Description("When should the task be executed"), ValueMap{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn"}, Values{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn"}] string ScheduleType;
+    [Write, Description("When should the task be executed"), ValueMap{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn"}, Values{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn"}] string ScheduleType;
     [Write, Description("How many units (minutes, hours, days) between each run of this task?")] String RepeatInterval;
     [Write, Description("The time of day this task should start at - defaults to 12:00 AM. Not valid for AtLogon and AtStartup tasks")] DateTime StartTime;
     [Write, Description("Present if the task should exist, Absent if it should be removed"), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
