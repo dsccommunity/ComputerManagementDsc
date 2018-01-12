@@ -198,9 +198,9 @@ try
         $action = New-ScheduledTaskAction -Execute 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
         $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date)
         $task = New-ScheduledTask -Action $action -Trigger $trigger
-        Register-ScheduledTask -InputObject $task -TaskName 'Test task builtin' -TaskPath = '\xComputerManagement\'
+        Register-ScheduledTask -InputObject $task -TaskName 'Test task builtin' -TaskPath '\xComputerManagement\' -User 'NT AUTHORITY\SYSTEM'
 
-        Context "Built-in task needs to be disabled" {
+        Context 'Built-in task needs to be disabled' {
             $currentConfig = 'xScheduledTaskDisableBuiltIn'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
@@ -229,14 +229,16 @@ try
             }
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
+                $current = Get-DscConfiguration   | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq $currentConfig
+                }
                 $current.TaskName              | Should -Be 'Test task builtin'
                 $current.TaskPath              | Should -Be '\xComputerManagement\'
                 $current.Enable                | Should -Be $false
             }
         }
 
-        Context "Built-in task needs to be removed" {
+        Context 'Built-in task needs to be removed' {
             $currentConfig = 'xScheduledTaskRemoveBuiltIn'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
@@ -266,7 +268,9 @@ try
             }
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
+                $current = Get-DscConfiguration   | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq $currentConfig
+                }
                 $current.TaskName              | Should -Be 'Test task builtin'
                 $current.TaskPath              | Should -Be '\xComputerManagement\'
                 $current.Ensure                | Should -Be 'Absent'

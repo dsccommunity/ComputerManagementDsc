@@ -182,6 +182,7 @@ xScheduledTask has the following properties:
 * [Run a PowerShell script every 15 minutes indefinitely on a server](/Examples/xScheduledTask/8-RunPowerShellTaskEvery15MinutesIndefinitely.ps1)
 * [Run a PowerShell script once as a specified user with highest privileges](/Examples/xScheduledTask/9-RunPowerShellTaskOnceAsUserWithHighestPriveleges.ps1)
 * [Run a PowerShell script once as a specified user only when the user is logged on](/Examples/xScheduledTask/10-RunPowerShellTaskOnceAsUserInteractiveOnly.ps1)
+* [Disable a built-in scheduled task](/Examples/xScheduledTask/11-DisableABuiltInTask.ps1)
 
 ## xPowerPlan
 

@@ -391,7 +391,7 @@ function Get-TargetResource
 
         return @{
             TaskName = $TaskName
-            TaskPath = $task.TaskPath
+            TaskPath = $TaskPath
             Ensure   = 'Absent'
         }
     }
@@ -860,6 +860,21 @@ function Set-TargetResource
 
     if ($Ensure -eq 'Present')
     {
+        <#
+            If the scheduled task already exists and is enabled but it needs to be disabled
+            and the action executable isn't specified then disable the task
+        #>
+        if ($currentValues.Ensure -eq 'Present' `
+            -and $currentValues.Enable `
+            -and -not $Enable `
+            -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
+        {
+            Write-Verbose -Message ($script:localizedData.DisablingExistingScheduledTask -f $TaskName, $TaskPath)
+            Disable-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+
+            return
+        }
+
         if ($RepetitionDuration -lt $RepeatInterval)
         {
             New-InvalidArgumentException `
@@ -888,28 +903,25 @@ function Set-TargetResource
                 -ArgumentName DaysOfWeek
         }
 
-        if ($PSBoundParameters.ContainsKey('ActionExecutable'))
+        # Configure the action
+        $actionParameters = @{
+            Execute = $ActionExecutable
+        }
+
+        if ($ActionArguments)
         {
-            # Configure the action
-            $actionParameters = @{
-                Execute = $ActionExecutable
-            }
+            $actionParameters.Add('Argument', $ActionArguments)
+        }
 
-            if ($ActionArguments)
-            {
-                $actionParameters.Add('Argument', $ActionArguments)
-            }
+        if ($ActionWorkingPath)
+        {
+            $actionParameters.Add('WorkingDirectory', $ActionWorkingPath)
+        }
 
-            if ($ActionWorkingPath)
-            {
-                $actionParameters.Add('WorkingDirectory', $ActionWorkingPath)
-            }
+        $action = New-ScheduledTaskAction @actionParameters
 
-            $action = New-ScheduledTaskAction @actionParameters
-
-            $scheduledTaskArguments += @{
-                Action = $action
-            }
+        $scheduledTaskArguments += @{
+            Action = $action
         }
 
         # Configure the settings
@@ -975,147 +987,144 @@ function Set-TargetResource
             $setting.ExecutionTimeLimit = 'PT0S'
         }
 
-        if ($PSBoundParameters.ContainsKey('ScheduleType'))
+        # Configure the trigger
+        $triggerParameters = @{}
+
+        if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0))
         {
-            # Configure the trigger
-            $triggerParameters = @{}
+            $triggerParameters.Add('RandomDelay', $RandomDelay)
+        }
 
-            if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0))
+        switch ($ScheduleType)
+        {
+            'Once'
             {
-                $triggerParameters.Add('RandomDelay', $RandomDelay)
+                $triggerParameters.Add('Once', $true)
+                $triggerParameters.Add('At', $StartTime)
+
+                break
             }
 
-            switch ($ScheduleType)
+            'Daily'
             {
-                'Once'
-                {
-                    $triggerParameters.Add('Once', $true)
-                    $triggerParameters.Add('At', $StartTime)
+                $triggerParameters.Add('Daily', $true)
+                $triggerParameters.Add('At', $StartTime)
+                $triggerParameters.Add('DaysInterval', $DaysInterval)
 
-                    break
-                }
-
-                'Daily'
-                {
-                    $triggerParameters.Add('Daily', $true)
-                    $triggerParameters.Add('At', $StartTime)
-                    $triggerParameters.Add('DaysInterval', $DaysInterval)
-
-                    break
-                }
-
-                'Weekly'
-                {
-                    $triggerParameters.Add('Weekly', $true)
-                    $triggerParameters.Add('At', $StartTime)
-
-                    if ($DaysOfWeek.Count -gt 0)
-                    {
-                        $triggerParameters.Add('DaysOfWeek', $DaysOfWeek)
-                    }
-
-                    if ($WeeksInterval -gt 0)
-                    {
-                        $triggerParameters.Add('WeeksInterval', $WeeksInterval)
-                    }
-
-                    break
-                }
-
-                'AtStartup'
-                {
-                    $triggerParameters.Add('AtStartup', $true)
-
-                    break
-                }
-
-                'AtLogOn'
-                {
-                    $triggerParameters.Add('AtLogOn', $true)
-
-                    if (-not [System.String]::IsNullOrWhiteSpace($User))
-                    {
-                        $triggerParameters.Add('User', $User)
-                    }
-
-                    break
-                }
+                break
             }
 
-            $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
-
-            if (-not $trigger)
+            'Weekly'
             {
-                New-InvalidOperationException `
-                    -Message ($script:localizedData.TriggerCreationError) `
-                    -ErrorRecord $_
+                $triggerParameters.Add('Weekly', $true)
+                $triggerParameters.Add('At', $StartTime)
+
+                if ($DaysOfWeek.Count -gt 0)
+                {
+                    $triggerParameters.Add('DaysOfWeek', $DaysOfWeek)
+                }
+
+                if ($WeeksInterval -gt 0)
+                {
+                    $triggerParameters.Add('WeeksInterval', $WeeksInterval)
+                }
+
+                break
             }
 
-            if ($RepeatInterval -gt [System.TimeSpan]::Parse('0:0:0'))
+            'AtStartup'
             {
-                # A repetition pattern is required so create it and attach it to the trigger object
-                Write-Verbose -Message ($script:localizedData.ConfigureTriggerRepetitionMessage)
+                $triggerParameters.Add('AtStartup', $true)
 
-                if ($RepetitionDuration -le $RepeatInterval)
+                break
+            }
+
+            'AtLogOn'
+            {
+                $triggerParameters.Add('AtLogOn', $true)
+
+                if (-not [System.String]::IsNullOrWhiteSpace($User))
                 {
-                    New-InvalidArgumentException `
-                        -Message ($script:localizedData.RepetitionIntervalError -f $RepeatInterval, $RepetitionDuration) `
-                        -ArgumentName RepetitionDuration
+                    $triggerParameters.Add('User', $User)
                 }
 
-                $tempTriggerParameters = @{
-                    Once               = $true
-                    At                 = '6:6:6'
-                    RepetitionInterval = $RepeatInterval
+                break
+            }
+        }
+
+        $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
+
+        if (-not $trigger)
+        {
+            New-InvalidOperationException `
+                -Message ($script:localizedData.TriggerCreationError) `
+                -ErrorRecord $_
+        }
+
+        if ($RepeatInterval -gt [System.TimeSpan]::Parse('0:0:0'))
+        {
+            # A repetition pattern is required so create it and attach it to the trigger object
+            Write-Verbose -Message ($script:localizedData.ConfigureTriggerRepetitionMessage)
+
+            if ($RepetitionDuration -le $RepeatInterval)
+            {
+                New-InvalidArgumentException `
+                    -Message ($script:localizedData.RepetitionIntervalError -f $RepeatInterval, $RepetitionDuration) `
+                    -ArgumentName RepetitionDuration
+            }
+
+            $tempTriggerParameters = @{
+                Once               = $true
+                At                 = '6:6:6'
+                RepetitionInterval = $RepeatInterval
+            }
+
+            Write-Verbose -Message ($script:localizedData.CreateRepetitionPatternMessage)
+
+            switch ($trigger.GetType().FullName)
+            {
+                'Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger'
+                {
+                    # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
+                    Write-Verbose -Message ($script:localizedData.CreateTemporaryTaskMessage)
+
+                    $tempTriggerParameters.Add('RepetitionDuration', $RepetitionDuration)
+
+                    # Create a temporary trigger and task and copy the repetition CIM object from the temporary task
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerParameters
+                    $tempTask = New-ScheduledTask -Action $action -Trigger $tempTrigger
+
+                    # Store the repetition settings
+                    $repetition = $tempTask.Triggers[0].Repetition
                 }
 
-                Write-Verbose -Message ($script:localizedData.CreateRepetitionPatternMessage)
-
-                switch ($trigger.GetType().FullName)
+                'Microsoft.Management.Infrastructure.CimInstance'
                 {
-                    'Microsoft.PowerShell.ScheduledJob.ScheduledJobTrigger'
+                    # This is the type of trigger object returned in Windows Server 2016/Windows 10 and above
+                    Write-Verbose -Message ($script:localizedData.CreateTemporaryTriggerMessage)
+
+                    if ($RepetitionDuration -gt [System.TimeSpan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.TimeSpan]::MaxValue)
                     {
-                        # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
-                        Write-Verbose -Message ($script:localizedData.CreateTemporaryTaskMessage)
-
                         $tempTriggerParameters.Add('RepetitionDuration', $RepetitionDuration)
-
-                        # Create a temporary trigger and task and copy the repetition CIM object from the temporary task
-                        $tempTrigger = New-ScheduledTaskTrigger @tempTriggerParameters
-                        $tempTask = New-ScheduledTask -Action $action -Trigger $tempTrigger
-
-                        # Store the repetition settings
-                        $repetition = $tempTask.Triggers[0].Repetition
                     }
 
-                    'Microsoft.Management.Infrastructure.CimInstance'
-                    {
-                        # This is the type of trigger object returned in Windows Server 2016/Windows 10 and above
-                        Write-Verbose -Message ($script:localizedData.CreateTemporaryTriggerMessage)
+                    # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerParameters
 
-                        if ($RepetitionDuration -gt [System.TimeSpan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.TimeSpan]::MaxValue)
-                        {
-                            $tempTriggerParameters.Add('RepetitionDuration', $RepetitionDuration)
-                        }
+                    # Store the repetition settings
+                    $repetition = $tempTrigger.Repetition
+                }
 
-                        # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
-                        $tempTrigger = New-ScheduledTaskTrigger @tempTriggerParameters
-
-                        # Store the repetition settings
-                        $repetition = $tempTrigger.Repetition
-                    }
-
-                    default
-                    {
-                        New-InvalidOperationException `
-                            -Message ($script:localizedData.TriggerUnexpectedTypeError -f $trigger.GetType().FullName)
-                    }
+                default
+                {
+                    New-InvalidOperationException `
+                        -Message ($script:localizedData.TriggerUnexpectedTypeError -f $trigger.GetType().FullName)
                 }
             }
+        }
 
-            $scheduledTaskArguments += @{
-                Trigger   = $trigger
-            }
+        $scheduledTaskArguments += @{
+            Trigger = $trigger
         }
 
         # Prepare the register arguments
@@ -1742,4 +1751,34 @@ function ConvertTo-TimeSpanStringFromScheduledTaskString
     }
 
     return (New-TimeSpan -Days $days -Hours $hours -Minutes $minutes -Seconds $seconds).ToString()
+}
+
+<#
+    .SYNOPSIS
+        Helper function to disable an existing scheduled task.
+
+    .PARAMETER TaskName
+        The name of the task to disable.
+
+    .PARAMETER TaskPath
+        The path to the task to disable.
+#>
+function Disable-ScheduledTask
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $TaskName,
+
+        [Parameter()]
+        [System.String]
+        $TaskPath = '\'
+    )
+
+    $existingTask = Get-ScheduledTask @PSBoundParameters
+    Write-Verbose -Verbose -Message ($existingTask.Settings.Enabled | Out-String)
+    $existingTask.Settings.Enabled = $false
+    $null = $existingTask | Register-ScheduledTask -Force
 }
