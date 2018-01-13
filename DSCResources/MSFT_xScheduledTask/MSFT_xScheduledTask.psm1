@@ -1778,7 +1778,6 @@ function Disable-ScheduledTask
     )
 
     $existingTask = Get-ScheduledTask @PSBoundParameters
-    Write-Verbose -Verbose -Message ($existingTask.Settings.Enabled | Out-String)
     $existingTask.Settings.Enabled = $false
     $null = $existingTask | Register-ScheduledTask -Force
 }

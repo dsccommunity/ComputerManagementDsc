@@ -2,17 +2,17 @@
 param(
 )
 
-$script:DSCModuleName      = 'xComputerManagement'
-$script:DSCResourceName    = 'MSFT_xScheduledTask'
+$script:DSCModuleName = 'xComputerManagement'
+$script:DSCResourceName = 'MSFT_xScheduledTask'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 # Unit Test Template Version: 1.2.0
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -34,6 +34,34 @@ try
     InModuleScope $script:DSCResourceName {
         $script:DSCResourceName = 'MSFT_xScheduledTask'
 
+        # Function to allow mocking pipeline input
+        function Register-ScheduledTask
+        {
+            param (
+                [switch]
+                $Force,
+
+                [Parameter(ValueFromPipeline = $true)]
+                $InputObject,
+
+                [Parameter()]
+                [System.String]
+                $Password,
+
+                [Parameter()]
+                [System.String]
+                $User,
+
+                [Parameter()]
+                [System.String]
+                $TaskName,
+
+                [Parameter()]
+                [System.String]
+                $TaskPath
+            )
+        }
+
         Describe $script:DSCResourceName {
             BeforeAll {
                 Mock -CommandName Register-ScheduledTask
@@ -43,13 +71,13 @@ try
 
             Context 'No scheduled task exists, but it should' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
                 Mock -CommandName Get-ScheduledTask { return $null }
@@ -70,28 +98,28 @@ try
 
             Context 'A scheduled task exists, but it should not' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Minutes 15).ToString()
-                    Ensure = 'Absent'
-                    Verbose = $True
+                    Ensure             = 'Absent'
+                    Verbose            = $True
                 }
 
                 Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(@{
                                 Execute = $testParameters.ActionExecutable
                             })
-                        Triggers = @(@{
+                        Triggers  = @(@{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalMinutes)M"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
                             })
@@ -119,28 +147,28 @@ try
                 $testParameters = @{
                     TaskName = 'Test task'
                     TaskPath = '\Test\'
-                    Enable = $false
-                    Verbose = $True
+                    Enable   = $false
+                    Verbose  = $True
                 }
 
                 Mock -CommandName Get-ScheduledTask { return @{
                         TaskName = $testParameters.TaskName
                         TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                            })
-                        Triggers = @(@{
-                                Repetition = @{
-                                    Duration = "PT15M"
-                                    Interval = "PT15M"
-                                }
-                                CimClass = @{
-                                    CimClassName = 'MSFT_TaskTimeTrigger'
-                                }
-                            })
-                        Settings = @(@{
+                        Actions  = [pscustomobject] @{
+                            Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                        }
+                        Triggers = [pscustomobject] @{
+                            Repetition = @{
+                                Duration = "PT15M"
+                                Interval = "PT15M"
+                            }
+                            CimClass   = @{
+                                CimClassName = 'MSFT_TaskTimeTrigger'
+                            }
+                        }
+                        Settings = [pscustomobject] @{
                             Enabled = $true
-                        })
+                        }
                     } }
 
                 It 'Should return the correct values from Get-TargetResource' {
@@ -163,29 +191,35 @@ try
                 $testParameters = @{
                     TaskName = 'Test task'
                     TaskPath = '\Test\'
-                    Ensure = 'Absent'
-                    Verbose = $True
+                    Ensure   = 'Absent'
+                    Verbose  = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
                         TaskName = $testParameters.TaskName
                         TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                        Actions  = @(
+                            [pscustomobject] @{
                                 Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT15M"
                                     Interval = "PT15M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Settings = @(@{
+                            }
+                        )
+                        Settings = [pscustomobject] @{
                             Enabled = $true
-                        })
-                    } }
+                        }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -205,12 +239,12 @@ try
 
             Context 'A scheduled task doesnt exist, and it should not' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
+                    TaskName         = 'Test task'
+                    TaskPath         = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    Ensure = 'Absent'
-                    Verbose = $True
+                    ScheduleType     = 'Once'
+                    Ensure           = 'Absent'
+                    Verbose          = $True
                 }
 
                 Mock -CommandName Get-ScheduledTask { return $null }
@@ -227,34 +261,40 @@ try
 
             Context 'A scheduled task with Once based repetition exists, but has the wrong settings' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = ''
                                     Interval = "PT$(([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes) + 1)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -274,34 +314,40 @@ try
 
             Context 'A scheduled task with minutes based repetition exists and has the correct settings' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Minutes 30).ToString()
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalMinutes)M"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -315,34 +361,40 @@ try
 
             Context 'A scheduled task with hourly based repetition exists, but has the wrong settings' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Hours 4).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$(([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours))H"
                                     Interval = "PT$(([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalHours) + 1)H"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -362,34 +414,40 @@ try
 
             Context 'A scheduled task with hourly based repetition exists and has the correct settings' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Hours 4).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalHours)H"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -403,33 +461,39 @@ try
 
             Context 'A scheduled task with daily based repetition exists, but has the wrong settings' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
+                    TaskName         = 'Test task'
+                    TaskPath         = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Daily'
-                    DaysInterval = 3
-                    Verbose = $True
+                    ScheduleType     = 'Daily'
+                    DaysInterval     = 3
+                    Verbose          = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = $null
                                     Interval = "P$(($testParameters.DaysInterval) + 1)D"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskDailyTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -449,30 +513,36 @@ try
 
             Context 'A scheduled task with daily based repetition exists and has the correct settings' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
+                    TaskName         = 'Test task'
+                    TaskPath         = '\Test\'
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Daily'
-                    DaysInterval = 3
-                    Verbose = $True
+                    ScheduleType     = 'Daily'
+                    DaysInterval     = 3
+                    Verbose          = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 DaysInterval = $testParameters.DaysInterval
-                                CimClass = @{
+                                CimClass     = @{
                                     CimClassName = 'MSFT_TaskDailyTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -486,35 +556,41 @@ try
 
             Context 'A scheduled task exists and is configured with the wrong execution account' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
-                    RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                    TaskName            = 'Test task'
+                    TaskPath            = '\Test\'
+                    ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType        = 'Once'
+                    RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
                     ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
-                    Verbose = $True
+                    Verbose             = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'WrongUser'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -534,37 +610,43 @@ try
 
             Context 'A scheduled task exists and is configured with the wrong logon type' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
-                    RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                    TaskName            = 'Test task'
+                    TaskPath            = '\Test\'
+                    ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType        = 'Once'
+                    RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
                     ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
-                    LogonType = 'S4U'
-                    Verbose = $True
+                    LogonType           = 'S4U'
+                    Verbose             = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = [pscustomobject] @(
+                            @{
                                 Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
-                            UserId = 'DEMO\RightUser'
+                            }
+                        )
+                        Principal = [pscustomobject] @{
+                            UserId    = 'DEMO\RightUser'
                             LogonType = 'Password'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -585,37 +667,43 @@ try
 
             Context 'A scheduled task exists and is configured with the wrong run level' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
-                    RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                    TaskName            = 'Test task'
+                    TaskPath            = '\Test\'
+                    ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType        = 'Once'
+                    RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
                     ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
-                    RunLevel = 'Highest'
-                    Verbose = $True
+                    RunLevel            = 'Highest'
+                    Verbose             = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
-                            UserId = 'DEMO\RightUser'
+                            }
+                        )
+                        Principal = [pscustomobject] @{
+                            UserId   = 'DEMO\RightUser'
                             RunLevel = 'Limited'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -636,36 +724,42 @@ try
 
             Context 'A scheduled task exists and is configured with the wrong working directory' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ActionWorkingPath = 'C:\Example'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ActionWorkingPath  = 'C:\Example'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute          = $testParameters.ActionExecutable
                                 WorkingDirectory = 'C:\Wrong'
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = $null
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -685,36 +779,42 @@ try
 
             Context 'A scheduled task exists and is configured with the wrong executable arguments' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ActionArguments = '-File "C:\something\right.ps1"'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ActionArguments    = '-File "C:\something\right.ps1"'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = '-File "C:\something\wrong.ps1"'
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -734,39 +834,45 @@ try
 
             Context 'A scheduled task is enabled and should be disabled' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Enable = $false
-                    Verbose = $True
+                    Enable             = $false
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Settings = @(@{
-                                Enabled = $true
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Settings  = [pscustomobject] @{
+                            Enabled = $true
+                        }
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -787,41 +893,47 @@ try
 
             Context 'A scheduled task is enabled without an execution time limit and but has an execution time limit set' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
                     ExecutionTimeLimit = (New-TimeSpan -Seconds 0).ToString()
-                    Enable = $true
-                    Verbose = $True
+                    Enable             = $true
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Settings = @(@{
-                                Enabled = $true
-                                ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalSeconds + 60)S"
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Settings  = [pscustomobject] @{
+                            Enabled            = $true
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalSeconds + 60)S"
+                        }
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -841,51 +953,57 @@ try
 
             Context 'A scheduled task is enabled and has the correct settings' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    RandomDelay = (New-TimeSpan -Minutes 4).ToString()
-                    IdleWaitTimeout = (New-TimeSpan -Minutes 5).ToString()
-                    IdleDuration = (New-TimeSpan -Minutes 6).ToString()
+                    RandomDelay        = (New-TimeSpan -Minutes 4).ToString()
+                    IdleWaitTimeout    = (New-TimeSpan -Minutes 5).ToString()
+                    IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
                     ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
-                    RestartInterval = (New-TimeSpan -Minutes 8).ToString()
-                    Enable = $true
-                    Verbose = $True
+                    RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
+                    Enable             = $true
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
-                                Repetition = @{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Repetition  = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
                                 RandomDelay = "PT$([System.TimeSpan]::Parse($testParameters.RandomDelay).TotalMinutes)M"
-                                CimClass = @{
+                                CimClass    = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Settings = @(@{
-                                Enabled = $true
-                                IdleSettings = @{
-                                    IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
-                                    IdleDuration = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
-                                }
-                                ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
-                                RestartInterval = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Settings  = [pscustomobject] @{
+                            Enabled            = $true
+                            IdleSettings       = @{
+                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
+                                IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
+                            }
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
+                            RestartInterval    = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
+                        }
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -899,39 +1017,44 @@ try
 
             Context 'A scheduled task is disabled and has the correct settings' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Enable = $false
-                    Verbose = $True
+                    Enable             = $false
+                    Verbose            = $True
                 }
 
                 Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Settings = @(@{
-                                Enabled = $false
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Settings  = [pscustomobject] @{
+                            Enabled = $false
+                        }
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -945,39 +1068,45 @@ try
 
             Context 'A scheduled task is disabled but should be enabled' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Enable = $true
-                    Verbose = $True
+                    Enable             = $true
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Settings = @(@{
-                                Enabled = $false
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Settings  = [pscustomobject] @{
+                            Enabled = $false
+                        }
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -997,38 +1126,44 @@ try
 
             Context 'A Scheduled task exists, is disabled, and the optional parameter enable is not specified' -Fixture {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 15).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Settings = @(@{
-                                Enabled = $false
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Settings  = [pscustomobject] @{
+                            Enabled = $false
+                        }
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -1064,49 +1199,55 @@ try
 
             Context 'A scheduled task exists and is configured with the wrong interval, duration & random delay parameters' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 20).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                    RandomDelay = (New-TimeSpan -Minutes 4).ToString()
-                    IdleWaitTimeout = (New-TimeSpan -Minutes 5).ToString()
-                    IdleDuration = (New-TimeSpan -Minutes 6).ToString()
+                    RandomDelay        = (New-TimeSpan -Minutes 4).ToString()
+                    IdleWaitTimeout    = (New-TimeSpan -Minutes 5).ToString()
+                    IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
                     ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
-                    RestartInterval = (New-TimeSpan -Minutes 8).ToString()
-                    Verbose = $True
+                    RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
-                                Repetition = @{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Repetition  = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours + 1)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes + 1)M"
                                 }
                                 RandomDelay = "PT$([System.TimeSpan]::Parse($testParameters.RandomDelay).TotalMinutes + 1)M"
-                                CimClass = @{
+                                CimClass    = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Settings = @{
-                            IdleSettings = @{
+                            }
+                        )
+                        Settings  = [pscustomobject] @{
+                            IdleSettings       = @{
                                 IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
-                                IdleDuration = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
+                                IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
-                            RestartInterval = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
+                            RestartInterval    = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
                         }
-                        Principal = @{
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -1126,49 +1267,55 @@ try
 
             Context 'A scheduled task exists and is configured with the wrong idle timeout & idle duration parameters' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 20).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                    RandomDelay = (New-TimeSpan -Minutes 4).ToString()
-                    IdleWaitTimeout = (New-TimeSpan -Minutes 5).ToString()
-                    IdleDuration = (New-TimeSpan -Minutes 6).ToString()
+                    RandomDelay        = (New-TimeSpan -Minutes 4).ToString()
+                    IdleWaitTimeout    = (New-TimeSpan -Minutes 5).ToString()
+                    IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
                     ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
-                    RestartInterval = (New-TimeSpan -Minutes 8).ToString()
-                    Verbose = $True
+                    RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
-                                Repetition = @{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Repetition  = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
                                 RandomDelay = "PT$([System.TimeSpan]::Parse($testParameters.RandomDelay).TotalMinutes)M"
-                                CimClass = @{
+                                CimClass    = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Settings = @{
-                            IdleSettings = @{
+                            }
+                        )
+                        Settings  = [pscustomobject] @{
+                            IdleSettings       = @{
                                 IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes + 1)M"
-                                IdleDuration = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes + 1)M"
+                                IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes + 1)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
-                            RestartInterval = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
+                            RestartInterval    = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
                         }
-                        Principal = @{
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -1188,35 +1335,41 @@ try
 
             Context 'A scheduled task exists and is configured with the wrong duration parameter for an indefinite trigger' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 20).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = 'Indefinitely'
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT4H"
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -1236,35 +1389,41 @@ try
 
             Context 'A scheduled task exists and is configured with indefinite repetition duration for a trigger but should be fixed' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 20).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = ""
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -1284,35 +1443,41 @@ try
 
             Context 'A scheduled task exists and is configured with correctly with an indefinite duration trigger' {
                 $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType = 'Once'
-                    RepeatInterval = (New-TimeSpan -Minutes 20).ToString()
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = 'Indefinitely'
-                    Verbose = $True
+                    Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
-                        TaskName = $testParameters.TaskName
-                        TaskPath = $testParameters.TaskPath
-                        Actions = @(@{
-                                Execute = $testParameters.ActionExecutable
+                Mock -CommandName Get-ScheduledTask {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute   = $testParameters.ActionExecutable
                                 Arguments = $testParameters.Arguments
-                            })
-                        Triggers = @(@{
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
                                 Repetition = @{
                                     Duration = ""
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
-                                CimClass = @{
+                                CimClass   = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
-                            })
-                        Principal = @{
+                            }
+                        )
+                        Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
-                    } }
+                    }
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters

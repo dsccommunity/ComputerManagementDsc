@@ -183,6 +183,7 @@ xScheduledTask has the following properties:
 * [Run a PowerShell script once as a specified user with highest privileges](/Examples/xScheduledTask/9-RunPowerShellTaskOnceAsUserWithHighestPriveleges.ps1)
 * [Run a PowerShell script once as a specified user only when the user is logged on](/Examples/xScheduledTask/10-RunPowerShellTaskOnceAsUserInteractiveOnly.ps1)
 * [Disable a built-in scheduled task](/Examples/xScheduledTask/11-DisableABuiltInTask.ps1)
+* [Delete a built-in scheduled task](/Examples/xScheduledTask/12-DeleteABuiltInTask.ps1)
 
 ## xPowerPlan
 
@@ -219,12 +220,13 @@ xVirtualMemory has the following properties:
 ### Unreleased
 
 * BREAKING CHANGE: xScheduledTask:
-  * Add support to disable built-in scheduled tasks - See [Issue #74](https://github.com/PowerShell/xComputerManagement/issues/74).
   * Breaking change because `Get-TargetResource` no longer outputs
     `ActionExecutable` and `ScheduleType` properties when the scheduled
     task does not exist. It will also include `TaskPath` in output when
     scheduled task does not exist.
 * xScheduledTask:
+  * Add support to disable built-in scheduled tasks - See [Issue #74](https://github.com/PowerShell/xComputerManagement/issues/74).
+  * Fix unit test mocked schedule task object structure.
   * Fix error message when trigger type is unknown - See [Issue #121](https://github.com/PowerShell/xComputerManagement/issues/121).
   * Moved strings into separate strings file.
   * Updated to meet HQRM guidelines.
