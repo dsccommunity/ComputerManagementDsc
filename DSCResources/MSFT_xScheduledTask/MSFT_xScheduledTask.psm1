@@ -220,7 +220,7 @@ function Get-TargetResource
         [System.String]
         $Description,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         $ActionExecutable,
 
@@ -232,7 +232,7 @@ function Get-TargetResource
         [System.String]
         $ActionWorkingPath,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
         $ScheduleType,
@@ -390,10 +390,9 @@ function Get-TargetResource
         Write-Verbose -Message ($script:localizedData.TaskNotFoundMessage -f $TaskName, $TaskPath)
 
         return @{
-            TaskName         = $TaskName
-            ActionExecutable = $ActionExecutable
-            Ensure           = 'Absent'
-            ScheduleType     = $ScheduleType
+            TaskName = $TaskName
+            TaskPath = $TaskPath
+            Ensure   = 'Absent'
         }
     }
     else
@@ -685,7 +684,7 @@ function Set-TargetResource
         [System.String]
         $Description,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         $ActionExecutable,
 
@@ -697,7 +696,7 @@ function Set-TargetResource
         [System.String]
         $ActionWorkingPath,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
         $ScheduleType,
@@ -861,6 +860,21 @@ function Set-TargetResource
 
     if ($Ensure -eq 'Present')
     {
+        <#
+            If the scheduled task already exists and is enabled but it needs to be disabled
+            and the action executable isn't specified then disable the task
+        #>
+        if ($currentValues.Ensure -eq 'Present' `
+            -and $currentValues.Enable `
+            -and -not $Enable `
+            -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
+        {
+            Write-Verbose -Message ($script:localizedData.DisablingExistingScheduledTask -f $TaskName, $TaskPath)
+            Disable-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+
+            return
+        }
+
         if ($RepetitionDuration -lt $RepeatInterval)
         {
             New-InvalidArgumentException `
@@ -889,6 +903,7 @@ function Set-TargetResource
                 -ArgumentName DaysOfWeek
         }
 
+        # Configure the action
         $actionParameters = @{
             Execute = $ActionExecutable
         }
@@ -905,6 +920,11 @@ function Set-TargetResource
 
         $action = New-ScheduledTaskAction @actionParameters
 
+        $scheduledTaskArguments += @{
+            Action = $action
+        }
+
+        # Configure the settings
         $settingParameters = @{
             DisallowDemandStart             = $DisallowDemandStart
             DisallowHardTerminate           = $DisallowHardTerminate
@@ -952,6 +972,10 @@ function Set-TargetResource
 
         $setting = New-ScheduledTaskSettingsSet @settingParameters
 
+        $scheduledTaskArguments += @{
+            Settings = $setting
+        }
+
         <#
             On Windows Server 2012 R2 setting a blank timespan for ExecutionTimeLimit
             does not result in the PT0S timespan value being set. So set this
@@ -963,6 +987,7 @@ function Set-TargetResource
             $setting.ExecutionTimeLimit = 'PT0S'
         }
 
+        # Configure the trigger
         $triggerParameters = @{}
 
         if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0))
@@ -1098,6 +1123,10 @@ function Set-TargetResource
             }
         }
 
+        $scheduledTaskArguments += @{
+            Trigger = $trigger
+        }
+
         # Prepare the register arguments
         $registerArguments = @{
             TaskName = $TaskName
@@ -1146,10 +1175,7 @@ function Set-TargetResource
 
         $principal = New-ScheduledTaskPrincipal @principalArguments
 
-        $scheduledTaskArguments = @{
-            Action    = $action
-            Trigger   = $trigger
-            Settings  = $setting
+        $scheduledTaskArguments += @{
             Principal = $principal
         }
 
@@ -1363,7 +1389,7 @@ function Test-TargetResource
         [System.String]
         $Description,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         $ActionExecutable,
 
@@ -1375,7 +1401,7 @@ function Test-TargetResource
         [System.String]
         $ActionWorkingPath,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
         [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
         $ScheduleType,
@@ -1725,4 +1751,33 @@ function ConvertTo-TimeSpanStringFromScheduledTaskString
     }
 
     return (New-TimeSpan -Days $days -Hours $hours -Minutes $minutes -Seconds $seconds).ToString()
+}
+
+<#
+    .SYNOPSIS
+        Helper function to disable an existing scheduled task.
+
+    .PARAMETER TaskName
+        The name of the task to disable.
+
+    .PARAMETER TaskPath
+        The path to the task to disable.
+#>
+function Disable-ScheduledTask
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $TaskName,
+
+        [Parameter()]
+        [System.String]
+        $TaskPath = '\'
+    )
+
+    $existingTask = Get-ScheduledTask @PSBoundParameters
+    $existingTask.Settings.Enabled = $false
+    $null = $existingTask | Register-ScheduledTask @PSBoundParameters -Force
 }
