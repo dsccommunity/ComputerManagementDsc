@@ -37,7 +37,9 @@ try
         # Function to allow mocking pipeline input
         function Register-ScheduledTask
         {
-            param (
+            param
+            (
+                [Parameter()]
                 [switch]
                 $Force,
 
@@ -80,7 +82,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return $null }
+                Mock -CommandName Get-ScheduledTask -MockWith { return $null }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -108,7 +110,8 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
                         Actions   = @(@{
@@ -151,7 +154,8 @@ try
                     Verbose  = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
                         TaskName = $testParameters.TaskName
                         TaskPath = $testParameters.TaskPath
                         Actions  = [pscustomobject] @{
@@ -195,7 +199,7 @@ try
                     Verbose  = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName = $testParameters.TaskName
                         TaskPath = $testParameters.TaskPath
@@ -247,7 +251,7 @@ try
                     Verbose          = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return $null }
+                Mock -CommandName Get-ScheduledTask
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -270,7 +274,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -323,7 +327,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -370,7 +374,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -423,7 +427,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -469,7 +473,7 @@ try
                     Verbose          = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -521,7 +525,7 @@ try
                     Verbose          = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -566,7 +570,7 @@ try
                     Verbose             = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -621,7 +625,7 @@ try
                     Verbose             = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -678,7 +682,7 @@ try
                     Verbose             = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -734,7 +738,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -789,7 +793,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -844,7 +848,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -904,7 +908,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -968,7 +972,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -1027,7 +1031,8 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask { return @{
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
                         Actions   = @(
@@ -1078,7 +1083,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -1135,7 +1140,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -1213,7 +1218,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -1281,7 +1286,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -1344,7 +1349,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -1357,7 +1362,7 @@ try
                         Triggers  = @(
                             [pscustomobject] @{
                                 Repetition = @{
-                                    Duration = "PT4H"
+                                    Duration = 'PT4H'
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass   = @{
@@ -1398,7 +1403,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -1411,7 +1416,7 @@ try
                         Triggers  = @(
                             [pscustomobject] @{
                                 Repetition = @{
-                                    Duration = ""
+                                    Duration = ''
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass   = @{
@@ -1452,7 +1457,7 @@ try
                     Verbose            = $True
                 }
 
-                Mock -CommandName Get-ScheduledTask {
+                Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
                         TaskPath  = $testParameters.TaskPath
@@ -1465,7 +1470,7 @@ try
                         Triggers  = @(
                             [pscustomobject] @{
                                 Repetition = @{
-                                    Duration = ""
+                                    Duration = ''
                                     Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
                                 }
                                 CimClass   = @{

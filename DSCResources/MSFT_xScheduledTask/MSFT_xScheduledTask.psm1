@@ -1624,7 +1624,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingDscParameterStateMessage)
 
-    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues -Verbose
+    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues
 }
 
 <#

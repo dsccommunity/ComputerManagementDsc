@@ -9,12 +9,7 @@ Configuration Example
     (
         [Parameter()]
         [System.String[]]
-        $NodeName = 'localhost',
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullorEmpty()]
-        [System.Management.Automation.PSCredential]
-        $Credential
+        $NodeName = 'localhost'
     )
 
     Import-DscResource -ModuleName xComputerManagement
