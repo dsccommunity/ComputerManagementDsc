@@ -6,6 +6,8 @@ install:
     - git clone https://github.com/PowerShell/DscResource.Tests
 
     - ps: |
+        $moduleName = 'xComputerManagement'
+        $mainModuleFolder = "Modules\$moduleName"
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
         Invoke-AppveyorInstallTask -PesterMaximumVersion 4.0.8
 
@@ -22,7 +24,8 @@ build: false
 test_script:
     - ps: |
           Invoke-AppveyorTestScriptTask `
-            -ExcludeTag @() `
+            -Type 'Harness' `
+            -MainModulePath $mainModuleFolder `
             -CodeCoverage `
             -CodeCovIo
 
@@ -33,4 +36,7 @@ test_script:
 # scripts to run before deployment
 deploy_script:
     - ps: |
-          Invoke-AppveyorAfterTestTask
+        Invoke-AppveyorAfterTestTask `
+            -Type 'Wiki' `
+            -MainModulePath $mainModuleFolder `
+            -ResourceModuleName $moduleName
