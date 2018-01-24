@@ -1128,10 +1128,7 @@ function Set-TargetResource
         }
 
         # Prepare the register arguments
-        $registerArguments = @{
-            TaskName = $TaskName
-            TaskPath = $TaskPath
-        }
+        $registerArguments = @{}
 
         if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
         {
@@ -1179,22 +1176,31 @@ function Set-TargetResource
             Principal = $principal
         }
 
-        if ($currentValues.Ensure -eq 'Present')
-        {
-            Write-Verbose -Message ($script:localizedData.RemovePreviousScheduledTaskMessage -f $TaskName, $TaskPath)
+        # Create the scheduled task object depending on already present or not
+        if ($currentValues.Ensure -eq 'Present') {
+            Write-Verbose -Message ($script:localizedData.RetrieveScheduledTaskMessage -f $TaskName, $TaskPath)
+            $scheduledTask = Get-ScheduledTask  -TaskName $currentValues.TaskName -TaskPath $currentValues.TaskPath -ErrorAction Stop
+            
+            $scheduledTask.Actions = $action
+            $scheduledTask.Triggers = $trigger
+            $scheduledTask.Settings = $setting
+            $scheduledTask.Principal = $principal
 
-            $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false -ErrorAction Stop
+        } else {
+            $scheduledTaskArguments = @{
+                Action    = $action
+                Trigger   = $trigger
+                Settings  = $setting
+                Principal = $principal
+            }
+
+            $scheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
         }
-
-        Write-Verbose -Message ($script:localizedData.CreateNewScheduledTaskMessage -f $TaskName, $TaskPath)
-
-        # Create the scheduled task object
-        $scheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
-
+            
+       
         if ($repetition)
         {
             Write-Verbose -Message ($script:localizedData.SetRepetitionTriggerMessage -f $TaskName, $TaskPath)
-
             $scheduledTask.Triggers[0].Repetition = $repetition
         }
 
@@ -1203,12 +1209,25 @@ function Set-TargetResource
             $scheduledTask.Description = $Description
         }
 
-        # Register the scheduled task
-        $registerArguments.Add('InputObject', $scheduledTask)
+        if ($currentValues.Ensure -eq 'Present')
+        {
+            Write-Verbose -Message ($script:localizedData.UpdateScheduledTaskMessage -f $TaskName, $TaskPath)
+            $null = Set-ScheduledTask -InputObject $scheduledTask @registerArguments
+        
+        } else {
+            Write-Verbose -Message ($script:localizedData.CreateNewScheduledTaskMessage -f $TaskName, $TaskPath)
 
-        Write-Verbose -Message ($script:localizedData.RegisterScheduledTaskMessage -f $TaskName, $TaskPath)
+            # Register the scheduled task and 
 
-        $null = Register-ScheduledTask @registerArguments -ErrorAction Stop
+            $registerArguments.Add('TaskName',$TaskName)
+            $registerArguments.Add('TaskPath',$TaskPath)
+            $registerArguments.Add('InputObject', $scheduledTask)
+
+            Write-Verbose -Message ($script:localizedData.RegisterScheduledTaskMessage -f $TaskName, $TaskPath)
+            Write-Verbose -Message ($TaskName)
+         
+            $null = Register-ScheduledTask @registerArguments
+        }
     }
 
     if ($Ensure -eq 'Absent')
