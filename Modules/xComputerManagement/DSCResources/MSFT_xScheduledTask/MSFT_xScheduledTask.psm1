@@ -972,10 +972,6 @@ function Set-TargetResource
 
         $setting = New-ScheduledTaskSettingsSet @settingParameters
 
-        $scheduledTaskArguments += @{
-            Settings = $setting
-        }
-
         <#
             On Windows Server 2012 R2 setting a blank timespan for ExecutionTimeLimit
             does not result in the PT0S timespan value being set. So set this
@@ -1053,14 +1049,14 @@ function Set-TargetResource
         }
 
         $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
-
+        
         if (-not $trigger)
         {
             New-InvalidOperationException `
                 -Message ($script:localizedData.TriggerCreationError) `
                 -ErrorRecord $_
         }
-
+      
         if ($RepeatInterval -gt [System.TimeSpan]::Parse('0:0:0'))
         {
             # A repetition pattern is required so create it and attach it to the trigger object
@@ -1079,7 +1075,7 @@ function Set-TargetResource
                 RepetitionInterval = $RepeatInterval
             }
 
-            Write-Verbose -Message ($script:localizedData.CreateRepetitionPatternMessage)
+            #Write-Verbose -Message ($script:localizedData.CreateRepetitionPatternMessage)
 
             switch ($trigger.GetType().FullName)
             {
@@ -1121,17 +1117,10 @@ function Set-TargetResource
                         -Message ($script:localizedData.TriggerUnexpectedTypeError -f $trigger.GetType().FullName)
                 }
             }
-        }
-
-        $scheduledTaskArguments += @{
-            Trigger = $trigger
-        }
+        }  
 
         # Prepare the register arguments
-        $registerArguments = @{
-            TaskName = $TaskName
-            TaskPath = $TaskPath
-        }
+        $registerArguments = @{}
 
         if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
         {
@@ -1168,6 +1157,7 @@ function Set-TargetResource
         if ($PSBoundParameters.ContainsKey('RunLevel'))
         {
             $principalArguments.Add('RunLevel', $RunLevel)
+        
         }
 
         # Create the principal object
@@ -1175,22 +1165,31 @@ function Set-TargetResource
 
         $principal = New-ScheduledTaskPrincipal @principalArguments
 
-        $scheduledTaskArguments += @{
-            Principal = $principal
+        # Create the scheduled task object depending on already present or not
+        
+        $scheduledTaskArguments = @{
+                Action    = $action
+                Trigger   = $trigger
+                Settings  = $setting
+                Principal = $principal
+            }
+
+        $tempScheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
+        
+        if ($currentValues.Ensure -eq 'Present') {
+            Write-Verbose -Message ($script:localizedData.RetrieveScheduledTaskMessage -f $TaskName, $TaskPath)
+            $tempScheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
+
+            $scheduledTask = Get-ScheduledTask  -TaskName $currentValues.TaskName -TaskPath $currentValues.TaskPath -ErrorAction Stop
+            $scheduledTask.Actions = $action
+            $scheduledTask.Triggers = $tempScheduledTask.Triggers
+            $scheduledTask.Settings = $setting
+            $scheduledTask.Principal = $principal
+
+        } else {
+            $scheduledTask = $tempScheduledTask
         }
-
-        if ($currentValues.Ensure -eq 'Present')
-        {
-            Write-Verbose -Message ($script:localizedData.RemovePreviousScheduledTaskMessage -f $TaskName, $TaskPath)
-
-            $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false -ErrorAction Stop
-        }
-
-        Write-Verbose -Message ($script:localizedData.CreateNewScheduledTaskMessage -f $TaskName, $TaskPath)
-
-        # Create the scheduled task object
-        $scheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
-
+        
         if ($repetition)
         {
             Write-Verbose -Message ($script:localizedData.SetRepetitionTriggerMessage -f $TaskName, $TaskPath)
@@ -1203,12 +1202,25 @@ function Set-TargetResource
             $scheduledTask.Description = $Description
         }
 
-        # Register the scheduled task
-        $registerArguments.Add('InputObject', $scheduledTask)
+        if ($currentValues.Ensure -eq 'Present')
+        {
+            Write-Verbose -Message ($script:localizedData.UpdateScheduledTaskMessage -f $TaskName, $TaskPath)
+            $null = Set-ScheduledTask -InputObject $scheduledTask @registerArguments
+        
+        } else {
+            Write-Verbose -Message ($script:localizedData.CreateNewScheduledTaskMessage -f $TaskName, $TaskPath)
 
-        Write-Verbose -Message ($script:localizedData.RegisterScheduledTaskMessage -f $TaskName, $TaskPath)
+            # Register the scheduled task and 
 
-        $null = Register-ScheduledTask @registerArguments -ErrorAction Stop
+            $registerArguments.Add('TaskName',$TaskName)
+            $registerArguments.Add('TaskPath',$TaskPath)
+            $registerArguments.Add('InputObject', $scheduledTask)
+
+            Write-Verbose -Message ($script:localizedData.RegisterScheduledTaskMessage -f $TaskName, $TaskPath)
+            Write-Verbose -Message ($TaskName)
+         
+            $null = Register-ScheduledTask @registerArguments
+        }
     }
 
     if ($Ensure -eq 'Absent')
