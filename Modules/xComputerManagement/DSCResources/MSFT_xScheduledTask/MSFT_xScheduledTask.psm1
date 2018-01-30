@@ -1050,9 +1050,15 @@ function Set-TargetResource
 
         $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
         
+        if (-not $trigger)
+        {
+            New-InvalidOperationException `
+                -Message ($script:localizedData.TriggerCreationError) `
+                -ErrorRecord $_
+        }
+      
         if ($RepeatInterval -gt [System.TimeSpan]::Parse('0:0:0'))
         {
-
             # A repetition pattern is required so create it and attach it to the trigger object
             Write-Verbose -Message ($script:localizedData.ConfigureTriggerRepetitionMessage)
 
@@ -1063,9 +1069,13 @@ function Set-TargetResource
                     -ArgumentName RepetitionDuration
             }
 
-            $triggerParameters.Add('RepetitionInterval',$RepeatInterval)
+            $tempTriggerParameters = @{
+                Once               = $true
+                At                 = '6:6:6'
+                RepetitionInterval = $RepeatInterval
+            }
 
-            Write-Verbose -Message ($script:localizedData.CreateRepetitionPatternMessage)
+            #Write-Verbose -Message ($script:localizedData.CreateRepetitionPatternMessage)
 
             switch ($trigger.GetType().FullName)
             {
@@ -1074,7 +1084,14 @@ function Set-TargetResource
                     # This is the type of trigger object returned in Windows Server 2012 R2/Windows 8.1 and below
                     Write-Verbose -Message ($script:localizedData.CreateTemporaryTaskMessage)
 
-                    $triggerParameters.Add('RepetitionDuration', $RepetitionDuration)
+                    $tempTriggerParameters.Add('RepetitionDuration', $RepetitionDuration)
+
+                    # Create a temporary trigger and task and copy the repetition CIM object from the temporary task
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerParameters
+                    $tempTask = New-ScheduledTask -Action $action -Trigger $tempTrigger
+
+                    # Store the repetition settings
+                    $repetition = $tempTask.Triggers[0].Repetition
                 }
 
                 'Microsoft.Management.Infrastructure.CimInstance'
@@ -1084,28 +1101,23 @@ function Set-TargetResource
 
                     if ($RepetitionDuration -gt [System.TimeSpan]::Parse('0:0:0') -and $RepetitionDuration -lt [System.TimeSpan]::MaxValue)
                     {
-                        $triggerParameters.Add('RepetitionDuration', $RepetitionDuration)
+                        $tempTriggerParameters.Add('RepetitionDuration', $RepetitionDuration)
                     }
 
+                    # Create a temporary trigger and copy the repetition CIM object from it to the actual trigger
+                    $tempTrigger = New-ScheduledTaskTrigger @tempTriggerParameters
+
+                    # Store the repetition settings
+                    $repetition = $tempTrigger.Repetition
                 }
+
                 default
                 {
                     New-InvalidOperationException `
                         -Message ($script:localizedData.TriggerUnexpectedTypeError -f $trigger.GetType().FullName)
                 }
             }
-
-            $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
-        }
-
-        
-        if (-not $trigger)
-        {
-            New-InvalidOperationException `
-                -Message ($script:localizedData.TriggerCreationError) `
-                -ErrorRecord $_
-        }
-        
+        }  
 
         # Prepare the register arguments
         $registerArguments = @{}
@@ -1154,26 +1166,37 @@ function Set-TargetResource
         $principal = New-ScheduledTaskPrincipal @principalArguments
 
         # Create the scheduled task object depending on already present or not
-        if ($currentValues.Ensure -eq 'Present') {
-            Write-Verbose -Message ($script:localizedData.RetrieveScheduledTaskMessage -f $TaskName, $TaskPath)
-            $scheduledTask = Get-ScheduledTask  -TaskName $currentValues.TaskName -TaskPath $currentValues.TaskPath -ErrorAction Stop
-            
-            $scheduledTask.Actions = $action
-            $scheduledTask.Triggers = $trigger
-            $scheduledTask.Settings = $setting
-            $scheduledTask.Principal = $principal
-
-        } else {
-            $scheduledTaskArguments = @{
+        
+        $scheduledTaskArguments = @{
                 Action    = $action
                 Trigger   = $trigger
                 Settings  = $setting
                 Principal = $principal
             }
 
-            $scheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
+        $tempScheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
+        
+        if ($currentValues.Ensure -eq 'Present') {
+            Write-Verbose -Message ($script:localizedData.RetrieveScheduledTaskMessage -f $TaskName, $TaskPath)
+            $tempScheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
+
+            $scheduledTask = Get-ScheduledTask  -TaskName $currentValues.TaskName -TaskPath $currentValues.TaskPath -ErrorAction Stop
+            $scheduledTask.Actions = $action
+            $scheduledTask.Triggers = $tempScheduledTask.Triggers
+            $scheduledTask.Settings = $setting
+            $scheduledTask.Principal = $principal
+
+        } else {
+            $scheduledTask = $tempScheduledTask
         }
-            
+        
+        if ($repetition)
+        {
+            Write-Verbose -Message ($script:localizedData.SetRepetitionTriggerMessage -f $TaskName, $TaskPath)
+
+            $scheduledTask.Triggers[0].Repetition = $repetition
+        }
+
         if (-not [System.String]::IsNullOrWhiteSpace($Description))
         {
             $scheduledTask.Description = $Description
