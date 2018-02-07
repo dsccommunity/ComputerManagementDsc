@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0.0
+
 - BREAKING CHANGE: xScheduledTask:
   - Breaking change because `Get-TargetResource` no longer outputs
     `ActionExecutable` and `ScheduleType` properties when the scheduled
