@@ -4,7 +4,7 @@ $script:DSCResourceName = 'MSFT_xComputer'
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 # Unit Test Template Version: 1.2.0
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
+$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xComputerManagement'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -59,7 +59,7 @@ try
                             -DomainName 'contoso.com' `
                             -WorkGroupName 'workgroup' `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Throws if Domain is specified without Credentials' {
@@ -72,7 +72,7 @@ try
                             -Name $env:COMPUTERNAME `
                             -DomainName 'contoso.com' `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should return True if Domain name is same as specified' {
@@ -92,7 +92,7 @@ try
                         -Name $env:COMPUTERNAME `
                         -DomainName 'Contoso.com' `
                         -Credential $credential `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'Should return True if Workgroup name is same as specified' {
@@ -111,7 +111,7 @@ try
                     Test-TargetResource `
                         -Name $env:COMPUTERNAME `
                         -WorkGroupName 'workgroup' `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'Should return True if ComputerName and Domain name is same as specified' {
@@ -131,13 +131,13 @@ try
                         -Name $env:COMPUTERNAME `
                         -DomainName 'contoso.com' `
                         -Credential $credential `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
 
                     Test-TargetResource `
                         -Name 'localhost' `
                         -DomainName 'contoso.com' `
                         -Credential $credential `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'Should return True if ComputerName and Workgroup is same as specified' {
@@ -156,12 +156,12 @@ try
                     Test-TargetResource `
                         -Name $env:COMPUTERNAME `
                         -WorkGroupName 'workgroup' `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
 
                     Test-TargetResource `
                         -Name 'localhost' `
                         -WorkGroupName 'workgroup' `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'Should return True if ComputerName is same and no Domain or Workgroup specified' {
@@ -179,11 +179,11 @@ try
 
                     Test-TargetResource `
                         -Name $env:COMPUTERNAME `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
 
                     Test-TargetResource `
                         -Name 'localhost' `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
 
                     Mock -CommandName Get-WmiObject {
                         [PSCustomObject] @{
@@ -199,11 +199,11 @@ try
 
                     Test-TargetResource `
                         -Name $env:COMPUTERNAME `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
 
                     Test-TargetResource `
                         -Name 'localhost' `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'Should return False if ComputerName is not same and no Domain or Workgroup specified' {
@@ -221,7 +221,7 @@ try
 
                     Test-TargetResource `
                         -Name $notComputerName `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
 
                     Mock -CommandName Get-WmiObject -MockWith {
                         [PSCustomObject] @{
@@ -237,7 +237,7 @@ try
 
                     Test-TargetResource `
                         -Name $notComputerName `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'Should return False if Domain name is not same as specified' {
@@ -257,13 +257,13 @@ try
                         -Name $env:COMPUTERNAME `
                         -DomainName 'adventure-works.com' `
                         -Credential $credential `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
 
                     Test-TargetResource `
                         -Name 'localhost' `
                         -DomainName 'adventure-works.com' `
                         -Credential $credential `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'Should return False if Workgroup name is not same as specified' {
@@ -282,12 +282,12 @@ try
                     Test-TargetResource `
                         -Name $env:COMPUTERNAME `
                         -WorkGroupName 'NOTworkgroup' `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
 
                     Test-TargetResource `
                         -Name 'localhost' `
                         -WorkGroupName 'NOTworkgroup' `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'Should return False if ComputerName is not same as specified' {
@@ -306,7 +306,7 @@ try
                     Test-TargetResource `
                         -Name $notComputerName `
                         -WorkGroupName 'workgroup' `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
 
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
@@ -324,7 +324,7 @@ try
                         -Name $notComputerName `
                         -DomainName 'contoso.com' `
                         -Credential $credential `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'Should return False if Computer is in Workgroup and Domain is specified' {
@@ -344,13 +344,13 @@ try
                         -Name $env:COMPUTERNAME `
                         -DomainName 'contoso.com' `
                         -Credential $credential `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
 
                     Test-TargetResource `
                         -Name 'localhost' `
                         -DomainName 'contoso.com' `
                         -Credential $credential `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'Should return False if ComputerName is in Domain and Workgroup is specified' {
@@ -371,14 +371,14 @@ try
                         -WorkGroupName 'Contoso' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
 
                     Test-TargetResource `
                         -Name 'localhost' `
                         -WorkGroupName 'Contoso' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'Throws if name is to long' {
@@ -386,7 +386,7 @@ try
                         Test-TargetResource `
                             -Name 'ThisNameIsTooLong' `
                             -Verbose
-                    } | Should Throw
+                    } | Should -Throw
                 }
 
                 It 'Throws if name contains illegal characters' {
@@ -394,7 +394,7 @@ try
                         Test-TargetResource `
                             -Name 'ThisIsBad<>' `
                             -Verbose
-                    } | Should Throw
+                    } | Should -Throw
                 }
 
                 It 'Should not Throw if name is localhost' {
@@ -402,7 +402,7 @@ try
                         Test-TargetResource `
                             -Name 'localhost' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return true if description is same as specified' {
@@ -415,12 +415,12 @@ try
                     Test-TargetResource `
                         -Name $env:COMPUTERNAME `
                         -Description 'This is my computer' `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
 
                     Test-TargetResource `
                         -Name 'localhost' `
                         -Description 'This is my computer' `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'Should return false if description is same as specified' {
@@ -433,12 +433,12 @@ try
                     Test-TargetResource `
                         -Name $env:COMPUTERNAME `
                         -Description 'This is my computer' `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
 
                     Test-TargetResource `
                         -Name 'localhost' `
                         -Description 'This is my computer' `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
             }
 
@@ -448,7 +448,7 @@ try
                         Get-TargetResource `
                             -Name $env:COMPUTERNAME `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a hashtable containing Name, DomainName, JoinOU, CurrentOU, Credential, UnjoinCredential, WorkGroupName and Description' {
@@ -456,8 +456,8 @@ try
                         -Name $env:COMPUTERNAME `
                         -Verbose
 
-                    $Result.GetType().Fullname | Should Be 'System.Collections.Hashtable'
-                    $Result.Keys | Sort-Object | Should Be @('Credential', 'CurrentOU', 'Description', 'DomainName', 'JoinOU', 'Name', 'UnjoinCredential', 'WorkGroupName')
+                    $Result.GetType().Fullname | Should -Be 'System.Collections.Hashtable'
+                    $Result.Keys | Sort-Object | Should -Be @('Credential', 'CurrentOU', 'Description', 'DomainName', 'JoinOU', 'Name', 'UnjoinCredential', 'WorkGroupName')
                 }
 
                 It 'Throws if name is to long' {
@@ -465,7 +465,7 @@ try
                         Get-TargetResource `
                             -Name 'ThisNameIsTooLong' `
                             -Verbose
-                    } | Should Throw
+                    } | Should -Throw
                 }
 
                 It 'Throws if name contains illegal characters' {
@@ -473,7 +473,7 @@ try
                         Get-TargetResource `
                             -Name 'ThisIsBad<>' `
                             -Verbose
-                    } | Should Throw
+                    } | Should -Throw
                 }
             }
 
@@ -492,7 +492,7 @@ try
                             -DomainName 'contoso.com' `
                             -WorkGroupName 'workgroup' `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It
@@ -508,7 +508,7 @@ try
                             -Name $env:COMPUTERNAME `
                             -DomainName 'contoso.com' `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It
@@ -532,7 +532,7 @@ try
                         -DomainName 'adventure-works.com' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
@@ -558,7 +558,7 @@ try
                         -JoinOU 'OU=Computers,DC=contoso,DC=com' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
@@ -582,7 +582,7 @@ try
                         -Name $notComputerName `
                         -WorkGroupName 'contoso' `
                         -Credential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $WorkGroupName -and $NewName -and $credential }
@@ -606,7 +606,7 @@ try
                         -Name $notComputerName `
                         -DomainName 'Contoso.com' `
                         -Credential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
@@ -631,7 +631,7 @@ try
                         -DomainName 'Contoso.com' `
                         -JoinOU 'OU=Computers,DC=contoso,DC=com' `
                         -Credential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
@@ -654,7 +654,7 @@ try
                     Set-TargetResource `
                         -Name $notComputerName `
                         -WorkGroupName 'adventure-works' `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $WorkGroupName -and $NewName }
@@ -679,7 +679,7 @@ try
                         -DomainName 'adventure-works.com' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
@@ -705,7 +705,7 @@ try
                         -DomainName 'adventure-works.com' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
@@ -732,7 +732,7 @@ try
                         -JoinOU 'OU=Computers,DC=contoso,DC=com' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
@@ -759,7 +759,7 @@ try
                         -JoinOU 'OU=Computers,DC=contoso,DC=com' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
@@ -784,7 +784,7 @@ try
                         -Name $env:COMPUTERNAME `
                         -WorkGroupName 'Contoso' `
                         -UnjoinCredential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
@@ -809,7 +809,7 @@ try
                         -Name 'localhost' `
                         -WorkGroupName 'Contoso' `
                         -UnjoinCredential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
@@ -833,7 +833,7 @@ try
                     Set-TargetResource `
                         -Name $notComputerName `
                         -Credential $credential `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It
@@ -854,7 +854,7 @@ try
 
                     Set-TargetResource `
                         -Name $notComputerName `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It
@@ -865,7 +865,7 @@ try
                         Set-TargetResource `
                             -Name 'ThisNameIsTooLong' `
                             -Verbose
-                    } | Should Throw
+                    } | Should -Throw
                 }
 
                 It 'Throws if name contains illegal characters' {
@@ -873,7 +873,7 @@ try
                         Set-TargetResource `
                             -Name 'ThisIsBad<>' `
                             -Verbose
-                    } | Should Throw
+                    } | Should -Throw
                 }
 
                 It 'Changes computer description in a workgroup' {
@@ -893,7 +893,7 @@ try
                         -Name $env:COMPUTERNAME `
                         -Description 'This is my computer' `
                         -DomainName '' `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1 -Scope It
                 }
@@ -913,7 +913,7 @@ try
 
                     Set-TargetResource `
                         -Name $env:COMPUTERNAME `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Set-TargetResource `
                         -Name $env:COMPUTERNAME `
@@ -921,9 +921,91 @@ try
                         -Credential $credential `
                         -UnjoinCredential $credential `
                         -Description 'This is my computer' `
-                        -Verbose | Should BeNullOrEmpty
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1 -Scope It
+                }
+            }
+
+            Context "$($script:DSCResourceName)\Get-ComputerDomain" {
+                It 'Returns domain netbios or DNS name if domain member' {
+                    Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'contoso.com';
+                            PartOfDomain = $true
+                        }
+                    }
+
+                    Mock -CommandName Get-Item -ParameterFilter { $Path -eq 'Env:\USERDOMAIN' } -MockWith {
+                        [PSCustomObject] @{
+                            Value = 'CONTOSO'
+                        }
+                    }
+
+                    $getComputerDomainParameters = @{
+                        netbios = $true
+                    }
+
+                    Get-ComputerDomain @getComputerDomainParameters | Should Be 'CONTOSO'
+
+                    $getComputerDomainParameters = @{
+                        netbios = $false
+                    }
+
+                    Get-ComputerDomain @getComputerDomainParameters | Should Be 'contoso.com'
+
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 2 -Scope It
+                    Assert-MockCalled -CommandName Get-Item -Exactly -Times 1 -Scope It
+                }
+
+                It 'Returns nothing if in a workgroup' {
+                    Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'WORKGROUP';
+                            PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-Item -ParameterFilter { $Path -eq 'Env:\USERDOMAIN' } -MockWith {
+                        [PSCustomObject] @{
+                            Value = 'Computer1'
+                        }
+                    }
+
+                    $getComputerDomainParameters = @{
+                        netbios = $true
+                    }
+
+                    Get-ComputerDomain @getComputerDomainParameters | Should Be ''
+
+                    $getComputerDomainParameters = @{
+                        netbios = $false
+                    }
+
+                    Get-ComputerDomain @getComputerDomainParameters | Should Be ''
+
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 2 -Scope It
+                    Assert-MockCalled -CommandName Get-Item -Exactly -Times 0 -Scope It
+                }
+
+                It 'Returns domain DNS name when netbios not specified' {
+                    Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'contoso.com';
+                            PartOfDomain = $true
+                        }
+                    }
+
+                    Mock -CommandName Get-Item -ParameterFilter { $Path -eq 'Env:\USERDOMAIN' } -MockWith {
+                        [PSCustomObject] @{
+                            Value = 'CONTOSO'
+                        }
+                    }
+
+                    Get-ComputerDomain | Should Be "contoso.com"
+
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Get-Item -Exactly -Times 0 -Scope It
                 }
             }
         }

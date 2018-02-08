@@ -1,0 +1,12 @@
+[ClassVersion("1.0.1.0"), FriendlyName("xComputer")]
+class MSFT_xComputer : OMI_BaseResource
+{
+    [Key, Description("The desired computer name.")] String Name;
+    [Write, Description("The name of the domain to join.")] String DomainName;
+    [Write, Description("The distinguished name of the organizational unit that the computer account will be created in.")] String JoinOU;
+    [Write, Description("Credential to be used to join a domain."), EmbeddedInstance("MSFT_Credential")] String Credential;
+    [Write, Description("Credential to be used to leave a domain."), EmbeddedInstance("MSFT_Credential")] String UnjoinCredential;
+    [Write, Description("The name of the workgroup.")] String WorkGroupName;
+    [Write, Description("The value assigned here will be set as the local computer description.")] String Description;
+    [Read, Description("A read-only property that specifies the organizational unit that the computer account is currently in.")] String CurrentOU;
+};

@@ -4,7 +4,7 @@ $script:DSCResourceName = 'MSFT_xOfflineDomainJoin'
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 # Unit Test Template Version: 1.2.0
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
+$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xComputerManagement'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -37,8 +37,8 @@ try
                 $result = Get-TargetResource `
                     @TestOfflineDomainJoin
 
-                $result.IsSingleInstance       | Should Be $testOfflineDomainJoin.IsSingleInstance
-                $result.RequestFile            | Should Be ''
+                $result.IsSingleInstance       | Should -Be $testOfflineDomainJoin.IsSingleInstance
+                $result.RequestFile            | Should -Be ''
             }
         }
 
@@ -51,7 +51,7 @@ try
                 Mock -CommandName Join-Domain
 
                 It 'Should not throw exception' {
-                    { Set-TargetResource @TestOfflineDomainJoin } | Should Not Throw
+                    { Set-TargetResource @TestOfflineDomainJoin } | Should -Not -Throw
                 }
 
                 It 'Should do call all the mocks' {
@@ -72,7 +72,7 @@ try
                         -Message ($LocalizedData.RequestFileNotFoundError -f $testOfflineDomainJoin.RequestFile) `
                         -ArgumentName 'RequestFile'
 
-                    { Test-TargetResource @TestOfflineDomainJoin } | Should Throw $errorRecord
+                    { Test-TargetResource @TestOfflineDomainJoin } | Should -Throw $errorRecord
                 }
 
                 It 'Should do call all the mocks' {
@@ -93,7 +93,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestOfflineDomainJoin | should be $false
+                    Test-TargetResource @TestOfflineDomainJoin | Should -Be $false
                 }
 
                 It 'Should do call all the mocks' {
@@ -112,7 +112,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestOfflineDomainJoin | should be $true
+                    Test-TargetResource @TestOfflineDomainJoin | Should -Be $true
                 }
 
                 It 'Should do call all the mocks' {
@@ -135,7 +135,7 @@ try
                         -Message ($LocalizedData.RequestFileNotFoundError -f $testOfflineDomainJoin.RequestFile) `
                         -ArgumentName 'RequestFile'
 
-                    { Test-TargetResource @TestOfflineDomainJoin } | Should Throw $errorRecord
+                    { Test-TargetResource @TestOfflineDomainJoin } | Should -Throw $errorRecord
                 }
 
                 It 'Should do call all the mocks' {
@@ -153,7 +153,7 @@ try
                 }
 
                 It 'Should not throw' {
-                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should Not Throw
+                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should -Not -Throw
                 }
 
                 It 'Should do call all the mocks' {
@@ -171,7 +171,7 @@ try
                     -Message $($LocalizedData.DjoinError -f 99)
 
                 It 'Should not throw' {
-                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should Throw $errorRecord
+                    { Join-Domain -RequestFile 'c:\doesnotmatter.txt' } | Should -Throw $errorRecord
                 }
 
                 It 'Should do call all the mocks' {

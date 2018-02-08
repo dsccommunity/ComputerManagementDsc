@@ -1,0 +1,10 @@
+
+[ClassVersion("1.0.0.0"), FriendlyName("xVirtualMemory")]
+class MSFT_xVirtualMemory : OMI_BaseResource
+{
+    [Key, Description("The drive letter for which paging settings should be set. Can be letter only, letter and colon or letter with colon and trailing slash.")] String Drive;
+    [Key, Description("The type of the paging setting to use. If set to AutoManagePagingFile, the drive letter will be ignored. If set to SystemManagedSize, the values for InitialSize and MaximumSize will be ignored"), ValueMap{"AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile"}, Values{"AutoManagePagingFile","CustomSize","SystemManagedSize","NoPagingFile"}] String Type;
+    [Write, Description("The initial size of the page file in Megabyte")] Sint64 InitialSize;
+    [Write, Description("The maximum size of the page file in Megabyte")] Sint64 MaximumSize;
+};
+

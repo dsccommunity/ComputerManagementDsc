@@ -1,9 +1,9 @@
-$script:DSCModuleName      = 'xComputerManagement' 
-$script:DSCResourceName    = 'MSFT_xVirtualMemory' 
+$script:DSCModuleName      = 'xComputerManagement'
+$script:DSCResourceName    = 'MSFT_xVirtualMemory'
 
 #region HEADER
 # Integration Test Template Version: 1.1.1
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xComputerManagement'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -26,26 +26,26 @@ try
     . $configFile
 
     Describe "$($script:DSCResourceName)_Integration" {
-    
+
         Context "Set page file to automatically managed" {
             $CurrentConfig = "setToAuto"
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath "localhost.mof")
-            
+
             It "should compile a MOF file without error" {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
-            
+
             It "should apply the MOF correctly" {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
-            
+
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
             }
         }
 
@@ -53,21 +53,21 @@ try
             $CurrentConfig = "setToCustom"
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath "localhost.mof")
-            
+
             It "should compile a MOF file without error" {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
-            
+
             It "should apply the MOF correctly" {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
-            
+
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
             }
         }
 
@@ -75,21 +75,21 @@ try
             $CurrentConfig = "setToSystemManaged"
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath "localhost.mof")
-            
+
             It "should compile a MOF file without error" {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
-            
+
             It "should apply the MOF correctly" {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
-            
+
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
             }
         }
 
@@ -97,21 +97,21 @@ try
             $CurrentConfig = "setToNone"
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath "localhost.mof")
-            
+
             It "should compile a MOF file without error" {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
-            
+
             It "should apply the MOF correctly" {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
-            
+
             It "should return a compliant state after being applied" {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should be $true 
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
             }
         }
     }

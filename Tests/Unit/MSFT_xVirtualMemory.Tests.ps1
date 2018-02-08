@@ -5,7 +5,7 @@ $script:DSCResourceName    = 'MSFT_xVirtualMemory'
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 # Unit Test Template Version: 1.2.0
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
+$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xComputerManagement'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -131,7 +131,7 @@ try {
 
                 It 'Should return type set to AutoManagePagingFile' {
                     $result = Get-TargetResource @testParameters
-                    $result.Type | Should Be 'AutoManagePagingFile'
+                    $result.Type | Should -Be 'AutoManagePagingFile'
                 }
 
                 It 'Should call the correct mocks' {
@@ -154,7 +154,7 @@ try {
 
                 It 'Should return type set to NoPagingFile' {
                     $result = Get-TargetResource @testParameters
-                    $result.Type | Should Be 'NoPagingFile'
+                    $result.Type | Should -Be 'NoPagingFile'
                 }
 
                 It 'Should call the correct mocks' {
@@ -189,8 +189,8 @@ try {
 
                 It 'Should return a expected type and drive letter' {
                     $result = Get-TargetResource @testParameters
-                    $result.Type | Should Be 'SystemManagedSize'
-                    $result.Drive | Should Be ([System.IO.DriveInfo] $testParameters.Drive).Name
+                    $result.Type | Should -Be 'SystemManagedSize'
+                    $result.Drive | Should -Be ([System.IO.DriveInfo] $testParameters.Drive).Name
                 }
 
                 It 'Should call the correct mocks' {
@@ -225,8 +225,8 @@ try {
 
                 It 'Should return expected type and drive letter' {
                     $result = Get-TargetResource @testParameters
-                    $result.Type | Should Be 'CustomSize'
-                    $result.Drive | Should Be ([System.IO.DriveInfo] $testParameters.Drive).Name
+                    $result.Type | Should -Be 'CustomSize'
+                    $result.Drive | Should -Be ([System.IO.DriveInfo] $testParameters.Drive).Name
                 }
 
                 It 'Should call the correct mocks' {
@@ -283,7 +283,7 @@ try {
                         Verbose     = $true
                     }
 
-                    { Set-TargetResource @testParameters } | Should Not Throw
+                    { Set-TargetResource @testParameters } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -335,7 +335,7 @@ try {
                             Verbose     = $true
                         }
 
-                        { Set-TargetResource @testParameters } | Should Not Throw
+                        { Set-TargetResource @testParameters } | Should -Not -Throw
                     }
 
                     It 'Should call the correct mocks' {
@@ -406,7 +406,7 @@ try {
                             Verbose     = $true
                         }
 
-                        { Set-TargetResource @testParameters } | Should Not Throw
+                        { Set-TargetResource @testParameters } | Should -Not -Throw
                     }
 
                     It 'Should call the correct mocks' {
@@ -473,7 +473,7 @@ try {
                                 Verbose     = $true
                             }
 
-                            { Set-TargetResource @testParameters } | Should Not Throw
+                            { Set-TargetResource @testParameters } | Should -Not -Throw
                         }
 
                         It 'Should call the correct mocks' {
@@ -539,7 +539,7 @@ try {
                             Verbose     = $true
                         }
 
-                        { Set-TargetResource @testParameters } | Should Not Throw
+                        { Set-TargetResource @testParameters } | Should -Not -Throw
                     }
 
                     It 'Should call the correct mocks' {
@@ -597,7 +597,7 @@ try {
                                 Verbose     = $true
                             }
 
-                            { Set-TargetResource @testParameters } | Should Not Throw
+                            { Set-TargetResource @testParameters } | Should -Not -Throw
                         }
 
                         It 'Should call the correct mocks' {
@@ -648,7 +648,7 @@ try {
                             Verbose     = $true
                         }
 
-                        { Set-TargetResource @testParameters } | Should Not Throw
+                        { Set-TargetResource @testParameters } | Should -Not -Throw
                     }
 
                     It 'Should call the correct mocks' {
@@ -693,7 +693,7 @@ try {
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call the correct mocks' {
@@ -724,7 +724,7 @@ try {
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call the correct mocks' {
@@ -767,7 +767,7 @@ try {
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call the correct mocks' {
@@ -810,7 +810,7 @@ try {
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call the correct mocks' {
@@ -844,7 +844,7 @@ try {
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call the correct mocks' {
@@ -882,7 +882,7 @@ try {
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call the correct mocks' {
@@ -925,7 +925,7 @@ try {
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call the correct mocks' {
@@ -968,7 +968,7 @@ try {
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call the correct mocks' {
@@ -1011,7 +1011,7 @@ try {
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call the correct mocks' {
@@ -1043,9 +1043,9 @@ try {
 
                     It 'Should return the expected object' {
                         $result = Get-PageFileSetting -Drive $testDrive -Verbose
-                        $result.InitialSize | Should Be $testInitialSize
-                        $result.MaximumSize | Should Be $testMaximumSize
-                        $result.Name | Should Be "$testDrive\"
+                        $result.InitialSize | Should -Be $testInitialSize
+                        $result.MaximumSize | Should -Be $testMaximumSize
+                        $result.Name | Should -Be "$testDrive\"
                     }
 
                     It 'Should call the correct mocks' {
@@ -1070,7 +1070,7 @@ try {
                                 -InitialSize $testInitialSize `
                                 -MaximumSize $testMaximumSize `
                                 -Verbose
-                         } | Should Not Throw
+                         } | Should -Not -Throw
                     }
 
                     It 'Should call the correct mocks' {
@@ -1089,7 +1089,7 @@ try {
                         -ParameterFilter $parameterFilterEnableAutoManagePaging
 
                     It 'Should not throw an exception' {
-                        { Set-AutoManagePaging -State Enable -Verbose } | Should Not Throw
+                        { Set-AutoManagePaging -State Enable -Verbose } | Should -Not -Throw
                     }
 
                     It 'Should call the correct mocks' {
@@ -1106,7 +1106,7 @@ try {
                         -ParameterFilter $parameterFilterDisableAutoManagePaging
 
                     It 'Should not throw an exception' {
-                        { Set-AutoManagePaging -State Disable -Verbose } | Should Not Throw
+                        { Set-AutoManagePaging -State Disable -Verbose } | Should -Not -Throw
                     }
 
                     It 'Should call the correct mocks' {
@@ -1125,7 +1125,7 @@ try {
                         -ParameterFilter $parameterFilterNewPageFileSetting
 
                     It 'Should not throw an exception' {
-                        { New-PageFile -PageFileName $testPageFileName -Verbose } | Should Not Throw
+                        { New-PageFile -PageFileName $testPageFileName -Verbose } | Should -Not -Throw
                     }
 
                     It 'Should call the correct mocks' {

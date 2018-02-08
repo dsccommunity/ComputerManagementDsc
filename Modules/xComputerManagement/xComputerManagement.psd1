@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '3.2.0.0'
+ModuleVersion = '4.0.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,18 +49,22 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* xScheduledTask:
-  * Enable Execution Time Limit of task to be set to indefinite
-    by setting `ExecutionTimeLimit` to "00:00:00" - See [Issue 115](https://github.com/PowerShell/xComputerManagement/issues/115)
-* xPowerPlan:
-  * Updated to meet HQRM guidelines.
-  * Converted calls to `throw` to use `New-InvalidOperationException`
-    in CommonResourceHelper.
-* Move Common Resource Helper functions into modules folder.
-* Changed resources to use Common Resource Helper functions.
-* Moved strings for Common Resource Helper functions into separate
-  strings file.
-* Added unit tests for Common Helper functions.
+        ReleaseNotes = '- BREAKING CHANGE: xScheduledTask:
+  - Breaking change because `Get-TargetResource` no longer outputs
+    `ActionExecutable` and `ScheduleType` properties when the scheduled
+    task does not exist. It will also include `TaskPath` in output when
+    scheduled task does not exist.
+- xScheduledTask:
+  - Add support to disable built-in scheduled tasks - See [Issue 74](https://github.com/PowerShell/xComputerManagement/issues/74).
+  - Fix unit test mocked schedule task object structure.
+  - Fix error message when trigger type is unknown - See [Issue 121](https://github.com/PowerShell/xComputerManagement/issues/121).
+  - Moved strings into separate strings file.
+  - Updated to meet HQRM guidelines.
+- xComputer:
+  - Resolved bug in Get-ComputerDomain where LocalSystem doesn"t have
+    rights to the domain.
+- Updated tests to meet Pester V4 guidelines - See [Issue 106](https://github.com/PowerShell/xComputerManagement/issues/106).
+- Converted module to use auto documentation format.
 
 '
 
@@ -68,6 +72,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 

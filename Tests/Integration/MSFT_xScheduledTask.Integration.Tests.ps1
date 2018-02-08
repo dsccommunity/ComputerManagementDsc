@@ -3,7 +3,7 @@ $Global:DSCModuleName = 'xComputerManagement'
 $Global:DSCResourceName = 'MSFT_xScheduledTask'
 #region HEADER
 # Integration Test Template Version: 1.1.1
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xComputerManagement'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -59,7 +59,7 @@ try
                         . $currentConfig `
                             -OutputPath $configDir `
                             -ConfigurationData $configData
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should apply the MOF correctly' {
@@ -70,11 +70,11 @@ try
                             -Force `
                             -Verbose `
                             -ErrorAction Stop
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
                 }
             }
 
@@ -88,7 +88,7 @@ try
                         . $currentConfig `
                             -OutputPath $configDir `
                             -ConfigurationData $configData
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should apply the MOF correctly' {
@@ -99,11 +99,11 @@ try
                             -Force `
                             -Verbose `
                             -ErrorAction Stop
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
                 }
             }
 
@@ -117,7 +117,7 @@ try
                         . $currentConfig `
                             -OutputPath $configDir `
                             -ConfigurationData $configData
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should apply the MOF correctly' {
@@ -128,11 +128,11 @@ try
                             -Force `
                             -Verbose `
                             -ErrorAction Stop
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
                 }
             }
         }
@@ -152,7 +152,7 @@ try
                     Set-TimeZoneId -Id 'W. Australia Standard Time'
                     . $currentConfig `
                         -OutputPath $configDir
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
@@ -164,33 +164,116 @@ try
                         -Force `
                         -Verbose `
                         -ErrorAction Stop
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should be $true
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
-                $current.TaskName              | Should Be 'Test task once cross timezone'
-                $current.TaskPath              | Should Be '\xComputerManagement\'
-                $current.ActionExecutable      | Should Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                $current.ScheduleType          | Should Be 'Once'
-                $current.RepeatInterval        | Should Be '00:15:00'
-                $current.RepetitionDuration    | Should Be '23:00:00'
-                $current.ActionWorkingPath     | Should Be (Get-Location).Path
-                $current.Enable                | Should Be $true
-                $current.RandomDelay           | Should Be '01:00:00'
-                $current.DisallowHardTerminate | Should Be $true
-                $current.RunOnlyIfIdle         | Should Be $false
-                $current.Priority              | Should Be 9
-                $current.RunLevel              | Should Be 'Limited'
-                $current.ExecutionTimeLimit    | Should Be '00:00:00'
+                $current.TaskName              | Should -Be 'Test task once cross timezone'
+                $current.TaskPath              | Should -Be '\xComputerManagement\'
+                $current.ActionExecutable      | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                $current.ScheduleType          | Should -Be 'Once'
+                $current.RepeatInterval        | Should -Be '00:15:00'
+                $current.RepetitionDuration    | Should -Be '23:00:00'
+                $current.ActionWorkingPath     | Should -Be (Get-Location).Path
+                $current.Enable                | Should -Be $true
+                $current.RandomDelay           | Should -Be '01:00:00'
+                $current.DisallowHardTerminate | Should -Be $true
+                $current.RunOnlyIfIdle         | Should -Be $false
+                $current.Priority              | Should -Be 9
+                $current.RunLevel              | Should -Be 'Limited'
+                $current.ExecutionTimeLimit    | Should -Be '00:00:00'
             }
 
             AfterAll {
                 Set-TimeZoneId -Id $currentTimeZoneId
+            }
+        }
+
+        # Simulate a "built-in" scheduled task
+        $action = New-ScheduledTaskAction -Execute 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+        $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date)
+        $task = New-ScheduledTask -Action $action -Trigger $trigger
+        Register-ScheduledTask -InputObject $task -TaskName 'Test task builtin' -TaskPath '\xComputerManagement\' -User 'NT AUTHORITY\SYSTEM'
+
+        Context 'Built-in task needs to be disabled' {
+            $currentConfig = 'xScheduledTaskDisableBuiltIn'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+
+            It 'Should compile the MOF without throwing' {
+                {
+                    . $currentConfig `
+                        -OutputPath $configDir `
+                        -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration `
+                        -Path $configDir `
+                        -Wait `
+                        -Force `
+                        -Verbose `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration   | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq $currentConfig
+                }
+                $current.TaskName              | Should -Be 'Test task builtin'
+                $current.TaskPath              | Should -Be '\xComputerManagement\'
+                $current.Enable                | Should -Be $false
+            }
+        }
+
+        Context 'Built-in task needs to be removed' {
+            $currentConfig = 'xScheduledTaskRemoveBuiltIn'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+
+
+            It 'Should compile the MOF without throwing' {
+                {
+                    . $currentConfig `
+                        -OutputPath $configDir `
+                        -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration `
+                        -Path $configDir `
+                        -Wait `
+                        -Force `
+                        -Verbose `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration   | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq $currentConfig
+                }
+                $current.TaskName              | Should -Be 'Test task builtin'
+                $current.TaskPath              | Should -Be '\xComputerManagement\'
+                $current.Ensure                | Should -Be 'Absent'
             }
         }
     }
