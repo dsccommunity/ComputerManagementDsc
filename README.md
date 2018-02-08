@@ -28,7 +28,7 @@ out the [xComputerManagement wiki](https://github.com/PowerShell/xComputerManage
 
 ### master
 
-[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xsqlserver/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xComputerManagement/branch/master)
 [![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master)
 
 This is the branch containing the latest release - no contributions should be made
