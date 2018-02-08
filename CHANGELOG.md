@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix master branch AppVeyor badge link URL - See [Issue #140](https://github.com/PowerShell/xComputerManagement/issues/140).
+
 ## 4.0.0.0
 
 - BREAKING CHANGE: xScheduledTask:
