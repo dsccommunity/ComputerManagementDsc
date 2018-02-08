@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fix master branch AppVeyor badge link URL - See [Issue #140](https://github.com/PowerShell/xComputerManagement/issues/140).
+- Fix master branch AppVeyor badge link URL in README.MD - See [Issue #140](https://github.com/PowerShell/xComputerManagement/issues/140).
 
 ## 4.0.0.0
 
