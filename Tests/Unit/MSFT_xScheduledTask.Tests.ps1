@@ -296,7 +296,7 @@ try
                     RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
                     Verbose            = $True
                 }
-                
+
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         TaskName  = $testParameters.TaskName
@@ -321,7 +321,6 @@ try
                             UserId = 'SYSTEM'
                         }
                     }
-
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {

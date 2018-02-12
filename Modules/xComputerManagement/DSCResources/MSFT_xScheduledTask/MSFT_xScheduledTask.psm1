@@ -1177,21 +1177,26 @@ function Set-TargetResource
         }
 
         $tempScheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
-        
-        if ($currentValues.Ensure -eq 'Present') {
+
+        if ($currentValues.Ensure -eq 'Present')
+        {
             Write-Verbose -Message ($script:localizedData.RetrieveScheduledTaskMessage -f $TaskName, $TaskPath)
             $tempScheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
 
-            $scheduledTask = Get-ScheduledTask -TaskName $currentValues.TaskName -TaskPath $currentValues.TaskPath -ErrorAction Stop
+            $scheduledTask = Get-ScheduledTask `
+                -TaskName $currentValues.TaskName `
+                -TaskPath $currentValues.TaskPath `
+                -ErrorAction Stop
             $scheduledTask.Actions = $action
             $scheduledTask.Triggers = $tempScheduledTask.Triggers
             $scheduledTask.Settings = $setting
             $scheduledTask.Principal = $principal
-
-        } else {
+        }
+        else
+        {
             $scheduledTask = $tempScheduledTask
         }
-       
+
         Write-Verbose -Message ($script:localizedData.CreateNewScheduledTaskMessage -f $TaskName, $TaskPath)
 
         if ($repetition)
@@ -1212,8 +1217,9 @@ function Set-TargetResource
 
             Write-Verbose -Message ($script:localizedData.UpdateScheduledTaskMessage -f $TaskName, $TaskPath)
             $null = Set-ScheduledTask -InputObject $scheduledTask @registerArguments
-        
-        } else {
+        }
+        else
+        {
             Write-Verbose -Message ($script:localizedData.CreateNewScheduledTaskMessage -f $TaskName, $TaskPath)
 
             # Register the scheduled task
@@ -1222,11 +1228,8 @@ function Set-TargetResource
             $registerArguments.Add('TaskPath',$TaskPath)
             $registerArguments.Add('InputObject', $scheduledTask)
 
-            Write-Verbose -Message ($script:localizedData.RegisterScheduledTaskMessage -f $TaskName, $TaskPath)
-            Write-Verbose -Message ($TaskName)
-         
             $null = Register-ScheduledTask @registerArguments
-        }       
+        }
     }
 
     if ($Ensure -eq 'Absent')
