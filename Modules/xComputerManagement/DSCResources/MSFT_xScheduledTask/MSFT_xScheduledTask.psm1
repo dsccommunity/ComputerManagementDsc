@@ -438,9 +438,7 @@ function Get-TargetResource
 
             default
             {
-                New-InvalidArgumentException `
-                    -Message ($script:localizedData.TriggerTypeError -f $trigger.CimClass.CimClassName) `
-                    -ArgumentName CimClassName
+                $returnScheduleType = ''
             }
         }
 

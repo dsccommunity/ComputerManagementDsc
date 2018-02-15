@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fix master branch AppVeyor badge link URL in README.MD - See [Issue #140](https://github.com/PowerShell/xComputerManagement/issues/140).
+- Fix deletion of scheduled task with unknown or empty task trigger. Get-TargetResource returns an empty ScheduleType string if the task trigger is empty or unknown - See [Issue #137](https://github.com/PowerShell/xComputerManagement/issues/137)
 
 ## 4.0.0.0
 
