@@ -439,6 +439,7 @@ function Get-TargetResource
             default
             {
                 $returnScheduleType = ''
+                Write-Verbose -Message ($script:localizedData.TriggerTypeUnknown -f $trigger.CimClass.CimClassName)
             }
         }
 
