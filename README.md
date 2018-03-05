@@ -11,6 +11,11 @@ The **xComputerManagement** module contains the following resources:
 - **xScheduledTask**: is used to define basic run once or recurring scheduled tasks
   on the local computer. It can also be used to delete or disable built-in
   scheduled tasks.
+
+  _The **xScheduledTask** resource requires the `ScheduledTasks` PowerShell module
+  which is only available on Windows Server 2012/Windows 8 and above. DSC configurations
+  containing this resource may be compiled on Windows Server 2008 R2/Windows 7 but
+  can not be applied._
 - **xVirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
 

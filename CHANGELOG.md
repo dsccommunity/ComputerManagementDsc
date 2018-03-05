@@ -7,6 +7,7 @@
   Get-TargetResource returns an empty ScheduleType string if the task
   trigger is empty or unknown - See [Issue
   #137](https://github.com/PowerShell/xComputerManagement/issues/137).
+- Added dependency information for xScheduledTask to README.MD.
 
 ## 4.0.0.0
 
