@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.1.0.0
+
 - xScheduledTask:
   - Update existing Scheduled Task using SetScheduleTask
     instead of UnRegister/Register - See [Issue #134](https://github.com/PowerShell/xComputerManagement/issues/134).
