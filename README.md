@@ -11,6 +11,11 @@ The **xComputerManagement** module contains the following resources:
 - **xScheduledTask**: is used to define basic run once or recurring scheduled tasks
   on the local computer. It can also be used to delete or disable built-in
   scheduled tasks.
+
+  _The **xScheduledTask** resource requires the `ScheduledTasks` PowerShell module
+  which is only available on Windows Server 2012/Windows 8 and above. DSC configurations
+  containing this resource may be compiled on Windows Server 2008 R2/Windows 7 but
+  can not be applied._
 - **xVirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
 
@@ -28,7 +33,7 @@ out the [xComputerManagement wiki](https://github.com/PowerShell/xComputerManage
 
 ### master
 
-[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xsqlserver/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xComputerManagement/branch/master)
 [![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master)
 
 This is the branch containing the latest release - no contributions should be made

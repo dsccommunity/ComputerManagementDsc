@@ -65,6 +65,28 @@ try
             )
         }
 
+        # Function to allow mocking pipeline input
+        function Set-ScheduledTask
+        {
+            param
+            (
+                [Parameter()]
+                [switch]
+                $Force,
+
+                [Parameter(ValueFromPipeline = $true)]
+                $InputObject,
+
+                [Parameter()]
+                [System.String]
+                $Password,
+
+                [Parameter()]
+                [System.String]
+                $User
+            )
+        }
+
         Describe $script:DSCResourceName {
             BeforeAll {
                 Mock -CommandName Register-ScheduledTask
@@ -312,8 +334,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -412,8 +433,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -511,8 +531,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -608,8 +627,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -665,8 +683,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -722,8 +739,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -777,8 +793,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -832,8 +847,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -890,8 +904,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
 
             }
@@ -951,8 +964,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -1125,8 +1137,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -1266,9 +1277,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
-                }
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1                }
             }
 
             Context 'A scheduled task exists and is configured with the wrong idle timeout & idle duration parameters' {
@@ -1334,8 +1343,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -1388,8 +1396,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -1442,8 +1449,7 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Unregister-ScheduledTask -Exactly -Times 1
-                    Assert-Mockcalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
                 }
             }
 
@@ -1492,6 +1498,52 @@ try
 
                 It 'Should return true from the test method' {
                     Test-TargetResource @testParameters | Should -Be $true
+                }
+            }
+
+            Context 'When a built-in scheduled task exists and is enabled, but it should be disabled and the trigger type is not recognized' {
+                $testParameters = @{
+                    TaskName = 'Test task'
+                    TaskPath = '\Test\'
+                    Enable   = $false
+                    Verbose  = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = [pscustomobject] @{
+                            Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                        }
+                        Triggers = [pscustomobject] @{
+                            Repetition = @{
+                                Duration = "PT15M"
+                                Interval = "PT15M"
+                            }
+                            CimClass   = @{
+                                CimClassName = 'MSFT_TaskEventTrigger'
+                            }
+                        }
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                        }
+                    } }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Enable | Should -Be $true
+                    $result.Ensure | Should -Be 'Present'
+                    $result.ScheduleType | Should -BeNullOrEmpty
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                It 'Should disable the scheduled task in the set method' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
                 }
             }
         }

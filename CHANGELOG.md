@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 4.1.0.0
+
+- xScheduledTask:
+  - Update existing Scheduled Task using SetScheduleTask
+    instead of UnRegister/Register - See [Issue #134](https://github.com/PowerShell/xComputerManagement/issues/134).
+- Fix master branch AppVeyor badge link URL in README.MD - See [Issue #140](https://github.com/PowerShell/xComputerManagement/issues/140).
+- Fix deletion of scheduled task with unknown or empty task trigger.
+  Get-TargetResource returns an empty ScheduleType string if the task
+  trigger is empty or unknown - See [Issue
+  #137](https://github.com/PowerShell/xComputerManagement/issues/137).
+- Added dependency information for xScheduledTask to README.MD.
+
 ## 4.0.0.0
 
 - BREAKING CHANGE: xScheduledTask:

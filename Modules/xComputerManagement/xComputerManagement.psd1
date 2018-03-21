@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '4.0.0.0'
+moduleVersion = '4.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,22 +49,15 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- BREAKING CHANGE: xScheduledTask:
-  - Breaking change because `Get-TargetResource` no longer outputs
-    `ActionExecutable` and `ScheduleType` properties when the scheduled
-    task does not exist. It will also include `TaskPath` in output when
-    scheduled task does not exist.
-- xScheduledTask:
-  - Add support to disable built-in scheduled tasks - See [Issue 74](https://github.com/PowerShell/xComputerManagement/issues/74).
-  - Fix unit test mocked schedule task object structure.
-  - Fix error message when trigger type is unknown - See [Issue 121](https://github.com/PowerShell/xComputerManagement/issues/121).
-  - Moved strings into separate strings file.
-  - Updated to meet HQRM guidelines.
-- xComputer:
-  - Resolved bug in Get-ComputerDomain where LocalSystem doesn"t have
-    rights to the domain.
-- Updated tests to meet Pester V4 guidelines - See [Issue 106](https://github.com/PowerShell/xComputerManagement/issues/106).
-- Converted module to use auto documentation format.
+        ReleaseNotes = '- xScheduledTask:
+  - Update existing Scheduled Task using SetScheduleTask
+    instead of UnRegister/Register - See [Issue 134](https://github.com/PowerShell/xComputerManagement/issues/134).
+- Fix master branch AppVeyor badge link URL in README.MD - See [Issue 140](https://github.com/PowerShell/xComputerManagement/issues/140).
+- Fix deletion of scheduled task with unknown or empty task trigger.
+  Get-TargetResource returns an empty ScheduleType string if the task
+  trigger is empty or unknown - See [Issue
+  137](https://github.com/PowerShell/xComputerManagement/issues/137).
+- Added dependency information for xScheduledTask to README.MD.
 
 '
 
@@ -72,6 +65,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 

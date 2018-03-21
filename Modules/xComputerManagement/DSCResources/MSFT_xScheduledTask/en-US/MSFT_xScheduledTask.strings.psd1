@@ -2,7 +2,7 @@ ConvertFrom-StringData @'
     GetScheduledTaskMessage = Getting scheduled task '{0}' in '{1}'.
     TaskNotFoundMessage = Task '{0}' not found in '{1}'. Returning an empty task with Ensure = "Absent".
     TaskFoundMessage = Task '{0}' found in '{1}'. Retrieving settings, first action, first trigger and repetition settings.
-    TriggerTypeError = Trigger type '{0}' not recognized.
+    TriggerTypeUnknown = Trigger type '{0}' not recognized.
     DetectedScheduleTypeMessage = Detected schedule type '{0}' for first trigger.
     SetScheduledTaskMessage = Setting scheduled task '{0}' in '{1}'.
     DisablingExistingScheduledTask = Disabling existing scheduled task '{0}' in '{1}'.
@@ -22,7 +22,9 @@ ConvertFrom-StringData @'
     CreateNewScheduledTaskMessage = Creating new scheduled task '{0}' in '{1}'.
     SetRepetitionTriggerMessage = Setting repetition trigger settings on task '{0}' in '{1}'.
     RegisterScheduledTaskMessage = Registering the scheduled task '{0}' in '{1}'.
+    RetrieveScheduledTaskMessage = Retrieving the scheduled task '{0}' from '{1}'.
     RemoveScheduledTaskMessage = Removing scheduled task '{0}' from '{1}'.
+    UpdateScheduledTaskMessage = Updating scheduled task '{0}' in '{1}'.
     TestScheduledTaskMessage = Testing scheduled task '{0}' in '{1}'.
     GetCurrentTaskValuesMessage = Current scheduled task values retrieved.
     CurrentTaskValuesNullMessage = Current scheduled values were null.

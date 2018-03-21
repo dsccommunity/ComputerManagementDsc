@@ -438,9 +438,8 @@ function Get-TargetResource
 
             default
             {
-                New-InvalidArgumentException `
-                    -Message ($script:localizedData.TriggerTypeError -f $trigger.CimClass.CimClassName) `
-                    -ArgumentName CimClassName
+                $returnScheduleType = ''
+                Write-Verbose -Message ($script:localizedData.TriggerTypeUnknown -f $trigger.CimClass.CimClassName)
             }
         }
 
@@ -1128,10 +1127,7 @@ function Set-TargetResource
         }
 
         # Prepare the register arguments
-        $registerArguments = @{
-            TaskName = $TaskName
-            TaskPath = $TaskPath
-        }
+        $registerArguments = @{}
 
         if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
         {
@@ -1179,17 +1175,28 @@ function Set-TargetResource
             Principal = $principal
         }
 
+        $tempScheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
+
         if ($currentValues.Ensure -eq 'Present')
         {
-            Write-Verbose -Message ($script:localizedData.RemovePreviousScheduledTaskMessage -f $TaskName, $TaskPath)
+            Write-Verbose -Message ($script:localizedData.RetrieveScheduledTaskMessage -f $TaskName, $TaskPath)
+            $tempScheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
 
-            $null = Unregister-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Confirm:$false -ErrorAction Stop
+            $scheduledTask = Get-ScheduledTask `
+                -TaskName $currentValues.TaskName `
+                -TaskPath $currentValues.TaskPath `
+                -ErrorAction Stop
+            $scheduledTask.Actions = $action
+            $scheduledTask.Triggers = $tempScheduledTask.Triggers
+            $scheduledTask.Settings = $setting
+            $scheduledTask.Principal = $principal
+        }
+        else
+        {
+            $scheduledTask = $tempScheduledTask
         }
 
         Write-Verbose -Message ($script:localizedData.CreateNewScheduledTaskMessage -f $TaskName, $TaskPath)
-
-        # Create the scheduled task object
-        $scheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
 
         if ($repetition)
         {
@@ -1203,12 +1210,25 @@ function Set-TargetResource
             $scheduledTask.Description = $Description
         }
 
-        # Register the scheduled task
-        $registerArguments.Add('InputObject', $scheduledTask)
+        if ($currentValues.Ensure -eq 'Present')
+        {
+            # Updating the scheduled task
 
-        Write-Verbose -Message ($script:localizedData.RegisterScheduledTaskMessage -f $TaskName, $TaskPath)
+            Write-Verbose -Message ($script:localizedData.UpdateScheduledTaskMessage -f $TaskName, $TaskPath)
+            $null = Set-ScheduledTask -InputObject $scheduledTask @registerArguments
+        }
+        else
+        {
+            Write-Verbose -Message ($script:localizedData.CreateNewScheduledTaskMessage -f $TaskName, $TaskPath)
 
-        $null = Register-ScheduledTask @registerArguments -ErrorAction Stop
+            # Register the scheduled task
+
+            $registerArguments.Add('TaskName',$TaskName)
+            $registerArguments.Add('TaskPath',$TaskPath)
+            $registerArguments.Add('InputObject', $scheduledTask)
+
+            $null = Register-ScheduledTask @registerArguments
+        }
     }
 
     if ($Ensure -eq 'Absent')
