@@ -1,22 +1,22 @@
-# xComputerManagement
+# ComputerManagementDsc
 
-The **xComputerManagement** module contains the following resources:
+The **ComputerManagementDsc** module contains the following resources:
 
-- **xComputer**: allows you to configure a computer by changing its name and
+- **Computer**: allows you to configure a computer by changing its name and
   description and modifying its Active Directory domain or workgroup membership.
-- **xOfflineDomainJoin**: allows you to join computers to an Active Directory
+- **OfflineDomainJoin**: allows you to join computers to an Active Directory
   domain using an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx)
   request file.
-- **xPowerPlan**: allows specifying a power plan to activate.
-- **xScheduledTask**: is used to define basic run once or recurring scheduled tasks
+- **PowerPlan**: allows specifying a power plan to activate.
+- **ScheduledTask**: is used to define basic run once or recurring scheduled tasks
   on the local computer. It can also be used to delete or disable built-in
   scheduled tasks.
 
-  _The **xScheduledTask** resource requires the `ScheduledTasks` PowerShell module
+  _The **ScheduledTask** resource requires the `ScheduledTasks` PowerShell module
   which is only available on Windows Server 2012/Windows 8 and above. DSC configurations
   containing this resource may be compiled on Windows Server 2008 R2/Windows 7 but
   can not be applied._
-- **xVirtualMemory**: allows configuration of properties of the paging file on
+- **VirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
@@ -26,23 +26,23 @@ additional questions or comments.
 
 ## Documentation and Examples
 
-For a full list of resources in xComputerManagement and examples on their use, check
-out the [xComputerManagement wiki](https://github.com/PowerShell/xComputerManagement/wiki).
+For a full list of resources in ComputerManagementDsc and examples on their use, check
+out the [ComputerManagementDsc wiki](https://github.com/PowerShell/ComputerManagementDsc/wiki).
 
 ## Branches
 
 ### master
 
-[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xComputerManagement/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/ComputerManagementDsc/branch/master)
+[![codecov](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/master)
 
 This is the branch containing the latest release - no contributions should be made
 directly to this branch.
 
 ### dev
 
-[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xComputerManagement/branch/dev)
-[![codecov](https://codecov.io/gh/PowerShell/xComputerManagement/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xComputerManagement/branch/dev)
+[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/ComputerManagementDsc/branch/dev)
+[![codecov](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/dev)
 
 This is the development branch to which contributions should be proposed by contributors
 as pull requests. This development branch will periodically be merged to the master
