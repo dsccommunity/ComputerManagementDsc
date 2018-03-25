@@ -26,8 +26,8 @@ additional questions or comments.
 
 ## Documentation and Examples
 
-For a full list of resources in ComputerManagementDsc and examples on their use, check
-out the [ComputerManagementDsc wiki](https://github.com/PowerShell/ComputerManagementDsc/wiki).
+For a full list of resources in ComputerManagementDsc and examples on their use,
+check out the [ComputerManagementDsc wiki](https://github.com/PowerShell/ComputerManagementDsc/wiki).
 
 ## Branches
 
