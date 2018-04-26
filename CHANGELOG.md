@@ -3,8 +3,8 @@
 ## Unreleased
 
 - BREAKING CHANGE:
-  - Renamed ComputerManagement to ComputerManagementDsc - fixes [Issue #119](https://github.com/PowerShell/xComputerManagement/issues/119).
-  - Changed all MSFT_xResourceName to MSFT_ResourceName.
+  - Renamed ComputerManagement to ComputerManagementDsc - fixes [Issue #119](https://github.com/PowerShell/ComputerManagementDsc/issues/119).
+  - Changed all MSFT\_xResourceName to MSFT\_ResourceName.
   - Updated DSCResources, Examples, Modules and Tests with new naming.
   - Updated Year to 2018 in License and Manifest.
   - Updated README.md from xComputerManagement to ComputerManagementDsc.
