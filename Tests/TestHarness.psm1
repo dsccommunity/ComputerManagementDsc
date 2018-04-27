@@ -10,12 +10,12 @@ function Invoke-TestHarness
         $DscTestsPath
     )
 
-    Write-Verbose -Message 'Commencing all xComputerManagement tests'
+    Write-Verbose -Message 'Commencing all ComputerManagementDsc tests'
 
     $repoDir = Join-Path -Path $PSScriptRoot -ChildPath '..\' -Resolve
 
     $testCoverageFiles = @()
-    Get-ChildItem -Path "$repoDir\modules\xComputerManagement\DSCResources\**\*.psm1" -Recurse | ForEach-Object {
+    Get-ChildItem -Path "$repoDir\modules\ComputerManagementDsc\DSCResources\**\*.psm1" -Recurse | ForEach-Object {
         if ($_.FullName -notlike '*\DSCResource.Tests\*') {
             $testCoverageFiles += $_.FullName
         }
@@ -27,7 +27,7 @@ function Invoke-TestHarness
         $testResultSettings.Add('OutputFile', $TestResultsFile)
     }
 
-    Import-Module -Name "$repoDir\modules\xComputerManagement\xComputerManagement.psd1"
+    Import-Module -Name "$repoDir\modules\ComputerManagementDsc\ComputerManagementDsc.psd1"
     $testsToRun = @()
 
     # Run Unit Tests
