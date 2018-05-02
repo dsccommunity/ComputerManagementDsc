@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.0.0.0
+
 - BREAKING CHANGE:
   - Renamed ComputerManagement to ComputerManagementDsc - fixes [Issue #119](https://github.com/PowerShell/ComputerManagementDsc/issues/119).
   - Changed all MSFT\_xResourceName to MSFT\_ResourceName.

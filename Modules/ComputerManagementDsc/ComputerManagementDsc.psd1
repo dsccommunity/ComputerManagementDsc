@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-moduleVersion = '4.1.0.0'
+moduleVersion = '5.0.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,15 +49,17 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- xScheduledTask:
-  - Update existing Scheduled Task using SetScheduleTask
-    instead of UnRegister/Register - See [Issue 134](https://github.com/PowerShell/xComputerManagement/issues/134).
-- Fix master branch AppVeyor badge link URL in README.MD - See [Issue 140](https://github.com/PowerShell/xComputerManagement/issues/140).
-- Fix deletion of scheduled task with unknown or empty task trigger.
-  Get-TargetResource returns an empty ScheduleType string if the task
-  trigger is empty or unknown - See [Issue
-  137](https://github.com/PowerShell/xComputerManagement/issues/137).
-- Added dependency information for xScheduledTask to README.MD.
+        ReleaseNotes = '- BREAKING CHANGE:
+  - Renamed ComputerManagement to ComputerManagementDsc - fixes [Issue 119](https://github.com/PowerShell/ComputerManagementDsc/issues/119).
+  - Changed all MSFT\_xResourceName to MSFT\_ResourceName.
+  - Updated DSCResources, Examples, Modules and Tests with new naming.
+  - Updated Year to 2018 in License and Manifest.
+  - Updated README.md from xComputerManagement to ComputerManagementDsc.
+- OfflineDomainJoin:
+  - Cleaned up spacing in strings file to make consistent with other
+    resources.
+- VirtualMemory:
+  - Converted strings to single quotes in integration test.
 
 '
 
@@ -65,3 +67,4 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
