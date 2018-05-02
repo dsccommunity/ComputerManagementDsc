@@ -6,7 +6,7 @@ install:
     - git clone https://github.com/PowerShell/DscResource.Tests
 
     - ps: |
-        $moduleName = 'xComputerManagement'
+        $moduleName = 'ComputerManagementDsc'
         $mainModuleFolder = "Modules\$moduleName"
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
         Invoke-AppveyorInstallTask -PesterMaximumVersion 4.0.8

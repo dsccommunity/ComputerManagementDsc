@@ -7,5 +7,5 @@ if ( (-not (Test-Path -Path (Join-Path -Path $repoRoot -ChildPath 'DSCResource.T
 
 Import-Module (Join-Path $PSScriptRoot "..\Tests\TestHarness.psm1" -Resolve)
 $dscTestsPath = Join-Path -Path $PSScriptRoot `
-                          -ChildPath "..\Modules\xComputerManagement\DscResource.Tests\Meta.Tests.ps1"
+                          -ChildPath "..\Modules\ComputerManagementDsc\DscResource.Tests\Meta.Tests.ps1"
 Invoke-TestHarness -DscTestsPath $dscTestsPath
