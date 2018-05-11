@@ -1,4 +1,4 @@
-# Import the Networking Resource Helper Module
+# Import the ComputerManagement Resource Helper Module
 Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
             -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
