@@ -1,3 +1,11 @@
+// This file enables setting of the machine time zone
+// using .NET framework classes.
+// It can be used to set the time zone when the
+// PowerShell time zone cmdlets are not available.
+//
+// It creates a namespace Microsoft.PowerShell.TimeZone
+// containing the classes and structures required to
+// set the time zone.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -208,11 +216,13 @@ namespace Microsoft.PowerShell.TimeZone
         public static void Set(string name)
         {
             var regTimeZones = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones");
-            // Print out all the possible time-zones.
-            //foreach(var subKey in regTimeZones.GetSubKeyNames())
-            //{
-            //    Console.WriteLine(subKey);
-            //}
+            if (DEBUG) {
+                // Print out all the possible time-zones.
+                foreach(var subKey in regTimeZones.GetSubKeyNames())
+                {
+                    Console.WriteLine(subKey);
+                }
+            }
             var subKey = regTimeZones.GetSubKeyNames().Where(s => s == name).First();
             string daylightName = (string)regTimeZones.OpenSubKey(subKey).GetValue("Dlt");
             string standardName = (string)regTimeZones.OpenSubKey(subKey).GetValue("Std");

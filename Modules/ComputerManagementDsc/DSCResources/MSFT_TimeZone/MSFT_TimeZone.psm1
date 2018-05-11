@@ -17,13 +17,13 @@ $LocalizedData = Get-LocalizedData `
 
 <#
     .SYNOPSIS
-    Returns the current time zone of the node.
+        Returns the current time zone of the node.
 
     .PARAMETER IsSingleInstance
-    Specifies the resource is a single instance, the value must be 'Yes'.
+        Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER TimeZone
-    Specifies the time zone.
+        Specifies the time zone.
 #>
 function Get-TargetResource
 {
@@ -58,13 +58,13 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the current time zone of the node.
+        Sets the current time zone of the node.
 
     .PARAMETER IsSingleInstance
-    Specifies the resource is a single instance, the value must be 'Yes'.
+        Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER TimeZone
-    Specifies the time zone.
+        Specifies the time zone.
 #>
 function Set-TargetResource
 {
@@ -91,20 +91,19 @@ function Set-TargetResource
     }
     else
     {
-        Write-Verbose -Message ($LocalizedData.TimeZoneAlreadySetMessage `
-                -f $TimeZone)
+        Write-Verbose -Message ($LocalizedData.TimeZoneAlreadySetMessage -f $TimeZone)
     }
 }
 
 <#
     .SYNOPSIS
-    Tests the current time zone of the node.
+        Tests the current time zone of the node.
 
     .PARAMETER IsSingleInstance
-    Specifies the resource is a single instance, the value must be 'Yes'.
+        Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER TimeZone
-    Specifies the time zone.
+        Specifies the time zone.
 #>
 function Test-TargetResource
 {
