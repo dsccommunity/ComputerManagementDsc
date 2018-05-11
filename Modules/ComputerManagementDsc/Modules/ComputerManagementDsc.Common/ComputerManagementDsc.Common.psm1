@@ -364,11 +364,10 @@ function Get-TimeZoneId
                 -Namespace root\cimv2).StandardName
     }
 
-    Write-Verbose -Message ($LocalizedData.CurrentTimeZoneMessage `
-            -f $timeZone)
+    Write-Verbose -Message ($LocalizedData.CurrentTimeZoneMessage -f $timeZone)
 
     $timeZoneInfo = [System.TimeZoneInfo]::GetSystemTimeZones() |
-        Where-Object StandardName -eq $timeZone
+        Where-Object -Property StandardName -EQ $timeZone
 
     return $timeZoneInfo.Id
 } # function Get-TimeZoneId
@@ -422,16 +421,14 @@ function Set-TimeZoneId
         if (Test-Command -Name 'Add-Type' -Module 'Microsoft.Powershell.Utility')
         {
             # We can use reflection to modify the time zone.
-            Write-Verbose -Message ($LocalizedData.SettingTimeZoneMessage `
-                    -f $TimeZoneId, '.NET')
+            Write-Verbose -Message ($LocalizedData.SettingTimeZoneMessage -f $TimeZoneId, '.NET')
 
             Set-TimeZoneUsingDotNet -TimeZoneId $TimeZoneId
         }
         else
         {
             # For anything else use TZUTIL.EXE.
-            Write-Verbose -Message ($LocalizedData.SettingTimeZoneMessage `
-                    -f $TimeZoneId, 'TZUTIL.EXE')
+            Write-Verbose -Message ($LocalizedData.SettingTimeZoneMessage -f $TimeZoneId, 'TZUTIL.EXE')
 
             try
             {
@@ -444,8 +441,7 @@ function Set-TimeZoneId
         } # if
     } # if
 
-    Write-Verbose -Message ($LocalizedData.TimeZoneUpdatedMessage `
-            -f $TimeZoneId)
+    Write-Verbose -Message ($LocalizedData.TimeZoneUpdatedMessage -f $TimeZoneId)
 } # function Set-TimeZoneId
 
 <#

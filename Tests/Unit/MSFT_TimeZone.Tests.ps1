@@ -46,17 +46,17 @@ try
                 -CommandName Get-TimeZoneId `
                 -MockWith { 'Pacific Standard Time' }
 
-            $TimeZone = Get-TargetResource `
+            $timeZone = Get-TargetResource `
                 -TimeZone 'Pacific Standard Time' `
                 -IsSingleInstance 'Yes' `
                 -Verbose
 
             It 'Should return hashtable with Key TimeZone' {
-                $TimeZone.ContainsKey('TimeZone') | Should -Be $true
+                $timeZone.ContainsKey('TimeZone') | Should -Be $true
             }
 
             It 'Should return hashtable with Value that matches "Pacific Standard Time"' {
-                $TimeZone.TimeZone = 'Pacific Standard Time'
+                $timeZone.TimeZone = 'Pacific Standard Time'
             }
         }
 
@@ -80,13 +80,13 @@ try
             }
 
             It 'Should not call Set-TimeZoneId when Current TimeZone already set to desired State' {
-                $SystemTimeZone = Get-TargetResource `
+                $systemTimeZone = Get-TargetResource `
                     -TimeZone 'Eastern Standard Time' `
                     -IsSingleInstance 'Yes' `
                     -Verbose
 
                 Set-TargetResource `
-                    -TimeZone $SystemTimeZone.TimeZone `
+                    -TimeZone $systemTimeZone.TimeZone `
                     -IsSingleInstance 'Yes' `
                     -Verbose
 

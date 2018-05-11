@@ -54,20 +54,20 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
         #endregion
 
         It 'Should have set the configuration and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
+            $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $current.TimeZone         | Should Be $configData.AllNodes[0].TimeZone
-            $current.IsSingleInstance | Should Be $configData.AllNodes[0].IsSingleInstance
+            $current.TimeZone         | Should -Be $configData.AllNodes[0].TimeZone
+            $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance
         }
     }
     #endregion
