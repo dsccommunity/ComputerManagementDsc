@@ -16,6 +16,8 @@ The **ComputerManagementDsc** module contains the following resources:
   which is only available on Windows Server 2012/Windows 8 and above. DSC configurations
   containing this resource may be compiled on Windows Server 2008 R2/Windows 7 but
   can not be applied._
+- **TimeZone**: this resource is used for setting the time zone on a machine.
+  It replaces the older standalone `xTimeZone` resource.
 - **VirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- TimeZone:
+  - Migrated xTimeZone resource from [xTimeZone](https://github.com/PowerShell/xTimeZone)
+    and renamed to TimeZone - fixes [Issue #157](https://github.com/PowerShell/ComputerManagementDsc/issues/157).
+
 ## 5.0.0.0
 
 - BREAKING CHANGE:

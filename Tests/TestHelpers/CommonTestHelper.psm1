@@ -84,7 +84,7 @@ function Get-InvalidOperationRecord
 <#
     .SYNOPSIS
         Returns the current Time Zone. This method is used because the
-        Get-Timezone cmdlet is not available on OS versions prior to
+        Get-TimeZone cmdlet is not available on OS versions prior to
         Windows 10/Windows Server 2016.
 #>
 function Get-TimeZoneId
@@ -93,7 +93,7 @@ function Get-TimeZoneId
     param()
 
     $TimeZone = (Get-CimInstance `
-        -ClassName WIN32_Timezone `
+        -ClassName WIN32_TimeZone `
         -Namespace root\cimv2).StandardName
 
     $timeZoneInfo = [System.TimeZoneInfo]::GetSystemTimeZones() |
@@ -105,11 +105,11 @@ function Get-TimeZoneId
 <#
     .SYNOPSIS
         Set the current Time Zone. This method is used because the
-        Set-Timezone cmdlet is not available on OS versions prior to
+        Set-TimeZone cmdlet is not available on OS versions prior to
         Windows 10/Windows Server 2016.
 
     .PARAMETER Id
-        The Id of the Timezone to set the system to.
+        The Id of the TimeZone to set the system to.
 #>
 function Set-TimeZoneId
 {
