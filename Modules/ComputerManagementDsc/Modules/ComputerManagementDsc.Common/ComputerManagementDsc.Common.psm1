@@ -312,6 +312,34 @@ function Test-DscObjectHasProperty
 
 <#
     .SYNOPSIS
+        This function tests if a cmdlet exists.
+
+    .PARAMETER Name
+        The name of the cmdlet to check for.
+
+    .PARAMETER Module
+        The module containing the command.
+#>
+function Test-Command
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Module
+    )
+
+    return ($null -ne (Get-Command @PSBoundParameters -ErrorAction SilentlyContinue))
+} # function Test-Command
+
+<#
+    .SYNOPSIS
         Get the of the current time zone Id.
 #>
 function Get-TimeZoneId
@@ -458,6 +486,7 @@ function Set-TimeZoneUsingDotNet
 Export-ModuleMember -Function `
     Test-DscParameterState, `
     Test-DscObjectHasProperty, `
+    Test-Command, `
     Get-TimeZoneId, `
     Test-TimeZoneId, `
     Set-TimeZoneId, `

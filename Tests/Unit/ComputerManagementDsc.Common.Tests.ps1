@@ -445,7 +445,6 @@ try
                 Context '"Get-TimeZone" not available and current timezone is set to "Pacific Standard Time"' {
                     Mock `
                         -CommandName Get-Command `
-                        -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                         -ParameterFilter {
                             $Name -eq 'Get-TimeZone'
                         }
@@ -463,7 +462,6 @@ try
                     It 'Should call expected mocks' {
                         Assert-MockCalled `
                             -CommandName Get-Command `
-                            -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                             -ParameterFilter {
                                 $Name -eq 'Get-TimeZone'
                             } -Exactly -Times 1
@@ -475,7 +473,6 @@ try
                 Context '"Get-TimeZone" not available and current timezone is set to "Russia TZ 11 Standard Time"' {
                     Mock `
                         -CommandName Get-Command `
-                        -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                         -ParameterFilter {
                             $Name -eq 'Get-TimeZone'
                         }
@@ -493,7 +490,6 @@ try
                     It 'Should call expected mocks' {
                         Assert-MockCalled `
                             -CommandName Get-Command `
-                            -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                             -ParameterFilter {
                                 $Name -eq 'Get-TimeZone'
                             } -Exactly -Times 1
@@ -509,7 +505,6 @@ try
 
                     Mock `
                         -CommandName Get-Command `
-                        -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                         -ParameterFilter {
                             $Name -eq 'Get-TimeZone'
                         } -MockWith {
@@ -531,7 +526,6 @@ try
                     It 'Should call expected mocks' {
                         Assert-MockCalled `
                             -CommandName Get-Command `
-                            -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                             -ParameterFilter {
                                 $Name -eq 'Get-TimeZone'
                             } -Exactly -Times 1
@@ -563,14 +557,12 @@ try
                 Context '"Set-TimeZone" and "Add-Type" is not available, Tzutil Returns 0' {
                     Mock `
                         -CommandName Get-Command `
-                        -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                         -ParameterFilter {
                             $Name -eq 'Add-Type'
                         }
 
                     Mock `
                         -CommandName Get-Command `
-                        -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                         -ParameterFilter {
                             $Name -eq 'Set-TimeZone'
                         }
@@ -589,14 +581,12 @@ try
                     It 'Should call expected mocks' {
                         Assert-MockCalled `
                             -CommandName Get-Command `
-                            -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                             -ParameterFilter {
                                 $Name -eq 'Add-Type'
                             } -Exactly -Times 1
 
                         Assert-MockCalled `
                             -CommandName Get-Command `
-                            -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                             -ParameterFilter {
                                 $Name -eq 'Set-TimeZone'
                             } -Exactly -Times 1
@@ -609,7 +599,6 @@ try
                 Context '"Set-TimeZone" is not available but "Add-Type" is available' {
                     Mock `
                         -CommandName Get-Command `
-                        -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                         -ParameterFilter {
                             $Name -eq 'Add-Type'
                         } -MockWith {
@@ -618,7 +607,6 @@ try
 
                     Mock `
                         -CommandName Get-Command `
-                        -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                         -ParameterFilter {
                             $Name -eq 'Set-TimeZone'
                         }
@@ -638,14 +626,12 @@ try
                     It 'Should call expected mocks' {
                         Assert-MockCalled `
                             -CommandName Get-Command `
-                            -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                             -ParameterFilter {
                                 $Name -eq 'Add-Type'
                             } -Exactly -Times 1
 
                         Assert-MockCalled `
                             -CommandName Get-Command `
-                            -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                             -ParameterFilter {
                                 $Name -eq 'Set-TimeZone'
                             } -Exactly -Times 1
@@ -668,14 +654,12 @@ try
 
                     Mock `
                         -CommandName Get-Command `
-                        -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                         -ParameterFilter {
                             $Name -eq 'Add-Type'
                         }
 
                     Mock `
                         -CommandName Get-Command `
-                        -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                         -ParameterFilter {
                             $Name -eq 'Set-TimeZone'
                         } -MockWith {
@@ -691,14 +675,12 @@ try
                     It 'Should call expected mocks' {
                         Assert-MockCalled `
                             -CommandName Get-Command `
-                            -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                             -ParameterFilter {
                                 $Name -eq 'Add-Type'
                             } -Exactly -Times 0
 
                         Assert-MockCalled `
                             -CommandName Get-Command `
-                            -ModuleName 'ComputerManagementDsc.ResourceHelper' `
                             -ParameterFilter {
                                 $Name -eq 'Set-TimeZone'
                             } -Exactly -Times 1
