@@ -30,7 +30,6 @@ try
     . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        #region DEFAULT TESTS
         $configData = @{
             AllNodes = @(
                 @{
@@ -60,7 +59,6 @@ try
         It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
-        #endregion
 
         It 'Should have set the configuration and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
