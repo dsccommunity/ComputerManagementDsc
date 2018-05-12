@@ -341,6 +341,9 @@ function Test-Command
 <#
     .SYNOPSIS
         Get the of the current time zone Id.
+
+    .NOTES
+        This function is also used by ScheduledTask integration tests.
 #>
 function Get-TimeZoneId
 {
@@ -378,6 +381,9 @@ function Get-TimeZoneId
 
     .PARAMETER TimeZoneId
         The Id of the time zone to compare with the current time zone.
+
+    .NOTES
+        This function is also used by ScheduledTask integration tests.
 #>
 function Test-TimeZoneId
 {
@@ -401,6 +407,9 @@ function Test-TimeZoneId
 
     .PARAMETER TimeZoneId
         The Id of the time zone to set.
+
+    .NOTES
+        This function is also used by ScheduledTask integration tests.
 #>
 function Set-TimeZoneId
 {
@@ -451,6 +460,9 @@ function Set-TimeZoneId
 
     .PARAMETER TimeZoneId
         The Id of the time zone to set using .NET.
+
+    .NOTES
+        This function is also used by ScheduledTask integration tests.
 #>
 function Set-TimeZoneUsingDotNet
 {
