@@ -58,9 +58,6 @@ try
                     return 'OK'
                 }
 
-                Mock -CommandName Add-Type
-                Mock -CommandName Set-TimeZoneUsingDotNet
-
                 It 'Should not throw an exception' {
                     { Set-TimeZoneId -TimezoneId 'Eastern Standard Time' } | Should -Not -Throw
                 }
@@ -83,8 +80,6 @@ try
                         } -Exactly -Times 1
 
                     Assert-MockCalled -CommandName TzUtil.exe -Exactly -Times 0
-                    Assert-MockCalled -CommandName Add-Type -Exactly -Times 0
-                    Assert-MockCalled -CommandName Set-TimeZoneUsingDotNet -Exactly -Times 1
                 }
             }
         }

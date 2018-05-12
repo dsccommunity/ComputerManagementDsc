@@ -216,13 +216,6 @@ namespace Microsoft.PowerShell.TimeZone
         public static void Set(string name)
         {
             var regTimeZones = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones");
-            if (DEBUG) {
-                // Print out all the possible time-zones.
-                foreach(var subKey in regTimeZones.GetSubKeyNames())
-                {
-                    Console.WriteLine(subKey);
-                }
-            }
             var subKey = regTimeZones.GetSubKeyNames().Where(s => s == name).First();
             string daylightName = (string)regTimeZones.OpenSubKey(subKey).GetValue("Dlt");
             string standardName = (string)regTimeZones.OpenSubKey(subKey).GetValue("Std");
