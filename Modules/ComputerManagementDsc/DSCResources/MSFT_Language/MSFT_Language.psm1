@@ -30,7 +30,7 @@ $script:localizedData = Get-LocalizedData `
 #>
 Function Get-TargetResource
 {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("UseVerboseMessageInDSCResource")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseVerboseMessageInDSCResource','')]
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     Param
@@ -458,7 +458,7 @@ Function Test-TargetResource
     #If SystemLocale requires configuration
     if ($systemLocale -ne "")
     {
-        if ($currentUser.SystemLocale.Name -ne $systemLocale)
+        if ($currentUser.SystemLocale -ne $systemLocale)
         {
             $result = $false
         }
@@ -479,21 +479,21 @@ Function Test-TargetResource
         foreach($language in $AddInputLanguages)
         {
             #check if they are already on the system for the current user
-            if ($currentUser.CurrentInstalledLanguages -notcontains $language)
+            if (!($currentUser.CurrentInstalledLanguages.ContainsValue($language)))
             {
                 $result = $false
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'Current User', 'AddInputLanguages')
             }
 
             #Check System Account if also adding Languages
-            if ($CopySystem -eq $true -and $system.CurrentInstalledLanguages -notcontains $language)
+            if ($CopySystem -eq $true -and !($system.CurrentInstalledLanguages.ContainsValue($language)))
             {
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'System', 'AddInputLanguages')
                 $result = $false
             }
 
             #Check New User Account if also adding Languages
-            if ($CopyNewUser -eq $true -and $newUser.CurrentInstalledLanguages -notcontains $language)
+            if ($CopyNewUser -eq $true -and !($newUser.CurrentInstalledLanguages.ContainsValue($language)))
             {
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'New Users', 'AddInputLanguages')
                 $result = $false
@@ -510,21 +510,21 @@ Function Test-TargetResource
     {
         foreach($language in $RemoveInputLanguages)
         {
-            if ($currentUser.CurrentInstalledLanguages -contains $language)
+            if ($currentUser.CurrentInstalledLanguages.ContainsValue($language))
             {
                 $result = $false
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'Current User', 'RemoveInputLanguages')
             }
 
             #Check System Account if also configuring System
-            if ($CopySystem -eq $true -and $system.CurrentInstalledLanguages -contains $language)
+            if ($CopySystem -eq $true -and $system.CurrentInstalledLanguages.ContainsValue($language))
             {
                 $result = $false
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'System', 'RemoveInputLanguages')
             }
 
             #Check New User Account if also configuring new users
-            if ($CopyNewUser -eq $true -and $newUser.CurrentInstalledLanguages -contains $language)
+            if ($CopyNewUser -eq $true -and $newUser.CurrentInstalledLanguages.ContainsValue($language))
             {
                 $result = $false
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'New Users', 'RemoveInputLanguages')
@@ -689,7 +689,7 @@ Function Get-LanguageInformation
 
     #region MUI Fallback Language
 
-    if ($UserID.ToUpperInvariant())
+    if ($UserID.ToUpperInvariant() -eq 'CURRENTUSER')
     {
         $MUIFallbackLanguageRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\Desktop\LanguageConfiguration\'
     }
@@ -702,7 +702,7 @@ Function Get-LanguageInformation
     {
         $MUIFallbackLanguage = Get-ItemPropertyValue $MUIFallbackLanguageRegistryFull -Name $MUILanguage -ErrorAction Stop
         [String]$MUIFallbackLanguage = $MUIFallbackLanguage[0]
-        Write-Verbose -Message ($script:localizedData.MUIFallBack -f $MUIFallbackLanguage)
+        Write-Verbose -Message ($script:localizedData.UserMUIFallBack -f $MUIFallbackLanguage)
     }
     catch
     {
@@ -722,7 +722,7 @@ Function Get-LanguageInformation
     $RegEx = Get-LanguageRegex
     $ReturnLanguage = @{}
 
-    foreach ($Language in $CULanguages)
+    foreach ($Language in $Languages)
     {
         $LanguagePath = Join-Path -Path $InstalledLanguageRegistryFull -ChildPath $Language
         $LanguageProperties = Get-ItemProperty -Path $LanguagePath -ErrorAction Continue

@@ -1,4 +1,4 @@
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "Function")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope = "Function")]
 param
 (
 )
@@ -188,7 +188,7 @@ Function Set-TargetResource
 #>
 Function Test-TargetResource
 {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("UseVerboseMessageInDSCResource")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseVerboseMessageInDSCResource','')]
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     Param
