@@ -28,23 +28,23 @@ try
     $NewLanguagePackFromFile = 'de-DE'
     $RemoveLanguagePack = 'en-US'
 
-    Describe "Pre-flight Checks" -Tag "Integration" {
+    Describe "Pre-flight Checks" -Tag "Integration","RequiresDependency" {
 
         Context "Ensure Language Binaries are available" {
             It "Language Pack Folder $LanguagePackFolderLocation Exists" {
-                Test-Path -Path $LanguagePackFolderLocation -PathType Container | Should Be $true
+                Test-Path -Path $LanguagePackFolderLocation -PathType Container | Should -Be $true
             }
 
             It "Language Pack Folder must include at least 1 cab file" {
-                (Get-ChildItem -Path $LanguagePackFolderLocation -Filter "*.cab").count | Should BeGreaterThan 0
+                (Get-ChildItem -Path $LanguagePackFolderLocation -Filter "*.cab").count | Should -BeGreaterThan 0
             }
 
             It "Language Pack File Location must be a cab file" {
-                $LanguagePackFileLocation.EndsWith(".cab") | Should Be $true
+                $LanguagePackFileLocation.EndsWith(".cab") | Should -Be $true
             }
 
             It "Language Pack File Location must exist" {
-                Test-Path -Path $LanguagePackFileLocation -PathType Leaf | Should Be $true
+                Test-Path -Path $LanguagePackFileLocation -PathType Leaf | Should -Be $true
             }
         }
     
@@ -52,17 +52,17 @@ try
         Context "Ensure System requires modification" {
             It "New Language Pack $NewLanguagePackFromFolder mustn't be installed"        {
                 $CurrentState = Get-TargetResource -LanguagePackName $NewLanguagePackFromFolder
-                $CurrentState.ensure | Should Be "Absent"
+                $CurrentState.ensure | Should -Be "Absent"
             }
 
             It "New Language Pack $NewLanguagePackFromFile mustn't be installed"        {
                 $CurrentState = Get-TargetResource -LanguagePackName $NewLanguagePackFromFile
-                $CurrentState.ensure | Should Be "Absent"
+                $CurrentState.ensure | Should -Be "Absent"
             }
 
             It "Language Pack to be removed $RemoveLanguagePack must be installed"        {
                 $CurrentState = Get-TargetResource -LanguagePackName $RemoveLanguagePack
-                $CurrentState.ensure | Should Be "Present"
+                $CurrentState.ensure | Should -Be "Present"
             }
         }
     }
@@ -71,7 +71,7 @@ try
     . $configFile 
 
     #region Integration Tests
-    Describe "$($script:DSCResourceName) Folder Install Integration" -Tag "Integration" {
+    Describe "$($script:DSCResourceName) Folder Install Integration" -Tag "Integration","RequiresDependency" {
         #region DEFAULT TESTS
         It "Should compile and apply the MOF without throwing" {
             {
@@ -79,59 +79,73 @@ try
                 & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive -LangaugePackName $NewLanguagePackFromFolder -LangaugePackLocation $LanguagePackFolderLocation -Ensure "Present"
                 Start-DscConfiguration -Path $TestDrive `
                     -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
         #endregion
 
         It 'Should have installed the language Pack' {
             $currentConfig = Get-TargetResource -LanguagePackName $NewLanguagePackFromFolder -Verbose
-            $currentConfig.Ensure | Should Be "Present"
+            $currentConfig.Ensure | Should -Be "Present"
         }
     }
 
-    Describe "$($script:DSCResourceName) File Install Integration" -Tag "Integration" {
-        #region DEFAULT TESTS
-        It 'Should compile and apply the MOF without throwing' {
+    Describe "$($script:DSCResourceName) File Install Integration" -Tag "Integration","RequiresDependency" {
+        $configMof = (Join-Path -Path $TestDrive -ChildPath 'localhost.mof')
+
+        It 'Should compile the MOF without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive -LangaugePackName $NewLanguagePackFromFile -LangaugePackLocation $LanguagePackFileLocation -Ensure "Present"
-                Start-DscConfiguration -Path $TestDrive `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+                & "$($script:DSCResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -LangaugePackName $NewLanguagePackFromFile `
+                    -LangaugePackLocation $LanguagePackFileLocation `
+                    -Ensure "Present"
+            } | Should -Not -Throw
         }
 
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        It 'Should apply the MOF correctly' {
+            {
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -Wait `
+                    -Force `
+                    -Verbose `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
         }
-        #endregion
 
-        It 'Should have installed the language Pack' {
-            $currentConfig = Get-TargetResource -LanguagePackName $NewLanguagePackFromFile -Verbose
-            $currentConfig.Ensure | Should Be "Present"
+        It 'Should return a compliant state after being applied' {
+            (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
         }
     }
 
-    Describe "$($script:DSCResourceName) Language Pack Uninstall Integration" -Tag "Integration","RebootRequired" {
-        #region DEFAULT TESTS
-        It 'Should compile and apply the MOF without throwing' {
+    Describe "$($script:DSCResourceName) Language Pack Uninstall Integration" -Tag "Integration","RebootRequired","RequiresDependency" {
+
+        It 'Should compile the MOF without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive -LangaugePackName $RemoveLanguagePack -Ensure "Absent"
-                Start-DscConfiguration -Path $TestDrive `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+                & "$($script:DSCResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -LangaugePackName $RemoveLanguagePack `
+                    -Ensure "Absent"
+            } | Should -Not -Throw
         }
 
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        It 'Should apply the MOF correctly' {
+            {
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -Wait `
+                    -Force `
+                    -Verbose `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
         }
-        #endregion
 
-        It 'Should have removed the language Pack' {
-            $currentConfig = Get-TargetResource -LanguagePackName $RemoveLanguagePack -Verbose
-            $currentConfig.Ensure | Should Be "Absent"
+        It 'Should return a compliant state after being applied' {
+            (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
         }
     }
     #endregion

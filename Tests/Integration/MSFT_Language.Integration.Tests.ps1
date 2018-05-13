@@ -35,37 +35,37 @@ try
         Context "Ensure System requires modification" {
             $CurrentState = Get-TargetResource -IsSingleInstance "Yes"
             It "LocationID requires modification"        {
-                $CurrentState.LocationID | Should Not Be $LocationID
+                $CurrentState.LocationID | Should -Not -Be $LocationID
             }
 
             It "MUILanguage requires modification"        {
                 #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
-                $CurrentState.MUILanguage | Should Not Be $MUILanguage
+                $CurrentState.MUILanguage | Should -Not -Be $MUILanguage
             }
 
             It "MUI Fallback Language requires modification"        {
                 #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
-                $CurrentState.MUIFallbackLanguage | Should Not Be $MUIFallbackLanguage
+                $CurrentState.MUIFallbackLanguage | Should -Not -Be $MUIFallbackLanguage
             }
             
             It "System Locale requires modification"        {
                 #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
-                $CurrentState.SystemLocale | Should Not Be $SystemLocale
+                $CurrentState.SystemLocale | Should -Not -Be $SystemLocale
             }
 
             It "$AddInputLanguages keyboard is not already installed"        {
                 #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
-                $CurrentState.CurrentInstalledLanguages.Values | Should Not Match $AddInputLanguages
+                $CurrentState.CurrentInstalledLanguages.Values | Should -Not -Match $AddInputLanguages
             }
 
             It "$RemoveInputLanguages keyboard should be installed"        {
                 #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
-                $CurrentState.CurrentInstalledLanguages.Values | Should Match $RemoveInputLanguages
+                $CurrentState.CurrentInstalledLanguages.Values | Should -Match $RemoveInputLanguages
             }
 
             It "User Locale requires modification"        {
                 #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
-                $CurrentState.UserLocale | Should Not Be $UserLocale
+                $CurrentState.UserLocale | Should -Not -Be $UserLocale
             }
         }
     }
@@ -74,9 +74,9 @@ try
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $configFile
 
-    Describe "$($script:DSCResourceName)_Integration" -Tag "Integration","RebootRequired" {
-        #region DEFAULT TESTS
-        It 'Should compile and apply the MOF without throwing' {
+    Describe "$($script:DSCResourceName)_Integration" -Tag "Integration" {
+        $configMof = (Join-Path -Path $TestDrive -ChildPath 'localhost.mof')
+        It 'Should compile the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive `
                     -LocationID $LocationID `
@@ -86,31 +86,24 @@ try
                     -AddInputLanguages $AddInputLanguages `
                     -RemoveInputLanguages $RemoveInputLanguages `
                     -UserLocale $UserLocale
-                Start-DscConfiguration -Path $TestDrive `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        It 'Should apply the MOF correctly' {
+            {
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -Wait `
+                    -Force `
+                    -Verbose `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
         }
-        #endregion
 
-        It 'Resource Test should return true' {
-            Test-TargetResource -IsSingleInstance "Yes" `
-                -LocationID $LocationID `
-                -MUILanguage $MUILanguage `
-                -MUIFallbackLanguage $MUIFallbackLanguage `
-                -SystemLocale $SystemLocale `
-                -AddInputLanguages $AddInputLanguages `
-                -RemoveInputLanguages $RemoveInputLanguages `
-                -UserLocale $UserLocale `
-                -CopySystem $true `
-                -CopyNewUser $true | Should Be $true
+        It 'Should return a compliant state after being applied' {
+            (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
         }
     }
-    #endregion
-
 }
 finally
 {
