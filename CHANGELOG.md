@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added Langauge Resource from LanguageDsc - fixes [Issue #127](https://github.com/PowerShell/ComputerManagementDsc/issues/127)
+- Added LangaugePack Resource from LangaugeDsc - fixes [Issue #127](https://github.com/PowerShell/ComputerManagementDsc/issues/127)
+
 ## 5.0.0.0
 
 - BREAKING CHANGE:
