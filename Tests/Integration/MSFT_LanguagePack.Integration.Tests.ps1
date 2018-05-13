@@ -28,7 +28,7 @@ try
     $NewLanguagePackFromFile = 'de-DE'
     $RemoveLanguagePack = 'en-US'
 
-    Describe "Pre-flight Checks" -Tag "Integration","RequiresDependency" {
+    Describe "Pre-flight Checks" -Tag @("Integration","RequiresDependency") {
 
         Context "Ensure Language Binaries are available" {
             It "Language Pack Folder $LanguagePackFolderLocation Exists" {
@@ -71,7 +71,7 @@ try
     . $configFile 
 
     #region Integration Tests
-    Describe "$($script:DSCResourceName) Folder Install Integration" -Tag "Integration","RequiresDependency" {
+    Describe "$($script:DSCResourceName) Folder Install Integration" -Tag @("Integration","RequiresDependency") {
         #region DEFAULT TESTS
         It "Should compile and apply the MOF without throwing" {
             {
@@ -93,7 +93,7 @@ try
         }
     }
 
-    Describe "$($script:DSCResourceName) File Install Integration" -Tag "Integration","RequiresDependency" {
+    Describe "$($script:DSCResourceName) File Install Integration" -Tag @("Integration","RequiresDependency") {
         $configMof = (Join-Path -Path $TestDrive -ChildPath 'localhost.mof')
 
         It 'Should compile the MOF without throwing' {
@@ -122,7 +122,7 @@ try
         }
     }
 
-    Describe "$($script:DSCResourceName) Language Pack Uninstall Integration" -Tag "Integration","RebootRequired","RequiresDependency" {
+    Describe "$($script:DSCResourceName) Language Pack Uninstall Integration" -Tag @("Integration","RebootRequired","RequiresDependency") {
 
         It 'Should compile the MOF without throwing' {
             {
