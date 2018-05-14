@@ -30,7 +30,7 @@ try
     $AddInputLanguages = "0809:00000809"
     $RemoveInputLanguages = "0409:00000409"
     $UserLocale = "en-GB"
-
+    <#
     Describe "Pre-flight Checks" -Tag "Integration" {
         Context "Ensure System requires modification" {
             $CurrentState = Get-TargetResource -IsSingleInstance "Yes"
@@ -69,6 +69,7 @@ try
             }
         }
     }
+    #>
 
     #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
@@ -87,6 +88,10 @@ try
                     -RemoveInputLanguages $RemoveInputLanguages `
                     -UserLocale $UserLocale
             } | Should -Not -Throw
+        }
+
+        It 'Should not return a compliant state before being applied' {
+            (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $false
         }
 
         It 'Should apply the MOF correctly' {
