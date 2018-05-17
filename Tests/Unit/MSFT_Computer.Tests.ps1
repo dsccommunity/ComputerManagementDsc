@@ -96,7 +96,7 @@ try
                 }
 
                 It 'Should return True if Workgroup name is same as specified' {
-                    Mock -CommandName Get-WMIObject -MockWith {
+                    Mock -CommandName Get-CimInstance -MockWith {
                         [PSCustomObject] @{
                             Domain       = 'Workgroup';
                             Workgroup    = 'Workgroup';
@@ -457,7 +457,7 @@ try
                         -Verbose
 
                     $Result.GetType().Fullname | Should -Be 'System.Collections.Hashtable'
-                    $Result.Keys | Sort-Object | Should -Be @('Credential', 'CurrentOU', 'Description', 'DomainName', 'JoinOU', 'Name', 'UnjoinCredential', 'WorkGroupName')
+                    $Result.Keys | Sort-Object | Should -Be @('Credential', 'CurrentOU', 'Description', 'DomainName', 'JoinOU', 'Name', 'Server', 'UnjoinCredential', 'WorkGroupName')
                 }
 
                 It 'Throws if name is to long' {
