@@ -5,7 +5,7 @@
 
 Configuration Example
 {
-    Import-DscResource -ModuleName PowerShellExecutionPolicy
+    Import-DscResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
