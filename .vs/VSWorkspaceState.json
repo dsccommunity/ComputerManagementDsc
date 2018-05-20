@@ -4,16 +4,14 @@
     "\\Modules",
     "\\Modules\\ComputerManagementDsc",
     "\\Modules\\ComputerManagementDsc\\DSCResources",
-    "\\Modules\\ComputerManagementDsc\\DSCResources\\MSFT_Computer",
-    "\\Modules\\ComputerManagementDsc\\DSCResources\\MSFT_Language",
-    "\\Modules\\ComputerManagementDsc\\DSCResources\\MSFT_LanguagePack",
     "\\Modules\\ComputerManagementDsc\\DSCResources\\MSFT_LanguagePack\\en-US",
     "\\Modules\\ComputerManagementDsc\\DSCResources\\MSFT_Language\\en-US",
+    "\\Modules\\ComputerManagementDsc\\Examples",
+    "\\Modules\\ComputerManagementDsc\\Examples\\Resources",
+    "\\Modules\\ComputerManagementDsc\\Examples\\Resources\\VirtualMemory",
     "\\Tests",
-    "\\Tests\\Integration",
-    "\\Tests\\TestHelpers",
-    "\\Tests\\Unit"
+    "\\Tests\\Integration"
   ],
-  "SelectedNode": "\\appveyor.yml",
+  "SelectedNode": "\\Tests\\Integration\\MSFT_LanguagePack.Integration.Tests.ps1",
   "PreviewInSolutionExplorer": false
 }

@@ -30,7 +30,6 @@ $script:localizedData = Get-LocalizedData `
 #>
 Function Get-TargetResource
 {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseVerboseMessageInDSCResource','')]
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     Param
@@ -41,6 +40,7 @@ Function Get-TargetResource
         $IsSingleInstance
     )
 
+    Write-Verbose -Message ($script:localizedData.StartingGetResource)
     return Get-LanguageInformation -UserID 'CURRENTUSER'
 }
 

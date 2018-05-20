@@ -188,7 +188,6 @@ Function Set-TargetResource
 #>
 Function Test-TargetResource
 {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('UseVerboseMessageInDSCResource','')]
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     Param
@@ -210,6 +209,8 @@ Function Test-TargetResource
         [System.String]
         $Ensure="Present"
     )
+
+    Write-Verbose -Message ($script:localizedData.StartingTestResource)
 
     return (Get-TargetResource -LanguagePackName $LanguagePackName).Ensure -eq $Ensure
 }

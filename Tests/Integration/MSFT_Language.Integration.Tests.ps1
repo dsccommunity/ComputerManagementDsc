@@ -18,6 +18,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 #endregion
 
+Import-Module -Name $script:moduleRoot -ErrorAction Stop
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 # Using try/finally to always cleanup.
@@ -30,52 +31,47 @@ try
     $AddInputLanguages = "0809:00000809"
     $RemoveInputLanguages = "0409:00000409"
     $UserLocale = "en-GB"
-    <#
+    
     Describe "Pre-flight Checks" -Tag "Integration" {
         Context "Ensure System requires modification" {
             $CurrentState = Get-TargetResource -IsSingleInstance "Yes"
+
             It "LocationID requires modification"        {
                 $CurrentState.LocationID | Should -Not -Be $LocationID
             }
 
             It "MUILanguage requires modification"        {
-                #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
                 $CurrentState.MUILanguage | Should -Not -Be $MUILanguage
             }
 
             It "MUI Fallback Language requires modification"        {
-                #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
                 $CurrentState.MUIFallbackLanguage | Should -Not -Be $MUIFallbackLanguage
             }
             
             It "System Locale requires modification"        {
-                #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
                 $CurrentState.SystemLocale | Should -Not -Be $SystemLocale
             }
 
             It "$AddInputLanguages keyboard is not already installed"        {
-                #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
                 $CurrentState.CurrentInstalledLanguages.Values | Should -Not -Match $AddInputLanguages
             }
 
             It "$RemoveInputLanguages keyboard should be installed"        {
-                #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
                 $CurrentState.CurrentInstalledLanguages.Values | Should -Match $RemoveInputLanguages
             }
 
             It "User Locale requires modification"        {
-                #$CurrentState = Get-TargetResource -IsSingleInstance "Yes"
                 $CurrentState.UserLocale | Should -Not -Be $UserLocale
             }
         }
     }
-    #>
+    
 
     #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $configFile
 
-    Describe "$($script:DSCResourceName)_Integration" -Tag "Integration" {
+    Describe "$($script:DSCResourceName)_Integration" -Tag @('Integration', 'RebootRequired') {
         $configMof = (Join-Path -Path $TestDrive -ChildPath 'localhost.mof')
         It 'Should compile the MOF without throwing' {
             {

@@ -28,7 +28,7 @@ test_script:
             -MainModulePath $mainModuleFolder `
             -CodeCoverage `
             -CodeCovIo `
-            -ExcludeTag @("RequiresDependency","RebootRequired")
+            -ExcludeTag @('RequiresDependency','RebootRequired')
 
 #---------------------------------#
 #      deployment configuration   #
