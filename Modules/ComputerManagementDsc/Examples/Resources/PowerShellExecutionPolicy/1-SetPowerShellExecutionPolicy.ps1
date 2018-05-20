@@ -3,7 +3,7 @@
     This example shows how to configure powershell's execution policy for the specified execution policy scope.
 #>
 
-Configuration PowershellExecutionPolicyExample
+Configuration Example
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
@@ -17,5 +17,5 @@ Configuration PowershellExecutionPolicyExample
     } # End of Node
 } # End of Configuration
 
-PowershellExecutionPolicyExample
-Start-DscConfiguration PowershellExecutionPolicyExample -Wait -Verbose -Force
+#Example
+#Start-DscConfiguration Example -Wait -Verbose -Force

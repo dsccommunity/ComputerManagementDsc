@@ -3,7 +3,7 @@
     This example shows how to configure powershell's execution policy using the default scope level.
 #>
 
-Configuration PowershellExecutionPolicyWithoutScopeExample
+Configuration Example
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
@@ -16,5 +16,5 @@ Configuration PowershellExecutionPolicyWithoutScopeExample
     } # End of Node
 } # End of PowershellExecutionPolicyExample
 
-PowershellExecutionPolicyWithoutScopeExample
-Start-DscConfiguration PowershellExecutionPolicyWithoutScopeExample -Wait -Verbose -Force
+#Example
+#Start-DscConfiguration Example -Wait -Verbose -Force
