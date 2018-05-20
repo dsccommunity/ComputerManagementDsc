@@ -3,8 +3,8 @@
    Unit test for PowerShellExecutionPolicy DSC Resource
 #>
 
-$Global:DSCModuleName      = 'PowerShellExecutionPolicy'
-$Global:DSCResourceName    = 'MSFT_PowerShellExecutionPolicy'
+$Script:DSCModuleName      = 'PowerShellExecutionPolicy'
+$Script:DSCResourceName    = 'MSFT_PowerShellExecutionPolicy'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -18,20 +18,20 @@ else
 }
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Global:DSCModuleName `
-    -DSCResourceName $Global:DSCResourceName `
+    -DSCModuleName $Script:DSCModuleName `
+    -DSCResourceName $Script:DSCResourceName `
     -TestType Unit
 #endregion
 
-$Global:invalidPolicyThrowMessage = "Cannot validate argument on parameter 'ExecutionPolicy'. The argument `"badParam`" does "
-$Global:invalidPolicyThrowMessage += "not belong to the set `"Bypass,Restricted,AllSigned,RemoteSigned,Unrestricted`" "
-$Global:invalidPolicyThrowMessage += "specified by the ValidateSet attribute. Supply an argument that is in the set and then "
-$Global:invalidPolicyThrowMessage += "try the command again."
+$Script:invalidPolicyThrowMessage = "Cannot validate argument on parameter 'ExecutionPolicy'. The argument `"badParam`" does "
+$Script:invalidPolicyThrowMessage += "not belong to the set `"Bypass,Restricted,AllSigned,RemoteSigned,Unrestricted`" "
+$Script:invalidPolicyThrowMessage += "specified by the ValidateSet attribute. Supply an argument that is in the set and then "
+$Script:invalidPolicyThrowMessage += "try the command again."
 
-$Global:invalidPolicyExecutionPolicyScopeThrowMessage = "Cannot validate argument on parameter 'ExecutionPolicyScope'. The argument `"badParam`" does "
-$Global:invalidPolicyExecutionPolicyScopeThrowMessage += "not belong to the set `"CurrentUser,LocalMachine,MachinePolicy,Process,UserPolicy`" "
-$Global:invalidPolicyExecutionPolicyScopeThrowMessage += "specified by the ValidateSet attribute. Supply an argument that is in the set and then "
-$Global:invalidPolicyExecutionPolicyScopeThrowMessage += "try the command again."
+$Script:invalidPolicyExecutionPolicyScopeThrowMessage = "Cannot validate argument on parameter 'ExecutionPolicyScope'. The argument `"badParam`" does "
+$Script:invalidPolicyExecutionPolicyScopeThrowMessage += "not belong to the set `"CurrentUser,LocalMachine,MachinePolicy,Process,UserPolicy`" "
+$Script:invalidPolicyExecutionPolicyScopeThrowMessage += "specified by the ValidateSet attribute. Supply an argument that is in the set and then "
+$Script:invalidPolicyExecutionPolicyScopeThrowMessage += "try the command again."
 
 # Begin Testing
 try
@@ -41,14 +41,14 @@ try
 
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $Script:DSCResourceName {
 
         #region Pester Test Initialization
         #endregion
 
 
         #region Function Get-TargetResource
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+        Describe "$($Script:DSCResourceName)\Get-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
                 { Get-TargetResource -ExecutionPolicy 'badParam' } | should throw $invalidPolicyThrowMessage
@@ -74,7 +74,7 @@ try
 
 
         #region Function Test-TargetResource
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
+        Describe "$($Script:DSCResourceName)\Test-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
                 { Test-TargetResource -ExecutionPolicy 'badParam' } | should throw $invalidPolicyThrowMessage
@@ -109,7 +109,7 @@ try
 
 
         #region Function Set-TargetResource
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
+        Describe "$($Script:DSCResourceName)\Set-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
                 { Set-TargetResource -ExecutionPolicy 'badParam' } | should throw $invalidPolicyThrowMessage
@@ -159,4 +159,3 @@ finally
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }
-

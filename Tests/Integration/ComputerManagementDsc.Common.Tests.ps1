@@ -54,7 +54,7 @@ try
                     }
 
                 Mock -CommandName 'TzUtil.exe' -MockWith {
-                    $global:LASTEXITCODE = 0
+                    $Script:LASTEXITCODE = 0
                     return 'OK'
                 }
 

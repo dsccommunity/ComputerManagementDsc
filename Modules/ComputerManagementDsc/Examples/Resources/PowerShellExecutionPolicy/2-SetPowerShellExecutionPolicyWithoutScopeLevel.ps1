@@ -3,7 +3,7 @@
     This example shows how to configure powershell's execution policy using the default scope level.
 #>
 
-Configuration Example
+Configuration PowershellExecutionPolicyWithoutScopeExample
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
@@ -12,6 +12,9 @@ Configuration Example
         PowerShellExecutionPolicy ExecutionPolicy
         {
             ExecutionPolicy = 'RemoteSigned'
-        }
-    }
-}
+        } # End of PowerShellExecutionPolicy
+    } # End of Node
+} # End of PowershellExecutionPolicyExample
+
+PowershellExecutionPolicyWithoutScopeExample
+Start-DscConfiguration PowershellExecutionPolicyWithoutScopeExample -Wait -Verbose -Force

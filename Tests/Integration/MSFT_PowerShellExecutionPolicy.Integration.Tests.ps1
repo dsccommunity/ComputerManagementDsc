@@ -1,4 +1,4 @@
-$script:DSCModuleName = 'PowerShellExecutionPolicy'
+$script:DSCModuleName = 'ComputerManagementDsc'
 $script:DSCResourceName = 'MSFT_PowerShellExecutionPolicy'
 
 #region HEADER
@@ -64,8 +64,6 @@ try
 finally
 {
     #region FOOTER
-
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
-
     #endregion
 }

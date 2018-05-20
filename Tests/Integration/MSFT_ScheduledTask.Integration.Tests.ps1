@@ -1,6 +1,6 @@
 #Requires -Version 5.0
-$Global:DSCModuleName = 'ComputerManagementDsc'
-$Global:DSCResourceName = 'MSFT_ScheduledTask'
+$Script:DSCModuleName = 'ComputerManagementDsc'
+$Script:DSCResourceName = 'MSFT_ScheduledTask'
 #region HEADER
 # Integration Test Template Version: 1.1.1
 $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
@@ -12,8 +12,8 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Global:DSCModuleName `
-    -DSCResourceName $Global:DSCResourceName `
+    -DSCModuleName $Script:DSCModuleName `
+    -DSCResourceName $Script:DSCResourceName `
     -TestType Integration
 #endregion
 
@@ -22,11 +22,11 @@ Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot 
 # Begin Testing
 try
 {
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Global:DSCResourceName).config.ps1"
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Script:DSCResourceName).config.ps1"
     . $ConfigFile
 
     #region Pester Tests
-    Describe $Global:DSCResourceName {
+    Describe $Script:DSCResourceName {
 
         $contexts = @{
             Once              = 'ScheduledTaskOnce'
