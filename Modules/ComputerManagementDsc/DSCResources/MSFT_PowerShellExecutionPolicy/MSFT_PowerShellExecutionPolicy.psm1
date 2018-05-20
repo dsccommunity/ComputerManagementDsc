@@ -109,7 +109,7 @@ function Test-TargetResource
         $ExecutionPolicyScope = 'LocalMachine'
     )
 
-    Write-Verbose (Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
+    Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
 
     If($(Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
     {
