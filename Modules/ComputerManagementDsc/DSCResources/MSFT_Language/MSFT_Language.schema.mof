@@ -1,0 +1,17 @@
+
+[ClassVersion("1.0.0.0"), FriendlyName("Language")]
+class MSFT_Language : OMI_BaseResource
+{
+    [Key, ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Write] Sint32 LocationID;
+    [Write] String MUILanguage;
+    [Write] String MUIFallbackLanguage;
+    [Write] String SystemLocale;
+    [Write] String AddInputLanguages[];
+    [Write] String RemoveInputLanguages[];
+    [Write] String UserLocale;
+    [Write] Boolean CopySystem;
+    [Write] Boolean CopyNewUser;
+    [Read, EmbeddedInstance("MSFT_KeyValuePair")] String CurrentInstalledLanguages[];
+};
+
