@@ -18,7 +18,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 #endregion
 
-Import-Module -Name $script:moduleRoot -ErrorAction Stop
+Import-Module -Name (Join-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResources' ) -ChildPath 'MSFT_Language')
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 # Using try/finally to always cleanup.
@@ -34,7 +34,7 @@ try
     
     Describe "Pre-flight Checks" -Tag "Integration" {
         Context "Ensure System requires modification" {
-            $CurrentState = Get-TargetResource -IsSingleInstance "Yes"
+            $CurrentState = Get-TargetResource -IsSingleInstance 'Yes'
 
             It "LocationID requires modification"        {
                 $CurrentState.LocationID | Should -Not -Be $LocationID
