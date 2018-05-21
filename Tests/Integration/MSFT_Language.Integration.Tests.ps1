@@ -36,31 +36,31 @@ try
         Context "Ensure System requires modification" {
             $CurrentState = Get-TargetResource -IsSingleInstance 'Yes'
 
-            It "LocationID requires modification"        {
+            It "LocationID requires modification" {
                 $CurrentState.LocationID | Should -Not -Be $LocationID
             }
 
-            It "MUILanguage requires modification"        {
+            It "MUILanguage requires modification" {
                 $CurrentState.MUILanguage | Should -Not -Be $MUILanguage
             }
 
-            It "MUI Fallback Language requires modification"        {
+            It "MUI Fallback Language requires modification" {
                 $CurrentState.MUIFallbackLanguage | Should -Not -Be $MUIFallbackLanguage
             }
             
-            It "System Locale requires modification"        {
+            It "System Locale requires modification" {
                 $CurrentState.SystemLocale | Should -Not -Be $SystemLocale
             }
 
-            It "$AddInputLanguages keyboard is not already installed"        {
+            It "$AddInputLanguages keyboard is not already installed" {
                 $CurrentState.CurrentInstalledLanguages.Values | Should -Not -Match $AddInputLanguages
             }
 
-            It "$RemoveInputLanguages keyboard should be installed"        {
+            It "$RemoveInputLanguages keyboard should be installed" {
                 $CurrentState.CurrentInstalledLanguages.Values | Should -Match $RemoveInputLanguages
             }
 
-            It "User Locale requires modification"        {
+            It "User Locale requires modification" {
                 $CurrentState.UserLocale | Should -Not -Be $UserLocale
             }
         }
@@ -70,39 +70,47 @@ try
     #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $configFile
+    if ($env:APPVEYOR -eq $true)
+    {
+        Write-Warning -Message ('Integration test for {0} will be skipped because appveyor does not support reboots.' -f $script:DSCResourceName)
+    }
+    else
+    {
+        Describe "$($script:DSCResourceName)_Integration" -Tag @('Integration', 'RebootRequired') {
 
-    Describe "$($script:DSCResourceName)_Integration" -Tag @('Integration', 'RebootRequired') {
-        $configMof = (Join-Path -Path $TestDrive -ChildPath 'localhost.mof')
-        It 'Should compile the MOF without throwing' {
-            {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive `
-                    -LocationID $LocationID `
-                    -MUILanguage $MUILanguage `
-                    -MUIFallbackLanguage $MUIFallbackLanguage `
-                    -SystemLocale $SystemLocale `
-                    -AddInputLanguages $AddInputLanguages `
-                    -RemoveInputLanguages $RemoveInputLanguages `
-                    -UserLocale $UserLocale
-            } | Should -Not -Throw
-        }
 
-        It 'Should not return a compliant state before being applied' {
-            (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $false
-        }
+            $configMof = (Join-Path -Path $TestDrive -ChildPath 'localhost.mof')
+            It 'Should compile the MOF without throwing' {
+                {
+                    & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive `
+                        -LocationID $LocationID `
+                        -MUILanguage $MUILanguage `
+                        -MUIFallbackLanguage $MUIFallbackLanguage `
+                        -SystemLocale $SystemLocale `
+                        -AddInputLanguages $AddInputLanguages `
+                        -RemoveInputLanguages $RemoveInputLanguages `
+                        -UserLocale $UserLocale
+                } | Should -Not -Throw
+            }
 
-        It 'Should apply the MOF correctly' {
-            {
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -Wait `
-                    -Force `
-                    -Verbose `
-                    -ErrorAction Stop
-            } | Should -Not -Throw
-        }
+            It 'Should not return a compliant state before being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $false
+            }
 
-        It 'Should return a compliant state after being applied' {
-            (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -Wait `
+                        -Force `
+                        -Verbose `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+            }
         }
     }
 }

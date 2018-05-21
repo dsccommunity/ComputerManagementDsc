@@ -27,8 +27,7 @@ test_script:
             -Type 'Harness' `
             -MainModulePath $mainModuleFolder `
             -CodeCoverage `
-            -CodeCovIo `
-            -ExcludeTag @('RequiresDependency','RebootRequired')
+            -CodeCovIo
 
 #---------------------------------#
 #      deployment configuration   #
