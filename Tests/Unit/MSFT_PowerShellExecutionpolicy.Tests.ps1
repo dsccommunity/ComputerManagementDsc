@@ -3,7 +3,7 @@
    Unit test for PowerShellExecutionPolicy DSC Resource
 #>
 
-$Script:DSCModuleName      = 'PowerShellExecutionPolicy'
+$Script:DSCModuleName      = 'ComputerManagementDsc'
 $Script:DSCResourceName    = 'MSFT_PowerShellExecutionPolicy'
 
 #region HEADER
