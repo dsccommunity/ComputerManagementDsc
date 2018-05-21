@@ -11,8 +11,8 @@ Configuration Example
     {
         PowerShellExecutionPolicy ExecutionPolicy
         {
-            ExecutionPolicy      = 'RemoteSigned'
             ExecutionPolicyScope = 'CurrentUser'
+            ExecutionPolicy      = 'RemoteSigned'
         } # End of PowershellExecutionPolicy Resource
     } # End of Node
 } # End of Configuration

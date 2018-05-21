@@ -32,14 +32,14 @@ function Get-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
-        [System.String]
-        $ExecutionPolicy,
-
-        [Parameter()]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
-        $ExecutionPolicyScope = 'LocalMachine'
+        $ExecutionPolicyScope,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
+        [System.String]
+        $ExecutionPolicy
     )
 
     Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
@@ -70,14 +70,14 @@ function Set-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
-        [System.String]
-        $ExecutionPolicy,
-
-        [Parameter()]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
-        $ExecutionPolicyScope = 'LocalMachine'
+        $ExecutionPolicyScope,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
+        [System.String]
+        $ExecutionPolicy
     )
 
     If($PSCmdlet.ShouldProcess("$ExecutionPolicy","Set-ExecutionPolicy"))
@@ -119,21 +119,21 @@ function Test-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
-        [System.String]
-        $ExecutionPolicy,
-
-        [Parameter()]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
-        $ExecutionPolicyScope = 'LocalMachine'
+        $ExecutionPolicyScope,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
+        [System.String]
+        $ExecutionPolicy
     )
 
     Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
 
     If($(Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
     {
-        return $true
+        $ExecutionPolicyScope
     }
     else
     {
