@@ -12,7 +12,7 @@ Configuration Example
         PowerShellExecutionPolicy ExecutionPolicy
         {
             ExecutionPolicy      = 'RemoteSigned'
-            ExecutionPolicyScope = 'LocalMachine'
+            ExecutionPolicyScope = 'CurrentUser'
         } # End of PowershellExecutionPolicy Resource
     } # End of Node
 } # End of Configuration

@@ -35,6 +35,7 @@ function Get-TargetResource
         [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
         [System.String]
         $ExecutionPolicy,
+
         [Parameter()]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
@@ -43,13 +44,13 @@ function Get-TargetResource
 
     Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
 
-    #Gets the execution policies for the current session.
+    # Gets the execution policies for the current session.
     $returnValue = @{
         ExecutionPolicy = $(Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
         ExecutionPolicyScope = $ExecutionPolicyScope
     }
 
-    $returnValue
+    return $returnValue
 }
 
 <#
@@ -72,6 +73,7 @@ function Set-TargetResource
         [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
         [System.String]
         $ExecutionPolicy,
+
         [Parameter()]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
@@ -120,6 +122,7 @@ function Test-TargetResource
         [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
         [System.String]
         $ExecutionPolicy,
+
         [Parameter()]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]

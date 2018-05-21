@@ -6,6 +6,6 @@ ConvertFrom-StringData -StringData @'
     TestingPowerShellExecutionPolicy                = Testing the Powershell Execution Policy.
     GettingPowerShellExecutionPolicyScope           = Getting the Powershell Execution Policy Scope.
     SettingPowerShellExecutionPolicyScope           = Setting the Powershell Execution Policy Scope.
-    PowerShellExecutionPolicyAlreadySetMessageScope = Powershell Execution Policy Scope already set to {0}.
+    PowerShellExecutionPolicyScopeAlreadySetMessage = Powershell Execution Policy Scope already set to {0}.
     TestingPowerShellExecutionPolicyScope           = Testing the Powershell Execution Policy Scope.
 '@
