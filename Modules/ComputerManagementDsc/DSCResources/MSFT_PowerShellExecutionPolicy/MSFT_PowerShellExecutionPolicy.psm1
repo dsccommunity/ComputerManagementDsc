@@ -34,7 +34,7 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
-        $ExecutionPolicyScope = 'LocalMachine',
+        $ExecutionPolicyScope,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
@@ -73,7 +73,7 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
-        $ExecutionPolicyScope = 'LocalMachine',
+        $ExecutionPolicyScope,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
@@ -86,7 +86,7 @@ function Set-TargetResource
         Try
         {
             Write-Verbose "Setting the execution policy of PowerShell."
-            Set-ExecutionPolicy -ExecutionPolicy $ExecutionPolicy -Force -ErrorAction Stop -Scope $ExecutionPolicyScope
+            Set-ExecutionPolicy -ExecutionPolicy $ExecutionPolicy -Scope $ExecutionPolicyScope -Force -ErrorAction Stop
         }
         Catch
         {
@@ -122,7 +122,7 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
-        $ExecutionPolicyScope = 'LocalMachine',
+        $ExecutionPolicyScope,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
