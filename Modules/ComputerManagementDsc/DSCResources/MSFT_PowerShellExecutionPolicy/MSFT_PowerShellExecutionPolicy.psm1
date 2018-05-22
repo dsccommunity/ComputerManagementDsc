@@ -43,11 +43,12 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
+    Write-Verbose -Message $ExecutionPolicyScope
 
     # Gets the execution policies for the current session.
     $returnValue = @{
-        ExecutionPolicy = $(Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
         ExecutionPolicyScope = $ExecutionPolicyScope
+        ExecutionPolicy = $(Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
     }
 
     return $returnValue
@@ -130,6 +131,7 @@ function Test-TargetResource
     )
 
     Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
+    Write-Verbose -Message $ExecutionPolicyScope
 
     If($(Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
     {
