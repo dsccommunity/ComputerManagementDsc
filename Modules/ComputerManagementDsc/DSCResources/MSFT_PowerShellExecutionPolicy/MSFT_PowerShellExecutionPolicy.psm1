@@ -31,10 +31,10 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
-        $ExecutionPolicyScope,
+        $ExecutionPolicyScope = 'LocalMachine',
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
@@ -69,10 +69,10 @@ function Set-TargetResource
     [CmdletBinding(SupportsShouldProcess=$true)]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
-        $ExecutionPolicyScope,
+        $ExecutionPolicyScope = 'LocalMachine',
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
@@ -118,10 +118,10 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
         [System.String]
-        $ExecutionPolicyScope,
+        $ExecutionPolicyScope = 'LocalMachine',
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
