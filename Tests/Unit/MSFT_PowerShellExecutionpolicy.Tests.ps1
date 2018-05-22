@@ -48,7 +48,7 @@ try
         Describe "$($Script:DSCResourceName)\Get-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
-                { Get-TargetResource -ExecutionPolicy 'badParam' } | should throw $invalidPolicyThrowMessage
+                { Get-TargetResource -ExecutionPolicy 'badParam' } | should -Throw $invalidPolicyThrowMessage
             }
 
             It 'Returns correct execution policy' {
@@ -58,7 +58,7 @@ try
             }
 
             It 'Throws when passed an invalid execution policy ExecutionPolicyScope' {
-                { Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy) -ExecutionPolicyScope "badParam" } | should throw $invalidPolicyExecutionPolicyScopeThrowMessage
+                { Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy) -ExecutionPolicyScope "badParam" } | should -Throw $invalidPolicyExecutionPolicyScopeThrowMessage
             }
 
             It 'Returns correct execution policy for the correct ExecutionPolicyScope' {
@@ -74,7 +74,7 @@ try
         Describe "$($Script:DSCResourceName)\Test-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
-                { Test-TargetResource -ExecutionPolicy 'badParam' } | should throw $invalidPolicyThrowMessage
+                { Test-TargetResource -ExecutionPolicy 'badParam' } | should -Throw $invalidPolicyThrowMessage
             }
 
             It 'Returns true when current policy matches desired policy' {
@@ -88,7 +88,7 @@ try
             }
 
             It 'Throws when passed an invalid execution policy Scope' {
-                { Test-TargetResource -ExecutionPolicy 'badParam' } | should throw $invalidPolicyThrowMessage
+                { Test-TargetResource -ExecutionPolicy 'badParam' } | should -Throw $invalidPolicyThrowMessage
             }
 
             It 'Returns true when current policy matches desired policy with correct Scope' {
@@ -109,11 +109,11 @@ try
         Describe "$($Script:DSCResourceName)\Set-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
-                { Set-TargetResource -ExecutionPolicy 'badParam' } | should throw $invalidPolicyThrowMessage
+                { Set-TargetResource -ExecutionPolicy 'badParam' } | should -Throw $invalidPolicyThrowMessage
             }
 
             It 'Throws when passed an invalid scope level' {
-                { Set-TargetResource -ExecutionPolicy 'LocalMachine' -ExecutionPolicyScope "badParam" } | should throw $invalidScopeThrowMessage
+                { Set-TargetResource -ExecutionPolicy 'LocalMachine' -ExecutionPolicyScope "badParam" } | should -Throw $invalidScopeThrowMessage
             }
 
             It 'Set-ExecutionPolicy scope warning exception is caught' {
@@ -127,7 +127,7 @@ try
             It 'Throws non-caught exceptions'{
                 Mock -CommandName Set-ExecutionPolicy -MockWith { Throw 'Throw me!' }
 
-                { Set-TargetResource -ExecutionPolicy "Bypass" } | should throw 'Throw me!'
+                { Set-TargetResource -ExecutionPolicy "Bypass" } | should -Throw 'Throw me!'
             }
 
             It 'Sets execution policy' {
@@ -138,7 +138,7 @@ try
                 Assert-MockCalled -CommandName Set-ExecutionPolicy -Exactly 1 -Scope It
             }
 
-            It 'Sets execution policy in spesified Scope' {
+            It 'Sets execution policy in specified Scope' {
                 Mock -CommandName Set-ExecutionPolicy -MockWith { }
 
                 Set-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine'

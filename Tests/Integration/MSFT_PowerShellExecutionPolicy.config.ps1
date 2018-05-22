@@ -3,12 +3,11 @@ configuration MSFT_PowerShellExecutionPolicy_config
  {
     Import-DscResource -ModuleName ComputerManagementDsc
 
-    node localhost
+    node 'localhost'
     {
         PowerShellExecutionPolicy Integration_Test
         {
             ExecutionPolicy      = 'RemoteSigned'
-            ExecutionPolicyScope = 'LocalMachine'
         }
     }
 }
