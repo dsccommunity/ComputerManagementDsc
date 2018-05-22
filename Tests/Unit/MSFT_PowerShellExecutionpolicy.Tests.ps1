@@ -48,12 +48,12 @@ try
         Describe "$($Script:DSCResourceName)\Get-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
-                { Get-TargetResource -ExecutionPolicy 'badParam' } | should -Throw $invalidPolicyThrowMessage
+                { Get-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | should -Throw $invalidPolicyThrowMessage
             }
 
             It 'Returns correct execution policy' {
                 Mock Get-ExecutionPolicy { 'Unrestricted' }
-                $result = Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy)
+                $result = Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy ) -ExecutionPolicyScope 'LocalMachine'
                 $result.ExecutionPolicy | should be $(Get-ExecutionPolicy)
             }
 
@@ -74,17 +74,17 @@ try
         Describe "$($Script:DSCResourceName)\Test-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
-                { Test-TargetResource -ExecutionPolicy 'badParam' } | should -Throw $invalidPolicyThrowMessage
+                { Test-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | should -Throw $invalidPolicyThrowMessage
             }
 
             It 'Returns true when current policy matches desired policy' {
                 Mock Get-ExecutionPolicy { 'Unrestricted' }
-                Test-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy) | should be $True
+                Test-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy)  -ExecutionPolicyScope 'LocalMachine' | should be $True
             }
 
             It 'Returns false when current policy does not match desired policy' {
                 Mock -CommandName Get-ExecutionPolicy -MockWith { 'Restricted' }
-                Test-TargetResource -ExecutionPolicy "Bypass" | should be $false
+                Test-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine' | should be $false
             }
 
             It 'Throws when passed an invalid execution policy Scope' {
@@ -92,7 +92,7 @@ try
             }
 
             It 'Returns true when current policy matches desired policy with correct Scope' {
-                Test-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy) | should be $True
+                Test-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy)  -ExecutionPolicyScope 'LocalMachine' | should be $True
             }
 
             It 'Returns false when current policy does not match desired policy with correct ExecutionPolicyScope' {
@@ -109,7 +109,7 @@ try
         Describe "$($Script:DSCResourceName)\Set-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
-                { Set-TargetResource -ExecutionPolicy 'badParam' } | should -Throw $invalidPolicyThrowMessage
+                { Set-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | should -Throw $invalidPolicyThrowMessage
             }
 
             It 'Throws when passed an invalid scope level' {
@@ -119,7 +119,7 @@ try
             It 'Set-ExecutionPolicy scope warning exception is caught' {
                 Mock -CommandName Set-ExecutionPolicy -MockWith { Throw 'Windows PowerShell updated your execution policy successfully.' }
 
-                $result = Set-TargetResource -ExecutionPolicy "Bypass"
+                $result = Set-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine'
 
                 $result | should be $null
             }
@@ -127,13 +127,13 @@ try
             It 'Throws non-caught exceptions'{
                 Mock -CommandName Set-ExecutionPolicy -MockWith { Throw 'Throw me!' }
 
-                { Set-TargetResource -ExecutionPolicy "Bypass" } | should -Throw 'Throw me!'
+                { Set-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine' } | should -Throw 'Throw me!'
             }
 
             It 'Sets execution policy' {
                 Mock -CommandName Set-ExecutionPolicy -MockWith { }
 
-                Set-TargetResource -ExecutionPolicy "Bypass"
+                Set-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine'
 
                 Assert-MockCalled -CommandName Set-ExecutionPolicy -Exactly 1 -Scope It
             }
