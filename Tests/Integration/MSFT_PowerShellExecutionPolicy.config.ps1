@@ -8,6 +8,7 @@ configuration MSFT_PowerShellExecutionPolicy_config
         PowerShellExecutionPolicy Integration_Test
         {
             ExecutionPolicy      = 'RemoteSigned'
+            ExecutionPolicyScope = 'LocalMachine'
         }
     }
 }

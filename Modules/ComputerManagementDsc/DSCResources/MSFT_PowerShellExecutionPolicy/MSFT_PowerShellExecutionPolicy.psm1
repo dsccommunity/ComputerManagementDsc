@@ -135,7 +135,7 @@ function Test-TargetResource
 
     If($(Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
     {
-        $ExecutionPolicyScope
+        return $true
     }
     else
     {
