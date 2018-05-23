@@ -9,6 +9,7 @@
   ComputerManagementDsc.Common module to match what TimeZone requires.
   It was not exported in ComputerManagementDsc.ResourceHelper and not
   used.
+- Add `server` parameter to `Computer` resource
 
 ## 5.0.0.0
 
