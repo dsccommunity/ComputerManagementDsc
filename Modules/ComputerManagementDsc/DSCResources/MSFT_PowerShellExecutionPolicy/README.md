@@ -1,4 +1,4 @@
 # Description
 
-ExecutionPolicy: Specifies the desired PowerShell execution policy.
-ExecutionPolicyScope: Specifies the scope of the desired PowerShell execution policy.
+The resource allows configuration of properties of the Powershell
+execution policy and the scope of this policy.

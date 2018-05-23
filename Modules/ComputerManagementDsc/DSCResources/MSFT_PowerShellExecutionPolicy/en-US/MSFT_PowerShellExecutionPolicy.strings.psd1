@@ -1,11 +1,9 @@
 # culture="en-US"
 ConvertFrom-StringData -StringData @'
-    GettingPowerShellExecutionPolicy                = Getting the Powershell Execution Policy.
-    SettingPowerShellExecutionPolicy                = Setting the Powershell Execution Policy.
-    PowerShellExecutionPolicyAlreadySetMessage      = Powershell Execution Policy already set to {0}.
-    TestingPowerShellExecutionPolicy                = Testing the Powershell Execution Policy.
-    GettingPowerShellExecutionPolicyScope           = Getting the Powershell Execution Policy Scope.
-    SettingPowerShellExecutionPolicyScope           = Setting the Powershell Execution Policy Scope.
-    PowerShellExecutionPolicyScopeAlreadySetMessage = Powershell Execution Policy Scope already set to {0}.
-    TestingPowerShellExecutionPolicyScope           = Testing the Powershell Execution Policy Scope.
+    GettingPowerShellExecutionPolicy                = The current execution policy for '{0}' is '{1}'.
+    SettingPowerShellExecutionPolicy                = Setting the execution policy '{0}' is '{1}'.
+    PowerShellExecutionPolicyAlreadySetMessage      = Powershell execution policy already set to {0}.
+    UpdatePowershellExecutionPolicySuccess          = Updating PowerShell Execution policy for '{0}' is '{1}' successfully.
+    UpdatePowershellExecutionPolicyFailed           = Updating PowerShell Execution policy for '{0}' is '{1}' failed.
+    TestingPowerShellExecutionPolicy                = Testing the current execution policy for '{0}' is '{1}'.
 '@

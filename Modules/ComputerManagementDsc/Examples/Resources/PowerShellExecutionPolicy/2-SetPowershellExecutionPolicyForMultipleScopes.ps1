@@ -22,6 +22,3 @@ Configuration Example
         } # End of ExecutionPolicyLocalMachine Resource
     } # End of Node
 } # End of Configuration
-
-#Example
-#Start-DscConfiguration Example -Wait -Verbose -Force

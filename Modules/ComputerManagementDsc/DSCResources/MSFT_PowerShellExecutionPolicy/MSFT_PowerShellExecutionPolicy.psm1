@@ -42,8 +42,10 @@ function Get-TargetResource
         $ExecutionPolicy
     )
 
-    Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
-    Write-Verbose -Message $ExecutionPolicyScope
+    #Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
+    #Write-Verbose -Message $ExecutionPolicyScope
+    Write-Verbose -Message $localizedData.GettingPowerShellExecutionPolicy
+
 
     # Gets the execution policies for the current session.
     $returnValue = @{
@@ -81,23 +83,18 @@ function Set-TargetResource
         $ExecutionPolicy
     )
 
-    If($PSCmdlet.ShouldProcess("$ExecutionPolicy","Set-ExecutionPolicy"))
+    if ($PSCmdlet.ShouldProcess("$ExecutionPolicy","Set-ExecutionPolicy"))
     {
-        Try
+        try
         {
-            Write-Verbose "Setting the execution policy of PowerShell."
+            Write-Verbose $localizedData.SettingPowerShellExecutionPolicy
             Set-ExecutionPolicy -ExecutionPolicy $ExecutionPolicy -Scope $ExecutionPolicyScope -Force -ErrorAction Stop
+            Write-Verbose -Message $localizedData.UpdatePowershellExecutionPolicySuccess
         }
-        Catch
+        catch
         {
-            if($_.toString() -like "Windows PowerShell updated your execution policy successfully*")    # trap this error, it set correctly.
-            {
-                Write-Verbose "$_"
-            }
-            else
-            {
-                throw
-            }
+            Write-Verbose -Message $localizedData.UpdatePowershellExecutionPolicyFailed
+            throw
         }
     }
 }
@@ -130,10 +127,11 @@ function Test-TargetResource
         $ExecutionPolicy
     )
 
-    Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
-    Write-Verbose -Message $ExecutionPolicyScope
+    #Write-Verbose -Message (Get-ExecutionPolicy -Scope $ExecutionPolicyScope)
+    #Write-Verbose -Message $ExecutionPolicyScope
+    Write-Verbose -Message $localizedData.TestingPowerShellExecutionPolicy
 
-    If($(Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
+    if ($(Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
     {
         return $true
     }

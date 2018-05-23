@@ -16,6 +16,3 @@ Configuration Example
         } # End of PowershellExecutionPolicy Resource
     } # End of Node
 } # End of Configuration
-
-#Example
-#Start-DscConfiguration Example -Wait -Verbose -Force
