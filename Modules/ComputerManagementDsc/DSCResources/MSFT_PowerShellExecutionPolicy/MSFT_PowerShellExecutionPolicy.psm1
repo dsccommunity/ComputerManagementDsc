@@ -93,8 +93,14 @@ function Set-TargetResource
         }
         catch
         {
-            Write-Verbose -Message $localizedData.UpdatePowershellExecutionPolicyFailed
-            throw
+            if($_.toString() -like "Windows PowerShell updated your execution policy successfully*")
+            {
+                Write-Verbose "$_"
+            }
+            else
+            {
+                throw
+            }
         }
     }
 }
