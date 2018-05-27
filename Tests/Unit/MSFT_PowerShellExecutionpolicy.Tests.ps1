@@ -38,14 +38,15 @@ try
 
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
-    InModuleScope $Script:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
+        $script:DSCResourceName = 'MSFT_PowershellExecutionPolicy'
 
         #region Pester Test Initialization
         #endregion
 
 
         #region Function Get-TargetResource
-        Describe "$($Script:DSCResourceName)\Get-TargetResource" {
+        Describe "$($script:DSCResourceName)\Get-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
                 { Get-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | should -Throw $invalidPolicyThrowMessage
@@ -71,7 +72,7 @@ try
 
 
         #region Function Test-TargetResource
-        Describe "$($Script:DSCResourceName)\Test-TargetResource" {
+        Describe "$($script:DSCResourceName)\Test-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
                 { Test-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | should -Throw $invalidPolicyThrowMessage
@@ -106,7 +107,7 @@ try
 
 
         #region Function Set-TargetResource
-        Describe "$($Script:DSCResourceName)\Set-TargetResource" {
+        Describe "$script:DSCResourceName\Set-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
                 { Set-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | should -Throw $invalidPolicyThrowMessage

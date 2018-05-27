@@ -85,17 +85,18 @@ function Set-TargetResource
 
     if ($PSCmdlet.ShouldProcess("$ExecutionPolicy","Set-ExecutionPolicy"))
     {
+        Write-Verbose $localizedData.SettingPowerShellExecutionPolicy
+
         try
         {
-            Write-Verbose $localizedData.SettingPowerShellExecutionPolicy
             Set-ExecutionPolicy -ExecutionPolicy $ExecutionPolicy -Scope $ExecutionPolicyScope -Force -ErrorAction Stop
             Write-Verbose -Message $localizedData.UpdatePowershellExecutionPolicySuccess
         }
         catch
         {
-            if($_.toString() -like "Windows PowerShell updated your execution policy successfully*")
+            if($_.FullyQualifiedErrorId -like "Windows PowerShell updated your execution policy successfully*")
             {
-                Write-Verbose "$_"
+                Write-Verbose -Message ($localizedData.UpdatePowershellExecutionPolicySuccess -f $ExecutionPolicy)
             }
             else
             {
