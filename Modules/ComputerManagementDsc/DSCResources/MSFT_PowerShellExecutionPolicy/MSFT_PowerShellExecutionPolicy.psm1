@@ -96,7 +96,7 @@ function Set-TargetResource
         {
             if($_.FullyQualifiedErrorId -like "Windows PowerShell updated your execution policy successfully*")
             {
-                Write-Verbose -Message ($localizedData.UpdatePowershellExecutionPolicySuccess -f $ExecutionPolicy)
+                Write-Verbose -Message ($localizedData.UpdatePowershellExecutionPolicySuccess)
             }
             else
             {
