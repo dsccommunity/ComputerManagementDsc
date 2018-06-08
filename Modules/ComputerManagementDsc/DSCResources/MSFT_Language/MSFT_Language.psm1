@@ -637,8 +637,8 @@ Function Get-LanguageInformation
     param
     (
         [Parameter()]
+        [ValidateSet('CURRENTUSER','DEFAULT','MACHINE')]
         [System.String[]]
-        [ValidateSet('CURRENTUSER',' DEFAULT','MACHINE')]
         $UserID
     )
 
