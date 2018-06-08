@@ -1,5 +1,7 @@
-#Installs the latest version of Chrome in the language specified in the parameter Language.
-
+<#
+    .EXAMPLE
+    Installs the English (United Kingdom) and German language packs from \\fileserver1\LanguagePacks.
+#>
 Configuration Example
 {
     param
@@ -15,14 +17,14 @@ Configuration Example
     {
         LanguagePack en-GB
         {
-            LanguagePackName = "en-GB"
-            LanguagePackLocation = "\\fileserver1\LanguagePacks\"
+            LanguagePackName = 'en-GB'
+            LanguagePackLocation = '\\fileserver1\LanguagePacks\'
         }
 
         LanguagePack de-DE
         {
-            LanguagePackName = "de-DE"
-            LanguagePackLocation = "\\fileserver1\LanguagePacks\de-DE.cab"
+            LanguagePackName = 'de-DE'
+            LanguagePackLocation = '\\fileserver1\LanguagePacks\de-DE.cab'
         }
     }
 }

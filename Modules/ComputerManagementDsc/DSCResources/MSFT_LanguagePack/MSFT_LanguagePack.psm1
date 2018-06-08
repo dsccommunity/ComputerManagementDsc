@@ -1,3 +1,4 @@
+# Suppress the PSSA Rule for the use of global variables as $global:DSCMachineStatus is required to trigger a reboot.
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope = "Function")]
 param
 (
@@ -22,11 +23,11 @@ $script:localizedData = Get-LocalizedData `
 
 <#
     .SYNOPSIS
-        Retrieves the current state of the specified Language Pack
+        Retrieves the current state of the specified Language Pack.
 
     .PARAMETER LanguagePackName
-        The short code for the language to be tested.  ie en-GB
-    
+        The short code for the language to be tested.  ie en-GB.
+
     .PARAMETER LanguagePackLocation
         Not used in Get-TargetResource.
 
@@ -40,7 +41,7 @@ Function Get-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -52,7 +53,7 @@ Function Get-TargetResource
     Write-Verbose -Message ($script:localizedData.AllLanguagePacks -f $installedLanguages)
 
     $found = $installedLanguages -icontains $LanguagePackName
-    
+
     if ($found)
     {
         $ensure = "Present"
@@ -73,28 +74,28 @@ Function Get-TargetResource
 
 <#
     .SYNOPSIS
-        Installs or uninstalls the specified Language Pack
+        Installs or uninstalls the specified Language Pack.
 
     .PARAMETER LanguagePackName
-        The short code for the language to be installed or uninstalled.  ie en-GB
-    
+        The short code for the language to be installed or uninstalled.  ie en-GB.
+
     .PARAMETER LanguagePackLocation
         Either Local or Remote path to the language pack cab file.  This is only used
-        when installing a language pack
+        when installing a language pack.
 
     .PARAMETER SuppressReboot
-        If set to true the reboot required flag isn't set after successful installation of a 
+        If set to true the reboot required flag isn't set after successful installation of a
         language pack, this can be useful to save time when installing multiple language packs.
 
     .PARAMETER Ensure
         Indicates whether the given language pack should be installed or uninstalled.
         Set this property to Present to install the Language Pack, and Absent to uninstall
-        the Language Pack.  By Default Ensure is set to Present
+        the Language Pack.  By Default Ensure is set to Present.
 #>
 Function Set-TargetResource
 {
     [CmdletBinding()]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -106,18 +107,19 @@ Function Set-TargetResource
 
         [Parameter()]
         [Boolean]
-        $SuppressReboot=$false,
+        $SuppressReboot = $false,
 
         [Parameter()]
         [ValidateSet("Present","Absent")]
         [System.String]
-        $Ensure="Present"
+        $Ensure = "Present"
     )
     $timeout = 7200
 
-    switch ($Ensure) 
+    switch ($Ensure)
     {
-        'Present' {
+        'Present'
+        {
             if ($PSBoundParameters.ContainsKey('LanguagePackLocation'))
             {
                 Write-Verbose -Message ($script:localizedData.InstallingLanguagePack)
@@ -137,12 +139,16 @@ Function Set-TargetResource
                 New-InvalidOperationException -Message ($script:localizedData.ErrorSourceLocationRequired -f $LanguagePackLocation)
             }
         }
-        'Absent' {
+
+        'Absent'
+        {
             Write-Verbose -Message ($script:localizedData.RemovingLanguagePack)
             lpksetup.exe /u $LanguagePackName /r /a /s
             $startTime = Get-Date
         }
-        default {
+
+        default
+        {
             New-InvalidOperationException -Message ($script:localizedData.ErrorUnknownSwitch -f $Ensure)
         }
     }
@@ -159,38 +165,38 @@ Function Set-TargetResource
         Start-Sleep -Seconds 10
     } while ($null -ne $process)
 
-    #allow for suppression to install multiple language packs at the same time to save time
+    # Allow for suppression to install multiple language packs at the same time to save time
     if ($SuppressReboot -ne $true)
     {
-        #Force a reboot after installing or removing a language pack
+        # Force a reboot after installing or removing a language pack
         $global:DSCMachineStatus = 1
     }
 }
 
 <#
     .SYNOPSIS
-        Tests if a Language Pack requires installation or uninstallation
+        Tests if a Language Pack requires installation or uninstallation.
 
     .PARAMETER LanguagePackName
-        The short code for the language to be installed or uninstalled.  ie en-GB
-    
+        The short code for the language to be installed or uninstalled.  ie en-GB.
+
     .PARAMETER LanguagePackLocation
         Not used in Test-TargetResource.
 
     .PARAMETER SuppressReboot
-        If set to true the reboot required flag isn't set after successful installation of a 
+        If set to true the reboot required flag isn't set after successful installation of a
         language pack, this can be useful to save time when installing multiple language packs.
 
     .PARAMETER Ensure
         Indicates whether the given language pack should be present or absent.
         Set this property to Present to install the Language Pack, and Absent to uninstall
-        the Language Pack.  By Default Ensure is set to Present
+        the Language Pack.  By Default Ensure is set to Present.
 #>
 Function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -199,15 +205,15 @@ Function Test-TargetResource
         [Parameter()]
         [System.String]
         $LanguagePackLocation,
-        
+
         [Parameter()]
         [Boolean]
-        $SuppressReboot=$false,
+        $SuppressReboot = $false,
 
         [Parameter()]
         [ValidateSet("Present","Absent")]
         [System.String]
-        $Ensure="Present"
+        $Ensure = "Present"
     )
 
     Write-Verbose -Message ($script:localizedData.StartingTestResource)

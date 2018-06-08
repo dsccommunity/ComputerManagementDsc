@@ -1,5 +1,8 @@
-#Installs the latest version of Chrome in the language specified in the parameter Language.
-
+<#
+    .EXAMPLE
+    Configures the system locale, user locale and keyboard to English (United Kingdom) with a fallback to en-US,
+    all settings are also copied to the local system account and all new users.
+#>
 Configuration Example
 {
     param
@@ -15,14 +18,14 @@ Configuration Example
     {
         Language ConfigureLanguage
         {
-            IsSingleInstance = "Yes"
+            IsSingleInstance = 'Yes'
             LocationID = 242
-            MUILanguage = "en-GB"
-            MUIFallbackLanguage = "en-US"
-            SystemLocale = "en-GB"
-            AddInputLanguages = @("0809:00000809")
-            RemoveInputLanguages = @("0409:00000409")
-            UserLocale = "en-GB"
+            MUILanguage = 'en-GB'
+            MUIFallbackLanguage = 'en-US'
+            SystemLocale = 'en-GB'
+            AddInputLanguages = @('0809:00000809')
+            RemoveInputLanguages = @('0409:00000409')
+            UserLocale = 'en-GB'
             CopySystem = $true
             CopyNewUser = $true
         }

@@ -19,5 +19,6 @@ ConvertFrom-StringData @'
     ErrorInvalidKeyboardCode = Invalid Keyboard code.  Code must be in the format '{0}'.
     DebugLocationAfter = Location After Checking '{0}': '{1}'.
     DebugSkipCheck = '{0}' not specified, skipping checks.
-    StartingGetResource = Running Get Resource
+    StartingGetResource = Running Get Resource.
+    ErrorInvalidUserID = Unknown User ID {0}.
 '@

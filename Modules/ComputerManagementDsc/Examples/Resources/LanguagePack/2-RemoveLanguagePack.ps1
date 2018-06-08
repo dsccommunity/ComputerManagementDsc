@@ -1,5 +1,7 @@
-#Installs the latest version of Chrome in the language specified in the parameter Language.
-
+<#
+    .EXAMPLE
+    Removes the English (United States) language pack from the local system.
+#>
 Configuration Example
 {
     param
@@ -15,8 +17,8 @@ Configuration Example
     {
         LanguagePack removeEN-US
         {
-            LanguagePackName = "en-US"
-            Ensure = "Absent"
+            LanguagePackName = 'en-US'
+            Ensure = 'Absent'
         }
     }
 }
