@@ -120,7 +120,7 @@ try
                 $LanguageResource = Get-DscResource -Name Language
 
                 it 'IsSingleInstance should be mandatory.' {
-                
+
                     $LanguageResource.Properties.Where{$_.Name -eq 'IsSingleInstance'}.IsMandatory | Should -Be $true
                 }
 
@@ -527,14 +527,14 @@ try
                 $TestState = Test-TargetResource `
                     -IsSingleInstance "Yes" `
                     -Verbose
-                
+
                 It 'Should not throw exception' {
                     {
                         Test-TargetResource `
                             -IsSingleInstance "Yes"
                     } | Should -Not -Throw
                 }
-                
+
                 It 'All Mocks should have run'{
                     {Assert-VerifiableMock} | Should -Not -Throw
                 }
@@ -545,7 +545,7 @@ try
             }
 
             Context 'Throw as Invalid keyboard value Specified' {
-                
+
                 It 'Should throw exception' {
                     {
                         Test-TargetResource `
@@ -561,7 +561,7 @@ try
                             -RemoveInputLanguages $invalidLanguageID
                     } | Should -Throw
                 }
-                
+
             }
 
             Context 'Require no changes to all accounts' {
@@ -576,7 +576,7 @@ try
                     -CopySystem $true `
                     -CopyNewUser $true `
                     -Verbose
-                
+
                 It 'Should not throw exception' {
                     {
                         Test-TargetResource `
@@ -626,7 +626,7 @@ try
                     -CopySystem $true `
                     -CopyNewUser $true `
                     -Verbose
-                
+
                 It 'Should not throw exception' {
                     {
                         Test-TargetResource `
@@ -664,7 +664,7 @@ try
                     -CopySystem $true `
                     -CopyNewUser $true `
                     -Verbose
-                
+
                 It 'Should not throw exception' {
                     {
                         Test-TargetResource `
@@ -708,7 +708,7 @@ try
                     -CopySystem $false `
                     -CopyNewUser $false `
                     -Verbose
-                
+
                 It 'Should not throw exception' {
                     {
                         Test-TargetResource `
@@ -745,7 +745,7 @@ try
                     -CopySystem $true `
                     -CopyNewUser $true `
                     -Verbose
-                
+
                 It 'Should not throw exception' {
                     {
                         Test-TargetResource `
@@ -798,7 +798,7 @@ try
                     -CopySystem $true `
                     -CopyNewUser $true `
                     -Verbose
-                
+
                 It 'Should not throw exception' {
                     {
                         Test-TargetResource `

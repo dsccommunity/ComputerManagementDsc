@@ -140,7 +140,7 @@ Function Set-TargetResource
     $languageSettings += "        <gs:User UserID=`"Current`" CopySettingsToDefaultUserAcct=`"$($CopyNewUser.ToString().tolower())`" CopySettingsToSystemAcct=`"$($CopySystem.ToString().tolower())`"/>"
     $languageSettings += '    </gs:UserList>'
 
-    if (-not ([System.String]::IsNullOrEmpty($LocationID)))
+    if ($LocationID -gt 0)
     {
         $configurationRequired = $true
 
@@ -214,7 +214,7 @@ Function Set-TargetResource
         Write-Verbose -Message ($script:localizedData.KeyboardNotRequired)
     }
 
-    if ($UserLocale -ne "")
+    if (-not ([System.String]::IsNullOrEmpty($UserLocale)))
     {
         $configurationRequired = $true
 

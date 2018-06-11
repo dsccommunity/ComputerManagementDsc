@@ -31,7 +31,7 @@ try
     $AddInputLanguages = "0809:00000809"
     $RemoveInputLanguages = "0409:00000409"
     $UserLocale = "en-GB"
-    
+
     Describe "Pre-flight Checks" -Tag "Integration" {
         Context "Ensure System requires modification" {
             $CurrentState = Get-TargetResource -IsSingleInstance 'Yes'
@@ -47,7 +47,7 @@ try
             It "MUI Fallback Language requires modification" {
                 $CurrentState.MUIFallbackLanguage | Should -Not -Be $MUIFallbackLanguage
             }
-            
+
             It "System Locale requires modification" {
                 $CurrentState.SystemLocale | Should -Not -Be $SystemLocale
             }
@@ -65,7 +65,7 @@ try
             }
         }
     }
-    
+
 
     #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
