@@ -6,12 +6,12 @@ param
 
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-# Import the ComputerManagementDsc Common Modules
+# Import the ComputerManagementDsc Common Modules.
 Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
-# Import the ComputerManagementDsc Resource Helper Module
+# Import the ComputerManagementDsc Resource Helper Module.
 Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
             -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
@@ -165,10 +165,10 @@ Function Set-TargetResource
         Start-Sleep -Seconds 10
     } while ($null -ne $process)
 
-    # Allow for suppression to install multiple language packs at the same time to save time
+    # Allow for suppression to install multiple language packs at the same time to save time.
     if ($SuppressReboot -ne $true)
     {
-        # Force a reboot after installing or removing a language pack
+        # Force a reboot after installing or removing a language pack.
         $global:DSCMachineStatus = 1
     }
 }

@@ -2,9 +2,9 @@
 [ClassVersion("1.0.0.0"), FriendlyName("LanguagePack")]
 class MSFT_LanguagePack : OMI_BaseResource
 {
-    [Key] String LanguagePackName;
-    [Write] String LanguagePackLocation;
-    [Write] Boolean SuppressReboot;
-    [Write, ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Key, Description("The short code for the language to be installed or uninstalled.  ie en-GB.")] String LanguagePackName;
+    [Write, Description("Either Local or Remote path to the language pack cab file.  This is only used when installing a language pack.")] String LanguagePackLocation;
+    [Write, Description("If set to true the reboot required flag isn't set after successful installation of a language pack, this can be useful to save time when installing multiple language packs.")] Boolean SuppressReboot;
+    [Write, Description("Indicates whether the given language pack should be installed or uninstalled. Set this property to Present to install the Language Pack, and Absent to uninstall the Language Pack. By Default Ensure is set to Present."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
 };
 

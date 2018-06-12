@@ -2,16 +2,16 @@
 [ClassVersion("1.0.0.0"), FriendlyName("Language")]
 class MSFT_Language : OMI_BaseResource
 {
-    [Key, ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
-    [Write] Sint32 LocationID;
-    [Write] String MUILanguage;
-    [Write] String MUIFallbackLanguage;
-    [Write] String SystemLocale;
-    [Write] String AddInputLanguages[];
-    [Write] String RemoveInputLanguages[];
-    [Write] String UserLocale;
-    [Write] Boolean CopySystem;
-    [Write] Boolean CopyNewUser;
-    [Read, EmbeddedInstance("MSFT_KeyValuePair")] String CurrentInstalledLanguages[];
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'."), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Write, Description("Integer specifying the country location code, this can be found at https://msdn.microsoft.com/en-us/library/windows/desktop/dd374073(v=vs.85).aspx.")] Sint32 LocationID;
+    [Write, Description("User interface language, should be in the format en-GB.")] String MUILanguage;
+    [Write, Description("User interface language to be used when the primary does not cover the required settings, should be in the format en-GB.")] String MUIFallbackLanguage;
+    [Write, Description("The language used for the system locale, should be in the format en-GB.")] String SystemLocale;
+    [Write, Description("Array Specifying the keyboard input languages to be added to the available list.")] String AddInputLanguages[];
+    [Write, Description("Array specifying the keyboard input languages to be removed from the available list.")] String RemoveInputLanguages[];
+    [Write, Description("The language used for the user locale, should be in the format en-GB.")] String UserLocale;
+    [Write, Description("Boolean value to copy all settings to the system accounts, the default is true.")] Boolean CopySystem;
+    [Write, Description("Boolean value to copy all settings for new user accounts, the default is true.")] Boolean CopyNewUser;
+    [Read, Description("Read only value specifying the currently installed languages."), EmbeddedInstance("MSFT_KeyValuePair")] String CurrentInstalledLanguages[];
 };
 

@@ -13,7 +13,7 @@ ConvertFrom-StringData @'
     LocaleNotRequired = System Locale configuration not required.
     KeyboardNotRequired = Keyboard Layout configuration not required.
     UserLocaleNotRequired = User Locale configuration not required.
-    CreatedXML = Created XML is:
+    CreatedXML = Language configuration XML is:
     UpdateRequired = '{0}' requires update due to '{1}'.
     ErrorNoParameters = Nothing to do as no parameters where specified.
     ErrorInvalidKeyboardCode = Invalid Keyboard code.  Code must be in the format '{0}'.

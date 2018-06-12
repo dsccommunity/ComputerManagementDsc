@@ -5,17 +5,17 @@ param
 
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-# Import the ComputerManagementDsc Common Modules
+# Import the ComputerManagementDsc Common Modules.
 Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
-# Import the ComputerManagementDsc Resource Helper Module
+# Import the ComputerManagementDsc Resource Helper Module.
 Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
             -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
 
-# Import Localization Strings
+# Import Localization Strings.
 $script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_Language' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
@@ -51,7 +51,7 @@ Function Get-TargetResource
         Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER LocationID
-        Integer specifying the country location code, this can be found
+        Integer specifying the country location code, this can be found at
         https://msdn.microsoft.com/en-us/library/windows/desktop/dd374073(v=vs.85).aspx.
 
     .PARAMETER MUILanguage
@@ -128,7 +128,7 @@ Function Set-TargetResource
 
     <#
         Because some or all of the setting may be changed its impossible to set mandatory parameters,
-        instead we will throw an error if no settings have been defined
+        instead we will throw an error if no settings have been defined.
     #>
     $configurationRequired = $false
 
@@ -153,7 +153,7 @@ Function Set-TargetResource
         Write-Verbose -Message ($script:localizedData.LocationNotRequired)
     }
 
-    # Check to see if both MUI Language and MUIFallback Language have been specified
+    # Check to see if both MUI Language and MUIFallback Language have been specified.
     if (-not ([System.String]::IsNullOrEmpty($MUILanguage) -and [System.String]::IsNullOrEmpty($MUIFallbackLanguage)))
     {
         $configurationRequired = $true
@@ -234,7 +234,7 @@ Function Set-TargetResource
 
     if ($configurationRequired)
     {
-        # Configuration command can't take a xml object, it must load the file from the filesystem
+        # Configuration command can't take a xml object, it must load the file from the filesystem.
         Out-File -InputObject $languageSettings -FilePath "$env:TEMP\Locale.xml" -Force -Encoding ascii
 
         $arg = "intl.cpl,, /f:`"$env:TEMP\Locale.xml`""
@@ -346,22 +346,22 @@ Function Test-TargetResource
 
     #region Check Location
 
-    # If LocationID requires configuration
-    if ($LocationID -ne 0)
+    # If LocationID requires configuration.
+    if ($LocationID -gt 0)
     {
-        # Check current user
+        # Check current user.
         if ($currentUser.LocationID -ne $LocationID)
         {
             $result = $false
         }
 
-        # Check System Account if also configuring System
+        # Check System Account if also configuring System.
         if ($CopySystem -eq $true -and $system.LocationID -ne $LocationID)
         {
             $result = $false
         }
 
-        # Check New User Account if also configuring new users
+        # Check New User Account if also configuring new users.
         if ($CopyNewUser -eq $true -and $newUser.LocationID -ne $LocationID)
         {
             $result = $false
@@ -377,24 +377,24 @@ Function Test-TargetResource
 
     #region Check MUI Language
 
-    # If MUILanguage requires configuration
-    if ($MUILanguage -ne "")
+    # If MUILanguage requires configuration.
+    if (-not ([System.String]::IsNullOrEmpty($MUILanguage)))
     {
-        # Check current user
+        # Check current user.
         if ($currentUser.MUILanguage -ne $MUILanguage)
         {
             $result = $false
             Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'Current User', 'MUILanguage')
         }
 
-        # Check System Account if also configuring System
+        # Check System Account if also configuring System.
         if ($CopySystem -eq $true -and $system.MUILanguage -ne $MUILanguage)
         {
             $result = $false
             Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'System', 'MUILanguage')
         }
 
-        # Check New User Account if also configuring new users
+        # Check New User Account if also configuring new users.
         if ($CopyNewUser -eq $true -and $newUser.MUILanguage -ne $MUILanguage)
         {
             $result = $false
@@ -411,8 +411,8 @@ Function Test-TargetResource
 
     #region Check MUI Fallback Language
 
-    # If MUIFallbackLanguage requires configuration
-    if ($MUIFallbackLanguage -ne "")
+    # If MUIFallbackLanguage requires configuration.
+    if (-not ([System.String]::IsNullOrEmpty($MUIFallbackLanguage)))
     {
         # Check current user
         if ($null -ne $currentUser.FallbackLanguage)
@@ -424,7 +424,7 @@ Function Test-TargetResource
             }
         }
 
-        # Check System Account if also configuring System
+        # Check System Account if also configuring System.
         if ($null -ne $system.FallbackLanguage)
         {
             if ($CopySystem -eq $true -and $system.FallbackLanguage -ne $MUIFallbackLanguage)
@@ -434,7 +434,7 @@ Function Test-TargetResource
             }
         }
 
-        # Check New User Account if also configuring new users
+        # Check New User Account if also configuring new users.
         if ($null -ne $newUser.FallbackLanguage)
         {
             if ($CopyNewUser -eq $true -and $newUser.FallbackLanguage -ne $MUIFallbackLanguage)
@@ -454,8 +454,8 @@ Function Test-TargetResource
 
     #region Check SystemLocale
 
-    # If SystemLocale requires configuration
-    if ($systemLocale -ne "")
+    # If SystemLocale requires configuration.
+    if (-not ([System.String]::IsNullOrEmpty($systemLocale)))
     {
         if ($currentUser.SystemLocale -ne $systemLocale)
         {
@@ -474,24 +474,24 @@ Function Test-TargetResource
 
     if ($null -ne $AddInputLanguages)
     {
-        # Loop through all languages which need to be on the system
+        # Loop through all languages which need to be on the system.
         foreach($language in $AddInputLanguages)
         {
-            # Check if they are already on the system for the current user
+            # Check if they are already on the system for the current user.
             if (!($currentUser.CurrentInstalledLanguages.ContainsValue($language)))
             {
                 $result = $false
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'Current User', 'AddInputLanguages')
             }
 
-            # Check System Account if also adding Languages
+            # Check System Account if also adding Languages.
             if ($CopySystem -eq $true -and !($system.CurrentInstalledLanguages.ContainsValue($language)))
             {
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'System', 'AddInputLanguages')
                 $result = $false
             }
 
-            # Check New User Account if also adding Languages
+            # Check New User Account if also adding Languages.
             if ($CopyNewUser -eq $true -and !($newUser.CurrentInstalledLanguages.ContainsValue($language)))
             {
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'New Users', 'AddInputLanguages')
@@ -515,14 +515,14 @@ Function Test-TargetResource
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'Current User', 'RemoveInputLanguages')
             }
 
-            # Check System Account if also configuring System
+            # Check System Account if also configuring System.
             if ($CopySystem -eq $true -and $system.CurrentInstalledLanguages.ContainsValue($language))
             {
                 $result = $false
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'System', 'RemoveInputLanguages')
             }
 
-            # Check New User Account if also configuring new users
+            # Check New User Account if also configuring new users.
             if ($CopyNewUser -eq $true -and $newUser.CurrentInstalledLanguages.ContainsValue($language))
             {
                 $result = $false
@@ -540,8 +540,8 @@ Function Test-TargetResource
 
     #region Check User Locale
 
-    # If User Locale requires configuration
-    if ($UserLocale -ne "")
+    # If User Locale requires configuration.
+    if (-not ([System.String]::IsNullOrEmpty($UserLocale)))
     {
         # Check current user
         if ($currentUser.UserLocale -ne $UserLocale)
@@ -550,14 +550,14 @@ Function Test-TargetResource
             Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'Current User', 'UserLocale')
         }
 
-        # Check System Account if also configuring System
+        # Check System Account if also configuring System.
         if ($CopySystem -eq $true -and $system.UserLocale -ne $UserLocale)
         {
             $result = $false
             Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'System', 'UserLocale')
         }
 
-        # Check New User Account if also configuring new users
+        # Check New User Account if also configuring new users.
         if ($CopyNewUser -eq $true -and $newUser.UserLocale -ne $UserLocale)
         {
             $result = $false
@@ -577,7 +577,7 @@ Function Test-TargetResource
 
 <#
     .SYNOPSIS
-        Helper function to define the Language Regular expression once
+        Helper function to define the Language Regular expression once.
 #>
 Function Get-LanguageRegex
 {
@@ -587,15 +587,16 @@ Function Get-LanguageRegex
     (
     )
 
+    # RegEx taken from error output
     return '[0-9a-fA-F]{4}:[0-9a-fA-F]{8}|[0-9a-fA-F]{4}:\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}'
 }
 
 <#
     .SYNOPSIS
-        Checks that all language codes in an array are valid and throws a terminating error if they aren't
+        Checks that all language codes in an array are valid and throws a terminating error if they aren't.
 
     .PARAMETER Languages
-        Array of Language Codes to check
+        Array of Language Codes to check.
 #>
 Function Assert-LanguageCodesValid
 {
@@ -625,10 +626,10 @@ Function Assert-LanguageCodesValid
 
 <#
     .SYNOPSIS
-        Gathers all the language and locale information about a specific user account
+        Gathers all the language and locale information about a specific user account.
 
     .PARAMETER UserID
-        Either a specific User SID or CURRENTUSER, DEFAULT or MACHINE for predefined accounts
+        Either a specific User SID or CURRENTUSER, DEFAULT or MACHINE for predefined accounts.
 #>
 Function Get-LanguageInformation
 {
@@ -679,7 +680,7 @@ Function Get-LanguageInformation
     $MUILanguageRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\Desktop\'
     $MUILanguageDefaultRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\Desktop\MuiCached\'
 
-    # This is only set if the language has ever been changed, if not it defaults to system preferred
+    # This is only set if the language has ever been changed, if not it defaults to system preferred.
     try
     {
         $MUILanguage = Get-ItemPropertyValue $MUILanguageRegistryFull -Name 'PreferredUILanguages'
@@ -689,7 +690,7 @@ Function Get-LanguageInformation
         $MUILanguage = Get-ItemPropertyValue $MUILanguageDefaultRegistryFull -Name 'MachinePreferredUILanguages'
     }
 
-    # Assume there is only 1 active MUI installed
+    # Assume there is only 1 active MUI installed.
     [String]$MUILanguage = $MUILanguage[0]
     Write-Verbose -Message ($script:localizedData.UserMUI -f $MUILanguage)
 
@@ -726,7 +727,6 @@ Function Get-LanguageInformation
     $Languages = Get-ItemPropertyValue $InstalledLanguageRegistryFull -Name 'Languages'
     Write-Verbose -Message ($script:localizedData.CurrentlyInstalledLanguages -f $Languages)
 
-    # RegEX taken from implementation error output
     $languageRegEx = Get-LanguageRegex
     $ReturnLanguage = @{}
 
