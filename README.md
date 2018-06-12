@@ -4,7 +4,8 @@ The **ComputerManagementDsc** module contains the following resources:
 
 - **Computer**: allows you to configure a computer by changing its name and
   description and modifying its Active Directory domain or workgroup membership.
-- **Language**: allows you to configure the language settings on a Windows Operating System.
+- **Language**: allows you to configure the language settings on a Windows
+  Operating System.
 - **LanguagePack**: allows you to install or remove a Windows language pack.
 - **OfflineDomainJoin**: allows you to join computers to an Active Directory
   domain using an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx)
