@@ -10,6 +10,8 @@
 - Changed the scope from Global to Script in MSFT_ScheduledTask.Integration.Tests.ps1
 - Changed the scope from Global to Script ComputerManagementDsc.Common.Tests.ps1
 
+=======
+
 ## 5.1.0.0
 
 - TimeZone:
