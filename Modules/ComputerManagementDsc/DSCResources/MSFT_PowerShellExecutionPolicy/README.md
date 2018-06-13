@@ -1,4 +1,4 @@
 # Description
 
-The resource allows configuration of properties of the Powershell
-execution policy and the scope of this policy.
+This resource allows configuration of the PowerShell execution
+policy for different execution scopes.

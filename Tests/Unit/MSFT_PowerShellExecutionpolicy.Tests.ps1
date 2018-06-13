@@ -20,30 +20,29 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Unit
 #endregion HEADER
 
-$Script:invalidPolicyThrowMessage = "Cannot validate argument on parameter 'ExecutionPolicy'. The argument `"badParam`" does "
-$Script:invalidPolicyThrowMessage += "not belong to the set `"Bypass,Restricted,AllSigned,RemoteSigned,Unrestricted`" "
-$Script:invalidPolicyThrowMessage += "specified by the ValidateSet attribute. Supply an argument that is in the set and then "
-$Script:invalidPolicyThrowMessage += "try the command again."
+$Script:invalidPolicyThrowMessage = @"
+Cannot validate argument on parameter 'ExecutionPolicy'. The argument `"badParam`" does
+not belong to the set `"Bypass,Restricted,AllSigned,RemoteSigned,Unrestricted`"
+specified by the ValidateSet attribute. Supply an argument that is in the set and then
+try the command again.
+"@
 
-$Script:invalidPolicyExecutionPolicyScopeThrowMessage = "Cannot validate argument on parameter 'ExecutionPolicyScope'. The argument `"badParam`" does "
-$Script:invalidPolicyExecutionPolicyScopeThrowMessage += "not belong to the set `"CurrentUser,LocalMachine,MachinePolicy,Process,UserPolicy`" "
-$Script:invalidPolicyExecutionPolicyScopeThrowMessage += "specified by the ValidateSet attribute. Supply an argument that is in the set and then "
-$Script:invalidPolicyExecutionPolicyScopeThrowMessage += "try the command again."
+$Script:invalidPolicyExecutionPolicyScopeThrowMessage = @"
+Cannot validate argument on parameter 'ExecutionPolicyScope'. The argument `"badParam`"
+does not belong to the set `"CurrentUser,LocalMachine,MachinePolicy,Process,UserPolicy`"
+specified by the ValidateSet attribute. Supply an argument that is in the set and then
+try the command again.
+"@
 
 # Begin Testing
 try
 {
-
-    #region Pester Tests
-
-    # The InModuleScope command allows you to perform white-box unit testing on the internal
-    # (non-exported) code of a Script Module.
+    <#
+        The InModuleScope command allows you to perform white-box unit testing on the internal
+        (non-exported) code of a Script Module.
+    #>
     InModuleScope $script:DSCResourceName {
         $script:DSCResourceName = 'MSFT_PowershellExecutionPolicy'
-
-        #region Pester Test Initialization
-        #endregion
-
 
         #region Function Get-TargetResource
         Describe "$($script:DSCResourceName)\Get-TargetResource" {
@@ -59,7 +58,7 @@ try
             }
 
             It 'Throws when passed an invalid execution policy ExecutionPolicyScope' {
-                { Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy) -ExecutionPolicyScope "badParam" } | should -Throw $invalidPolicyExecutionPolicyScopeThrowMessage
+                { Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy) -ExecutionPolicyScope 'badParam' } | should -Throw $invalidPolicyExecutionPolicyScopeThrowMessage
             }
 
             It 'Returns correct execution policy for the correct ExecutionPolicyScope' {
@@ -85,7 +84,7 @@ try
 
             It 'Returns false when current policy does not match desired policy' {
                 Mock -CommandName Get-ExecutionPolicy -MockWith { 'Restricted' }
-                Test-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine' | should be $false
+                Test-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' | should be $false
             }
 
             It 'Throws when passed an invalid execution policy Scope' {
@@ -97,14 +96,12 @@ try
             }
 
             It 'Returns false when current policy does not match desired policy with correct ExecutionPolicyScope' {
-                Mock -CommandName Get-ExecutionPolicy -MockWith { "Restricted" }
+                Mock -CommandName Get-ExecutionPolicy -MockWith { 'Restricted' }
 
-                Test-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine' | should be $false
+                Test-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' | should be $false
             }
-
         }
         #endregion
-
 
         #region Function Set-TargetResource
         Describe "$script:DSCResourceName\Set-TargetResource" {
@@ -114,13 +111,13 @@ try
             }
 
             It 'Throws when passed an invalid scope level' {
-                { Set-TargetResource -ExecutionPolicy 'LocalMachine' -ExecutionPolicyScope "badParam" } | should -Throw $invalidScopeThrowMessage
+                { Set-TargetResource -ExecutionPolicy 'LocalMachine' -ExecutionPolicyScope 'badParam' } | should -Throw $invalidScopeThrowMessage
             }
 
             It 'Set-ExecutionPolicy scope warning exception is caught' {
                 Mock -CommandName Set-ExecutionPolicy -MockWith { Throw 'Windows PowerShell updated your execution policy successfully.' }
 
-                $result = Set-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine'
+                $result = Set-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine'
 
                 $result | should be $null
             }
@@ -128,13 +125,13 @@ try
             It 'Throws non-caught exceptions'{
                 Mock -CommandName Set-ExecutionPolicy -MockWith { Throw 'Throw me!' }
 
-                { Set-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine' } | should -Throw 'Throw me!'
+                { Set-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' } | should -Throw 'Throw me!'
             }
 
             It 'Sets execution policy' {
                 Mock -CommandName Set-ExecutionPolicy -MockWith { }
 
-                Set-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine'
+                Set-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine'
 
                 Assert-MockCalled -CommandName Set-ExecutionPolicy -Exactly 1 -Scope It
             }
@@ -142,18 +139,15 @@ try
             It 'Sets execution policy in specified Scope' {
                 Mock -CommandName Set-ExecutionPolicy -MockWith { }
 
-                Set-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine'
+                Set-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine'
 
                 Assert-MockCalled -CommandName Set-ExecutionPolicy -Exactly 1 -Scope It
             }
         }
         #endregion
     }
-    #endregion
 }
 finally
 {
-    #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
 }
