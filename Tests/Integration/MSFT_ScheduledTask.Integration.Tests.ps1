@@ -149,7 +149,7 @@ try
             It 'Should compile the MOF without throwing in W. Australia Standard Time Timezone' {
                 {
 
-                    Set-TimeZoneId -Id 'W. Australia Standard Time'
+                    Set-TimeZoneId -TimeZoneId 'W. Australia Standard Time'
                     . $currentConfig `
                         -OutputPath $configDir
                 } | Should -Not -Throw
@@ -157,7 +157,7 @@ try
 
             It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
                 {
-                    Set-TimeZoneId -Id 'New Zealand Standard Time'
+                    Set-TimeZoneId -TimeZoneId 'New Zealand Standard Time'
                     Start-DscConfiguration `
                         -Path $configDir `
                         -Wait `
@@ -190,7 +190,7 @@ try
             }
 
             AfterAll {
-                Set-TimeZoneId -Id $currentTimeZoneId
+                Set-TimeZoneId -TimeZoneId $currentTimeZoneId
             }
         }
 

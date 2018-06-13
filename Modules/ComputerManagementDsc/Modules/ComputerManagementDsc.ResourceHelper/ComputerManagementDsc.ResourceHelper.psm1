@@ -1,22 +1,5 @@
 <#
     .SYNOPSIS
-    Tests if the specified command can be found.
-
-    .PARAMETER name
-    The name of the command to test.
-#>
-function Test-Command
-{
-    param
-    (
-        [String] $Name
-    )
-
-    return ($null -ne (Get-Command -Name $Name -ErrorAction Continue 2> $null))
-}
-
-<#
-    .SYNOPSIS
     Tests if the current machine is a Nano server.
 #>
 function Test-IsNanoServer

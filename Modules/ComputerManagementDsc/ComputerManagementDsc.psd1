@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-moduleVersion = '5.0.0.0'
+moduleVersion = '5.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,17 +49,13 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- BREAKING CHANGE:
-  - Renamed ComputerManagement to ComputerManagementDsc - fixes [Issue 119](https://github.com/PowerShell/ComputerManagementDsc/issues/119).
-  - Changed all MSFT\_xResourceName to MSFT\_ResourceName.
-  - Updated DSCResources, Examples, Modules and Tests with new naming.
-  - Updated Year to 2018 in License and Manifest.
-  - Updated README.md from xComputerManagement to ComputerManagementDsc.
-- OfflineDomainJoin:
-  - Cleaned up spacing in strings file to make consistent with other
-    resources.
-- VirtualMemory:
-  - Converted strings to single quotes in integration test.
+        ReleaseNotes = '- TimeZone:
+  - Migrated xTimeZone resource from [xTimeZone](https://github.com/PowerShell/xTimeZone)
+    and renamed to TimeZone - fixes [Issue 157](https://github.com/PowerShell/ComputerManagementDsc/issues/157).
+- Moved Test-Command from ComputerManagementDsc.ResourceHelper to
+  ComputerManagementDsc.Common module to match what TimeZone requires.
+  It was not exported in ComputerManagementDsc.ResourceHelper and not
+  used.
 
 '
 
@@ -67,4 +63,5 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 

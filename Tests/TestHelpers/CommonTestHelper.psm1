@@ -81,58 +81,6 @@ function Get-InvalidOperationRecord
     return New-Object @newObjectParams
 }
 
-<#
-    .SYNOPSIS
-        Returns the current Time Zone. This method is used because the
-        Get-Timezone cmdlet is not available on OS versions prior to
-        Windows 10/Windows Server 2016.
-#>
-function Get-TimeZoneId
-{
-    [CmdletBinding()]
-    param()
-
-    $TimeZone = (Get-CimInstance `
-        -ClassName WIN32_Timezone `
-        -Namespace root\cimv2).StandardName
-
-    $timeZoneInfo = [System.TimeZoneInfo]::GetSystemTimeZones() |
-        Where-Object StandardName -eq $TimeZone
-
-    return $timeZoneInfo.Id
-} # function Get-TimeZoneId
-
-<#
-    .SYNOPSIS
-        Set the current Time Zone. This method is used because the
-        Set-Timezone cmdlet is not available on OS versions prior to
-        Windows 10/Windows Server 2016.
-
-    .PARAMETER Id
-        The Id of the Timezone to set the system to.
-#>
-function Set-TimeZoneId
-{
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $Id
-    )
-
-    try
-    {
-        & tzutil.exe @('/s',$Id)
-    }
-    catch
-    {
-        $ErrorMsg = $_.Exception.Message
-        Write-Verbose -Message $ErrorMsg
-    } # try
-} # function Set-TimeZoneId
-
 Export-ModuleMember -Function `
-    Get-TimeZoneId, `
-    Set-TimeZoneId, `
     Get-InvalidArgumentRecord, `
     Get-InvalidOperationRecord
