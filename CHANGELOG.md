@@ -9,9 +9,6 @@
   - Moved strings to localization file.
 - Changed the scope from Global to Script in MSFT_ScheduledTask.Integration.Tests.ps1
 - Changed the scope from Global to Script ComputerManagementDsc.Common.Tests.ps1
-
-## 5.1.0.0
-
 - TimeZone:
   - Migrated xTimeZone resource from [xTimeZone](https://github.com/PowerShell/xTimeZone)
     and renamed to TimeZone - fixes [Issue #157](https://github.com/PowerShell/ComputerManagementDsc/issues/157).
