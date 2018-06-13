@@ -613,6 +613,31 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
                 }
 
+                It 'Changes ComputerName and changes Workgroup to Domain with specified Domain Controller' {
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso';
+                            Workgroup    = 'Contoso';
+                            PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
+
+                    Set-TargetResource `
+                        -Name $notComputerName `
+                        -DomainName 'Contoso.com' `
+                        -Server 'dc01.contoso.com' `
+                        -Credential $credential `
+                        -Verbose | Should -BeNullOrEmpty
+
+                    Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName -and $Server }
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                }
+
                 It 'Changes ComputerName and changes Workgroup to Domain with specified OU' {
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
@@ -1006,6 +1031,12 @@ try
 
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Get-Item -Exactly -Times 0 -Scope It
+                }
+            }
+
+            Context "$($script:DSCResourceName)\Get-LogonServer" {
+                It 'Should return a non-empty string' {
+                    Get-LogonServer | Should -Not -BeNullOrEmpty
                 }
             }
         }
