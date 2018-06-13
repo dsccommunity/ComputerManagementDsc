@@ -1,7 +1,7 @@
 <#
     .EXAMPLE
     This configuration sets the machine name to 'Server01' and
-    joins the 'Contoso' domain.
+    joins the 'Contoso' domain using the domain controller 'dc1.contoso.com'.
     Note: this requires an AD credential to join the domain.
 #>
 Configuration Example
