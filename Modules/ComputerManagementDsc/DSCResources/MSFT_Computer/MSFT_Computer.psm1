@@ -47,7 +47,7 @@ $script:localizedData = Get-LocalizedData `
         The value assigned here will be set as the local computer description.
 
     .PARAMETER Server
-        The server to use to join the domain.
+        The Active Directory Domain Controller to use to join the domain.
 #>
 function Get-TargetResource
 {
@@ -152,7 +152,7 @@ function Get-TargetResource
         The value assigned here will be set as the local computer description.
 
     .PARAMETER Server
-        The server to use to join the domain.
+        The Active Directory Domain Controller to use to join the domain.
 #>
 function Set-TargetResource
 {
