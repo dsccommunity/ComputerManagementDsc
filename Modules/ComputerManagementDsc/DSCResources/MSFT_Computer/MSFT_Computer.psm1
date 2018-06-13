@@ -223,7 +223,7 @@ function Set-TargetResource
             }
             else
             {
-                $splat = @{
+                $addComputerParameters = @{
                     DomainName=$DomainName
                     Credential=$Credential
                     Force=$true
@@ -231,24 +231,24 @@ function Set-TargetResource
                 $rename=$false
                 if ($Name -ne $env:COMPUTERNAME)
                 {
-                    $splat.Add("NewName", $Name)
+                    $addComputerParameters.Add("NewName", $Name)
                     $rename=$true
                 }
                 if ($UnjoinCredential)
                 {
-                    $splat.Add("UnjoinDomainCredential", $UnjoinCredential)
+                    $addComputerParameters.Add("UnjoinDomainCredential", $UnjoinCredential)
                 }
                 if ($JoinOU)
                 {
-                    $splat.Add("OUPath", $JoinOU)
+                    $addComputerParameters.Add("OUPath", $JoinOU)
                 }
                 if ($Server)
                 {
-                    $splat.Add("Server", $Server)
+                    $addComputerParameters.Add("Server", $Server)
                 }
 
                 # Rename the computer, and join it to the domain.
-                Add-Computer @splat
+                Add-Computer @addComputerParameters
                 if ($rename)
                 {
                     Write-Verbose -Message ($script:localizedData.RenamedComputerAndJoinedDomainMessage -f $Name,$DomainName)
