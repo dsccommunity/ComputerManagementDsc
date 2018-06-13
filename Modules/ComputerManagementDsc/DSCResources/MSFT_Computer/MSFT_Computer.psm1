@@ -224,24 +224,27 @@ function Set-TargetResource
             else
             {
                 $addComputerParameters = @{
-                    DomainName=$DomainName
-                    Credential=$Credential
-                    Force=$true
+                    DomainName = $DomainName
+                    Credential = $Credential
+                    Force = $true
                 }
-                $rename=$false
+                $rename = $false
                 if ($Name -ne $env:COMPUTERNAME)
                 {
                     $addComputerParameters.Add("NewName", $Name)
-                    $rename=$true
+                    $rename = $true
                 }
+
                 if ($UnjoinCredential)
                 {
                     $addComputerParameters.Add("UnjoinDomainCredential", $UnjoinCredential)
                 }
+
                 if ($JoinOU)
                 {
                     $addComputerParameters.Add("OUPath", $JoinOU)
                 }
+
                 if ($Server)
                 {
                     $addComputerParameters.Add("Server", $Server)
@@ -249,6 +252,7 @@ function Set-TargetResource
 
                 # Rename the computer, and join it to the domain.
                 Add-Computer @addComputerParameters
+
                 if ($rename)
                 {
                     Write-Verbose -Message ($script:localizedData.RenamedComputerAndJoinedDomainMessage -f $Name,$DomainName)
@@ -610,18 +614,12 @@ function Get-ComputerOU
 <#
     .SYNOPSIS
         Returns the logon server.
-
 #>
 function Get-LogonServer
 {
     [CmdletBinding()]
     [OutputType([System.String])]
-    param
-    (
-        [Parameter()]
-        [Switch]
-        $NetBios
-    )
+    param()
 
     $logonserver = $env:LOGONSERVER -replace "\\",""
     return $logonserver
