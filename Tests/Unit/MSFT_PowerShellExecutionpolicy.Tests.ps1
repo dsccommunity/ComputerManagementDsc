@@ -1,15 +1,15 @@
 #region HEADER
-$script:DSCModuleName      = 'ComputerManagementDsc'
-$script:DSCResourceName    = 'MSFT_PowershellExecutionPolicy'
+$script:DSCModuleName = 'ComputerManagementDsc'
+$script:DSCResourceName = 'MSFT_PowershellExecutionPolicy'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 # Unit Test Template Version: 1.2.0
 $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
@@ -83,7 +83,7 @@ try
 
             It 'Returns false when current policy does not match desired policy' {
                 Mock -CommandName Get-ExecutionPolicy -MockWith { 'Restricted' }
-                Test-TargetResource -ExecutionPolicy "Bypass" -ExecutionPolicyScope 'LocalMachine' | Should be $false
+                Test-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' | Should be $false
             }
 
             It 'Throws when passed an invalid execution policy Scope' {
@@ -118,7 +118,7 @@ try
                 $result | should be $null
             }
 
-            It 'Throws non-caught exceptions'{
+            It 'Throws non-caught exceptions' {
                 Mock -CommandName Set-ExecutionPolicy -MockWith { Throw 'Throw me!' }
                 { Set-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' } | Should -Throw 'Throw me!'
             }

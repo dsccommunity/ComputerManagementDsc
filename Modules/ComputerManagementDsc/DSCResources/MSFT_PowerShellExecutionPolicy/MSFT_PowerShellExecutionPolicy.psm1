@@ -91,7 +91,7 @@ function Set-TargetResource
         }
         catch
         {
-            if($_.FullyQualifiedErrorId -eq 'ExecutionPolicyOverride,Microsoft.PowerShell.Commands.SetExecutionPolicyCommand')
+            if ($_.FullyQualifiedErrorId -eq 'ExecutionPolicyOverride,Microsoft.PowerShell.Commands.SetExecutionPolicyCommand')
             {
                 Write-Verbose -Message ($localizedData.UpdatePowershellExecutionPolicySuccess -f $ExecutionPolicyScope, $ExecutionPolicy)
             }
@@ -131,7 +131,7 @@ function Test-TargetResource
         $ExecutionPolicy
     )
 
-    Write-Verbose -Message $localizedData.TestingPowerShellExecutionPolicy
+    Write-Verbose -Message ($localizedData.TestingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
 
     if ((Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
     {
