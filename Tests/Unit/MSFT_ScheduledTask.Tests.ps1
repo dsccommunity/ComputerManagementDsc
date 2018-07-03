@@ -1408,7 +1408,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                    Verbose            = $True
+                    Verbose            = $False
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1522,13 +1522,14 @@ try
                                 Interval = "PT15M"
                             }
                             CimClass   = @{
-                                CimClassName = 'MSFT_TaskEventTrigger'
+                                CimClassName = 'MSFT_TaskSessionStateChangeTrigger'
                             }
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
                         }
-                    } }
+                    } 
+                }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
@@ -1544,6 +1545,187 @@ try
                 It 'Should disable the scheduled task in the set method' {
                     Set-TargetResource @testParameters
                     Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
+                }
+            }
+
+            Context 'When a scheduled task with an OnEvent scheduletype is in desired state' {
+                $testParameters = @{
+                    TaskName          = 'Test task'
+                    TaskPath          = '\Test\'
+                    ScheduleType      = 'OnEvent'
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
+                    Delay             = '00:01:00'
+                    Enable            = $True
+                    Verbose           = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = [pscustomobject] @{
+                            Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                        }
+                        Triggers = [pscustomobject] @{
+                            Delay = 'PT1M'
+                            Subscription = $testParameters.EventSubscription
+                            CimClass   = @{
+                                CimClassName = 'MSFT_TaskEventTrigger'
+                            }
+                        }
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                        }
+                    } 
+                }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Enable | Should -Be $true
+                    $result.Ensure | Should -Be 'Present'
+                    $result.ScheduleType | Should -Be 'OnEvent'
+                    $result.EventSubscription | Should -Be $testParameters.EventSubscription
+                    $result.Delay | Should -Be $testParameters.Delay
+                }
+
+                It 'Should return true from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+            }
+
+            Context 'When a scheduled task with an OnEvent scheduletype is needs to be created' {
+                $testParameters = @{
+                    TaskName          = 'Test task'
+                    TaskPath          = '\Test\'
+                    ScheduleType      = 'OnEvent'
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
+                    Delay             = '00:01:00'
+                    Enable            = $True
+                    Verbose           = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Ensure | Should -Be 'Absent'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                It 'Should register the new scheduled task' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+                }
+            }
+
+            Context 'When a scheduled task with an OnEvent scheduletype needs to be updated' {
+                $testParameters = @{
+                    TaskName          = 'Test task'
+                    TaskPath          = '\Test\'
+                    ScheduleType      = 'OnEvent'
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
+                    Delay             = '00:05:00'
+                    Enable            = $True
+                    Verbose           = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = [pscustomobject] @{
+                            Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                        }
+                        Triggers = [pscustomobject] @{
+                            Delay = 'PT1M'
+                            Subscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1601]]</Select></Query></QueryList>'
+                            CimClass   = @{
+                                CimClassName = 'MSFT_TaskEventTrigger'
+                            }
+                        }
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                        }
+                    } 
+                }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Enable | Should -Be $true
+                    $result.Ensure | Should -Be 'Present'
+                    $result.ScheduleType | Should -Be 'OnEvent'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                It 'Should not call Register-ScheduledTask on an already registered task' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled Register-ScheduledTask -Times 0 -Scope It
+                }
+
+                It 'Should call Set-ScheduledTask to update the scheduled task with the new values' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled Set-ScheduledTask -Times 1 -Scope It
+                }
+            }
+
+            Context 'When a scheduled task with an OnEvent scheduletype is used on combination with unsupported parameters for this scheduletype' {
+                $testParameters = @{
+                    TaskName          = 'Test task'
+                    TaskPath          = '\Test\'
+                    ScheduleType      = 'OnEvent'
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
+                    RandomDelay       = '01:00:00'
+                    Delay             = '00:01:00'
+                    Enable            = $True
+                    Verbose           = $True
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = [pscustomobject] @{
+                            Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                        }
+                        Triggers = [pscustomobject] @{
+                            Delay = 'PT1M'
+                            Subscription = $testParameters.EventSubscription
+                            CimClass   = @{
+                                CimClassName = 'MSFT_TaskEventTrigger'
+                            }
+                        }
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                        }
+                    } 
+                }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Enable | Should -Be $true
+                    $result.Ensure | Should -Be 'Present'
+                    $result.ScheduleType | Should -Be 'OnEvent'
+                    $result.RandomDelay | Should -Be '00:00:00'
+                }
+
+                It 'Should return true from the test method - ignoring the RandomDelay parameter' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+
+                $testParameters.EventSubscription = 'InvalidXML'
+
+                It 'When an EventSubscription cannot be parsed as valid XML an error is generated when changing the task' {
+                    { Set-TargetResource @testParameters } | Should throw
                 }
             }
         }

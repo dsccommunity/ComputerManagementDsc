@@ -234,7 +234,7 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn','OnEvent')]
         $ScheduleType,
 
         [Parameter()]
@@ -376,7 +376,15 @@ function Get-TargetResource
         [Parameter()]
         [ValidateSet('Group', 'Interactive', 'InteractiveOrPassword', 'None', 'Password', 'S4U', 'ServiceAccount')]
         [System.String]
-        $LogonType
+        $LogonType,
+
+        [Parameter()]
+        [System.String]
+        $EventSubscription,
+
+        [Parameter()]
+        [System.String]
+        $Delay = '00:00:00'
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
@@ -433,6 +441,12 @@ function Get-TargetResource
             'MSFT_TaskLogonTrigger'
             {
                 $returnScheduleType = 'AtLogon'
+                break
+            }
+
+            'MSFT_TaskEventTrigger'
+            {
+                $returnScheduleType = 'OnEvent'
                 break
             }
 
@@ -510,6 +524,8 @@ function Get-TargetResource
             RunOnlyIfNetworkAvailable       = $settings.RunOnlyIfNetworkAvailable
             RunLevel                        = [System.String] $task.Principal.RunLevel
             LogonType                       = [System.String] $task.Principal.LogonType
+            EventSubscription               = $trigger.Subscription
+            Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
         }
     }
 }
@@ -697,7 +713,7 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn','OnEvent')]
         $ScheduleType,
 
         [Parameter()]
@@ -839,7 +855,15 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Group', 'Interactive', 'InteractiveOrPassword', 'None', 'Password', 'S4U', 'ServiceAccount')]
         [System.String]
-        $LogonType
+        $LogonType,
+
+        [Parameter()]
+        [System.String]
+        $EventSubscription,
+
+        [Parameter()]
+        [System.String]
+        $Delay = '00:00:00'
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
@@ -900,6 +924,13 @@ function Set-TargetResource
             New-InvalidArgumentException `
                 -Message ($script:localizedData.WeekDayMissingError) `
                 -ArgumentName DaysOfWeek
+        }
+
+        if ($ScheduleType -eq 'OnEvent' -and -not([xml]$EventSubscription))
+        {
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.OnEventSubscriptionError) `
+                -ArgumentName EventSubscription
         }
 
         # Configure the action
@@ -989,7 +1020,8 @@ function Set-TargetResource
         # Configure the trigger
         $triggerParameters = @{}
 
-        if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0))
+        # A random delay is not supported when the scheduleType is set to OnEvent
+        if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0) -and $ScheduleType -ne 'OnEvent')
         {
             $triggerParameters.Add('RandomDelay', $RandomDelay)
         }
@@ -1049,9 +1081,23 @@ function Set-TargetResource
 
                 break
             }
+
+            'OnEvent' 
+            {
+                Write-Verbose -Message ($script:localizedData.ConfigureTaskEventTrigger -f $TaskName) 
+
+                $cimTriggerClass = Get-CimClass -ClassName MSFT_TaskEventTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskEventTrigger
+                $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
+                $trigger.Enabled = $true
+                $trigger.Delay = (New-ScheduledTaskTrigger -RandomDelay $Delay -Once -At (Get-Date)).RandomDelay
+                $trigger.Subscription = $EventSubscription
+            }
         }
 
-        $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
+        if($ScheduleType -ne 'OnEvent')
+        {
+            $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
+        }
 
         if (-not $trigger)
         {
@@ -1423,7 +1469,7 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn','OnEvent')]
         $ScheduleType,
 
         [Parameter()]
@@ -1565,7 +1611,15 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Group', 'Interactive', 'InteractiveOrPassword', 'None', 'Password', 'S4U', 'ServiceAccount')]
         [System.String]
-        $LogonType
+        $LogonType,
+
+        [Parameter()]
+        [System.String]
+        $EventSubscription,
+
+        [Parameter()]
+        [System.String]
+        $Delay = '00:00:00'
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
@@ -1580,7 +1634,15 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('RandomDelay'))
     {
-        $PSBoundParameters['RandomDelay'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RandomDelay).ToString()
+        if($ScheduleType -eq 'OnEvent')
+        {
+            # A random delay is not supported when the ScheduleType is set to OnEvent.
+            $null = $PSBoundParameters.Remove('RandomDelay')
+        }
+        else
+        {
+            $PSBoundParameters['RandomDelay'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RandomDelay).ToString()
+        }
     }
 
     if ($PSBoundParameters.ContainsKey('RepetitionDuration'))

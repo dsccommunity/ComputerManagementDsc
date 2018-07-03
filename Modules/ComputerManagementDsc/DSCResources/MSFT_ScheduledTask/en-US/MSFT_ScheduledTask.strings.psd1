@@ -10,6 +10,7 @@ ConvertFrom-StringData @'
     DaysIntervalError = DaysInterval must be greater than zero (0) for Daily schedules. DaysInterval specified is '{0}'.
     WeeksIntervalError = WeeksInterval must be greater than zero (0) for Weekly schedules. WeeksInterval specified is '{0}'.
     WeekDayMissingError = At least one weekday must be selected for Weekly schedule.
+    OnEventSubscriptionError = No (valid) XML Event Subscription was provided. This is required when the scheduletype is OnEvent.
     TriggerCreationError = Error creating new scheduled task trigger.
     ConfigureTriggerRepetitionMessage = Configuring trigger repetition.
     RepetitionIntervalError = Repetition interval is set to '{0}' but repetition duration is '{1}'.
@@ -20,6 +21,7 @@ ConvertFrom-StringData @'
     CreateScheduledTaskPrincipalMessage = Creating scheduled task principal for account '{0}' using logon type '{1}'.
     RemovePreviousScheduledTaskMessage = Removing previous scheduled task '{0}' from '{1}'.
     CreateNewScheduledTaskMessage = Creating new scheduled task '{0}' in '{1}'.
+    ConfigureTaskEventTrigger = Setting up an event based trigger on task {0}
     SetRepetitionTriggerMessage = Setting repetition trigger settings on task '{0}' in '{1}'.
     RegisterScheduledTaskMessage = Registering the scheduled task '{0}' in '{1}'.
     RetrieveScheduledTaskMessage = Retrieving the scheduled task '{0}' from '{1}'.
