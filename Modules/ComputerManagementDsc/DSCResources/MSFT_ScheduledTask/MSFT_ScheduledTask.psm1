@@ -242,7 +242,7 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn','OnEvent')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn', 'OnEvent')]
         $ScheduleType,
 
         [Parameter()]
@@ -729,7 +729,7 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn','OnEvent')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn', 'OnEvent')]
         $ScheduleType,
 
         [Parameter()]
@@ -1493,7 +1493,7 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn','OnEvent')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn', 'OnEvent')]
         $ScheduleType,
 
         [Parameter()]
