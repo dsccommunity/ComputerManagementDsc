@@ -201,6 +201,14 @@ $script:localizedData = Get-LocalizedData `
     .PARAMETER LogonType
         Specifies the security logon method that Task Scheduler uses to run the tasks that
         are associated with the principal. Not used in Get-TargetResource.
+
+    .PARAMETER EventSubscription
+        The event subscription in a string that can be parsed as valid XML. This parameter is only
+        valid in combination with the OnEvent Schedule Type.
+
+    .PARAMETER Delay
+        The time to wait after an event based trigger was triggered. This parameter is only
+        valid in combination with the OnEvent Schedule Type.
 #>
 function Get-TargetResource
 {
@@ -681,6 +689,14 @@ function Get-TargetResource
     .PARAMETER LogonType
         Specifies the security logon method that Task Scheduler uses to run the tasks that
         are associated with the principal.
+
+    .PARAMETER EventSubscription
+        The event subscription in a string that can be parsed as valid XML. This parameter is only
+        valid in combination with the OnEvent Schedule Type.
+
+    .PARAMETER Delay
+        The time to wait after an event based trigger was triggered. This parameter is only
+        valid in combination with the OnEvent Schedule Type.
 #>
 function Set-TargetResource
 {
@@ -1436,6 +1452,14 @@ function Set-TargetResource
     .PARAMETER LogonType
         Specifies the security logon method that Task Scheduler uses to run the tasks that
         are associated with the principal.
+
+    .PARAMETER EventSubscription
+        The event subscription in a string that can be parsed as valid XML. This parameter is only
+        valid in combination with the OnEvent Schedule Type.
+
+    .PARAMETER Delay
+        The time to wait after an event based trigger was triggered. This parameter is only
+        valid in combination with the OnEvent Schedule Type.
 #>
 function Test-TargetResource
 {
