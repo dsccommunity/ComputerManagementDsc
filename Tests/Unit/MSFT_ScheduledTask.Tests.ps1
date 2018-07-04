@@ -1408,7 +1408,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                    Verbose            = $False
+                    Verbose            = $True
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
