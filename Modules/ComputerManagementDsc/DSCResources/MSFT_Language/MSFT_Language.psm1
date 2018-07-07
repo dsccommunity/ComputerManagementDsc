@@ -197,14 +197,14 @@ Function Set-TargetResource
 
         $languageSettings += '    <gs:InputPreferences>'
 
-        foreach ($LanguageID in $AddInputLanguages)
+        foreach ($languageID in $AddInputLanguages)
         {
-            $languageSettings += "        <gs:InputLanguageID Action=`"add`" ID=`"$LanguageID`"/>"
+            $languageSettings += "        <gs:InputLanguageID Action=`"add`" ID=`"$languageID`"/>"
         }
 
-        foreach ($LanguageID in $RemoveInputLanguages)
+        foreach ($languageID in $RemoveInputLanguages)
         {
-            $languageSettings += "        <gs:InputLanguageID Action=`"remove`" ID=`"$LanguageID`"/>"
+            $languageSettings += "        <gs:InputLanguageID Action=`"remove`" ID=`"$languageID`"/>"
         }
 
         $languageSettings += '    </gs:InputPreferences>'
@@ -366,6 +366,7 @@ Function Test-TargetResource
         {
             $result = $false
         }
+
         Write-Debug -Message ($script:localizedData.DebugLocationAfter -f 'LocationID', $result)
     }
     else
@@ -400,6 +401,7 @@ Function Test-TargetResource
             $result = $false
             Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'New Users', 'MUILanguage')
         }
+
         Write-Debug -Message ($script:localizedData.DebugLocationAfter -f 'MUILanguage', $result)
     }
     else
@@ -443,6 +445,7 @@ Function Test-TargetResource
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'New Users', 'MUIFallbackLanguage')
             }
         }
+
         Write-Debug -Message ($script:localizedData.DebugLocationAfter -f 'MUIFallbackLanguage', $result)
     }
     else
@@ -461,6 +464,7 @@ Function Test-TargetResource
         {
             $result = $false
         }
+
         Write-Debug -Message ($script:localizedData.DebugLocationAfter -f 'SystemLocale', $result)
     }
     else
@@ -498,6 +502,7 @@ Function Test-TargetResource
                 $result = $false
             }
         }
+
         Write-Debug -Message ($script:localizedData.DebugLocationAfter -f 'AddInputLanguages', $result)
     }
     else
@@ -529,6 +534,7 @@ Function Test-TargetResource
                 Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'New Users', 'RemoveInputLanguages')
             }
         }
+
         Write-Debug -Message ($script:localizedData.DebugLocationAfter -f 'RemoveInputLanguages', $result)
     }
     else
@@ -563,6 +569,7 @@ Function Test-TargetResource
             $result = $false
             Write-Verbose -Message ($script:localizedData.UpdateRequired -f 'New Users', 'UserLocale')
         }
+
         Write-Debug -Message ($script:localizedData.DebugLocationAfter -f 'UserLocale', $result)
     }
     else
@@ -643,21 +650,21 @@ Function Get-LanguageInformation
         $UserID
     )
 
-    switch($UserID.ToUpperInvariant())
+    switch ($UserID.ToUpperInvariant())
     {
         'CURRENTUSER'
         {
-            $UserReg = 'HKCU:\'
+            $userReg = 'HKCU:\'
         }
 
         'DEFAULT'
         {
-            $UserReg = 'registry::hkey_Users\.DEFAULT\'
+            $userReg = 'registry::hkey_Users\.DEFAULT\'
         }
 
         'MACHINE'
         {
-            $UserReg = 'registry::hkey_Users\S-1-5-18\'
+            $userReg = 'registry::hkey_Users\S-1-5-18\'
         }
 
         default
@@ -668,31 +675,31 @@ Function Get-LanguageInformation
 
     #region LocationID
 
-    $LocationRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\International\Geo\'
+    $locationRegistryFull = Join-Path -Path $userReg -ChildPath 'Control Panel\International\Geo\'
 
-    $locationID = Get-ItemPropertyValue $LocationRegistryFull -Name 'Nation'
+    $locationID = Get-ItemPropertyValue -Path $locationRegistryFull -Name 'Nation'
     Write-Verbose -Message ($script:localizedData.UserLocationID -f $locationID)
 
     #endregion
 
     #region MUI Language
 
-    $MUILanguageRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\Desktop\'
-    $MUILanguageDefaultRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\Desktop\MuiCached\'
+    $muiLanguageRegistryFull = Join-Path -Path $userReg -ChildPath 'Control Panel\Desktop\'
+    $muiLanguageDefaultRegistryFull = Join-Path -Path $userReg -ChildPath 'Control Panel\Desktop\MuiCached\'
 
     # This is only set if the language has ever been changed, if not it defaults to system preferred.
     try
     {
-        $MUILanguage = Get-ItemPropertyValue $MUILanguageRegistryFull -Name 'PreferredUILanguages'
+        $muiLanguage = Get-ItemPropertyValue -Path $muiLanguageRegistryFull -Name 'PreferredUILanguages'
     }
     catch
     {
-        $MUILanguage = Get-ItemPropertyValue $MUILanguageDefaultRegistryFull -Name 'MachinePreferredUILanguages'
+        $muiLanguage = Get-ItemPropertyValue -Path $muiLanguageDefaultRegistryFull -Name 'MachinePreferredUILanguages'
     }
 
     # Assume there is only 1 active MUI installed.
-    [String]$MUILanguage = $MUILanguage[0]
-    Write-Verbose -Message ($script:localizedData.UserMUI -f $MUILanguage)
+    [String]$muiLanguage = $muiLanguage[0]
+    Write-Verbose -Message ($script:localizedData.UserMUI -f $muiLanguage)
 
     #endregion
 
@@ -700,18 +707,18 @@ Function Get-LanguageInformation
 
     if ($UserID.ToUpperInvariant() -eq 'CURRENTUSER')
     {
-        $MUIFallbackLanguageRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\Desktop\LanguageConfiguration\'
+        $muiFallbackLanguageRegistryFull = Join-Path -Path $userReg -ChildPath 'Control Panel\Desktop\LanguageConfiguration\'
     }
     else
     {
-        $MUIFallbackLanguageRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\Desktop\MuiCached\MachineLanguageConfiguration\'
+        $muiFallbackLanguageRegistryFull = Join-Path -Path $userReg -ChildPath 'Control Panel\Desktop\MuiCached\MachineLanguageConfiguration\'
     }
 
     try
     {
-        $MUIFallbackLanguage = Get-ItemPropertyValue $MUIFallbackLanguageRegistryFull -Name $MUILanguage -ErrorAction Stop
-        [String]$MUIFallbackLanguage = $MUIFallbackLanguage[0]
-        Write-Verbose -Message ($script:localizedData.UserMUIFallBack -f $MUIFallbackLanguage)
+        $muiFallbackLanguage = Get-ItemPropertyValue -Path $muiFallbackLanguageRegistryFull -Name $muiLanguage -ErrorAction Stop
+        [System.String]$muiFallbackLanguage = $muiFallbackLanguage[0]
+        Write-Verbose -Message ($script:localizedData.UserMUIFallBack -f $muiFallbackLanguage)
     }
     catch
     {
@@ -722,25 +729,34 @@ Function Get-LanguageInformation
 
     #region Installed Languages
 
-    $InstalledLanguageRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\International\User Profile\'
+    $installedLanguageRegistryFull = Join-Path -Path $userReg -ChildPath 'Control Panel\International\User Profile\'
 
-    $Languages = Get-ItemPropertyValue $InstalledLanguageRegistryFull -Name 'Languages'
-    Write-Verbose -Message ($script:localizedData.CurrentlyInstalledLanguages -f $Languages)
+    $languages = Get-ItemPropertyValue -Path $installedLanguageRegistryFull -Name 'Languages'
+    Write-Verbose -Message ($script:localizedData.CurrentlyInstalledLanguages -f $languages)
 
     $languageRegEx = Get-LanguageRegex
-    $ReturnLanguage = @{}
+    $returnLanguage = @{}
 
-    foreach ($Language in $Languages)
+    foreach ($language in $languages)
     {
-        $LanguagePath = Join-Path -Path $InstalledLanguageRegistryFull -ChildPath $Language
-        $LanguageProperties = Get-ItemProperty -Path $LanguagePath -ErrorAction Continue
-        Write-Verbose -Message ($script:localizedData.CurrentLanguageProperties -f $LanguageProperties)
-        $LanguageCodeObj = $LanguageProperties | Get-Member -MemberType NoteProperty | Where-Object {$_.Name -Match $languageRegEx} -ErrorAction Continue
-        $LanguageCode = $LanguageCodeObj.Name
-        if ($null -ne $LanguageCode)
+        $languagePath = Join-Path -Path $installedLanguageRegistryFull -ChildPath $language
+        $languageProperties = Get-ItemProperty -Path $languagePath -ErrorAction Continue
+        Write-Verbose -Message ($script:localizedData.CurrentLanguageProperties -f $languageProperties)
+
+        $languageCodeObj = $languageProperties | `
+            Get-Member -MemberType NoteProperty | `
+            Where-Object -FilterScript {
+                $_.Name -Match $languageRegEx
+            } -ErrorAction Continue
+
+        $languageCode = $languageCodeObj.Name
+
+        if ($null -ne $languageCode)
         {
-            Write-Verbose -Message ($script:localizedData.CurrentLanguageCode -f $LanguageCode)
-            $ReturnLanguage += @{$Language=$LanguageCode}
+            Write-Verbose -Message ($script:localizedData.CurrentLanguageCode -f $languageCode)
+            $returnLanguage += @{
+                $language = $languageCode
+            }
         }
     }
 
@@ -748,10 +764,10 @@ Function Get-LanguageInformation
 
     #region Current Locale
 
-    $UserLocaleRegistryFull = Join-Path -Path $UserReg -ChildPath 'Control Panel\International\'
+    $userLocaleRegistryFull = Join-Path -Path $userReg -ChildPath 'Control Panel\International\'
 
-    $Locale = Get-ItemPropertyValue $UserLocaleRegistryFull -Name 'LocaleName'
-    Write-Verbose -Message ($script:localizedData.UserLocale -f $Locale)
+    $locale = Get-ItemPropertyValue -Path $userLocaleRegistryFull -Name 'LocaleName'
+    Write-Verbose -Message ($script:localizedData.UserLocale -f $locale)
 
     #endregion
 
@@ -765,11 +781,11 @@ Function Get-LanguageInformation
     $returnValue = @{
         IsSingleInstance = 'Yes'
         LocationID = [System.Int32]$locationID
-        MUILanguage = [System.String]$MUILanguage
-        MUIFallbackLanguage = [System.String]$MUIFallbackLanguage
+        MUILanguage = [System.String]$muiLanguage
+        MUIFallbackLanguage = [System.String]$muiFallbackLanguage
         SystemLocale = [System.String]$systemLocale.Name
-        CurrentInstalledLanguages = [Hashtable]$ReturnLanguage
-        UserLocale = [System.String]$Locale
+        CurrentInstalledLanguages = [Hashtable]$returnLanguage
+        UserLocale = [System.String]$locale
     }
 
     return $returnValue

@@ -7,7 +7,7 @@ class MSFT_Language : OMI_BaseResource
     [Write, Description("User interface language, should be in the format en-GB.")] String MUILanguage;
     [Write, Description("User interface language to be used when the primary does not cover the required settings, should be in the format en-GB.")] String MUIFallbackLanguage;
     [Write, Description("The language used for the system locale, should be in the format en-GB.")] String SystemLocale;
-    [Write, Description("Array Specifying the keyboard input languages to be added to the available list.")] String AddInputLanguages[];
+    [Write, Description("Array specifying the keyboard input languages to be added to the available list.")] String AddInputLanguages[];
     [Write, Description("Array specifying the keyboard input languages to be removed from the available list.")] String RemoveInputLanguages[];
     [Write, Description("The language used for the user locale, should be in the format en-GB.")] String UserLocale;
     [Write, Description("Boolean value to copy all settings to the system accounts, the default is true.")] Boolean CopySystem;

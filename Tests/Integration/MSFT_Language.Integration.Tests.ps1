@@ -11,7 +11,7 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 }
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
-$TestEnvironment = Initialize-TestEnvironment `
+$testEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
     -TestType Integration
@@ -34,34 +34,34 @@ try
 
     Describe "Pre-flight Checks" -Tag "Integration" {
         Context "Ensure System requires modification" {
-            $CurrentState = Get-TargetResource -IsSingleInstance 'Yes'
+            $currentState = Get-TargetResource -IsSingleInstance 'Yes'
 
             It "LocationID requires modification" {
-                $CurrentState.LocationID | Should -Not -Be $LocationID
+                $currentState.LocationID | Should -Not -Be $LocationID
             }
 
             It "MUILanguage requires modification" {
-                $CurrentState.MUILanguage | Should -Not -Be $MUILanguage
+                $currentState.MUILanguage | Should -Not -Be $MUILanguage
             }
 
             It "MUI Fallback Language requires modification" {
-                $CurrentState.MUIFallbackLanguage | Should -Not -Be $MUIFallbackLanguage
+                $currentState.MUIFallbackLanguage | Should -Not -Be $MUIFallbackLanguage
             }
 
             It "System Locale requires modification" {
-                $CurrentState.SystemLocale | Should -Not -Be $SystemLocale
+                $currentState.SystemLocale | Should -Not -Be $SystemLocale
             }
 
             It "$AddInputLanguages keyboard is not already installed" {
-                $CurrentState.CurrentInstalledLanguages.Values | Should -Not -Match $AddInputLanguages
+                $currentState.CurrentInstalledLanguages.Values | Should -Not -Match $AddInputLanguages
             }
 
             It "$RemoveInputLanguages keyboard should be installed" {
-                $CurrentState.CurrentInstalledLanguages.Values | Should -Match $RemoveInputLanguages
+                $currentState.CurrentInstalledLanguages.Values | Should -Match $RemoveInputLanguages
             }
 
             It "User Locale requires modification" {
-                $CurrentState.UserLocale | Should -Not -Be $UserLocale
+                $currentState.UserLocale | Should -Not -Be $UserLocale
             }
         }
     }
@@ -100,7 +100,7 @@ try
             It 'Should apply the MOF correctly' {
                 {
                     Start-DscConfiguration `
-                        -Path $TestDrive `
+                        -Path $testDrive `
                         -Wait `
                         -Force `
                         -Verbose `
@@ -118,7 +118,7 @@ finally
 {
     #region FOOTER
 
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
+    Restore-TestEnvironment -TestEnvironment $testEnvironment
 
     #endregion
 

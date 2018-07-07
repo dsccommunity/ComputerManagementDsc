@@ -69,7 +69,7 @@ Function Get-TargetResource
         Ensure = [System.String]$ensure
     }
 
-    $returnValue
+    return $returnValue
 }
 
 <#

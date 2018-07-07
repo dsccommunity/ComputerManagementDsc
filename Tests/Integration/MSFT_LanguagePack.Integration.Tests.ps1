@@ -11,7 +11,7 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 }
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
-$TestEnvironment = Initialize-TestEnvironment `
+$testEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
     -TestType Integration
@@ -22,11 +22,11 @@ Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot 
 # Using try/finally to always cleanup.
 try
 {
-    $LanguagePackFolderLocation = "c:\LanguagePacks\"
-    $LanguagePackFileLocation = "c:\LanguagePacks\x64fre_Server_de-de_lp.cab"
-    $NewLanguagePackFromFolder = 'en-GB'
-    $NewLanguagePackFromFile = 'de-DE'
-    $RemoveLanguagePack = 'en-US'
+    $languagePackFolderLocation = "c:\LanguagePacks\"
+    $languagePackFileLocation = "c:\LanguagePacks\x64fre_Server_de-de_lp.cab"
+    $newLanguagePackFromFolder = 'en-GB'
+    $newLanguagePackFromFile = 'de-DE'
+    $removeLanguagePack = 'en-US'
     if ($env:APPVEYOR -eq $true)
     {
         Write-Warning -Message ('Pre-flight checks for {0} Integration test will be skipped because appveyor does not have the required cab files.' -f $script:DSCResourceName)
@@ -36,44 +36,44 @@ try
         Describe "Pre-flight Checks" -Tag @('Integration','RequiresDependency') {
 
             Context "Ensure Language Binaries are available" {
-                It "Language Pack Folder $LanguagePackFolderLocation Exists" {
-                    Test-Path -Path $LanguagePackFolderLocation -PathType Container | Should -Be $true
+                It "Language Pack Folder $languagePackFolderLocation Exists" {
+                    Test-Path -Path $languagePackFolderLocation -PathType Container | Should -Be $true
                 }
 
                 It "Language Pack Folder must include at least 1 cab file" {
-                    (Get-ChildItem -Path $LanguagePackFolderLocation -Filter "*.cab").count | Should -BeGreaterThan 0
+                    (Get-ChildItem -Path $languagePackFolderLocation -Filter "*.cab").count | Should -BeGreaterThan 0
                 }
 
                 It "Language Pack File Location must be a cab file" {
-                    $LanguagePackFileLocation.EndsWith(".cab") | Should -Be $true
+                    $languagePackFileLocation.EndsWith(".cab") | Should -Be $true
                 }
 
                 It "Language Pack File Location must exist" {
-                    Test-Path -Path $LanguagePackFileLocation -PathType Leaf | Should -Be $true
+                    Test-Path -Path $languagePackFileLocation -PathType Leaf | Should -Be $true
                 }
             }
-    
+
             Context "Ensure System requires modification" {
-                It "New Language Pack $NewLanguagePackFromFolder mustn't be installed"        {
-                    $CurrentState = Get-TargetResource -LanguagePackName $NewLanguagePackFromFolder
-                    $CurrentState.ensure | Should -Be "Absent"
+                It "New Language Pack $newLanguagePackFromFolder mustn't be installed"        {
+                    $currentState = Get-TargetResource -LanguagePackName $newLanguagePackFromFolder
+                    $currentState.ensure | Should -Be "Absent"
                 }
 
-                It "New Language Pack $NewLanguagePackFromFile mustn't be installed"        {
-                    $CurrentState = Get-TargetResource -LanguagePackName $NewLanguagePackFromFile
-                    $CurrentState.ensure | Should -Be "Absent"
+                It "New Language Pack $newLanguagePackFromFile mustn't be installed"        {
+                    $currentState = Get-TargetResource -LanguagePackName $newLanguagePackFromFile
+                    $currentState.ensure | Should -Be "Absent"
                 }
 
-                It "Language Pack to be removed $RemoveLanguagePack must be installed"        {
-                    $CurrentState = Get-TargetResource -LanguagePackName $RemoveLanguagePack
-                    $CurrentState.ensure | Should -Be "Present"
+                It "Language Pack to be removed $removeLanguagePack must be installed"        {
+                    $currentState = Get-TargetResource -LanguagePackName $removeLanguagePack
+                    $currentState.ensure | Should -Be "Present"
                 }
             }
         }
     }
 
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $configFile 
+    . $configFile
 
     #region Integration Tests
     if ($env:APPVEYOR -eq $true)
@@ -87,8 +87,8 @@ try
             It "Should compile and apply the MOF without throwing" {
                 {
                     Write-Verbose "Run Config" -Verbose:$true
-                    & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive -LangaugePackName $NewLanguagePackFromFolder -LangaugePackLocation $LanguagePackFolderLocation -Ensure "Present"
-                    Start-DscConfiguration -Path $TestDrive `
+                    & "$($script:DSCResourceName)_Config" -OutputPath $testDrive -LangaugePackName $newLanguagePackFromFolder -LangaugePackLocation $languagePackFolderLocation -Ensure "Present"
+                    Start-DscConfiguration -Path $testDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should -Not -Throw
             }
@@ -99,7 +99,7 @@ try
             #endregion
 
             It 'Should have installed the language Pack' {
-                $currentConfig = Get-TargetResource -LanguagePackName $NewLanguagePackFromFolder -Verbose
+                $currentConfig = Get-TargetResource -LanguagePackName $newLanguagePackFromFolder -Verbose
                 $currentConfig.Ensure | Should -Be "Present"
             }
         }
@@ -114,14 +114,14 @@ try
         Describe "$($script:DSCResourceName) File Install Integration" -Tag @("Integration","RequiresDependency") {
 
 
-            $configMof = (Join-Path -Path $TestDrive -ChildPath 'localhost.mof')
+            $configMof = (Join-Path -Path $testDrive -ChildPath 'localhost.mof')
 
             It 'Should compile the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -LangaugePackName $NewLanguagePackFromFile `
-                        -LangaugePackLocation $LanguagePackFileLocation `
+                        -OutputPath $testDrive `
+                        -LangaugePackName $newLanguagePackFromFile `
+                        -LangaugePackLocation $languagePackFileLocation `
                         -Ensure "Present"
                 } | Should -Not -Throw
             }
@@ -129,7 +129,7 @@ try
             It 'Should apply the MOF correctly' {
                 {
                     Start-DscConfiguration `
-                        -Path $TestDrive `
+                        -Path $testDrive `
                         -Wait `
                         -Force `
                         -Verbose `
@@ -154,7 +154,7 @@ try
                 {
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -LangaugePackName $RemoveLanguagePack `
+                        -LangaugePackName $removeLanguagePack `
                         -Ensure "Absent"
                 } | Should -Not -Throw
             }
@@ -162,7 +162,7 @@ try
             It 'Should apply the MOF correctly' {
                 {
                     Start-DscConfiguration `
-                        -Path $TestDrive `
+                        -Path $testDrive `
                         -Wait `
                         -Force `
                         -Verbose `
@@ -181,7 +181,7 @@ finally
 {
     #region FOOTER
 
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
+    Restore-TestEnvironment -TestEnvironment $testEnvironment
 
     #endregion
 
