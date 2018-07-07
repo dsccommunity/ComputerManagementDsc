@@ -17,7 +17,7 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
-$TestEnvironment = Initialize-TestEnvironment `
+$testEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
     -TestType Unit
@@ -29,7 +29,7 @@ function Invoke-TestSetup {
 }
 
 function Invoke-TestCleanup {
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
+    Restore-TestEnvironment -TestEnvironment $testEnvironment
 
     # TODO: Other Optional Cleanup Code Goes Here...
 }
@@ -44,10 +44,10 @@ try
         #Define Static Variables used within all Tests
         $script:DSCModuleName      = 'ComputerManagementDsc'
         $script:DSCResourceName = 'MSFT_LanguagePack'
-        $ExistingLanguagePack = 'en-US'
-        $NewLanguagePack = 'en-GB'
-        $InvalidLanguagePack = 'no-lg'
-        $LanguagePackLocation = "\\SRV1\LanguagePacks\"
+        $existingLanguagePack = 'en-US'
+        $newLanguagePack = 'en-GB'
+        $invalidLanguagePack = 'no-lg'
+        $languagePackLocation = "\\SRV1\LanguagePacks\"
 
         # TODO: Complete the Describe blocks below and add more as needed.
         # The most common method for unit testing is to test by function. For more information
@@ -62,7 +62,6 @@ try
                 $systemLocaleResource = Get-DscResource -Name LanguagePack -Module $script:DSCModuleName
 
                 it 'LanguagePackName should be mandatory.' {
-                
                     $systemLocaleResource.Properties.Where{$_.Name -eq 'LanguagePackName'}.IsMandatory | Should -Be $true
                 }
 
@@ -88,65 +87,65 @@ try
                 } }
 
             Context 'Language Pack is in the desired state' {
-                $Languages = Get-TargetResource `
-                    -LanguagePackName $ExistingLanguagePack
+                $languages = Get-TargetResource `
+                    -LanguagePackName $existingLanguagePack
 
                 It 'Should return hashtable with Key LanguagePackName'{
-                    $Languages.ContainsKey('LanguagePackName') | Should -Be $true
+                    $languages.ContainsKey('LanguagePackName') | Should -Be $true
                 }
 
-                It "Should return hashtable with Value that matches '$ExistingLanguagePack'" {
-                    $Languages.LanguagePackName = $ExistingLanguagePack
+                It "Should return hashtable with Value that matches '$existingLanguagePack'" {
+                    $languages.LanguagePackName = $existingLanguagePack
                 }
 
                 It 'Should return hashtable with Key Ensure'{
-                    $Languages.ContainsKey('Ensure') | Should -Be $true
+                    $languages.ContainsKey('Ensure') | Should -Be $true
                 }
 
                 It "Should return hashtable with Value that matches Present" {
-                    $Languages.Ensure = 'Present'
+                    $languages.Ensure = 'Present'
                 }
             }
 
             Context 'Language Pack has not been installed' {
-                $Languages = Get-TargetResource `
-                    -LanguagePackName $NewLanguagePack
+                $languages = Get-TargetResource `
+                    -LanguagePackName $newLanguagePack
 
                 It 'Should return hashtable with Key LanguagePackName'{
-                    $Languages.ContainsKey('LanguagePackName') | Should -Be $true
+                    $languages.ContainsKey('LanguagePackName') | Should -Be $true
                 }
 
-                It "Should return hashtable with Value that matches '$NewLanguagePack'" {
-                    $Languages.LanguagePackName = $NewLanguagePack
+                It "Should return hashtable with Value that matches '$newLanguagePack'" {
+                    $languages.LanguagePackName = $newLanguagePack
                 }
 
                 It 'Should return hashtable with Key Ensure'{
-                    $Languages.ContainsKey('Ensure') | Should -Be $true
+                    $languages.ContainsKey('Ensure') | Should -Be $true
                 }
 
                 It "Should return hashtable with Value that matches Absent" {
-                    $Languages.Ensure = 'Absent'
+                    $languages.Ensure = 'Absent'
                 }
             }
 
             Context 'Language Pack does not exist' {
-                $Languages = Get-TargetResource `
-                    -LanguagePackName $InvalidLanguagePack
+                $languages = Get-TargetResource `
+                    -LanguagePackName $invalidLanguagePack
 
                 It 'Should return hashtable with Key LanguagePackName'{
-                    $Languages.ContainsKey('LanguagePackName') | Should -Be $true
+                    $languages.ContainsKey('LanguagePackName') | Should -Be $true
                 }
 
-                It "Should return hashtable with Value that matches '$InvalidLanguagePack'" {
-                    $Languages.LanguagePackName = $InvalidLanguagePack
+                It "Should return hashtable with Value that matches '$invalidLanguagePack'" {
+                    $languages.LanguagePackName = $invalidLanguagePack
                 }
 
                 It 'Should return hashtable with Key Ensure'{
-                    $Languages.ContainsKey('Ensure') | Should -Be $true
+                    $languages.ContainsKey('Ensure') | Should -Be $true
                 }
 
                 It "Should return hashtable with Value that matches Absent" {
-                    $Languages.Ensure = 'Absent'
+                    $languages.Ensure = 'Absent'
                 }
             }
         }
@@ -159,40 +158,40 @@ try
                 } }
 
             Context 'Language Pack is already installed' {
-                $Languages = Test-TargetResource `
-                    -LanguagePackName $ExistingLanguagePack
+                $languages = Test-TargetResource `
+                    -LanguagePackName $existingLanguagePack
 
                 It 'Should return true'{
-                    $Languages | Should -Be $true
+                    $languages | Should -Be $true
                 }
             }
 
             Context 'Language Pack will be installed' {
-                $Languages = Test-TargetResource `
-                    -LanguagePackName $NewLanguagePack
+                $languages = Test-TargetResource `
+                    -LanguagePackName $newLanguagePack
 
                 It 'Should return false'{
-                    $Languages | Should -Be $false
+                    $languages | Should -Be $false
                 }
             }
 
             Context 'Language Pack will be removed' {
-                $Languages = Test-TargetResource `
-                    -LanguagePackName $ExistingLanguagePack `
+                $languages = Test-TargetResource `
+                    -LanguagePackName $existingLanguagePack `
                     -Ensure "Absent"
 
                 It 'Should return false'{
-                    $Languages | Should -Be $false
+                    $languages | Should -Be $false
                 }
             }
 
             Context 'Language Pack does not need to be removed' {
-                $Languages = Test-TargetResource `
-                    -LanguagePackName $InvalidLanguagePack `
+                $languages = Test-TargetResource `
+                    -LanguagePackName $invalidLanguagePack `
                     -Ensure "Absent"
 
                 It 'Should return true'{
-                    $Languages | Should -Be $true
+                    $languages | Should -Be $true
                 }
             }
         }
@@ -209,8 +208,8 @@ try
                 It 'Should not throw exception' {
                     {
                         Set-TargetResource `
-                            -LanguagePackName $NewLanguagePack `
-                            -LanguagePackLocation $LanguagePackLocation
+                            -LanguagePackName $newLanguagePack `
+                            -LanguagePackLocation $languagePackLocation
                     } | Should -Not -Throw
                 }
                 It 'Should call lpksetup.exe once' {
@@ -232,7 +231,7 @@ try
                 It 'Should not throw exception' {
                     {
                         Set-TargetResource `
-                            -LanguagePackName $ExistingLanguagePack `
+                            -LanguagePackName $existingLanguagePack `
                             -Ensure "Absent"
                     } | Should -Not -Throw
                 }
@@ -255,7 +254,7 @@ try
                 It 'Should not throw exception' {
                     {
                         Set-TargetResource `
-                            -LanguagePackName $NewLanguagePack `
+                            -LanguagePackName $newLanguagePack `
                             -Ensure "Present"
                     } | Should Throw
                 }
@@ -281,8 +280,8 @@ try
                 It 'Should not throw exception' {
                     {
                         Set-TargetResource `
-                            -LanguagePackName $NewLanguagePack `
-                            -LanguagePackLocation $LanguagePackLocation
+                            -LanguagePackName $newLanguagePack `
+                            -LanguagePackLocation $languagePackLocation
                             -Ensure "Present"
                     } | Should -Throw
                 }

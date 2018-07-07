@@ -48,7 +48,7 @@ try
         $currentLocation = "242"
         [String]$currentUILanguage = "en-GB"
         [String[]]$currentUILanguageArray = @("$currentUILanguage")
-        [String]$CcurrentUIFallbackLanguage = "en-US"
+        [String]$currentUIFallbackLanguage = "en-US"
         [String[]]$currentUIFallbackLanguageArray = @("en-US")
         $currentSystemLocale = "en-GB"
         $currentInstalledLanguages = @{"en-US" = "0409:00000409"; "en-GB" = "0809:00000809"}
@@ -183,7 +183,7 @@ try
                 -MockWith { [String[]]@($currentUILanguage,"") } `
                 -Verifiable
             Mock -CommandName Get-ItemPropertyValue `
-                -ParameterFilter { ($Path -eq "HKCU:\Control Panel\Desktop\LanguageConfiguration\") -and ($Name -eq $CurrentUILanguage) }`
+                -ParameterFilter { ($Path -eq "HKCU:\Control Panel\Desktop\LanguageConfiguration\") -and ($Name -eq $currentUILanguage) }`
                 -ModuleName $($script:DSCResourceName) `
                 -MockWith { @($currentUIFallbackLanguage,"") } `
                 -Verifiable
