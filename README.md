@@ -22,6 +22,7 @@ The **ComputerManagementDsc** module contains the following resources:
 - **TimeZone**: this resource is used for setting the time zone on a machine.
 - **VirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
+- **PowerShellExecutionPolicy**: Specifies the desired PowerShell execution policy.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
