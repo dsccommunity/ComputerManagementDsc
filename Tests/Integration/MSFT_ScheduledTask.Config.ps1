@@ -168,6 +168,25 @@ Configuration ScheduledTaskExecuteAsAdd
     }
 }
 
+Configuration ScheduledTaskOnEventAdd
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskOnEventAdd
+        {
+            TaskName          = 'Test task OnEvent'
+            TaskPath          = '\ComputerManagementDsc\'
+            Ensure            = 'Present'
+            ScheduleType      = 'OnEvent'
+            ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
+            EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
+            Delay             = '00:00:30'
+        }
+    }
+}
+
 Configuration ScheduledTaskOnceMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
@@ -290,6 +309,25 @@ Configuration ScheduledTaskExecuteAsMod
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType     = 'AtLogOn'
             RunLevel         = 'Limited'
+        }
+    }
+}
+
+Configuration ScheduledTaskOnEventMod
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskOnEventMod
+        {
+            TaskName          = 'Test task OnEvent'
+            TaskPath          = '\ComputerManagementDsc\'
+            Ensure            = 'Present'
+            ScheduleType      = 'OnEvent'
+            ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
+            EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7002)]]</Select></Query></QueryList>'
+            Delay             = '00:00:45'
         }
     }
 }
@@ -421,6 +459,25 @@ Configuration ScheduledTaskExecuteAsDel
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType     = 'AtLogOn'
             Ensure           = 'Absent'
+        }
+    }
+}
+
+Configuration ScheduledTaskOnEventDel
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskOnEventDel
+        {
+            TaskName          = 'Test task OnEvent'
+            TaskPath          = '\ComputerManagementDsc\'
+            Ensure            = 'Absent'
+            ScheduleType      = 'OnEvent'
+            ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
+            EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
+            Delay             = '00:00:30'
         }
     }
 }
