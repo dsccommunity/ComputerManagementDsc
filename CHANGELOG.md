@@ -10,7 +10,7 @@
 - Changed the scope from Global to Script in MSFT_ScheduledTask.Integration.Tests.ps1
 - Changed the scope from Global to Script ComputerManagementDsc.Common.Tests.ps1
 - ScheduledTask:
-  - Added support for event based triggers, implemented using the ScheduleType OnEvent
+  - Added support for event based triggers, implemented using the ScheduleType OnEvent - fixes [Issue #167](https://github.com/PowerShell/ComputerManagementDsc/issues/167)
 
 ## 5.1.0.0
 
