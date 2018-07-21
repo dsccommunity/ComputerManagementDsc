@@ -36,6 +36,7 @@ try
             AtLogon           = 'ScheduledTaskLogon'
             AtStartup         = 'ScheduledTaskStartup'
             ExecuteAs         = 'ScheduledTaskExecuteAs'
+            OnEvent           = 'ScheduledTaskOnEvent'
         }
 
         $configData = @{

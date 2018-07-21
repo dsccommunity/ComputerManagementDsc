@@ -102,7 +102,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith { return $null }
@@ -130,7 +130,7 @@ try
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Minutes 15).ToString()
                     Ensure             = 'Absent'
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -174,7 +174,7 @@ try
                     TaskName = 'Test task'
                     TaskPath = '\Test\'
                     Enable   = $false
-                    Verbose  = $True
+                    Verbose  = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -219,7 +219,7 @@ try
                     TaskName = 'Test task'
                     TaskPath = '\Test\'
                     Ensure   = 'Absent'
-                    Verbose  = $True
+                    Verbose  = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -271,7 +271,7 @@ try
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType     = 'Once'
                     Ensure           = 'Absent'
-                    Verbose          = $True
+                    Verbose          = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask
@@ -294,7 +294,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -346,7 +346,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Minutes 30).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -393,7 +393,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -445,7 +445,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -491,7 +491,7 @@ try
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType     = 'Daily'
                     DaysInterval     = 3
-                    Verbose          = $True
+                    Verbose          = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -542,7 +542,7 @@ try
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType     = 'Daily'
                     DaysInterval     = 3
-                    Verbose          = $True
+                    Verbose          = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -587,7 +587,7 @@ try
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
                     ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
-                    Verbose             = $True
+                    Verbose             = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -641,7 +641,7 @@ try
                     RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
                     ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
                     LogonType           = 'S4U'
-                    Verbose             = $True
+                    Verbose             = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -697,7 +697,7 @@ try
                     RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
                     ExecuteAsCredential = New-Object System.Management.Automation.PSCredential ('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
                     RunLevel            = 'Highest'
-                    Verbose             = $True
+                    Verbose             = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -752,7 +752,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -806,7 +806,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -860,7 +860,7 @@ try
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
                     Enable             = $false
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -919,7 +919,7 @@ try
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
                     ExecutionTimeLimit = (New-TimeSpan -Seconds 0).ToString()
                     Enable             = $true
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -982,7 +982,7 @@ try
                     ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
                     RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
                     Enable             = $true
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1041,7 +1041,7 @@ try
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
                     Enable             = $false
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1093,7 +1093,7 @@ try
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
                     Enable             = $true
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1149,7 +1149,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1227,7 +1227,7 @@ try
                     IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
                     ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
                     RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1293,7 +1293,7 @@ try
                     IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
                     ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
                     RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1355,7 +1355,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = 'Indefinitely'
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1408,7 +1408,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                    Verbose            = $False
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1461,7 +1461,7 @@ try
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
                     RepetitionDuration = 'Indefinitely'
-                    Verbose            = $True
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1506,7 +1506,7 @@ try
                     TaskName = 'Test task'
                     TaskPath = '\Test\'
                     Enable   = $false
-                    Verbose  = $True
+                    Verbose  = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1556,8 +1556,8 @@ try
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
                     Delay             = '00:01:00'
-                    Enable            = $True
-                    Verbose           = $True
+                    Enable            = $true
+                    Verbose           = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1594,7 +1594,7 @@ try
                 }
             }
 
-            Context 'When a scheduled task with an OnEvent scheduletype is needs to be created' {
+            Context 'When a scheduled task with an OnEvent scheduletype needs to be created' {
                 $testParameters = @{
                     TaskName          = 'Test task'
                     TaskPath          = '\Test\'
@@ -1602,8 +1602,8 @@ try
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
                     Delay             = '00:01:00'
-                    Enable            = $True
-                    Verbose           = $True
+                    Enable            = $true
+                    Verbose           = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask
@@ -1631,8 +1631,8 @@ try
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
                     Delay             = '00:05:00'
-                    Enable            = $True
-                    Verbose           = $True
+                    Enable            = $true
+                    Verbose           = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1686,8 +1686,8 @@ try
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
                     RandomDelay       = '01:00:00'
                     Delay             = '00:01:00'
-                    Enable            = $True
-                    Verbose           = $True
+                    Enable            = $true
+                    Verbose           = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {

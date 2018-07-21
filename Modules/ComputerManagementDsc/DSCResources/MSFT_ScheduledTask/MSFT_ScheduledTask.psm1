@@ -204,7 +204,8 @@ $script:localizedData = Get-LocalizedData `
 
     .PARAMETER EventSubscription
         The event subscription in a string that can be parsed as valid XML. This parameter is only
-        valid in combination with the OnEvent Schedule Type.
+        valid in combination with the OnEvent Schedule Type. For the query schema please check:
+        https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema
 
     .PARAMETER Delay
         The time to wait after an event based trigger was triggered. This parameter is only
@@ -692,7 +693,8 @@ function Get-TargetResource
 
     .PARAMETER EventSubscription
         The event subscription in a string that can be parsed as valid XML. This parameter is only
-        valid in combination with the OnEvent Schedule Type.
+        valid in combination with the OnEvent Schedule Type. For the query schema please check:
+        https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema
 
     .PARAMETER Delay
         The time to wait after an event based trigger was triggered. This parameter is only
@@ -942,7 +944,7 @@ function Set-TargetResource
                 -ArgumentName DaysOfWeek
         }
 
-        if ($ScheduleType -eq 'OnEvent' -and -not([xml]$EventSubscription))
+        if ($ScheduleType -eq 'OnEvent' -and -not ([xml]$EventSubscription))
         {
             New-InvalidArgumentException `
                 -Message ($script:localizedData.OnEventSubscriptionError) `
@@ -1098,19 +1100,19 @@ function Set-TargetResource
                 break
             }
 
-            'OnEvent' 
+            'OnEvent'
             {
-                Write-Verbose -Message ($script:localizedData.ConfigureTaskEventTrigger -f $TaskName) 
+                Write-Verbose -Message ($script:localizedData.ConfigureTaskEventTrigger -f $TaskName)
 
                 $cimTriggerClass = Get-CimClass -ClassName MSFT_TaskEventTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskEventTrigger
                 $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
                 $trigger.Enabled = $true
-                $trigger.Delay = (New-ScheduledTaskTrigger -RandomDelay $Delay -Once -At (Get-Date)).RandomDelay
+                $trigger.Delay = [System.Xml.XmlConvert]::ToString([timespan]$Delay)
                 $trigger.Subscription = $EventSubscription
             }
         }
 
-        if($ScheduleType -ne 'OnEvent')
+        if ($ScheduleType -ne 'OnEvent')
         {
             $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
         }
@@ -1455,7 +1457,8 @@ function Set-TargetResource
 
     .PARAMETER EventSubscription
         The event subscription in a string that can be parsed as valid XML. This parameter is only
-        valid in combination with the OnEvent Schedule Type.
+        valid in combination with the OnEvent Schedule Type. For the query schema please check:
+        https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema
 
     .PARAMETER Delay
         The time to wait after an event based trigger was triggered. This parameter is only
@@ -1658,9 +1661,10 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('RandomDelay'))
     {
-        if($ScheduleType -eq 'OnEvent')
+        if ($ScheduleType -eq 'OnEvent')
         {
             # A random delay is not supported when the ScheduleType is set to OnEvent.
+            Write-Verbose -Message ($script:localizedData.IgnoreRandomDelayWithTriggerTypeOnEvent -f $TaskName)
             $null = $PSBoundParameters.Remove('RandomDelay')
         }
         else
