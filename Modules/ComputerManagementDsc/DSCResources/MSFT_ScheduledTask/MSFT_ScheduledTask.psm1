@@ -1555,6 +1555,10 @@ function Test-TargetResource
         $ExecuteAsCredential,
 
         [Parameter()]
+        [System.String]
+        $ExecuteAsGMSA,
+
+        [Parameter()]
         [System.UInt32]
         $DaysInterval = 1,
 
