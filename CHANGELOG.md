@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.0.0
+
 - PowershellExecutionPolicy:
   - Updated to meet HQRM guidelines.
   - Migrated the xPowershellExecutionPolicy from [xPowershellExecutionPolicy](https://github.com/PowerShell/xPowerShellExecutionPolicy)
