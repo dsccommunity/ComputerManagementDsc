@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 5.2.0.0
+
+- PowershellExecutionPolicy:
+  - Updated to meet HQRM guidelines.
+  - Migrated the xPowershellExecutionPolicy from [xPowershellExecutionPolicy](https://github.com/PowerShell/xPowerShellExecutionPolicy)
+    and renamed to PowershellExecutionPolicy.
+  - Moved strings to localization file.
+- Changed the scope from Global to Script in MSFT_ScheduledTask.Integration.Tests.ps1
+- Changed the scope from Global to Script ComputerManagementDsc.Common.Tests.ps1
+- ScheduledTask:
+  - Added support for event based triggers, implemented using the ScheduleType OnEvent
+    fixes [Issue #167](https://github.com/PowerShell/ComputerManagementDsc/issues/167)
+
 ## 5.1.0.0
 
 - TimeZone:
@@ -11,6 +24,7 @@
   ComputerManagementDsc.Common module to match what TimeZone requires.
   It was not exported in ComputerManagementDsc.ResourceHelper and not
   used.
+- Add `server` parameter to `Computer` resource - fixes [Issue #161](https://github.com/PowerShell/ComputerManagementDsc/issues/161)
 
 ## 5.0.0.0
 

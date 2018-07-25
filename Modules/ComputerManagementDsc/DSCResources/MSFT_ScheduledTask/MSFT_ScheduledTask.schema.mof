@@ -7,7 +7,7 @@ class MSFT_ScheduledTask : OMI_BaseResource
     [Write, Description("The path to the .exe for this task")] string ActionExecutable;
     [Write, Description("The arguments to pass the executable")] string ActionArguments;
     [Write, Description("The working path to specify for the executable")] string ActionWorkingPath;
-    [Write, Description("When should the task be executed"), ValueMap{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn"}, Values{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn"}] string ScheduleType;
+    [Write, Description("When should the task be executed"), ValueMap{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn", "OnEvent"}, Values{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn", "OnEvent"}] string ScheduleType;
     [Write, Description("How many units (minutes, hours, days) between each run of this task?")] String RepeatInterval;
     [Write, Description("The time of day this task should start at - defaults to 12:00 AM. Not valid for AtLogon and AtStartup tasks")] DateTime StartTime;
     [Write, Description("Present if the task should exist, Absent if it should be removed"), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
@@ -42,4 +42,6 @@ class MSFT_ScheduledTask : OMI_BaseResource
     [Write, Description("Indicates that Task Scheduler runs the task only when a network is available. Task Scheduler uses the NetworkID parameter and NetworkName parameter that you specify in this cmdlet to determine if the network is available.")] Boolean RunOnlyIfNetworkAvailable;
     [Write, Description("Specifies the level of user rights that Task Scheduler uses to run the tasks that are associated with the principal. Defaults to 'Limited'."), ValueMap{"Limited","Highest"}, Values{"Limited","Highest"}] String RunLevel;
     [Write, Description("Specifies the security logon method that Task Scheduler uses to run the tasks that are associated with the principal."), ValueMap{"Group","Interactive","InteractiveOrPassword","None","Password","S4U","ServiceAccount"}, Values{"Group","Interactive","InteractiveOrPassword","None","Password","S4U","ServiceAccount"}] String LogonType;
+    [Write, Description("Specifies the EventSubscription in XML. This can be easily generated using the Windows Eventlog Viewer. For the query schema please check: https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema. Can only be used in combination with ScheduleType OnEvent")] String EventSubscription;
+    [Write, Description("Specifies a delay to the start of the trigger. The delay is a static delay before the task is executed. Can only be used in combination with ScheduleType OnEvent")] String Delay;
 };
