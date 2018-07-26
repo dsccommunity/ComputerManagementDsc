@@ -512,7 +512,7 @@ function Get-TargetResource
             ScheduleType                    = $returnScheduleType
             RepeatInterval                  = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Interval
             ExecuteAsCredential             = $task.Principal.UserId
-            ExecuteAsGMSA                   = $task.Principal.UserId -replace '^.+\\', $null
+            ExecuteAsGMSA                   = $task.Principal.UserId -replace '^.+\\|@.+', $null
             Enable                          = $settings.Enabled
             DaysInterval                    = $trigger.DaysInterval
             RandomDelay                     = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.RandomDelay
@@ -1773,10 +1773,13 @@ function Test-TargetResource
             There is a difference in W2012R2 and W2016 behaviour,
             W2012R2 returns the gMSA including the DOMAIN prefix,
             W2016 returns this without. So to be sure strip off the
-            domain part in Get & Test.
+            domain part in Get & Test. This means we either need to
+            remove everything before \ in the case of the DOMAIN\User
+            format, or we need to remove everything after @ in case
+            when the UPN format (User@domain.fqdn) is used.
         #>
 
-        $PSBoundParameters['ExecuteAsGMSA'] = $PSBoundParameters.ExecuteAsGMSA -replace '^.+\\', $null
+        $PSBoundParameters['ExecuteAsGMSA'] = $PSBoundParameters.ExecuteAsGMSA -replace '^.+\\|@.+', $null
     }
 
     $desiredValues = $PSBoundParameters
