@@ -12,11 +12,11 @@ Configuration Example
         [System.String[]]
         $NodeName = 'localhost',
 
-        # Group Managed Service Account must be in the form of DOMAIN\gMSA$
-        [Parameter(Mandatory = $true)]
-        [ValidatePattern('^\w+\\\w+\$$')]
+        # Group Managed Service Account must be in the form of DOMAIN\gMSA$ or user@domain.fqdn (UPN)
+        [Parameter()]
+        [ValidatePattern('^\w+\\\w+\$$|\w+@\w+\.\w+')]
         [System.String]
-        $GroupManagedServiceAccount
+        $GroupManagedServiceAccount = 'DOMAIN\gMSA$'
     )
 
     Import-DscResource -ModuleName ComputerManagementDsc
