@@ -11,7 +11,7 @@ ConvertFrom-StringData @'
     WeeksIntervalError = WeeksInterval must be greater than zero (0) for Weekly schedules. WeeksInterval specified is '{0}'.
     WeekDayMissingError = At least one weekday must be selected for Weekly schedule.
     OnEventSubscriptionError = No (valid) XML Event Subscription was provided. This is required when the scheduletype is OnEvent.
-    gMSAandCredentialError = 'Both ExecuteAsGMSA and ExecuteAsCredential parameters have been specified. A task can either run as a gMSA (Group Managed Service Account) or as a custom credential, not both. Please modify your configuration to include just one of the two.
+    gMSAandCredentialError = Both ExecuteAsGMSA and ExecuteAsCredential parameters have been specified. A task can either run as a gMSA (Group Managed Service Account) or as a custom credential, not both. Please modify your configuration to include just one of the two.
     TriggerCreationError = Error creating new scheduled task trigger.
     ConfigureTriggerRepetitionMessage = Configuring trigger repetition.
     RepetitionIntervalError = Repetition interval is set to '{0}' but repetition duration is '{1}'.
