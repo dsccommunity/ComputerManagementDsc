@@ -1748,7 +1748,7 @@ try
                     {
                         Set-TargetResource @testParameters -ErrorVariable duplicateCredential
                     }
-                    catch 
+                    catch
                     {
                         # Error from Set-TargetResource expected
                     }
@@ -1763,7 +1763,7 @@ try
                 It 'Should call Register-ScheduledTask with the name of the Group Managed Service Account' {
                     Set-TargetResource @testParameters
                     Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
-                        $User -eq $testParameters.ExecuteAsGMSA -and  $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
+                        $User -eq $null -and  $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
                     }
                 }
 

@@ -1221,7 +1221,6 @@ function Set-TargetResource
         if ($PSBoundParameters.ContainsKey('ExecuteAsGMSA'))
         {
             $username = $ExecuteAsGMSA
-            $registerArguments.Add('User', $username)
             $LogonType = 'Password'
         }
         elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
