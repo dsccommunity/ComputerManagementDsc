@@ -98,7 +98,7 @@ try
                 }
 
                 It 'Should return True if Workgroup name is same as specified' {
-                    Mock -CommandName Get-WMIObject -MockWith {
+                    Mock -CommandName Get-CimInstance -MockWith {
                         [PSCustomObject] @{
                             Domain       = 'Workgroup';
                             Workgroup    = 'Workgroup';
@@ -459,7 +459,7 @@ try
                         -Verbose
 
                     $Result.GetType().Fullname | Should -Be 'System.Collections.Hashtable'
-                    $Result.Keys | Sort-Object | Should -Be @('Credential', 'CurrentOU', 'Description', 'DomainName', 'JoinOU', 'Name', 'UnjoinCredential', 'WorkGroupName')
+                    $Result.Keys | Sort-Object | Should -Be @('Credential', 'CurrentOU', 'Description', 'DomainName', 'JoinOU', 'Name', 'Server', 'UnjoinCredential', 'WorkGroupName')
                 }
 
                 It 'Throws if name is to long' {
@@ -612,6 +612,31 @@ try
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                }
+
+                It 'Changes ComputerName and changes Workgroup to Domain with specified Domain Controller' {
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso';
+                            Workgroup    = 'Contoso';
+                            PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
+
+                    Set-TargetResource `
+                        -Name $notComputerName `
+                        -DomainName 'Contoso.com' `
+                        -Server 'dc01.contoso.com' `
+                        -Credential $credential `
+                        -Verbose | Should -BeNullOrEmpty
+
+                    Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName -and $Server }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
                 }
 
@@ -1008,6 +1033,12 @@ try
 
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Get-Item -Exactly -Times 0 -Scope It
+                }
+            }
+
+            Context "$($script:DSCResourceName)\Get-LogonServer" {
+                It 'Should return a non-empty string' {
+                    Get-LogonServer | Should -Not -BeNullOrEmpty
                 }
             }
         }

@@ -1,23 +1,24 @@
-
 # Integration Test Config Template Version: 1.0.0
 configuration MSFT_LanguagePack_Config {
-    Param
+    param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $LangaugePackName,
-        [Parameter(Mandatory=$false)]
+
+        [Parameter(Mandatory = $false)]
         [String]
         $LangaugePackLocation,
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("Present","Absent")]
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Present','Absent')]
         [String]
         $Ensure
     )
 
     Import-DscResource -ModuleName ComputerManagementDsc
-    node localhost {
 
+    node localhost {
         LanguagePack Integration_Test {
             LanguagePackName = $LangaugePackName
             LanguagePackLocation = $LangaugePackLocation
@@ -25,5 +26,3 @@ configuration MSFT_LanguagePack_Config {
         }
     }
 }
-
-# TODO: (Optional): Add More Configuration Templates

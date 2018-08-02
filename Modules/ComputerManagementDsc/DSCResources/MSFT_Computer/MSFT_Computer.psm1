@@ -45,6 +45,9 @@ $script:localizedData = Get-LocalizedData `
 
     .PARAMETER Description
         The value assigned here will be set as the local computer description.
+
+    .PARAMETER Server
+        The Active Directory Domain Controller to use to join the domain.
 #>
 function Get-TargetResource
 {
@@ -80,7 +83,11 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        $Description
+        $Description,
+
+        [Parameter()]
+        [System.String]
+        $Server
     )
 
     Write-Verbose -Message ($script:localizedData.GettingComputerStateMessage -f $Name)
@@ -112,6 +119,7 @@ function Get-TargetResource
         UnjoinCredential = [ciminstance] $convertToCimUnjoinCredential
         WorkGroupName    = (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup
         Description      = (Get-CimInstance -Class 'Win32_OperatingSystem').Description
+        Server           = Get-LogonServer
     }
 
     return $returnValue
@@ -142,6 +150,9 @@ function Get-TargetResource
 
     .PARAMETER Description
         The value assigned here will be set as the local computer description.
+
+    .PARAMETER Server
+        The Active Directory Domain Controller to use to join the domain.
 #>
 function Set-TargetResource
 {
@@ -176,7 +187,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $Description
+        $Description,
+
+        [Parameter()]
+        [System.String]
+        $Server
     )
 
     Write-Verbose -Message ($script:localizedData.SettingComputerStateMessage -f $Name)
@@ -208,71 +223,42 @@ function Set-TargetResource
             }
             else
             {
+                $addComputerParameters = @{
+                    DomainName = $DomainName
+                    Credential = $Credential
+                    Force = $true
+                }
+                $rename = $false
                 if ($Name -ne $env:COMPUTERNAME)
                 {
-                    # Rename the computer, and join it to the domain.
-                    if ($UnjoinCredential)
-                    {
-                        Add-Computer `
-                            -DomainName $DomainName `
-                            -Credential $Credential `
-                            -NewName $Name `
-                            -UnjoinDomainCredential $UnjoinCredential `
-                            -Force
-                    }
-                    else
-                    {
-                        if ($JoinOU)
-                        {
-                            Add-Computer `
-                                -DomainName $DomainName `
-                                -Credential $Credential `
-                                -NewName $Name `
-                                -OUPath $JoinOU `
-                                -Force
-                        }
-                        else
-                        {
-                            Add-Computer `
-                                -DomainName $DomainName `
-                                -Credential $Credential `
-                                -NewName $Name `
-                                -Force
-                        }
-                    }
+                    $addComputerParameters.Add("NewName", $Name)
+                    $rename = $true
+                }
 
+                if ($UnjoinCredential)
+                {
+                    $addComputerParameters.Add("UnjoinDomainCredential", $UnjoinCredential)
+                }
+
+                if ($JoinOU)
+                {
+                    $addComputerParameters.Add("OUPath", $JoinOU)
+                }
+
+                if ($Server)
+                {
+                    $addComputerParameters.Add("Server", $Server)
+                }
+
+                # Rename the computer, and join it to the domain.
+                Add-Computer @addComputerParameters
+
+                if ($rename)
+                {
                     Write-Verbose -Message ($script:localizedData.RenamedComputerAndJoinedDomainMessage -f $Name,$DomainName)
                 }
                 else
                 {
-                    # Same computer name, and join it to the domain.
-                    if ($UnjoinCredential)
-                    {
-                        Add-Computer `
-                            -DomainName $DomainName `
-                            -Credential $Credential `
-                            -UnjoinDomainCredential $UnjoinCredential `
-                            -Force
-                    }
-                    else
-                    {
-                        if ($JoinOU)
-                        {
-                            Add-Computer `
-                                -DomainName $DomainName `
-                                -Credential $Credential `
-                                -OUPath $JoinOU `
-                                -Force
-                        }
-                        else
-                        {
-                            Add-Computer `
-                                -DomainName $DomainName `
-                                -Credential $Credential `
-                                -Force
-                        }
-                    }
-
                     Write-Verbose -Message ($script:localizedData.JoinedDomainMessage -f $DomainName)
                 }
             }
@@ -449,7 +435,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $Description
+        $Description,
+
+        [Parameter()]
+        [System.String]
+        $Server
     )
 
     Write-Verbose -Message ($script:localizedData.TestingComputerStateMessage -f $Name)
@@ -619,6 +609,20 @@ function Get-ComputerOU
     }
 
     return $ou
+}
+
+<#
+    .SYNOPSIS
+        Returns the logon server.
+#>
+function Get-LogonServer
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param()
+
+    $logonserver = $env:LOGONSERVER -replace "\\",""
+    return $logonserver
 }
 
 Export-ModuleMember -Function *-TargetResource

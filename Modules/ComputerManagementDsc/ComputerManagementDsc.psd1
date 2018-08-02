@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-moduleVersion = '5.1.0.0'
+moduleVersion = '5.2.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,13 +49,16 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- TimeZone:
-  - Migrated xTimeZone resource from [xTimeZone](https://github.com/PowerShell/xTimeZone)
-    and renamed to TimeZone - fixes [Issue 157](https://github.com/PowerShell/ComputerManagementDsc/issues/157).
-- Moved Test-Command from ComputerManagementDsc.ResourceHelper to
-  ComputerManagementDsc.Common module to match what TimeZone requires.
-  It was not exported in ComputerManagementDsc.ResourceHelper and not
-  used.
+        ReleaseNotes = '- PowershellExecutionPolicy:
+  - Updated to meet HQRM guidelines.
+  - Migrated the xPowershellExecutionPolicy from [xPowershellExecutionPolicy](https://github.com/PowerShell/xPowerShellExecutionPolicy)
+    and renamed to PowershellExecutionPolicy.
+  - Moved strings to localization file.
+- Changed the scope from Global to Script in MSFT_ScheduledTask.Integration.Tests.ps1
+- Changed the scope from Global to Script ComputerManagementDsc.Common.Tests.ps1
+- ScheduledTask:
+  - Added support for event based triggers, implemented using the ScheduleType OnEvent
+    fixes [Issue 167](https://github.com/PowerShell/ComputerManagementDsc/issues/167)
 
 '
 
@@ -63,5 +66,6 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
