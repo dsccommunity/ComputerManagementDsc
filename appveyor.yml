@@ -4,7 +4,6 @@
 version: 1.9.{build}.0
 install:
     - git clone https://github.com/PowerShell/DscResource.Tests
-
     - ps: |
         $moduleName = 'ComputerManagementDsc'
         $mainModuleFolder = "Modules\$moduleName"
