@@ -6,8 +6,11 @@ ConvertFrom-StringData -StringData @'
     GettingEventlogLogMode              = The current Logmode for Eventlog '{0}' is '{1}'.
     GettingEventlogSecurityDescriptor   = The current SecurityDescriptor for Eventlog '{0}' is '{1}'.
     GettingEventlogLogFilePath          = The current LogfilePath for Eventlog '{0}' is '{1}'.
-    SettingEventlogLogMode              = Setting the LogMode for Eventlog '{0}' to '{1}'.
-    SettingEventlogLogSize              = Setting the LogSize for Eventlog '{0}' to '{1}'.
+    SettingEventlogLogMode              = Setting the LogMode for Eventlog from '{0}' to '{1}'.
+    SettingEventlogLogSize              = Setting the LogSize for Eventlog from '{0}' to '{1}'.
+    SettingEventlogSecurityDescriptor   = Setting the SecurityDescriptor for Eventlog from '{0}' to '{1}'.
+    SettingEventlogIsEnabled            = Setting the IsEnabled configuration for Eventlog from '{0}' to '{1}'.
+    SettingEventlogLogFilePath          = Setting the LogFilePath for Eventlog from '{0}' to '{1}'.
     WinEventlogLogSizeAlreadySetMessage = LogSize already set to {0} for Eventlog {1}.
     WinEventlogLogModeAlreadySetMessage = LogMode already set to {0} for Eventlog {1}.
     UpdateWinEventlogLogSizeSuccess     = Updating LogSize for Eventlog '{0}' to '{1}' successfully.

@@ -126,7 +126,7 @@ function Set-TargetResource
         $IsEnabled,
 
         [Parameter()]
-        [ValidateSet("AutoBackup","Circular","Retain")]
+        [ValidateSet('AutoBackup','Circular','Retain')]
         [System.String]
         $LogMode,
 
@@ -147,26 +147,31 @@ function Set-TargetResource
         if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $MaximumSizeInBytes -ne $log.MaximumSizeInBytes)
         {
             Set-MaximumSizeInBytes -LogName $LogName -MaximumSizeInBytes $MaximumSizeInBytes
+            Write-Verbose -Message ($localizedData.SettingEventlogLogSize -f $LogName, $MaximumSizeInBytes)
         }
 
         if ($PSBoundParameters.ContainsKey('LogMode') -and $LogMode -ne $log.LogMode)
         {
             Set-LogMode -LogName $LogName -LogMode $LogMode
+            Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode)
         }
 
         if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $SecurityDescriptor -ne $log.SecurityDescriptor)
         {
             Set-SecurityDescriptor -LogName $LogName -SecurityDescriptor $SecurityDescriptor
+            Write-Verbose -Message ($localizedData.SettingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
         }
 
-        if ($PSBoundParameters.ContainsKey("IsEnabled") -and $IsEnabled -ne $log.IsEnabled)
+        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $IsEnabled -ne $log.IsEnabled)
         {
             Set-IsEnabled -LogName $LogName -IsEnabled $IsEnabled
+            Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
         }
 
-        if ($PSBoundParameters.ContainsKey("LogFilePath") -and $LogFilePath -ne $log.LogFilePath)
+        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $LogFilePath -ne $log.LogFilePath)
         {
             Set-LogFilePath -LogName $LogName -LogFilePath $LogFilePath
+            Write-Verbose -Message ($localizedData.SettingEventlogLogFilePath  -f $LogName, $LogFilePath)
         }
     }
     catch
@@ -217,7 +222,7 @@ function Test-TargetResource
         $IsEnabled,
 
         [Parameter()]
-        [ValidateSet("AutoBackup","Circular","Retain")]
+        [ValidateSet('AutoBackup','Circular','Retain')]
         [System.String]
         $LogMode,
 
@@ -233,24 +238,29 @@ function Test-TargetResource
     try
     {
         $log = Get-WinEvent -ListLog $logName
-        if ($PSBoundParameters.ContainsKey("MaximumSizeInBytes") -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
+        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
         {
+            Write-Verbose -Message ($localizedData.GettingEventlogLogSize -f $LogName, $MaximumSizeInBytes)
             return $false
         }
-        if ($PSBoundParameters.ContainsKey("IsEnabled") -and $log.IsEnabled -ne $IsEnabled)
+        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
         {
+            Write-Verbose -Message ($localizedData.GettingEventlogIsEnabled -f $LogName, $IsEnabled)
             return $false
         }
-        if ($PSBoundParameters.ContainsKey("LogMode") -and $log.LogMode -ne $LogMode)
+        if ($PSBoundParameters.ContainsKey('LogMode') -and $log.LogMode -ne $LogMode)
         {
+            Write-Verbose -Message ($localizedData.GettingEventlogLogMode -f $LogName, $LogMode)
             return $false
         }
-        if ($PSBoundParameters.ContainsKey("SecurityDescriptor") -and $log.SecurityDescriptor -ne $SecurityDescriptor)
+        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
         {
+            Write-Verbose -Message ($localizedData.GettingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
             return $false
         }
-        if ($PSBoundParameters.ContainsKey("LogFilePath") -and $log.LogFilePath -ne $LogFilePath)
+        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath)
         {
+            Write-Verbose -Message ($localizedData.GettingEventlogLogFilePath -f $LogName, $LogFilePath)
             return $false
         }
         return $true

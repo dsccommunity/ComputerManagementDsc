@@ -14,7 +14,7 @@ Configuration Example
             LogName            = 'Application'
             IsEnabled          = $true
             LogMode            = 'Circular'
-            MaximumSizeInBytes = '20971520'
+            MaximumSizeInBytes = '4194304'
         } # End of WinEventLog Resource
     } # End of Node
 } # End of Configuration

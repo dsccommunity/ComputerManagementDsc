@@ -107,7 +107,6 @@ try
                 SecurityDescriptor = 'TestDescriptor'
             }
 
-
             It 'should return true when all properties match does not match' {
                 $testResults = Test-WinEventLogTargetResource @params
                 $testResults | Should Be $True
@@ -150,7 +149,6 @@ try
                 $Log.LogMode = 'Circular'
                 $Log.SaveChanges()
                 New-Item -Path "$env:SystemDrive\tmp" -ItemType Directory -Force | Out-Null
-
             }
 
             Context 'When set is called and actual value does not match expected value' {
@@ -232,7 +230,6 @@ try
 
             AfterAll {
                 Remove-EventLog -LogName 'Pester'
-
                 $log = Get-WinEvent -ListLog 'Microsoft-Windows-CAPI2/Operational'
                 $log.IsEnabled = $Capi2Log.IsEnabled
                 $log.SaveChanges()

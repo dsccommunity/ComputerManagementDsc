@@ -9,7 +9,7 @@ configuration MSFT_WinEventLog_configLogSize
             LogName            = "Application"
             IsEnabled          = $true
             LogMode            = "Circular"
-            MaximumSizeInBytes = '20971520'
+            MaximumSizeInBytes = '209741943041520'
         }
     }
 }
@@ -24,7 +24,7 @@ configuration MSFT_WinEventLog_configLogModeLogSize
             LogName            = "Microsoft-Windows-MSPaint/Admin"
             IsEnabled          = $true
             LogMode            = "AutoBackup"
-            MaximumSizeInBytes = '20971520'
+            MaximumSizeInBytes = '4194304'
         }
     }
 }
