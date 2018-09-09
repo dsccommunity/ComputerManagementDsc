@@ -41,7 +41,7 @@ try
 
         Describe 'WinEventLog Get-TargetResource' {
 
-            Mock Get-WinEvent -ModuleName MSFT_xWinEventLog {
+            Mock Get-WinEvent -ModuleName MSFT_WinEventLog {
                 $properties = @{
                     MaximumSizeInBytes = '999'
                     IsEnabled          = $true
@@ -86,7 +86,7 @@ try
 
         Describe 'WinEventLog Test-TargetResource' {
 
-            Mock Get-WinEvent -ModuleName MSFT_xWinEventLog {
+            Mock Get-WinEvent -ModuleName MSFT_WinEventLog {
                 $properties = @{
                     MaximumSizeInBytes = '5111808'
                     IsEnabled          = $true
@@ -139,7 +139,7 @@ try
             }
 
             It 'Should call Get-WinEventLog' {
-                Assert-MockCalled Get-WinEvent -ModuleName MSFT_xWinEventLog -Exactly 6
+                Assert-MockCalled Get-WinEvent -ModuleName MSFT_WinEventLog -Exactly 6
             }
         }
 
@@ -184,23 +184,23 @@ try
 
 
             #Setting up mocks to validate code is never called... not sure if this is good practice
-            Mock -CommandName Set-MaximumSizeInBytes -ModuleName MSFT_xWinEventLog -MockWith {
+            Mock -CommandName Set-MaximumSizeInBytes -ModuleName MSFT_WinEventLog -MockWith {
                 return $true
             }
 
-            Mock -CommandName Set-LogMode -ModuleName MSFT_xWinEventLog -MockWith {
+            Mock -CommandName Set-LogMode -ModuleName MSFT_WinEventLog -MockWith {
                 return $true
             }
 
-            Mock -CommandName Set-SecurityDescriptor -ModuleName MSFT_xWinEventLog -MockWith {
+            Mock -CommandName Set-SecurityDescriptor -ModuleName MSFT_WinEventLog -MockWith {
                 return $true
             }
 
-            Mock -CommandName Set-IsEnabled -ModuleName MSFT_xWinEventLog -MockWith {
+            Mock -CommandName Set-IsEnabled -ModuleName MSFT_WinEventLog -MockWith {
                 return $true
             }
 
-            Mock -CommandName Set-LogFilePath -ModuleName MSFT_xWinEventLog -MockWith {
+            Mock -CommandName Set-LogFilePath -ModuleName MSFT_WinEventLog -MockWith {
                 return $true
             }
 
@@ -210,23 +210,23 @@ try
                 Set-WinEventLogTargetResource -LogName $Log.LogName -SecurityDescriptor $log.SecurityDescriptor -LogMode $log.LogMode -IsEnabled $log.IsEnabled
 
                 It 'Should not call Set-MaximumSizeInBytes' {
-                    Assert-MockCalled -CommandName Set-MaximumSizeInBytes -ModuleName MSFT_xWinEventLog -Exactly 0
+                    Assert-MockCalled -CommandName Set-MaximumSizeInBytes -ModuleName MSFT_WinEventLog -Exactly 0
                 }
 
                 It 'Should not call Set-LogMode' {
-                    Assert-MockCalled -CommandName Set-LogMode -ModuleName MSFT_xWinEventLog -Exactly 0
+                    Assert-MockCalled -CommandName Set-LogMode -ModuleName MSFT_WinEventLog -Exactly 0
                 }
 
                 It 'Should not call Set-SecurityDescriptor' {
-                    Assert-MockCalled -CommandName Set-SecurityDescriptor -ModuleName MSFT_xWinEventLog -Exactly 0
+                    Assert-MockCalled -CommandName Set-SecurityDescriptor -ModuleName MSFT_WinEventLog -Exactly 0
                 }
 
                 It 'Should not call Set-IsEnabled' {
-                    Assert-MockCalled -CommandName Set-IsEnabled -ModuleName MSFT_xWinEventLog -Exactly 0
+                    Assert-MockCalled -CommandName Set-IsEnabled -ModuleName MSFT_WinEventLog -Exactly 0
                 }
 
                 It 'Should not call Set-LogFilePath' {
-                    Assert-MockCalled -CommandName Set-LogFilePath -ModuleName MSFT_xWinEventLog -Exactly 0
+                    Assert-MockCalled -CommandName Set-LogFilePath -ModuleName MSFT_WinEventLog -Exactly 0
                 }
             }
 
