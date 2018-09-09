@@ -3,7 +3,7 @@ configuration MSFT_WinEventLog_config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
-    Node localhost
+    node localhost
     {
         WinEventLog ApplicationEventlog
         {

@@ -9,6 +9,3 @@ class MSFT_WinEventLog : OMI_BaseResource
     [Write] String SecurityDescriptor;
     [Write] String LogFilePath;
 };
-
-
-

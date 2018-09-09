@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_PowerShellExecutionPolicy'
+$script:DSCResourceName = 'MSFT_WinEventLog'
 
 #region HEADER
 # Integration Test Template Version: 1.1.1
@@ -54,8 +54,10 @@ try
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $current.ExecutionPolicy      | Should Be 'RemoteSigned'
-            $current.ExecutionPolicyScope | Should Be 'LocalMachine'
+            $current.LogName            | Should Be 'Application'
+            $current.MaximumSizeInBytes | Should Be '4096'
+            $current.LogMode            | Should Be 'Circular'
+            $current.IsEnabled          | Should Be 'true'
         }
     }
     #endregion

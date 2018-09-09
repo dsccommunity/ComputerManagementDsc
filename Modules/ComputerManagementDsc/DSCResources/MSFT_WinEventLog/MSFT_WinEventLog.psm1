@@ -20,13 +20,13 @@ $script:localizedData = Get-LocalizedData `
         Gets the current resource state.
 
     .PARAMETER errorId
-        Specifies the given errorid
+        Specifies the given errorid.
 
     .PARAMETER errorMessage
-        Specifies the given error message
+        Specifies the given error message.
 
     .PARAMETER errorCategory
-        Specifies the given error category
+        Specifies the given error category.
 #>
 function New-TerminatingError
 {
@@ -96,17 +96,17 @@ function Get-TargetResource
     .PARAMETER MaximumSizeInBytes
         Specifies the given maximum size in bytes for a specified eventlog.
 
-    .PARAMETER IsEnabled
-        Specifies the given maximum size in bytes for a specified eventlog.
-
     .PARAMETER LogMode
-        Specifies the given maximum size in bytes for a specified eventlog.
+        Specifies the given LogMode for a specified eventlog.
 
     .PARAMETER SecurityDescriptor
-        Specifies the given maximum size in bytes for a specified eventlog.
+        Specifies the given SecurityDescriptor for a specified eventlog.
+
+    .PARAMETER IsEnabled
+        Specifies the given state of a eventlog.
 
     .PARAMETER LogFilePath
-        Specifies the given maximum size in bytes for a specified eventlog.
+        Specifies the given LogFile path of a eventlog.
 #>
 function Set-TargetResource
 {
@@ -193,10 +193,10 @@ function Set-TargetResource
         Specifies the given SecurityDescriptor for a specified eventlog.
 
     .PARAMETER IsEnabled
-        Specifies the given state of a eventlog
+        Specifies the given state of a eventlog.
 
     .PARAMETER LogFilePath
-        Specifies the given LogFile path of a Eventlog
+        Specifies the given LogFile path of a eventlog.
 #>
 function Test-TargetResource
 {
@@ -357,7 +357,7 @@ Function Set-SecurityDescriptor
         Specifies the given name of a eventlog.
 
     .PARAMETER IsEnabled
-        Specifies the given state of a eventlog
+        Specifies the given state of a eventlog.
 #>
 Function Set-IsEnabled
 {
@@ -386,7 +386,7 @@ Function Set-IsEnabled
         Specifies the given name of a eventlog.
 
     .PARAMETER LogFilePath
-        Specifies the given LogFile path of a Eventlog
+        Specifies the given LogFilepath of a eventlog.
 #>
 Function Set-LogFilePath
 {
