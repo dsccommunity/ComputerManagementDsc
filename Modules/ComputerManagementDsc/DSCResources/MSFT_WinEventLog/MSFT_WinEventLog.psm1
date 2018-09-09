@@ -260,7 +260,6 @@ function Test-TargetResource
         write-Debug "ERROR: $($_ | Format-List * -force | Out-String)"
         New-TerminatingError -errorId 'TestWinEventLogFailed' -errorMessage $_.Exception -errorCategory InvalidOperation
     }
-
 }
 
 <#
@@ -284,13 +283,11 @@ Function Set-MaximumSizeInBytes
         [Parameter()]
         [System.Int64]
         $MaximumSizeInBytes
-
     )
 
     $log = Get-WinEvent -ListLog $logName
     $log.MaximumSizeInBytes = $MaximumSizeInBytes
     $log.SaveChanges()
-
 }
 
 <#
@@ -375,7 +372,6 @@ Function Set-IsEnabled
     $log = Get-WinEvent -ListLog $LogName
     $log.IsEnabled = $IsEnabled
     $log.SaveChanges()
-
 }
 
 <#

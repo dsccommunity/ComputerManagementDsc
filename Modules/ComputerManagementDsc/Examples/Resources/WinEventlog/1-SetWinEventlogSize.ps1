@@ -9,12 +9,12 @@ Configuration Example
 
     Node localhost
     {
-        WinEventLog ApplicationEventlog
+        WinEventLog ApplicationEventlogSize
         {
             LogName            = 'Application'
             IsEnabled          = $true
             LogMode            = 'Circular'
-            MaximumSizeInBytes = 4096mb
+            MaximumSizeInBytes = '20971520'
         } # End of WinEventLog Resource
     } # End of Node
 } # End of Configuration

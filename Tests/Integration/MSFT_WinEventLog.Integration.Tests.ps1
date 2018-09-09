@@ -55,7 +55,7 @@ try
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
             $current.LogName            | Should Be 'Application'
-            $current.MaximumSizeInBytes | Should Be '4096'
+            $current.MaximumSizeInBytes | Should Be '20971520'
             $current.LogMode            | Should Be 'Circular'
             $current.IsEnabled          | Should Be 'true'
         }
