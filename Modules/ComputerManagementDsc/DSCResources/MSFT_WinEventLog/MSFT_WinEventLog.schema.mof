@@ -8,4 +8,5 @@ class MSFT_WinEventLog : OMI_BaseResource
     [Write, ValueMap{"AutoBackup","Circular","Retain"}, Values{"AutoBackup","Circular","Retain"}] String LogMode;
     [Write] String SecurityDescriptor;
     [Write] String LogFilePath;
+    [Write] Sint32 LogRetentionDays;
 };
