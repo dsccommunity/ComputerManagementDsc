@@ -55,13 +55,12 @@ try
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
             $current.LogName            | Should Be 'Application'
-            $current.MaximumSizeInBytes | Should Be '20971520'
-            $current.LogMode            | Should Be 'Circular'
-            $current.IsEnabled          | Should Be 'true'
+            $current.IsEnabled          | Should Be $true
+            $current.LogMode            | Should be 'Circular'
+            $current.MaximumSizeInBytes | Should Be '1052672'
         }
     }
     #endregion
-
 }
 finally
 {

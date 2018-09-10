@@ -1,30 +1,16 @@
 # Integration Test Config Template Version: 1.0.0
-configuration MSFT_WinEventLog_configLogSize
-{
-    Import-DSCResource -ModuleName ComputerManagementDsc
-    node localhost
-    {
-        WinEventLog WinEventLog_configLogSize
-        {
-            LogName            = "Application"
-            IsEnabled          = $true
-            LogMode            = "Circular"
-            MaximumSizeInBytes = '209741943041520'
-        }
-    }
-}
+configuration MSFT_WinEventLog_config
+ {
+    Import-DscResource -ModuleName ComputerManagementDsc
 
-configuration MSFT_WinEventLog_configLogModeLogSize
-{
-    Import-DSCResource -ModuleName ComputerManagementDsc
-    node localhost
+    node 'localhost'
     {
-        WinEventLog WinEventLog_configLogModeLogSize
+        WinEventLog Integration_Test
         {
-            LogName            = "Microsoft-Windows-MSPaint/Admin"
+            LogName            = 'Application'
             IsEnabled          = $true
-            LogMode            = "AutoBackup"
-            MaximumSizeInBytes = '4194304'
+            LogMode            = 'Circular'
+            MaximumSizeInBytes = '209741943041520'
         }
     }
 }
