@@ -10,7 +10,7 @@ configuration MSFT_WinEventLog_config
             LogName            = 'Application'
             IsEnabled          = $true
             LogMode            = 'Circular'
-            MaximumSizeInBytes = '209741943041520'
+            MaximumSizeInBytes = '20971520'
         }
     }
 }

@@ -14,9 +14,9 @@ Configuration Example
         {
             LogName            = 'Application'
             IsEnabled          = $true
-            LogMode            = 'AutoBackup'
-            LogRetentionDays   = 30
-            SecurityDescriptor =
+            LogMode            = 'Circular'
+            MaximumSizeInBytes = 5111800
+            SecurityDescriptor = 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)'
         } # End of WinEventLog Resource
     } # End of Node
 } # End of Configuration
