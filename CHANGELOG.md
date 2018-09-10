@@ -6,7 +6,8 @@
   - Migrated the xWinEventLog from [xWinEventLog](https://github.com/PowerShell/xWinEventLog)
     and renamed to WinEventLog.
   - Moved strings in localization file.
-  - LogMode is now set with Limit-EventLog, fixing issue #18 "Cannot save changes to LogMode property"
+  - LogMode is now set with Limit-EventLog,
+    fixing issue #18 "Cannot save changes to LogMode property"
 
 ## 5.2.0.0
 

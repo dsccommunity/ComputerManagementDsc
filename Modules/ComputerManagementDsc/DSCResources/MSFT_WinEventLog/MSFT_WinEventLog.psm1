@@ -169,7 +169,6 @@ function Set-TargetResource
 
         if ($PSBoundParameters.ContainsKey('LogMode') -and $LogMode -ne $log.LogMode)
         {
-
             if($Logmode -ne 'AutoBackup')
             {
                 Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode, $MaximumSizeInBytes)
@@ -413,7 +412,8 @@ Function Set-LogMode
         $MaximumSizeInBytes
     )
 
-    switch ($LogMode) {
+    switch ($LogMode)
+    {
         'AutoBackup' { $LogModeLimit = 'OverwriteOlder' }
         'Circular' { $LogModeLimit = 'OverwriteAsNeeded' }
         'Retain' { $LogModeLimit = 'DoNotOverWrite' }
