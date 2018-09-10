@@ -57,7 +57,7 @@ try
             $current.LogName            | Should Be 'Application'
             $current.IsEnabled          | Should Be $true
             $current.LogMode            | Should be 'Circular'
-            $current.MaximumSizeInBytes | Should Be '1052672'
+            $current.MaximumSizeInBytes | Should Be '20971520'
         }
     }
     #endregion
