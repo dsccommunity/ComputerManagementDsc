@@ -152,33 +152,24 @@ function Set-TargetResource
 
     try
     {
-        $LogName = "Application"
-        $MaximumSizeInBytes = "4194304"
-        $Logmode = "Circular"
         $log = Get-WinEvent -ListLog $LogName
         Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
         $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq "$LogName"} | Select-Object MinimumRetentionDays
-        Write-Verbose -Message ($localizedData.GettingEventlogLogModeRetention -f $LogName)
         $update = $false
 
         if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $MaximumSizeInBytes -ne $log.MaximumSizeInBytes)
         {
-            Write-Verbose -Message ($localizedData.SettingEventlogLogSize -f $LogName, $MaximumSizeInBytes)
             Set-MaximumSizeInBytes -LogName $LogName -MaximumSizeInBytes $MaximumSizeInBytes
         }
 
         if ($PSBoundParameters.ContainsKey('LogMode') -and $LogMode -ne $log.LogMode)
         {
-            if($Logmode -ne 'AutoBackup')
-            {
-                Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode, $MaximumSizeInBytes)
-                Set-LogMode -LogName $LogName -LogMode $LogMode -MaximumSizeInBytes $MaximumSizeInBytes
-            }
-            else
-            {
-                Write-Verbose -Message ($localizedData.SettingEventlogLogRetention -f $LogName, $LogMode, $MinimumRetentionDays)
-                Set-LogMode -LogName $LogName -LogMode $LogMode -LogRetentionDays $LogRetentionDays
-            }
+            Set-LogMode -LogName $LogName -LogMode $LogMode
+        }
+
+        if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+        {
+            Set-LogRetentionDays -LogName $LogName -LogRetentionDays $LogRetentionDays
         }
 
         if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $SecurityDescriptor -ne $log.SecurityDescriptor)
@@ -272,40 +263,36 @@ function Test-TargetResource
         if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
         {
             Write-Verbose -Message ($localizedData.TestingWinEventlogLogSize -f $LogName, $MaximumSizeInBytes)
-            Write-Verbose -Message ($localizedData.SetResourceNotInDesiredState -f $LogName, 'MaximumSizeInBytes',$LogRetentionDays)
             return $false
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'MaximumSizeInBytes',$LogRetentionDays)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'MaximumSizeInBytes',$MaximumSizeInBytes)
         }
 
         if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
         {
             Write-Verbose -Message ($localizedData.TestingWinEventlogIsEnabled -f $LogName, $IsEnabled)
-            Write-Verbose -Message ($localizedData.SetResourceNotInDesiredState -f $LogName, 'IsEnabled',$LogRetentionDays)
             return $false
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'IsEnabled',$LogRetentionDays)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'IsEnabled',$IsEnabled)
         }
 
         if ($PSBoundParameters.ContainsKey('LogMode') -and $log.LogMode -ne $LogMode)
         {
             Write-Verbose -Message ($localizedData.TestingWinEventlogLogMode -f $LogName, $LogMode)
-            Write-Verbose -Message ($localizedData.SetResourceNotInDesiredState -f $LogName, 'LogMode',$LogRetentionDays)
             return $false
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogMode',$LogRetentionDays)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogMode',$LogMode)
         }
 
         if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
         {
             Write-Verbose -Message ($localizedData.TestingWinEventlogLogRetention -f $LogName, $LogRetentionDays)
-            Write-Verbose -Message ($localizedData.SetResourceNotInDesiredState -f $LogName, 'LogRetentionDays',$LogRetentionDays)
             return $false
         }
         else
@@ -316,23 +303,21 @@ function Test-TargetResource
         if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
         {
             Write-Verbose -Message ($localizedData.TestingWinEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
-            Write-Verbose -Message ($localizedData.SetResourceNotInDesiredState -f $LogName, 'SecurityDescriptor',$LogRetentionDays)
             return $false
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'SecurityDescriptor',$LogRetentionDays)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'SecurityDescriptor',$SecurityDescriptor)
         }
 
         if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath)
         {
             Write-Verbose -Message ($localizedData.TestingWinEventlogLogFilePath -f $LogName, $LogFilePath)
-            Write-Verbose -Message ($localizedData.SetResourceNotInDesiredState -f $LogName, 'LogFilePath',$LogRetentionDays)
             return $false
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogFilePath',$LogRetentionDays)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogFilePath',$LogFilePath)
         }
 
         return $true
@@ -368,10 +353,12 @@ Function Set-MaximumSizeInBytes
     )
 
     Write-Verbose -Message ($localizedData.SettingEventlogLogSize -f $LogName, $MaximumSizeInBytes)
+    $log = Get-WinEvent -ListLog $LogName
+    $log.MaximumSizeInBytes = $MaximumSizeInBytes
 
     try
     {
-        Limit-EventLog -LogName $LogName -MaximumSize $MaximumSizeInBytes
+        $log.SaveChanges()
         Write-Verbose -Message ($localizedData.SettingWinEventlogMaximumSizeInBytesSuccess -f $LogName, $MaximumSizeInBytes)
     }
     catch
@@ -401,31 +388,19 @@ Function Set-LogMode
         [Parameter()]
         [ValidateSet('AutoBackup','Circular','Retain')]
         [System.String]
-        $LogMode,
-
-        [Parameter()]
-        [System.Int32]
-        $LogRetentionDays,
-
-        [Parameter()]
-        [System.Int64]
-        $MaximumSizeInBytes
+        $LogMode
     )
 
-    switch ($LogMode)
-    {
-        'AutoBackup' { $LogModeLimit = 'OverwriteOlder' }
-        'Circular' { $LogModeLimit = 'OverwriteAsNeeded' }
-        'Retain' { $LogModeLimit = 'DoNotOverWrite' }
-    }
-
-    Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogModeLimit)
+    #Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode)
 
     if ($Logmode -ne 'AutoBackup')
     {
+        $log = Get-WinEvent -ListLog $LogName
+        $log.LogMode = $LogMode
+
         try
         {
-            Limit-Eventlog -LogName $LogName -OverflowAction $LogModeLimit -MaximumSize $MaximumSizeInBytes -Verbose
+            $log.SaveChanges()
             Write-Verbose -Message ($localizedData.SettingWinEventlogLogModeSuccess -f $LogName, $LogMode)
         }
         catch
@@ -435,15 +410,59 @@ Function Set-LogMode
     }
     else
     {
+        $log = Get-WinEvent -ListLog $LogName
+        $log.LogMode = $LogMode
+
         try
         {
-            Limit-Eventlog -LogName $LogName -OverflowAction $LogModeLimit -RetentionDays $LogRetentionDays -Verbose
+            $log.SaveChanges()
             Write-Verbose -Message ($localizedData.SettingWinEventlogLogModeSuccess -f $LogName, $LogMode)
         }
         catch
         {
             Write-Verbose -Message ($localizedData.SettingWinEventlogLogModeFailed -f $LogName, $LogMode)
         }
+    }
+}
+
+<#
+    .SYNOPSIS
+        Sets the desired resource state.
+
+    .PARAMETER LogName
+        Specifies the given name of a eventlog.
+
+    .PARAMETER Retention
+        Specifies the given RetentionDays for LogMode Autobackup.
+#>
+Function Set-LogRetentionDays
+{
+    [CmdletBinding()]
+    param(
+        [Parameter()]
+        [System.String]
+        $LogName,
+
+        [Parameter()]
+        [ValidateSet('AutoBackup')]
+        [System.String]
+        $LogMode,
+
+        [Parameter()]
+        [System.Int32]
+        $LogRetentionDays
+    )
+
+    Write-Verbose -Message ($localizedData.SettingEventlogLogRetention -f $LogName, $LogRetentionDays)
+
+    try
+    {
+        Limit-Eventlog -LogName $LogName -OverflowAction 'OverwriteOlder' -RetentionDays $LogRetentionDays
+        Write-Verbose -Message ($localizedData.SettingWinEventlogRetentionDaysSuccess -f $LogName, $LogRetentionDays)
+    }
+    catch
+    {
+        Write-Verbose -Message ($localizedData.SettingWinEventlogRetentionDaysFailed -f $LogName, $LogRetentionDays)
     }
 }
 

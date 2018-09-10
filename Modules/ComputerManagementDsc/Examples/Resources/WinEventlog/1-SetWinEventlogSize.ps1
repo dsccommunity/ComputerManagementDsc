@@ -1,7 +1,7 @@
 <#
     .EXAMPLE
     Example script that sets the application eventlog
-    to size maximum size 4096MB
+    to a maximum size 4096MB.
 #>
 Configuration Example
 {
