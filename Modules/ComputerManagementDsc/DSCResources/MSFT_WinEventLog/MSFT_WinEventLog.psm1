@@ -391,7 +391,7 @@ Function Set-LogMode
         $LogMode
     )
 
-    #Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode)
+    Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode)
 
     if ($Logmode -ne 'AutoBackup')
     {
