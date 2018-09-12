@@ -5,9 +5,9 @@ $script:DSCResourceName = 'MSFT_WinEventLog'
 # Integration Test Template Version: 1.1.1
 $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
@@ -18,6 +18,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 #endregion
 
+# Using try/finally to always cleanup.
 try
 {
     #region Integration Tests
@@ -25,46 +26,119 @@ try
     . $configFile
 
     Describe "$($script:DSCResourceName)_Integration" {
-        #region DEFAULT TESTS
-        It 'Should compile and apply the MOF without throwing' {
-            {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
 
-                $startDscConfigurationParameters = @{
-                    Path         = $TestDrive
-                    ComputerName = 'localhost'
-                    Wait         = $true
-                    Verbose      = $true
-                    Force        = $true
-                    ErrorAction  = 'Stop'
-                }
+        Context 'Set Eventlog to Logmode Retain with a MaximumSizeInBytes 65536' {
+            $CurrentConfig = 'MSFT_WinEventLog_RetainSize'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
-                Start-DscConfiguration @startDscConfigurationParameters
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            {
-                Get-DscConfiguration -Verbose -ErrorAction Stop
-            } | Should -Not -Throw
-        }
-        #endregion
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
             }
-            $current.LogName            | Should Be 'Application'
-            $current.IsEnabled          | Should Be $true
-            $current.LogMode            | Should be 'Circular'
-            $current.MaximumSizeInBytes | Should Be '20971520'
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            }
+        }
+
+        Context 'Set Eventlog to Logmode AutoBackup with LogRetentionDays of 30 days' {
+            $CurrentConfig = 'MSFT_WinEventLog_AutobackupLogRetention'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            }
+        }
+
+        Context 'Set Eventlog to Logmode Circular, MaximumSizeInBytes 20971520, LogFilePath C:\temp\Application.evtx' {
+            $CurrentConfig = 'MSFT_WinEventLog_CircularLogPath'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            }
+        }
+
+        Context 'Set Eventlog to Logmode Circular with a SecurityDescriptor' {
+            $CurrentConfig = 'MSFT_WinEventLog_CircularSecurityDescriptor'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            }
+        }
+
+        Context 'Set Eventlog back to the default configuration' {
+            $CurrentConfig = 'MSFT_WinEventLog_Default'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            }
         }
     }
-    #endregion
 }
 finally
 {
-    #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
 }

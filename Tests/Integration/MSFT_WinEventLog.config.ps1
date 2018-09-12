@@ -61,7 +61,7 @@ configuration MSFT_WinEventLog_CircularSecurityDescriptor
     }
 }
 
-configuration MSFT_WinEventLog_CircularSizeDefault
+configuration MSFT_WinEventLog_Default
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
