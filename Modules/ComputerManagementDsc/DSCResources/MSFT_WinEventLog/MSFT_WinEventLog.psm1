@@ -223,8 +223,7 @@ function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    param
-    (
+    param(
         [Parameter(Mandatory = $true)]
         [System.String]
         $LogName,
@@ -267,7 +266,7 @@ function Test-TargetResource
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'MaximumSizeInBytes',$MaximumSizeInBytes)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
@@ -277,7 +276,7 @@ function Test-TargetResource
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'IsEnabled',$IsEnabled)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         if ($PSBoundParameters.ContainsKey('LogMode') -and $log.LogMode -ne $LogMode)
@@ -287,7 +286,7 @@ function Test-TargetResource
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogMode',$LogMode)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
@@ -297,7 +296,7 @@ function Test-TargetResource
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogRetentionDays',$LogRetentionDays)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
@@ -307,7 +306,7 @@ function Test-TargetResource
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'SecurityDescriptor',$SecurityDescriptor)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath)
@@ -317,7 +316,7 @@ function Test-TargetResource
         }
         else
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogFilePath',$LogFilePath)
+            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         return $true
