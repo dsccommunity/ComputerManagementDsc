@@ -258,6 +258,8 @@ function Test-TargetResource
     try
     {
         $log = Get-WinEvent -ListLog $logName
+        $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq "$LogName"} | Select-Object MinimumRetentionDays
+
         if ($PSBoundParameters.ContainsKey("MaximumSizeInBytes") -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogMaximumSizeInBytes -f $LogName, $MaximumSizeInBytes)
@@ -276,6 +278,12 @@ function Test-TargetResource
             return $false
         }
 
+        if ($PSBoundParameters.ContainsKey("LogRetentionDays") -and $log.LogFilePath -ne $MinimumRetentionDays.MinimumRetentionDays)
+        {
+            Write-Verbose -Message ($localizedData.TestingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
+            return $false
+        }
+
         if ($PSBoundParameters.ContainsKey("LogFilePath") -and $log.LogFilePath -ne $LogFilePath)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogLogFilePath -f $LogName, $LogFilePath)
@@ -285,12 +293,6 @@ function Test-TargetResource
         if ($PSBoundParameters.ContainsKey("SecurityDescriptor") -and $log.SecurityDescriptor -ne $SecurityDescriptor)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
-            return $false
-        }
-
-        if ($PSBoundParameters.ContainsKey("LogFilePath") -and $log.LogFilePath -ne $LogFilePath)
-        {
-            Write-Verbose -Message ($localizedData.TestingEventlogLogFilePath -f $LogName, $LogFilePath)
             return $false
         }
 
