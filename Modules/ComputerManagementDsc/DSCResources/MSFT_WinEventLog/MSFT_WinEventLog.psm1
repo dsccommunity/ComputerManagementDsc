@@ -223,7 +223,8 @@ function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    param(
+    param
+    (
         [Parameter(Mandatory = $true)]
         [System.String]
         $LogName,
@@ -237,7 +238,7 @@ function Test-TargetResource
         $IsEnabled,
 
         [Parameter()]
-        [ValidateSet('AutoBackup','Circular','Retain')]
+        [ValidateSet("AutoBackup","Circular","Retain")]
         [System.String]
         $LogMode,
 
@@ -257,66 +258,40 @@ function Test-TargetResource
     try
     {
         $log = Get-WinEvent -ListLog $logName
-        Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
-
-        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
+        if ($PSBoundParameters.ContainsKey("MaximumSizeInBytes") -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogLogSize -f $LogName, $MaximumSizeInBytes)
+            Write-Verbose -Message ($localizedData.TestingEventlogMaximumSizeInBytes -f $LogName, $MaximumSizeInBytes)
             return $false
         }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
-        }
 
-        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
+        if ($PSBoundParameters.ContainsKey("IsEnabled") -and $log.IsEnabled -ne $IsEnabled)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogIsEnabled -f $LogName, $IsEnabled)
+            Write-Verbose -Message ($localizedData.TestingEventlogIsEnabled -f $LogName, $IsEnabled)
             return $false
         }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
-        }
 
-        if ($PSBoundParameters.ContainsKey('LogMode') -and $log.LogMode -ne $LogMode)
+        if ($PSBoundParameters.ContainsKey("LogMode") -and $log.LogMode -ne $LogMode)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogLogMode -f $LogName, $LogMode)
+            Write-Verbose -Message ($localizedData.TestingEventlogLogMode -f $LogName, $LogMode)
             return $false
         }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
-        }
 
-        if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+        if ($PSBoundParameters.ContainsKey("LogFilePath") -and $log.LogFilePath -ne $LogFilePath)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogLogRetention -f $LogName, $LogRetentionDays)
+            Write-Verbose -Message ($localizedData.TestingEventlogLogFilePath -f $LogName, $LogFilePath)
             return $false
         }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
-        }
 
-        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
+        if ($PSBoundParameters.ContainsKey("SecurityDescriptor") -and $log.SecurityDescriptor -ne $SecurityDescriptor)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
+            Write-Verbose -Message ($localizedData.TestingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
             return $false
         }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
-        }
 
-        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath)
+        if ($PSBoundParameters.ContainsKey("LogFilePath") -and $log.LogFilePath -ne $LogFilePath)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogLogFilePath -f $LogName, $LogFilePath)
+            Write-Verbose -Message ($localizedData.TestingEventlogLogFilePath -f $LogName, $LogFilePath)
             return $false
-        }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         return $true
