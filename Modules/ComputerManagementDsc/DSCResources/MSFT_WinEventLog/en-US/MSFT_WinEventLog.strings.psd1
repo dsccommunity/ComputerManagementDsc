@@ -1,0 +1,30 @@
+# culture      ="en-US"
+ConvertFrom-StringData -StringData @'
+    GettingEventlogName                         = The current Eventlog is '{0}'.
+    TestingEventlogSecurityDescriptor           = Setting the SecurityDescriptor for Eventlog '{0}' to '{1}'.
+    TestingEventlogLogFilePath                  = Setting the LogFilePath for Eventlog '{0}' to '{1}'.
+    TestingEventlogMaximumSizeInBytes           = Testing the given LogSize '{1}' for Eventlog '{0}'.
+    TestingEventlogLogMode                      = Testing the given LogMode '{1}' for Eventlog '{0}'.
+    TestingEventlogLogRetentionDays             = Testing the given Retention '{1}' days for Eventlog '{0}' in Logmode 'AutoBackup'.
+    TestingEventlogIsEnabled                    = Testing the given LogSize '{1}' for Eventlog '{0}'.
+    TestingWinEventlogSecurityDescriptor        = Testing the given LogSize '{1}' for Eventlog '{0}'.
+    TestingWinEventlogLogFilePath               = Testing the given LogSize '{1}' for Eventlog '{0}'.
+    SettingEventlogLogMode                      = Setting the LogMode for Eventlog '{0}' to '{1}'.
+    SettingEventlogLogRetentionDays             = Setting the Log Retention for Eventlog '{0}' to '{1}' days.
+    SettingEventlogLogSize                      = Setting the LogSize for Eventlog '{0}' to '{1}'.
+    SettingEventlogLogFilePath                  = Setting the LogSize for Eventlog '{0}' to '{1}'.
+    SettingEventlogIsEnabled                    = Setting the IsEnabled configuration for Eventlog '{0}' to '{1}'.
+    SettingWinEventlogMaximumSizeInBytesSuccess = Updating MaximumSizeInBytes for Eventlog '{0}' to '{1}' successfully.
+    SettingWinEventlogMaximumSizeInBytesFailed  = Updating MaximumSizeInBytes for Eventlog '{0}' to '{1}' failed.
+    SettingWinEventlogSecurityDescriptorSuccess = Updating SecurityDescriptor for Eventlog '{0}' to '{1}' successfully.
+    SettingWinEventlogSecurityDescriptorFailed  = Updating SecurityDescriptor for Eventlog '{0}' to '{1}' failed.
+    SettingWinEventlogLogModeSuccess            = Updating LogMode for Eventlog '{0}' to '{1}' successfully.
+    SettingWinEventlogLogModeFailed             = Updating LogMode for Eventlog '{0}' to '{1}' failed.
+    SettingWinEventlogIsEnabledSuccess          = Updating IsEnabled for Eventlog '{0}' to '{1}' successfully.
+    SettingWinEventlogIsEnabledFailed           = Updating IsEnabled for Eventlog '{0}' to '{1}' failed.
+    SettingWinEventlogLogFilePathSuccess        = Updating LogFilePath for Eventlog '{0}' to '{1}' successfully.
+    SettingWinEventlogLogFilePathFailed         = Updating LogFilePath for Eventlog '{0}' to '{1}' failed.
+    SettingWinEventlogRetentionDaysSuccess      = Updating Logfile Retention for Eventlog '{0}' to '{1}' successfully.
+    SettingWinEventlogRetentionDaysFailed       = Updating Logfile Retention for Eventlog '{0}' to '{1}' failed.
+    SetResourceIsInDesiredState                 = EventLog '{0}' is in desired state for configuration '{1}'.
+'@
