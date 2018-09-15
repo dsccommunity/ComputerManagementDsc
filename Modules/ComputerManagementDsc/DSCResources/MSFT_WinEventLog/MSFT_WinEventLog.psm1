@@ -1,4 +1,4 @@
-﻿$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
+$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 # Import the ComputerManagementDsc Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
@@ -238,7 +238,7 @@ function Test-TargetResource
         $IsEnabled,
 
         [Parameter()]
-        [ValidateSet("AutoBackup","Circular","Retain")]
+        [ValidateSet('AutoBackup','Circular','Retain')]
         [System.String]
         $LogMode,
 
@@ -260,37 +260,37 @@ function Test-TargetResource
         $log = Get-WinEvent -ListLog $logName
         $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq "$LogName"} | Select-Object MinimumRetentionDays
 
-        if ($PSBoundParameters.ContainsKey("MaximumSizeInBytes") -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
+        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogMaximumSizeInBytes -f $LogName, $MaximumSizeInBytes)
             return $false
         }
 
-        if ($PSBoundParameters.ContainsKey("IsEnabled") -and $log.IsEnabled -ne $IsEnabled)
+        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogIsEnabled -f $LogName, $IsEnabled)
             return $false
         }
 
-        if ($PSBoundParameters.ContainsKey("LogMode") -and $log.LogMode -ne $LogMode)
+        if ($PSBoundParameters.ContainsKey('LogMode') -and $log.LogMode -ne $LogMode)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogLogMode -f $LogName, $LogMode)
             return $false
         }
 
-        if ($PSBoundParameters.ContainsKey("LogRetentionDays") -and $log.LogFilePath -ne $MinimumRetentionDays.MinimumRetentionDays)
+        if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $log.LogFilePath -ne $MinimumRetentionDays.MinimumRetentionDays)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
             return $false
         }
 
-        if ($PSBoundParameters.ContainsKey("LogFilePath") -and $log.LogFilePath -ne $LogFilePath)
+        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath)
         {
             Write-Verbose -Message ($localizedData.TestingWinEventlogLogFilePath -f $LogName, $LogFilePath)
             return $false
         }
 
-        if ($PSBoundParameters.ContainsKey("SecurityDescriptor") -and $log.SecurityDescriptor -ne $SecurityDescriptor)
+        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
         {
             Write-Verbose -Message ($localizedData.TestingWinEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
             return $false
