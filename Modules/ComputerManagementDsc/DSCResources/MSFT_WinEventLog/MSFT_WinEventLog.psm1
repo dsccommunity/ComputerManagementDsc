@@ -223,7 +223,8 @@ function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    param(
+    param
+    (
         [Parameter(Mandatory = $true)]
         [System.String]
         $LogName,
@@ -257,56 +258,30 @@ function Test-TargetResource
     try
     {
         $log = Get-WinEvent -ListLog $logName
-        Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
+        $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq "$LogName"} | Select-Object MinimumRetentionDays
 
         if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogLogSize -f $LogName, $MaximumSizeInBytes)
+            Write-Verbose -Message ($localizedData.TestingEventlogMaximumSizeInBytes -f $LogName, $MaximumSizeInBytes)
             return $false
-        }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogIsEnabled -f $LogName, $IsEnabled)
+            Write-Verbose -Message ($localizedData.TestingEventlogIsEnabled -f $LogName, $IsEnabled)
             return $false
-        }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         if ($PSBoundParameters.ContainsKey('LogMode') -and $log.LogMode -ne $LogMode)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogLogMode -f $LogName, $LogMode)
+            Write-Verbose -Message ($localizedData.TestingEventlogLogMode -f $LogName, $LogMode)
             return $false
-        }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
-        if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+        if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $log.LogFilePath -ne $MinimumRetentionDays.MinimumRetentionDays)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogLogRetention -f $LogName, $LogRetentionDays)
+            Write-Verbose -Message ($localizedData.TestingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
             return $false
-        }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
-        }
-
-        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
-        {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
-            return $false
-        }
-        else
-        {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
         }
 
         if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath)
@@ -314,9 +289,11 @@ function Test-TargetResource
             Write-Verbose -Message ($localizedData.TestingWinEventlogLogFilePath -f $LogName, $LogFilePath)
             return $false
         }
-        else
+
+        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
         {
-            Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName)
+            Write-Verbose -Message ($localizedData.TestingWinEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
+            return $false
         }
 
         return $true
@@ -452,7 +429,7 @@ Function Set-LogRetentionDays
         $LogRetentionDays
     )
 
-    Write-Verbose -Message ($localizedData.SettingEventlogLogRetention -f $LogName, $LogRetentionDays)
+    Write-Verbose -Message ($localizedData.SettingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
 
     try
     {
