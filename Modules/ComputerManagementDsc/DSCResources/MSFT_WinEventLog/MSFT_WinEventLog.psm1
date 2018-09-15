@@ -1,4 +1,4 @@
-$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
+﻿$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 # Import the ComputerManagementDsc Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
@@ -286,13 +286,13 @@ function Test-TargetResource
 
         if ($PSBoundParameters.ContainsKey("LogFilePath") -and $log.LogFilePath -ne $LogFilePath)
         {
-            Write-Verbose -Message ($localizedData.TestingEventlogLogFilePath -f $LogName, $LogFilePath)
+            Write-Verbose -Message ($localizedData.TestingWinEventlogLogFilePath -f $LogName, $LogFilePath)
             return $false
         }
 
         if ($PSBoundParameters.ContainsKey("SecurityDescriptor") -and $log.SecurityDescriptor -ne $SecurityDescriptor)
         {
-            Write-Verbose -Message ($localizedData.TestingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
+            Write-Verbose -Message ($localizedData.TestingWinEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
             return $false
         }
 
@@ -429,7 +429,7 @@ Function Set-LogRetentionDays
         $LogRetentionDays
     )
 
-    Write-Verbose -Message ($localizedData.SettingEventlogLogRetention -f $LogName, $LogRetentionDays)
+    Write-Verbose -Message ($localizedData.SettingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
 
     try
     {
