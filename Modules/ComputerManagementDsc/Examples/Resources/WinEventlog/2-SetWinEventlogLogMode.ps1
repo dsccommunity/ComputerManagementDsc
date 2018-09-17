@@ -16,7 +16,7 @@ Configuration Example
             IsEnabled          = $true
             LogMode            = 'AutoBackup'
             LogRetentionDays   = '10'
-            MaximumSizeInBytes = '2097152'
+            MaximumSizeInBytes = 2048kb
         } # End of WinEventLog Resource
     } # End of Node
 } # End of Configuration

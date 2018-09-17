@@ -23,7 +23,11 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-        #Getting initial Value for Capi2 Log so we can test the ability to set Isenabled to False
+
+    InModuleScope $script:DSCResourceName {
+        $script:DSCResourceName = 'MSFT_WinEventLog'
+
+    #Getting initial Value for Capi2 Log so we can test the ability to set Isenabled to False
         #and then set it back to its original value when we're done
         $Capi2Log = Get-WinEvent -ListLog 'Microsoft-Windows-CAPI2/Operational'
         if ($Capi2Log.IsEnabled)
@@ -32,14 +36,14 @@ try
             $Capi2Log.SaveChanges()
         }
 
-        Describe 'WinEventLog Get-TargetResource' {
+        Describe "$($script:DSCResourceName)\Get-TargetResource" {
 
             Mock -ModuleName 'MSFT_WinEventLog' Get-WinEvent {
                 $properties = @{
-                    MaximumSizeInBytes = '999'
+                    MaximumSizeInBytes = 4096kb
                     IsEnabled          = $true
-                    LogMode            = 'Test'
-                    LogFilePath        = 'c:\logs\test.evtx'
+                    LogMode            = 'Circular'
+                    LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
                     SecurityDescriptor = 'TestDescriptor'
                 }
 
@@ -56,20 +60,20 @@ try
                 $results.LogName = 'Application'
             }
 
-            It 'Should return a Hashatable with the MaximumSizeInBytes is 999' {
-                $results.MaximumSizeInBytes | Should Be '999'
+            It 'Should return a Hashatable with the MaximumSizeInBytes is 4096kb' {
+                $results.MaximumSizeInBytes | Should Be 4096kb
             }
 
             It 'Should return a Hashtable where IsEnabled is true' {
                 $results.IsEnabled | should Be $true
             }
 
-            It 'Should return a HashTable where LogMode is Test' {
-                $results.LogMode | Should Be 'Test'
+            It 'Should return a HashTable where LogMode is Circular' {
+                $results.LogMode | Should Be 'Circular'
             }
 
-            It 'Should return a HashTable where LogFilePath is c:\logs\test.evtx' {
-                $results.LogFilePath | Should Be 'c:\logs\test.evtx'
+            It 'Should return a HashTable where LogFilePath is %SystemRoot%\System32\Winevt\Logs\Application.evtx' {
+                $results.LogFilePath | Should Be "%SystemRoot%\System32\Winevt\Logs\Application.evtx"
             }
 
             It 'Should return a HashTable where SecurityDescriptor is TestDescriptor' {
@@ -77,11 +81,12 @@ try
             }
         }
 
-        Describe 'WinEventLog Test-TargetResource' {
+        Describe "$($script:DSCResourceName)\Test-TargetResource" {
 
             Mock -ModuleName 'MSFT_WinEventLog' Get-WinEvent {
                 $properties = @{
-                    MaximumSizeInBytes = '5111808'
+                    LogName            = 'Application'
+                    MaximumSizeInBytes = 2048kb
                     IsEnabled          = $true
                     LogMode            = 'Circular'
                     LogFilePath        = 'c:\logs\test.evtx'
@@ -93,7 +98,7 @@ try
 
             $params = @{
                 LogName            = 'Application'
-                MaximumSizeInBytes = '5111808'
+                MaximumSizeInBytes = 2048kb
                 LogMode            = 'Circular'
                 IsEnabled          = $true
                 LogFilePath        = 'c:\logs\test.evtx'
@@ -106,27 +111,27 @@ try
             }
 
             It 'should return false when MaximumSizeInBytes does not match' {
-                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes '1' -IsEnabled $true -SecurityDescriptor 'TestDescriptor' -LogMode 'Circular' -LogFilePath 'c:\logs\test.evtx'
+                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 4096kb -IsEnabled $true -SecurityDescriptor 'TestDescriptor' -LogMode 'Circular' -LogFilePath 'c:\logs\test.evtx'
                 $testResults | Should Be $False
             }
 
             It 'should return false when LogMode does not match' {
-                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes '5111808' -IsEnabled $true -SecurityDescriptor 'TestDescriptor' -LogMode 'AutoBackup' -LogFilePath 'c:\logs\test.evtx'
+                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 2048kb -IsEnabled $true -SecurityDescriptor 'TestDescriptor' -LogMode 'Retain' -LogFilePath 'c:\logs\test.evtx'
                 $testResults | Should Be $false
             }
 
             It 'should return false when IsEnabled does not match' {
-                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes '5111808' -IsEnabled $false -SecurityDescriptor 'TestDescriptor' -LogMode 'Circular' -LogFilePath 'c:\logs\test.evtx'
+                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 2048kb -IsEnabled $false -SecurityDescriptor 'TestDescriptor' -LogMode 'Circular' -LogFilePath 'c:\logs\test.evtx'
                 $testResults | Should Be $false
             }
 
             It 'Should return false when SecurityDescriptor does not match' {
-                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes '5111808' -IsEnabled $true -SecurityDescriptor 'TestDescriptorFail' -LogMode 'Circular' -LogFilePath 'c:\logs\test.evtx'
+                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 2048kb -IsEnabled $true -SecurityDescriptor 'TestDescriptorFail' -LogMode 'Circular' -LogFilePath 'c:\logs\test.evtx'
                 $testResults | Should Be $false
             }
 
             It 'Should return false when LogFilePath does not match' {
-                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes '5111808' -IsEnabled $true -SecurityDescriptor 'TestDescriptor' -LogMode 'Circular' -LogFilePath 'c:\logs\wrongfile.evtx'
+                $testResults = Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 2048kb -IsEnabled $true -SecurityDescriptor 'TestDescriptor' -LogMode 'Circular' -LogFilePath 'c:\wronglogs\wrongfile.evtx'
                 $testResults | Should Be $false
             }
 
@@ -135,7 +140,7 @@ try
             }
         }
 
-        Describe 'WinEventLog Set-TargetResource' {
+        Describe "$($script:DSCResourceName)\Set-TargetResource" {
             BeforeAll {
                 New-EventLog -LogName 'Pester' -Source 'PesterTest'
                 $Log = Get-WinEvent -ListLog 'Pester'
@@ -147,12 +152,12 @@ try
             Context 'When set is called and actual value does not match expected value' {
 
                 It 'Should update MaximumSizeInBytes' {
-                    Set-TargetResource -LogName 'Pester' -MaximumSizeInBytes '5111800'
-                    (Get-WinEvent -ListLog 'Pester').MaximumSizeInBytes | Should Be '5111800'
+                    Set-TargetResource -LogName 'Pester' -MaximumSizeInBytes 4096kb -IsEnabled $true
+                    (Get-WinEvent -ListLog 'Pester').MaximumSizeInBytes | Should Be 4096kb
                 }
 
                 It 'Should update the LogMode' {
-                    Set-TargetResource -LogName 'Pester' -LogMode 'AutoBackup'
+                    Set-TargetResource -LogName 'Pester' -LogMode 'AutoBackup' -IsEnabled $true
                     (Get-WinEvent -ListLog 'Pester').LogMode | Should Be 'AutoBackup'
                 }
 
@@ -162,17 +167,16 @@ try
                 }
 
                 It 'Should update SecurityDescriptor' {
-                    Set-TargetResource -LogName 'Pester' -SecurityDescriptor 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)'
+                    Set-TargetResource -LogName 'Pester' -SecurityDescriptor 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)' -IsEnabled $true
                     (Get-WinEvent -ListLog 'Pester').SecurityDescriptor = 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)'
                 }
 
                 It 'Should update the LogFilePath' {
-                    Set-TargetResource -LogName 'Pester' -LogFilePath 'c:\tmp\test.evtx'
+                    Set-TargetResource -LogName 'Pester' -LogFilePath 'c:\tmp\test.evtx' -IsEnabled $true
                     (Get-WinEvent -ListLog 'Pester').LogFilePath | Should Be 'c:\tmp\test.evtx'
                 }
             }
 
-            #Setting up mocks to validate code is never called... not sure if this is good practice
             Mock -CommandName Set-MaximumSizeInBytes -ModuleName MSFT_WinEventLog -MockWith {
                 return $true
             }
@@ -227,6 +231,7 @@ try
                 Remove-Item -Path "$env:SystemDrive\tmp" -Recurse -Force -ErrorAction SilentlyContinue
             }
         }
+    }
 }
 finally
 {

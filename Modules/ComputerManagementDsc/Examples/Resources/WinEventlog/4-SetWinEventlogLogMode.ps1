@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    Example script that sets the application eventlog
+    Example script that sets the application Eventlog
     logmode to 'Autobackup' with 30 days retention.
 #>
 Configuration Example
