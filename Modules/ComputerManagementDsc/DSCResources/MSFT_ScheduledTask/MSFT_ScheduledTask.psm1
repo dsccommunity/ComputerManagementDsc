@@ -1197,17 +1197,22 @@ function Set-TargetResource
         {
             $username = $ExecuteAsCredential.UserName
             $registerArguments.Add('User', $username)
+            if ($username -inotlike 'NT AUTHORITY\*') {
 
-            # If the LogonType is not specified then set it to password
-            if ([System.String]::IsNullOrEmpty($LogonType))
-            {
-                $LogonType = 'Password'
+                # If the LogonType is not specified then set it to password
+                if ([System.String]::IsNullOrEmpty($LogonType))
+                {
+                    $LogonType = 'Password'
+                }
+
+                if ($LogonType -notin ('Interactive', 'S4U'))
+                {
+                    # Only set the password if the LogonType is not interactive or S4U
+                    $registerArguments.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
+                }
             }
-
-            if ($LogonType -notin ('Interactive', 'S4U'))
-            {
-                # Only set the password if the LogonType is not interactive or S4U
-                $registerArguments.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
+            else {
+                $LogonType = 'ServiceAccount'
             }
         }
         else
