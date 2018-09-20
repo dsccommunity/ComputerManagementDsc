@@ -1735,6 +1735,7 @@ function Test-TargetResource
         if ($username -ilike 'NT AUTHORITY\*') {
             $PSBoundParameters['LogonType'] ='ServiceAccount'
             $currentValues['LogonType'] ='ServiceAccount'
+            $PSBoundParameters['ExecuteAsCredential'] = $username.ToUpper().Replace('NT AUTHORITY\')
         }
     }
     else
