@@ -15,7 +15,7 @@ install:
 #      build configuration        #
 #---------------------------------#
 
-build: false
+#build: false
 
 #---------------------------------#
 #      test configuration         #
