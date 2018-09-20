@@ -1732,7 +1732,7 @@ function Test-TargetResource
         # The password of the execution credential can not be compared
         $username = $ExecuteAsCredential.UserName
         $PSBoundParameters['ExecuteAsCredential'] = $username
-        if ($username -inotlike 'NT AUTHORITY\*') {
+        if ($username -ilike 'NT AUTHORITY\*') {
             $PSBoundParameters['LogonType'] ='ServiceAccount'
         }
     }
