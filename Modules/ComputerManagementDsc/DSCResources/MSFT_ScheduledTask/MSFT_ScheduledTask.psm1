@@ -1734,12 +1734,14 @@ function Test-TargetResource
         $PSBoundParameters['ExecuteAsCredential'] = $username
         if ($username -ilike 'NT AUTHORITY\*') {
             $PSBoundParameters['LogonType'] ='ServiceAccount'
+            $currentValues['LogonType'] ='ServiceAccount'
         }
     }
     else
     {
         # must be running as System, login type is ServiceAccount
         $PSBoundParameters['LogonType'] ='ServiceAccount'
+        $currentValues['LogonType'] ='ServiceAccount'
     }
 
     $desiredValues = $PSBoundParameters
