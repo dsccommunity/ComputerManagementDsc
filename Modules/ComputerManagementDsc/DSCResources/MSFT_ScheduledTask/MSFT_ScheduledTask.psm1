@@ -516,7 +516,9 @@ function Get-TargetResource
             AllowStartIfOnBatteries         = -not $settings.DisallowStartIfOnBatteries
             Hidden                          = $settings.Hidden
             RunOnlyIfIdle                   = $settings.RunOnlyIfIdle
-            IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.IdleWaitTimeout
+            #$settings.IdleSettings.IdleWaitTimeout is always null, changed to WaitTimeout property to avoid Test-TargetResource returning a spurious false
+            #IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.IdleWaitTimeout
+            IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.WaitTimeout
             NetworkName                     = $settings.NetworkSettings.Name
             DisallowStartOnRemoteAppSession = $settings.DisallowStartOnRemoteAppSession
             StartWhenAvailable              = $settings.StartWhenAvailable
@@ -1733,9 +1735,19 @@ function Test-TargetResource
         $username = $ExecuteAsCredential.UserName
         $PSBoundParameters['ExecuteAsCredential'] = $username
         if ($username -ilike 'NT AUTHORITY\*') {
+
+            #Overwrite the LogonType Parameter when ExecuteAsCredential is a service account
             $PSBoundParameters['LogonType'] ='ServiceAccount'
             $currentValues['LogonType'] ='ServiceAccount'
-            $PSBoundParameters['ExecuteAsCredential'] = $username.ToUpper().Replace('NT AUTHORITY\')
+
+            # For built service accounts, $ExecuteAsCredential.UserName will look like 'NT AUTHORITY\NETWORK SERVICE' but
+            # $ExecuteAsCredential.UserName return by Get-TargetResouce (from $task.Principal.UserId) is 'NETWORK SERVICE'
+            # Therefore strip 'NT AUTHORITY\'
+            $PSBoundParameters['ExecuteAsCredential'] = $username.ToUpper().Replace('NT AUTHORITY\', '')
+
+            #Sync the User Parameter when ExecuteAsCredential is a service account
+            $PSBoundParameters.User = $PSBoundParameters['ExecuteAsCredential']
+            $currentValues.User = $PSBoundParameters['ExecuteAsCredential']
         }
     }
     else
@@ -1745,8 +1757,21 @@ function Test-TargetResource
         $currentValues['LogonType'] ='ServiceAccount'
     }
 
+    if ($PSBoundParameters.ContainsKey('WeeksInterval') -and ((-not $currentValues.ContainsKey('WeeksInterval')) -or ($null -eq $currentValues['WeeksInterval']))) {
+        #The WeeksInterval parameter is defaulted to 1, even when the property is unset/undefined for the current task returned from Get-TargetResouce
+        #initialise a missing or null WeeksInterval to spurious calls to Set-TargetResouce
+        $currentValues.WeeksInterval = $PSBoundParameters['WeeksInterval']
+    }
+
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
+    if ($desiredValues.ContainsKey('Verbose')) {
+        #initialise a missing or null Verbose to spurious calls to Set-TargetResouce
+        $currentValues.Add('Verbose', $desiredValues['Verbose'])
+    }
+
+    # $desiredValues.GetEnumerator() | Sort-Object Key | Foreach-Object { $_.Key + ' = ' + $_.Value } | Set-Content -Path (Join-Path -path $env:temp -ChildPath 'sc_PSBoundParameters.txt') -Force
+    # $currentValues.GetEnumerator() | Sort-Object Name | Foreach-Object { $_.Name + ' = ' + $_.Value } | Set-Content -Path (Join-Path -path $env:temp -ChildPath 'sc_currentValues.txt') -Force
 
     Write-Verbose -Message ($script:localizedData.TestingDscParameterStateMessage)
 
