@@ -1010,7 +1010,7 @@ try
                         Settings  = [pscustomobject] @{
                             Enabled            = $true
                             IdleSettings       = @{
-                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
+                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
                                 IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
@@ -1254,7 +1254,7 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             IdleSettings       = @{
-                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
+                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
                                 IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
@@ -1320,7 +1320,7 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             IdleSettings       = @{
-                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes + 1)M"
+                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes + 1)M"
                                 IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes + 1)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
