@@ -1770,8 +1770,10 @@ function Test-TargetResource
         $currentValues.Add('Verbose', $desiredValues['Verbose'])
     }
 
-    # $desiredValues.GetEnumerator() | Sort-Object Key | Foreach-Object { $_.Key + ' = ' + $_.Value } | Set-Content -Path (Join-Path -path $env:temp -ChildPath 'sc_PSBoundParameters.txt') -Force
-    # $currentValues.GetEnumerator() | Sort-Object Name | Foreach-Object { $_.Name + ' = ' + $_.Value } | Set-Content -Path (Join-Path -path $env:temp -ChildPath 'sc_currentValues.txt') -Force
+    'desiredValues' | Out-Host
+    $desiredValues.GetEnumerator() | Sort-Object Key | Foreach-Object { $_.Key + ' = ' + $_.Value } | Out-Host
+    'currentValues' | Out-Host
+    $currentValues.GetEnumerator() | Sort-Object Name | Foreach-Object { $_.Name + ' = ' + $_.Value } | Out-Host
 
     Write-Verbose -Message ($script:localizedData.TestingDscParameterStateMessage)
 

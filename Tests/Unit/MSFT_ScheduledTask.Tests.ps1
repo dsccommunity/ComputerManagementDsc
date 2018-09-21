@@ -1028,7 +1028,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters -Verbose | Should -Be $true
+                    Test-TargetResource @testParameters | Should -Be $true
                 }
             }
 
