@@ -1028,7 +1028,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters -Verbose | Should -Be $true
                 }
             }
 
@@ -1528,7 +1528,7 @@ try
                         Settings = [pscustomobject] @{
                             Enabled = $true
                         }
-                    } 
+                    }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
@@ -1577,7 +1577,7 @@ try
                         Settings = [pscustomobject] @{
                             Enabled = $true
                         }
-                    } 
+                    }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
@@ -1652,7 +1652,7 @@ try
                         Settings = [pscustomobject] @{
                             Enabled = $true
                         }
-                    } 
+                    }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
@@ -1707,7 +1707,7 @@ try
                         Settings = [pscustomobject] @{
                             Enabled = $true
                         }
-                    } 
+                    }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
