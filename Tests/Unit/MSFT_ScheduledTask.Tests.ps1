@@ -1730,7 +1730,6 @@ try
             }
 
             Context 'When a scheduled task is created using a Group Managed Service Account' {
-
                 $testParameters = @{
                     TaskName            = 'Test task'
                     TaskPath            = '\Test\'
@@ -1800,13 +1799,13 @@ try
                     }
                 }
 
-                It 'Test should return true if the task is in desired state and given gMSA user in DOMAIN\User$ format' {
+                It 'Should return true if the task is in desired state and given gMSA user in DOMAIN\User$ format' {
                     Test-TargetResource @testParameters | Should -Be $true
                 }
 
                 $testParameters.ExecuteAsGMSA = 'gMSA$@domain.fqdn'
 
-                It 'Test should return true if the task is in desired state and given gMSA user in UPN format' {
+                It 'Should return true if the task is in desired state and given gMSA user in UPN format' {
                     Test-TargetResource @testParameters | Should -Be $true
                 }
             }
