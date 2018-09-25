@@ -40,7 +40,7 @@ try
                 Write-Output (New-Object -TypeName PSObject -Property $properties)
             }
 
-            $results = Get-TargetResource 'Application'
+            $results = Get-TargetResource -LogName 'Application' -IsEnabled $true
 
             It 'Should return an hashtable' {
                 $results.GetType().Name | Should Be 'HashTable'
