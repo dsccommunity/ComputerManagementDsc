@@ -11,6 +11,8 @@ ConvertFrom-StringData -StringData @'
     SettingEventlogLogRetentionDays             = Setting the Log Retention for Eventlog '{0}' to '{1}' days.
     SettingEventlogLogSize                      = Setting the LogSize for Eventlog '{0}' to '{1}'.
     SettingEventlogLogFilePath                  = Setting the LogFilePath for Eventlog '{0}' to '{1}'.
+    SettingEventlogLogFilePathDirectorySuccess  = New Logfiledirectory for Eventlog '{0} successfully created on path '{1}'.
+    SettingEventlogLogFilePathDirectoryFailure  = New Logfiledirectory for Eventlog '{0}' on path '{1}' failed.
     SettingEventlogIsEnabled                    = Setting the IsEnabled configuration for Eventlog '{0}' to '{1}'.
     SettingEventlogSecurityDescriptor           = Setting the SecurityDescriptor configuration for Eventlog '{0}' to '{1}'.
     SettingWinEventlogMaximumSizeInBytesSuccess = Updating MaximumSizeInBytes for Eventlog '{0}' successfully to '{1}'.

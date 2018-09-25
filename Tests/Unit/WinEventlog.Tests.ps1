@@ -7,8 +7,7 @@ Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot 
 # Unit Test Template Version: 1.2.0
 $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
-{
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) ) {
     & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
@@ -20,109 +19,10 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Unit
 #endregion HEADER
 
-# Begin Testing
-try
-{
+try {
     InModuleScope $script:DSCResourceName {
         $script:DSCResourceName = 'MSFT_WinEventLog'
-
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
-
-            Mock Get-WinEvent {
-                $properties = @{
-                    MaximumSizeInBytes = 4096kb
-                        IsEnabled          = $true
-                        LogMode            = 'Circular'
-                        LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
-                        SecurityDescriptor = 'TestDescriptor'
-                }
-
-                Write-Output (New-Object -TypeName PSObject -Property $properties)
-            }
-
-            $results = Get-TargetResource 'Application'
-
-            It 'Should return an hashtable' {
-                $results.GetType().Name | Should Be 'HashTable'
-            }
-
-            It 'Should return a Hashtable name is Application' {
-                $results.LogName = 'Application'
-            }
-
-            It 'Should return a Hashatable with the MaximumSizeInBytes is 4096kb' {
-                $results.MaximumSizeInBytes | Should Be 4096kb
-            }
-
-            It 'Should return a Hashtable where IsEnabled is true' {
-                $results.IsEnabled | should Be $true
-            }
-
-            It 'Should return a HashTable where LogMode is Circular' {
-                $results.LogMode | Should Be 'Circular'
-            }
-
-            It 'Should return a HashTable where LogFilePath is %SystemRoot%\System32\Winevt\Logs\Application.evtx' {
-                $results.LogFilePath | Should Be "%SystemRoot%\System32\Winevt\Logs\Application.evtx"
-            }
-
-            It 'Should return a HashTable where SecurityDescriptor is TestDescriptor' {
-                $results.SecurityDescriptor | Should Be 'TestDescriptor'
-            }
-        }
-
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
-
-            It 'Throws when passed an invalid Logname' {
-                { Test-TargetResource -LogName 'badLogName' -IsEnabled $true -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should not throw when passed an valid Logname' {
-                { Test-TargetResource -LogName 'Application' -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Throws when passed an invalid LogMode' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'BadLogmode' -IsEnabled $true -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should not throw when passed an valid LogMode' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Throws when passed an invalid MaximumSizeInBytes below 1028' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -MaximumSizeInBytes 1027kb -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Throws when passed an invalid MaximumSizeInBytes above 18014398509481983kb' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -MaximumSizeInBytes 18014398509481983kb -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should not throw when passed an valid MaximumSizeInBytes' {
-                { Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 1028kb -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Throws when passed an invalid LogRetentionDays below 1 day' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true -LogRetentionDays 0  -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Throws when passed an invalid LogRetentionDays above 365 days' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true -LogRetentionDays 366 -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should not throw when passed an valid LogRetentionDays' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -LogRetentionDays 30 -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Throws when passed an invalid LogFilePath' {
-                { Test-TargetResource -LogName 'Application' -IsEnabled $true -LogFilePath 'C:\BadDirectory\badlog.evtx' -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should not throw when passed an valid LogFilePath' {
-                { Test-TargetResource -LogName 'Application' -IsEnabled $true -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -ErrorAction Stop } | Should -Not -Throw
-            }
-        }
-
-        Describe "$($script:DSCResourceName)\Set-TargetResource" {
+        Describe 'Get-WinEventlog' {
             Mock Get-WinEvent {
                 $properties = @{
                     MaximumSizeInBytes = 5000kb
@@ -211,9 +111,6 @@ try
                 }
             }
         }
-
-
-
     }
 }
 finally
