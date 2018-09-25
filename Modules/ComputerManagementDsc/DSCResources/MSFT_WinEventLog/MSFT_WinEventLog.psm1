@@ -48,7 +48,11 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $LogName
+        $LogName,
+
+        [Parameter(Mandatory = $true)]
+        [System.Boolean]
+        $IsEnabled
     )
 
     try
