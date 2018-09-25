@@ -8,7 +8,6 @@
   - Moved strings in localization file.
   - LogMode is now set with Limit-EventLog,
     fixing issue #18 "Cannot save changes to LogMode property"
-
 - ScheduledTask:
   - Added support for Group Managed Service Accounts, implemented using the ExecuteAsGMSA
     parameter. Fixes [Issue #111](https://github.com/PowerShell/ComputerManagementDsc/issues/111)
