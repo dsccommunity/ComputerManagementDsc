@@ -113,10 +113,6 @@ try
                 { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -LogRetentionDays 30 -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
             }
 
-            It 'Throws when passed an invalid LogFilePath' {
-                { Test-TargetResource -LogName 'Application' -IsEnabled $true -LogFilePath 'C:\BadDirectory\badlog.evtx' -ErrorAction Stop } | Should -Throw
-            }
-
             It 'Should not throw when passed an valid LogFilePath' {
                 { Test-TargetResource -LogName 'Application' -IsEnabled $true -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -ErrorAction Stop } | Should -Not -Throw
             }
@@ -127,7 +123,7 @@ try
                 $properties = @{
                     MaximumSizeInBytes = 5000kb
                     IsEnabled          = $true
-                    LogMode            = 'Circular'
+                    LogMode            = 'AutoBackup'
                     LogFilePath        = 'c:\logs\test.evtx'
                     SecurityDescriptor = 'TestDescriptor'
                     LogRetentionDays   = '30'
@@ -174,15 +170,15 @@ try
                     Assert-MockCalled -CommandName Set-IsEnabled -Exactly 0 -Scope It
                 }
 
-                It 'Sets LogMode to Retain' {
+                It 'Sets LogMode to Circular' {
                     Mock -CommandName Set-LogMode -MockWith { }
-                    Set-TargetResource -IsEnabled $true -LogName 'Application' -LogMode 'Retain'
+                    Set-TargetResource -IsEnabled $true -LogName 'Application' -LogMode 'Circular'
                     Assert-MockCalled -CommandName Set-LogMode -Exactly 1 -Scope It
                 }
 
                 It 'LogMode is in desired state' {
                     Mock -CommandName Set-LogMode -MockWith { }
-                    Set-TargetResource -IsEnabled $true -LogName 'Application' -LogMode 'Circular'
+                    Set-TargetResource -IsEnabled $true -LogName 'Application' -LogMode 'AutoBackup'
                     Assert-MockCalled -CommandName Set-LogMode -Exactly 0 -Scope It
                 }
 
@@ -204,16 +200,13 @@ try
                     Assert-MockCalled -CommandName Set-LogFilePath -Exactly 1 -Scope It
                 }
 
-                It 'LogFilePath is in diesred state' {
+                It 'LogFilePath is in desired state' {
                     Mock -CommandName Set-LogFilePath -MockWith { }
                     Set-TargetResource -IsEnabled $true -LogName 'Application' -LogFilePath 'c:\logs\test.evtx'
                     Assert-MockCalled -CommandName Set-LogFilePath -Exactly 0 -Scope It
                 }
             }
         }
-
-
-
     }
 }
 finally

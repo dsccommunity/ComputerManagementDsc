@@ -562,20 +562,6 @@ Function Set-LogFilePath
     $log.LogFilePath = $LogFilePath
     Write-Verbose -Message ($localizedData.SettingEventlogLogFilePath -f $LogName, $LogFilePath)
 
-    $PathtoLog = (get-item $LogFilePath).parent.parent.FullName
-    if (!(Test-Path $PathtoLog))
-    {
-        try
-        {
-            New-Item -Path $PathtoLog -ItemType Directory
-            Write-Verbose -Message ($localizedData.SettingEventlogLogFilePathDirectorySuccess -f $LogName, $LogFilePath)
-        }
-        catch
-        {
-            Write-Verbose -Message ($localizedData.SettingEventlogLogFilePathDirectoryFailure -f $LogName, $LogFilePath)
-        }
-    }
-
     try
     {
         $log.SaveChanges()
