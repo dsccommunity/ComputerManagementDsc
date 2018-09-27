@@ -58,7 +58,7 @@ function Get-TargetResource
     try
     {
         $log = Get-WinEvent -ListLog $logName
-        $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $logName} | Select-Object MinimumRetentionDays
+        $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} | Select-Object MinimumRetentionDays
 
         $returnValue = @{
             LogName = [System.String]$LogName
@@ -143,6 +143,7 @@ function Set-TargetResource
     try
     {
         $log = Get-WinEvent -ListLog $LogName
+        $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} | Select-Object MinimumRetentionDays
         Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
         $update = $false
 
@@ -163,7 +164,6 @@ function Set-TargetResource
                 Set-LogMode -LogName $LogName -LogMode $LogMode
             }
 
-            $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq "$LogName"} | Select-Object MinimumRetentionDays
             if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
             {
                 Set-LogRetentionDays -LogName $LogName -LogRetentionDays $LogRetentionDays
@@ -257,6 +257,7 @@ function Test-TargetResource
     try
     {
         $log = Get-WinEvent -ListLog $logName
+        $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} | Select-Object MinimumRetentionDays
 
         if ($IsEnabled -eq $true)
         {
@@ -293,8 +294,7 @@ function Test-TargetResource
                 return $true
             }
 
-            $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq "$LogName"} | Select-Object MinimumRetentionDays
-            if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $log.LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+            if ($PSBoundParameters.ContainsKey('LogRetentionDays') -and $LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
             {
                 Write-Verbose -Message ($localizedData.TestingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
                 return $false
