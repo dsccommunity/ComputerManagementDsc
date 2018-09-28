@@ -30,11 +30,12 @@ try
 
             Mock Get-WinEvent {
                 $properties = @{
-                    MaximumSizeInBytes = 4096kb
+                    MaximumSizeInBytes     = 4096kb
                         IsEnabled          = $true
                         LogMode            = 'Circular'
                         LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
                         SecurityDescriptor = 'TestDescriptor'
+                        LogRetentionDays   = '0'
                 }
 
                 Write-Output (New-Object -TypeName PSObject -Property $properties)
@@ -46,35 +47,58 @@ try
                 $results.GetType().Name | Should Be 'HashTable'
             }
 
-            It 'Should return a Hashtable name is Application' {
+            It 'Should return a Logname Application' {
                 $results.LogName = 'Application'
             }
 
-            It 'Should return a Hashatable with the MaximumSizeInBytes is 4096kb' {
+            It 'Should return a MaximumSizeInBytes of 4096kb' {
                 $results.MaximumSizeInBytes | Should Be 4096kb
             }
 
-            It 'Should return a Hashtable where IsEnabled is true' {
+            It 'Should return IsEnabled is true' {
                 $results.IsEnabled | should Be $true
             }
 
-            It 'Should return a HashTable where LogMode is Circular' {
+            It 'Should return a LogMode is Circular' {
                 $results.LogMode | Should Be 'Circular'
             }
 
-            It 'Should return a HashTable where LogFilePath is %SystemRoot%\System32\Winevt\Logs\Application.evtx' {
+            It 'Should return a LogRetentionDays of 0' {
+                $results.LogRetentionDays | Should Be 0
+            }
+
+            It 'Should return a LogFilePath of %SystemRoot%\System32\Winevt\Logs\Application.evtx' {
                 $results.LogFilePath | Should Be "%SystemRoot%\System32\Winevt\Logs\Application.evtx"
             }
 
-            It 'Should return a HashTable where SecurityDescriptor is TestDescriptor' {
+            It 'Should return SecurityDescriptor with a value TestDescriptor' {
                 $results.SecurityDescriptor | Should Be 'TestDescriptor'
             }
         }
 
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
 
-            It 'Throws when passed an invalid Logname' {
-                { Test-TargetResource -LogName 'badLogName' -IsEnabled $true -ErrorAction Stop } | Should -Throw
+            Mock Get-WinEvent {
+                $properties = @{
+                    MaximumSizeInBytes = 1028kb
+                    IsEnabled          = $true
+                    LogMode            = 'Circular'
+                    LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
+                    SecurityDescriptor = 'TestDescriptor'
+                    LogRetentionDays   = '7'
+                    LogName            = 'Application'
+                }
+
+                Write-Output (New-Object -TypeName PSObject -Property $properties)
+            }
+
+            Mock Get-EventLog {
+                $params = @{
+                    MinimumRetentionDays = '7'
+                    Log                  = 'Application'
+                }
+
+                Write-Output (New-Object -TypeName PSObject -Property $params)
             }
 
             It 'Should not throw when passed an valid Logname' {
@@ -89,12 +113,28 @@ try
                 { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
             }
 
-            It 'Throws when passed an invalid MaximumSizeInBytes below 1028' {
+            It 'Should return $true if Logmode is in desired state' {
+                Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true | Should Be $true
+            }
+
+            It 'Should return $false if Logmode is not in desired state' {
+                Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true | Should Be $false
+            }
+
+            It 'Throws when passed an invalid MaximumSizeInBytes below 1028kb' {
                 { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -MaximumSizeInBytes 1027kb -ErrorAction Stop } | Should -Throw
             }
 
             It 'Throws when passed an invalid MaximumSizeInBytes above 18014398509481983kb' {
                 { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -MaximumSizeInBytes 18014398509481983kb -ErrorAction Stop } | Should -Throw
+            }
+
+            It 'Should return $true if MaximumSizeInBytes is in desired state' {
+                Test-TargetResource -MaximumSizeInBytes 1028kb -LogName 'Application' -IsEnabled $true | Should Be $true
+            }
+
+            It 'Should return $false if MaximumSizeInBytes is not in desired state' {
+                Test-TargetResource -MaximumSizeInBytes 2048kb -LogName 'Application' -IsEnabled $true | Should Be $false
             }
 
             It 'Should not throw when passed an valid MaximumSizeInBytes' {
@@ -113,8 +153,36 @@ try
                 { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -LogRetentionDays 30 -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
             }
 
+            It 'Should return $true if LogRetentionDays is in desired state' {
+                Test-TargetResource -LogName 'Application' -LogRetentionDays 7 -IsEnabled $true | Should Be $true
+            }
+
+            It 'Should return $false if LogRetentionDays is not in desired state' {
+                Test-TargetResource -LogName 'Application' -LogRetentionDays 13 -IsEnabled $true | Should Be $false
+            }
+
             It 'Should not throw when passed an valid LogFilePath' {
                 { Test-TargetResource -LogName 'Application' -IsEnabled $true -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should return $true if LogFilePath is in desired state' {
+                Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -IsEnabled $true | Should Be $true
+            }
+
+            It 'Should return $false if LogFilePath is not in desired state' {
+                Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\OtherLogs\Application.evtx' -IsEnabled $true | Should Be $false
+            }
+
+            It 'Should not throw when passed an valid SecurityDescriptor' {
+                { Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestDescriptor' -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should return $true if SecurityDescriptor is in desired state' {
+                Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestDescriptor' -IsEnabled $true | Should Be $true
+            }
+
+            It 'Should return $false if SecurityDescriptor is not in desired state' {
+                Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestTestDescriptor' -IsEnabled $true | Should Be $false
             }
         }
 
@@ -133,6 +201,15 @@ try
                 Write-Output (New-Object -TypeName PSObject -Property $properties)
             }
 
+            Mock Get-EventLog {
+                $params = @{
+                    MinimumRetentionDays = '7'
+                    Log                  = 'TestLog'
+                }
+
+                Write-Output (New-Object -TypeName PSObject -Property $params)
+            }
+
             Context 'When set is called and actual value does not match expected value' {
 
                 It 'Sets MaximumSizeInBytes to 1028kb' {
@@ -147,7 +224,7 @@ try
                     Assert-MockCalled -CommandName Set-MaximumSizeInBytes -Exactly 0 -Scope It
                 }
 
-                It 'Sets LogRetentionDays to 32' {
+                It 'Sets LogRetentionDays to 32 days' {
                     Mock -CommandName Set-LogRetentionDays -MockWith { }
                     Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog'
                     Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly 1 -Scope It

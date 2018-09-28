@@ -5,8 +5,8 @@ ConvertFrom-StringData -StringData @'
     TestingWinEventlogLogFilePath               = Setting the LogFilePath for Eventlog '{0}' to '{1}'.
     TestingEventlogMaximumSizeInBytes           = Testing the given LogSize '{1}' for Eventlog '{0}'.
     TestingEventlogLogMode                      = Testing the given LogMode '{1}' for Eventlog '{0}'.
-    TestingEventlogLogRetentionDays             = Testing the given Retention '{1}' days for Eventlog '{0}' in Logmode 'AutoBackup'.
-    TestingEventlogIsEnabled                    = Testing the given LogSize '{1}' for Eventlog '{0}'.
+    TestingEventlogLogRetentionDays             = Testing the given Retention '{1}' days for Eventlog '{0}'.
+    TestingEventlogIsEnabled                    = Testing the given State '{1}' for Eventlog '{0}'.
     SettingEventlogLogMode                      = Setting the LogMode for Eventlog '{0}' to '{1}'.
     SettingEventlogLogRetentionDays             = Setting the Log Retention for Eventlog '{0}' to '{1}' days.
     SettingEventlogLogSize                      = Setting the LogSize for Eventlog '{0}' to '{1}'.

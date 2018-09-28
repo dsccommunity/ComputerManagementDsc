@@ -69,10 +69,10 @@ configuration MSFT_WinEventLog_EnableLog
     {
         WinEventLog Integration_Test
         {
-            LogName            = 'Microsoft-Windows-Dsc/Analytic'
+            LogName            = 'Microsoft-Windows-CAPI2/Operational'
             IsEnabled          = $true
             LogMode            = 'Circular'
-            MaximumSizeInBytes = 4096kb
+            MaximumSizeInBytes = 1028kb
         }
     }
 }
@@ -84,7 +84,7 @@ configuration MSFT_WinEventLog_DisableLog
     {
         WinEventLog Integration_Test
         {
-            LogName            = 'Microsoft-Windows-Dsc/Analytic'
+            LogName            = 'Microsoft-Windows-CAPI2/Operational'
             IsEnabled          = $false
         }
     }
