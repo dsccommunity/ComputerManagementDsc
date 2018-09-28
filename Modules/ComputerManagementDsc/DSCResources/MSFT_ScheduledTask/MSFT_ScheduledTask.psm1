@@ -64,6 +64,11 @@ $script:localizedData = Get-LocalizedData `
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
         AtLogon and AtStartup tasks. Not used in Get-TargetResource.
 
+    .PARAMETER SynchronizeAcrossTimeZone
+        Enable the scheduled task option to synchronize across time zones. This is enabled
+        by including the timezone offset in the scheduled task trigger. Defaults to false
+        which does not include the timezone offset.
+
     .PARAMETER Ensure
         Present if the task should exist, Absent if it should be removed.
 
@@ -587,6 +592,11 @@ function Get-TargetResource
     .PARAMETER StartTime
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
         AtLogon and AtStartup tasks.
+
+    .PARAMETER SynchronizeAcrossTimeZone
+        Enable the scheduled task option to synchronize across time zones. This is enabled
+        by including the timezone offset in the scheduled task trigger. Defaults to false
+        which does not include the timezone offset.
 
     .PARAMETER Ensure
         Present if the task should exist, Absent if it should be removed.
@@ -1405,6 +1415,11 @@ function Set-TargetResource
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
         AtLogon and AtStartup tasks.
 
+    .PARAMETER SynchronizeAcrossTimeZone
+        Enable the scheduled task option to synchronize across time zones. This is enabled
+        by including the timezone offset in the scheduled task trigger. Defaults to false
+        which does not include the timezone offset.
+
     .PARAMETER Ensure
         Present if the task should exist, Absent if it should be removed.
 
@@ -1795,11 +1810,6 @@ function Test-TargetResource
 
     $currentValues = Get-TargetResource @PSBoundParameters
 
-    foreach($key in $currentValues.Keys)
-    {
-        Write-Verbose "Current key $key has value $($currentvalues[$key])"
-    }
-
     Write-Verbose -Message ($script:localizedData.GetCurrentTaskValuesMessage)
 
     if ($Ensure -eq 'Absent' -and $currentValues.Ensure -eq 'Absent')
@@ -1838,11 +1848,6 @@ function Test-TargetResource
 
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
-
-    foreach($key in $desiredValues.Keys)
-    {
-        Write-Verbose "Desired Key $key has value $($desiredValues[$key])"
-    }
 
     Write-Verbose -Message ($script:localizedData.TestingDscParameterStateMessage)
 

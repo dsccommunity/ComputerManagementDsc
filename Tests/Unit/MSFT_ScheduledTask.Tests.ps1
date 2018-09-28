@@ -1866,6 +1866,158 @@ try
                     }
                 }
             }
+
+            Context 'When a scheduled task is created and synchronize across time zone is disabled' {
+                $startTimeString           = '2018-10-01T01:00:00'
+                $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+                $testParameters = @{
+                    TaskName                  = 'Test task'
+                    TaskPath                  = '\Test\'
+                    ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime                 = Get-Date -Date $startTimeString
+                    SynchronizeAcrossTimeZone = $false
+                    ScheduleType              = 'Once'
+                    Verbose                   = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                StartBoundary = $startTimeString
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                    }
+                }
+
+                It 'Should return the time in string format and SynchronizeAcrossTimeZone with value false' {
+                    $result = Get-TargetResource @testParameters
+                    $result.StartTime | Should -Be $startTimeString
+                    $result.SynchronizeAcrossTimeZone | Should -Be $false
+                }
+
+                It 'Should return true given that startTime is set correctly' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                StartBoundary = $startTimeStringWithOffset
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                    }
+                }
+
+                It 'Should return false given that the task is configured with synchronize across time zone' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                Set-TargetResource @testParameters
+
+                It "Should set task trigger StartBoundary to $startTimeString" {
+                    Assert-MockCalled -CommandName Set-ScheduledTask -ParameterFilter {
+                        $InputObject.Triggers[0].StartBoundary -eq $startTimeString
+                    }
+                }
+            }
+
+            Context 'When a scheduled task is created and synchronize across time zone is enabled' {
+                $startTimeString           = '2018-10-01T01:00:00'
+                $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+                $testParameters = @{
+                    TaskName                  = 'Test task'
+                    TaskPath                  = '\Test\'
+                    ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime                 = Get-Date -Date $startTimeString
+                    SynchronizeAcrossTimeZone = $true
+                    ScheduleType              = 'Once'
+                    Verbose                   = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                StartBoundary = $startTimeStringWithOffset
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                    }
+                }
+
+                It 'Should return the time in string format and SynchronizeAcrossTimeZone with value true' {
+                    $result = Get-TargetResource @testParameters
+                    $result.StartTime | Should -Be $startTimeStringWithOffset
+                    $result.SynchronizeAcrossTimeZone | Should -Be $true
+                }
+
+                It 'Should return true given that startTime is set correctly' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                StartBoundary = $startTimeString
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                    }
+                }
+
+                It 'Should return false given that the task is configured with synchronize across time zone disabled' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                Set-TargetResource @testParameters
+
+                It "Should set task trigger StartBoundary to $startTimeStringWithOffset" {
+                    Assert-MockCalled -CommandName Set-ScheduledTask -ParameterFilter {
+                        $InputObject.Triggers[0].StartBoundary -eq $startTimeStringWithOffset
+                    }
+                }
+            }
         }
     }
     #endregion
