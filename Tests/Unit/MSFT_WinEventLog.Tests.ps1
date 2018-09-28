@@ -28,7 +28,7 @@ try
 
         Describe "$($script:DSCResourceName)\Get-TargetResource" {
 
-            Mock Get-WinEvent {
+            Mock -CommandName Get-WinEvent -MockWith {
                 $properties = @{
                     MaximumSizeInBytes     = 4096kb
                         IsEnabled          = $true
@@ -78,7 +78,7 @@ try
 
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
 
-            Mock Get-WinEvent {
+            Mock -CommandName Get-WinEvent -MockWith {
                 $properties = @{
                     MaximumSizeInBytes = 1028kb
                     IsEnabled          = $true
@@ -92,7 +92,7 @@ try
                 Write-Output (New-Object -TypeName PSObject -Property $properties)
             }
 
-            Mock Get-EventLog {
+            Mock -CommandName Get-EventLog -MockWith {
                 $params = @{
                     MinimumRetentionDays = '7'
                     Log                  = 'Application'
@@ -187,7 +187,7 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
-            Mock Get-WinEvent {
+            Mock -CommandName Get-WinEvent -MockWith {
                 $properties = @{
                     MaximumSizeInBytes = 5000kb
                     IsEnabled          = $true
@@ -201,7 +201,7 @@ try
                 Write-Output (New-Object -TypeName PSObject -Property $properties)
             }
 
-            Mock Get-EventLog {
+            Mock -CommandName Get-EventLog -MockWith {
                 $params = @{
                     MinimumRetentionDays = '7'
                     Log                  = 'TestLog'
@@ -213,75 +213,75 @@ try
             Context 'When set is called and actual value does not match expected value' {
 
                 It 'Sets MaximumSizeInBytes to 1028kb' {
-                    Mock -CommandName Set-MaximumSizeInBytes -MockWith { }
+                    Mock -CommandName Set-MaximumSizeInBytes
                     Set-TargetResource -MaximumSizeInBytes 1028kb -IsEnabled $true -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-MaximumSizeInBytes -Exactly 1 -Scope It
+                    Assert-MockCalled -CommandName Set-MaximumSizeInBytes -Exactly -Times 1 -Scope It
                 }
 
                 It 'MaximumSizeInBytes is in desired state' {
-                    Mock -CommandName Set-MaximumSizeInBytes -MockWith { }
+                    Mock -CommandName Set-MaximumSizeInBytes
                     Set-TargetResource -MaximumSizeInBytes 5000kb -IsEnabled $true -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-MaximumSizeInBytes -Exactly 0 -Scope It
+                    Assert-MockCalled -CommandName Set-MaximumSizeInBytes -Exactly -Times 0 -Scope It
                 }
 
                 It 'Sets LogRetentionDays to 32 days' {
-                    Mock -CommandName Set-LogRetentionDays -MockWith { }
+                    Mock -CommandName Set-LogRetentionDays
                     Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly 1 -Scope It
+                    Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
                 }
 
                 It 'LogRetentionDays is in desired state' {
-                    Mock -CommandName Set-LogRetentionDays -MockWith { }
+                    Mock -CommandName Set-LogRetentionDays
                     Set-TargetResource -LogRetentionDays '7' -IsEnabled $true -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly 0 -Scope It
+                    Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 0 -Scope It
                 }
 
                 It 'Sets IsEnabled to false' {
-                    Mock -CommandName Set-IsEnabled -MockWith { }
+                    Mock -CommandName Set-IsEnabled
                     Set-TargetResource -IsEnabled $false -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-IsEnabled -Exactly 1 -Scope It
+                    Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 1 -Scope It
                 }
 
                 It 'IsEnabled is in desired state' {
-                    Mock -CommandName Set-IsEnabled -MockWith { }
+                    Mock -CommandName Set-IsEnabled
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-IsEnabled -Exactly 0 -Scope It
+                    Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 0 -Scope It
                 }
 
                 It 'Sets LogMode to Circular' {
-                    Mock -CommandName Set-LogMode -MockWith { }
+                    Mock -CommandName Set-LogMode
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogMode 'Circular'
-                    Assert-MockCalled -CommandName Set-LogMode -Exactly 1 -Scope It
+                    Assert-MockCalled -CommandName Set-LogMode -Exactly -Times 1 -Scope It
                 }
 
                 It 'LogMode is in desired state' {
-                    Mock -CommandName Set-LogMode -MockWith { }
+                    Mock -CommandName Set-LogMode
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogMode 'AutoBackup'
-                    Assert-MockCalled -CommandName Set-LogMode -Exactly 0 -Scope It
+                    Assert-MockCalled -CommandName Set-LogMode -Exactly -Times 0 -Scope It
                 }
 
                 It 'Sets SecurityDescriptor to OtherTestDescriptor' {
-                    Mock -CommandName Set-SecurityDescriptor -MockWith { }
+                    Mock -CommandName Set-SecurityDescriptor
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'OtherTestDescriptor'
-                    Assert-MockCalled -CommandName Set-SecurityDescriptor -Exactly 1 -Scope It
+                    Assert-MockCalled -CommandName Set-SecurityDescriptor -Exactly -Times 1 -Scope It
                 }
 
                 It 'SecurityDescriptor is in desired state' {
-                    Mock -CommandName Set-SecurityDescriptor -MockWith { }
+                    Mock -CommandName Set-SecurityDescriptor
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'TestDescriptor'
-                    Assert-MockCalled -CommandName Set-SecurityDescriptor -Exactly 0 -Scope It
+                    Assert-MockCalled -CommandName Set-SecurityDescriptor -Exactly -Times 0 -Scope It
                 }
 
                 It 'Sets LogFilePath to default path' {
-                    Mock -CommandName Set-LogFilePath -MockWith { }
+                    Mock -CommandName Set-LogFilePath
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
-                    Assert-MockCalled -CommandName Set-LogFilePath -Exactly 1 -Scope It
+                    Assert-MockCalled -CommandName Set-LogFilePath -Exactly -Times 1 -Scope It
                 }
 
                 It 'LogFilePath is in desired state' {
-                    Mock -CommandName Set-LogFilePath -MockWith { }
+                    Mock -CommandName Set-LogFilePath
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath 'c:\logs\test.evtx'
-                    Assert-MockCalled -CommandName Set-LogFilePath -Exactly 0 -Scope It
+                    Assert-MockCalled -CommandName Set-LogFilePath -Exactly -Times 0 -Scope It
                 }
             }
         }

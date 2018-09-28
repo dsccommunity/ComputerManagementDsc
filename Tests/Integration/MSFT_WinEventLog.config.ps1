@@ -105,3 +105,31 @@ configuration MSFT_WinEventLog_CircularSecurityDescriptor
         }
     }
 }
+
+configuration MSFT_WinEventLog_EnableBackupLog
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        WinEventLog Integration_Test
+        {
+            LogName            = 'Microsoft-Windows-Backup'
+            IsEnabled          = $true
+            LogMode            = 'Circular'
+            MaximumSizeInBytes = 2048kb
+        }
+    }
+}
+
+configuration MSFT_WinEventLog_DisableBackupLog
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        WinEventLog Integration_Test
+        {
+            LogName            = 'Microsoft-Windows-Backup'
+            IsEnabled          = $false
+        }
+    }
+}

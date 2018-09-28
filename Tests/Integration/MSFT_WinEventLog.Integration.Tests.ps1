@@ -181,6 +181,50 @@ try
             }
         }
 
+        Context 'Enable a Logfile other than Application Eventlog' {
+            $CurrentConfig = 'MSFT_WinEventLog_EnableBackupLog'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            }
+        }
+
+        Context 'Disable a Logfile other than Application Eventlog' {
+            $CurrentConfig = 'MSFT_WinEventLog_DisableBackupLog'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            }
+        }
+
         Context 'Set Eventlog back to the default configuration' {
             $CurrentConfig = 'MSFT_WinEventLog_Default'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
