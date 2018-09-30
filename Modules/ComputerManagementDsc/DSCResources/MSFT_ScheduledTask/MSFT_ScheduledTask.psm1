@@ -71,6 +71,10 @@ $script:localizedData = Get-LocalizedData `
         True if the task should be enabled, false if it should be disabled.
         Not used in Get-TargetResource.
 
+    .PARAMETER BuiltInAccount
+        Run the task as  one of the built in service accounts ('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE').
+        When set -ExecuteAsCredential will be ignored and -LogonType will be set to 'SericeAccount'
+
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
         as the local system account.
@@ -262,6 +266,10 @@ function Get-TargetResource
         [Parameter()]
         [System.Boolean]
         $Enable = $true,
+
+        [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
+        [String]
+        $BuiltInAccount,
 
         [Parameter()]
         [System.Management.Automation.PSCredential]
@@ -491,7 +499,7 @@ function Get-TargetResource
             $startAt = $StartTime
         }
 
-        return @{
+        $result = @{
             TaskName                        = $task.TaskName
             TaskPath                        = $task.TaskPath
             StartTime                       = $startAt
@@ -538,6 +546,12 @@ function Get-TargetResource
             EventSubscription               = $trigger.Subscription
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
         }
+
+        if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount')) {
+            $result.Add('BuiltInAccount', $task.Principal.UserId)
+        }
+
+        return $result
     }
 }
 
