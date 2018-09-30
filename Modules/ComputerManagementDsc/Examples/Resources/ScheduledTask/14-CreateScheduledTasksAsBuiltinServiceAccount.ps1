@@ -28,8 +28,9 @@ Configuration Example
             ScheduleType       = 'Once'
             RepeatInterval     = '00:15:00'
             RepetitionDuration = '4.00:00:00'
-            #the password is set to the dummy value 'TEST'
-            ExecuteAsCredential = ([pscredential]::new('NT AUTHORITY\NETWORK SERVICE', (ConvertTo-SecureString -String 'TEST' -AsPlainText -Force -ErrorAction Stop)))
+            #the password is set to the dummy value 'TEST' because pscredential will not accept a null password parameter
+            #ExecuteAsCredential = ([pscredential]::new('NT AUTHORITY\NETWORK SERVICE', (ConvertTo-SecureString -String 'TEST' -AsPlainText -Force -ErrorAction Stop)))
+            BuiltInAccount = 'NETWORK SERVICE'
         }
     }
 }

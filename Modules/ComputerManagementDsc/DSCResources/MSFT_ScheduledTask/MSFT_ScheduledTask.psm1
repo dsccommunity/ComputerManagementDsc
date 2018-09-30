@@ -516,7 +516,7 @@ function Get-TargetResource
             AllowStartIfOnBatteries         = -not $settings.DisallowStartIfOnBatteries
             Hidden                          = $settings.Hidden
             RunOnlyIfIdle                   = $settings.RunOnlyIfIdle
-            #$settings.IdleSettings.IdleWaitTimeout is always null, changed to WaitTimeout property to avoid Test-TargetResource returning a spurious false
+            #$settings.IdleSettings.IdleWaitTimeout is always null, changed to WaitTimeout property to avoid Test-TargetResource returning a spurious value
             #IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.IdleWaitTimeout
             IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.WaitTimeout
             NetworkName                     = $settings.NetworkSettings.Name
@@ -578,6 +578,10 @@ function Get-TargetResource
 
     .PARAMETER Enable
         True if the task should be enabled, false if it should be disabled.
+
+    .PARAMETER BuiltInAccount
+        Run the task as  one of the built in service accounts ('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE').
+        When set -ExecuteAsCredential will be ignored and -LogonType will be set to 'SericeAccount'
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
@@ -752,6 +756,10 @@ function Set-TargetResource
         [Parameter()]
         [System.Boolean]
         $Enable = $true,
+
+        [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
+        [String]
+        $BuiltInAccount,
 
         [Parameter()]
         [System.Management.Automation.PSCredential]
@@ -1195,30 +1203,32 @@ function Set-TargetResource
         # Prepare the register arguments
         $registerArguments = @{}
 
-        if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
+        if ($PSBoundParameters.ContainsKey('BuiltInAccount')) {
+            #the validateset on BuiltInAccount has already checked the non null value to be 'LOCAL SERVICE', 'NETWORK SERVICE' or 'SYSTEM'
+            $username = 'NT AUTHORITY\' + $BuiltInAccount
+            $registerArguments.Add('User', $username)
+            $LogonType = 'ServiceAccount'
+        }
+        elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
         {
             $username = $ExecuteAsCredential.UserName
             $registerArguments.Add('User', $username)
-            if ($username -inotlike 'NT AUTHORITY\*') {
 
-                # If the LogonType is not specified then set it to password
-                if ([System.String]::IsNullOrEmpty($LogonType))
-                {
-                    $LogonType = 'Password'
-                }
-
-                if ($LogonType -notin ('Interactive', 'S4U'))
-                {
-                    # Only set the password if the LogonType is not interactive or S4U
-                    $registerArguments.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
-                }
+            # If the LogonType is not specified then set it to password
+            if ([System.String]::IsNullOrEmpty($LogonType))
+            {
+                $LogonType = 'Password'
             }
-            else {
-                $LogonType = 'ServiceAccount'
+
+            if ($LogonType -notin ('Interactive', 'S4U'))
+            {
+                # Only set the password if the LogonType is not interactive or S4U
+                $registerArguments.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
             }
         }
         else
         {
+            #'NT AUTHORITY\SYSTEM' basically gives the schedule task admin privileges, should we default to 'NT AUTHORITY\LOCAL SERVICE' instead?
             $username = 'NT AUTHORITY\SYSTEM'
             $registerArguments.Add('User', $username)
             $LogonType = 'ServiceAccount'
@@ -1347,6 +1357,10 @@ function Set-TargetResource
 
     .PARAMETER Enable
         True if the task should be enabled, false if it should be disabled.
+
+    .PARAMETER BuiltInAccount
+        Run the task as  one of the built in service accounts ('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE').
+        When set -ExecuteAsCredential will be ignored and -LogonType will be set to 'SericeAccount'
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
@@ -1522,6 +1536,10 @@ function Test-TargetResource
         [Parameter()]
         [System.Boolean]
         $Enable = $true,
+
+        [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
+        [String]
+        $BuiltInAccount,
 
         [Parameter()]
         [System.Management.Automation.PSCredential]
@@ -1729,26 +1747,19 @@ function Test-TargetResource
         return $false
     }
 
-    if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
+    if ($PSBoundParameters.ContainsKey('BuiltInAccount')) {
+
+        $PSBoundParameters.User = $BuiltInAccount
+        $currentValues.User = $BuiltInAccount
+
+        $PSBoundParameters['LogonType'] ='ServiceAccount'
+        $currentValues['LogonType'] ='ServiceAccount'
+    }
+    elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
     {
         # The password of the execution credential can not be compared
         $username = $ExecuteAsCredential.UserName
         $PSBoundParameters['ExecuteAsCredential'] = $username
-        if ($username -ilike 'NT AUTHORITY\*') {
-
-            #Overwrite the LogonType Parameter when ExecuteAsCredential is a service account
-            $PSBoundParameters['LogonType'] ='ServiceAccount'
-            $currentValues['LogonType'] ='ServiceAccount'
-
-            # For built service accounts, $ExecuteAsCredential.UserName will look like 'NT AUTHORITY\NETWORK SERVICE' but
-            # $ExecuteAsCredential.UserName return by Get-TargetResouce (from $task.Principal.UserId) is 'NETWORK SERVICE'
-            # Therefore strip 'NT AUTHORITY\'
-            $PSBoundParameters['ExecuteAsCredential'] = $username.ToUpper().Replace('NT AUTHORITY\', '')
-
-            #Sync the User Parameter when ExecuteAsCredential is a service account
-            $PSBoundParameters.User = $PSBoundParameters['ExecuteAsCredential']
-            $currentValues.User = $PSBoundParameters['ExecuteAsCredential']
-        }
     }
     else
     {
@@ -1774,6 +1785,9 @@ function Test-TargetResource
     $desiredValues.GetEnumerator() | Sort-Object Key | Foreach-Object { $_.Key + ' = ' + $_.Value } | Out-Host
     'currentValues' | Out-Host
     $currentValues.GetEnumerator() | Sort-Object Name | Foreach-Object { $_.Name + ' = ' + $_.Value } | Out-Host
+
+    #$desiredValues.GetEnumerator() | Sort-Object Key | Foreach-Object { $_.Key + ' = ' + $_.Value } | Set-Content -Path (Join-Path -path $env:temp -ChildPath 'sc_PSBoundParameters.txt') -Force
+    #$currentValues.GetEnumerator() | Sort-Object Name | Foreach-Object { $_.Name + ' = ' + $_.Value } | Set-Content -Path (Join-Path -path $env:temp -ChildPath 'sc_currentValues.txt') -Force
 
     Write-Verbose -Message ($script:localizedData.TestingDscParameterStateMessage)
 
