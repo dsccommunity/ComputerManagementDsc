@@ -195,6 +195,100 @@ try
             }
         }
 
+        Context "When a scheduled task is created and synchronize across time zone is disabled" {
+            $currentConfig = 'ScheduledTaskOnceSynchronizeAcrossTimeZoneDisabled'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+
+            It 'Should compile the MOF without throwing' {
+                {
+                    . $currentConfig `
+                        -OutputPath $configDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration `
+                        -Path $configDir `
+                        -Wait `
+                        -Force `
+                        -Verbose `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+            }
+
+            $expectedStartTime = '2018-10-01T01:00:00'
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
+                $current.TaskName                  | Should -Be 'Test task sync across time zone disabled'
+                $current.TaskPath                  | Should -Be '\ComputerManagementDsc\'
+                $current.ActionExecutable          | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                $current.ScheduleType              | Should -Be 'Once'
+                $current.StartTime                 | Should -Be (Get-Date -Date $expectedStartTime)
+                $current.SynchronizeAcrossTimeZone | Should -Be $false
+                $current.ActionWorkingPath         | Should -Be (Get-Location).Path
+                $current.Enable                    | Should -Be $true
+            }
+
+            It "Should have the trigger startBoundary set to $expectedStartTime" {
+                $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone disabled')
+                $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
+            }
+        }
+
+        Context "When a scheduled task is created and synchronize across time zone is enabled" {
+            $currentConfig = 'ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+
+            It 'Should compile the MOF without throwing' {
+                {
+                    . $currentConfig `
+                        -OutputPath $configDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration `
+                        -Path $configDir `
+                        -Wait `
+                        -Force `
+                        -Verbose `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+            }
+
+            $expectedStartTime = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
+                $current.TaskName                  | Should -Be 'Test task sync across time zone enabled'
+                $current.TaskPath                  | Should -Be '\ComputerManagementDsc\'
+                $current.ActionExecutable          | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                $current.ScheduleType              | Should -Be 'Once'
+                $current.StartTime                 | Should -Be (Get-Date -Date $expectedStartTime)
+                $current.SynchronizeAcrossTimeZone | Should -Be $true
+                $current.ActionWorkingPath         | Should -Be (Get-Location).Path
+                $current.Enable                    | Should -Be $true
+            }
+
+            It "Should have the trigger startBoundary set to $expectedStartTime" {
+                $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone enabled')
+                $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
+            }
+        }
+
         # Simulate a "built-in" scheduled task
         $action = New-ScheduledTaskAction -Execute 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
         $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date)
