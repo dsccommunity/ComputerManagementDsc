@@ -5,6 +5,7 @@
 - ScheduledTask:
   - Added support for Group Managed Service Accounts, implemented using the ExecuteAsGMSA
     parameter. Fixes [Issue #111](https://github.com/PowerShell/ComputerManagementDsc/issues/111)
+  - Added support to set the Synchronize Across Time Zone option. Fixes [Issue #109](https://github.com/PowerShell/ComputerManagementDsc/issues/109)
 
 ## 5.2.0.0
 

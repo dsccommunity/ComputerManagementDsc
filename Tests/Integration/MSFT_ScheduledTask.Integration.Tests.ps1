@@ -225,7 +225,7 @@ try
             $expectedStartTime = '2018-10-01T01:00:00'
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
+                $current = Get-DscConfiguration    | Where-Object {$_.ConfigurationName -eq $currentConfig}
                 $current.TaskName                  | Should -Be 'Test task sync across time zone disabled'
                 $current.TaskPath                  | Should -Be '\ComputerManagementDsc\'
                 $current.ActionExecutable          | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
@@ -272,7 +272,7 @@ try
             $expectedStartTime = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq $currentConfig}
+                $current = Get-DscConfiguration    | Where-Object {$_.ConfigurationName -eq $currentConfig}
                 $current.TaskName                  | Should -Be 'Test task sync across time zone enabled'
                 $current.TaskPath                  | Should -Be '\ComputerManagementDsc\'
                 $current.ActionExecutable          | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
