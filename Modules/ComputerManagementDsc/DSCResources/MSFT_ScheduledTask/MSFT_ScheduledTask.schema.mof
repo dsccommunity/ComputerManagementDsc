@@ -12,6 +12,7 @@ class MSFT_ScheduledTask : OMI_BaseResource
     [Write, Description("The time of day this task should start at - defaults to 12:00 AM. Not valid for AtLogon and AtStartup tasks")] DateTime StartTime;
     [Write, Description("Present if the task should exist, Absent if it should be removed"), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
     [Write, Description("True if the task should be enabled, false if it should be disabled")] boolean Enable;
+    [Write, Description("Run the task as  one of the built in service accounts ('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE'). When set -ExecuteAsCredential will be ignored and -LogonType will be set to 'SericeAccount'"), ValueMap{"SYSTEM", "LOCAL SERVICE", "NETWORK SERVICE"}, Values{"SYSTEM", "LOCAL SERVICE", "NETWORK SERVICE"}] string BuiltInAccount;
     [Write, Description("The credential this task should execute as. If not specified defaults to running as the local system account"), EmbeddedInstance("MSFT_Credential")] string ExecuteAsCredential;
     [Write, Description("Specifies the interval between the days in the schedule. An interval of 1 produces a daily schedule. An interval of 2 produces an every-other day schedule.")] Uint32 DaysInterval;
     [Write, Description("Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting.")] String RandomDelay;
