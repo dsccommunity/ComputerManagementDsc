@@ -1346,9 +1346,9 @@ function Set-TargetResource
 
                 The problem in New-ScheduledTaskTrigger is that it always writes the time the format that
                 includes the full timezone offset (W2016 behaviour, W2012R2 does it the other way around).
-                Which means "Synchronize across time zones" is enabled by default. To prevent that, we are
-                overwriting the StartBoundary here to insert the time in the format we want it, so we can enable
-                or disable "Synchronize across time zones".
+                Which means "Synchronize across time zones" is enabled by default on W2016 and disabled by
+                default on W2012R2. To prevent that, we are overwriting the StartBoundary here to insert
+                the time in the format we want it, so we can enable or disable "Synchronize across time zones".
             #>
 
             $scheduledTask.Triggers[0].StartBoundary = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
@@ -2011,10 +2011,10 @@ function Disable-ScheduledTask
 
 <#
     .SYNOPSIS
-        Returns a formatted datetime string for use in ScheduledTask resource
+        Returns a formatted datetime string for use in ScheduledTask resource.
 
     .PARAMETER Date
-        The date to format
+        The date to format.
 
     .PARAMETER SynchronizeAcrossTimeZone
         Boolean to specifiy if the returned string is formatted in synchronize
@@ -2026,11 +2026,11 @@ Function Get-DateTimeString
     param
     (
         [Parameter(Mandatory = $true)]
-        [DateTime]
+        [System.DateTime]
         $Date,
 
         [Parameter(Mandatory = $true)]
-        [Boolean]
+        [System.Boolean]
         $SynchronizeAcrossTimeZone
     )
 
@@ -2045,5 +2045,5 @@ Function Get-DateTimeString
         $returnDate = Get-Date -Date $Date -Format $format
     }
 
-    $returnDate
+    return $returnDate
 }

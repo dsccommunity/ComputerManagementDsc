@@ -1,11 +1,8 @@
 <#
     .EXAMPLE
-    This example creates a scheduled task called 'Test task Once' in the folder
-    task folder 'MyTasks' that starts a new powershell process once at 00:00 repeating
-    every 15 minutes for 8 hours. The task is delayed by a random amount up to 1 hour
-    each time. The task will run even if the previous task is still running and it
-    will prevent hard termintaing of the previously running task instance. The task
-    execution will have no time limit.
+    This example creates a scheduled task called 'Test task sync across time zone enabled'
+    in the folder 'MyTasks' that starts a new powershell process once 2018-10-01 01:00
+    The task will have the option Synchronize across time zone enabled.
 #>
 Configuration Example
 {
