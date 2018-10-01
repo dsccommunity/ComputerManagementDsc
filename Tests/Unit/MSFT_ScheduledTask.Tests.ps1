@@ -2018,6 +2018,23 @@ try
                     }
                 }
             }
+
+            Context 'When a scheduled task is configured to SynchronizeAcrossTimeZone and the ScheduleType is not Once, Daily or Weekly' {
+                $startTimeString           = '2018-10-01T01:00:00'
+                $testParameters = @{
+                    TaskName                  = 'Test task'
+                    TaskPath                  = '\Test\'
+                    ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime                 = Get-Date -Date $startTimeString
+                    SynchronizeAcrossTimeZone = $true
+                    ScheduleType              = 'AtLogon'
+                    Verbose                   = $true
+                }
+
+                It 'Should throw when Set-TargetResource is called and SynchronizeAcrossTimeZone is used in combination with an unsupported trigger type' {
+                    { Set-TargetResource @testParamers } | Should Throw
+                }
+            }
         }
     }
     #endregion
