@@ -4,7 +4,7 @@
 
 - ScheduledTask:
   - IdleWaitTimeout returned from Get-TargetResource always null - See [Issue #186](https://github.com/PowerShell/ComputerManagementDsc/issues/186).
-  - Added Property BuiltInAccount
+  - Added Property BuiltInAccount - See [Issue #130](https://github.com/PowerShell/ComputerManagementDsc/issues/130).
     Used for running the Scheduled Task as one of the built in
     service accounts.
     Valid Values: 'SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE'.
@@ -24,6 +24,8 @@
     with PSDscAllowPlainTextPassword = $true (not secure) or the
     resultant MOF file to be encrytpted (additional complexity that
     may not otherwise be required for a specific environment)
+  - Added support for Group Managed Service Accounts, implemented using the ExecuteAsGMSA
+    parameter. Fixes [Issue #111](https://github.com/PowerShell/ComputerManagementDsc/issues/111)
 
 ## 5.2.0.0
 

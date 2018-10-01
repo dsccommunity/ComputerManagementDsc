@@ -1738,6 +1738,7 @@ try
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
                     ExecuteAsGMSA       = 'DOMAIN\gMSA$'
+                    BuiltInAccount      = 'NETWORK SERVICE'
                     ExecuteAsCredential = [pscredential]::new('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
                     Verbose             = $true
                 }
@@ -1753,11 +1754,28 @@ try
                     }
                     finally
                     {
-                        $duplicateCredential.Message | Should -Be "Both ExecuteAsGMSA and ExecuteAsCredential parameters have been specified. A task can either run as a gMSA (Group Managed Service Account) or as a custom credential, not both. Please modify your configuration to include just one of the two.`r`nParameter name: ExecuteAsGMSA"
+                        $duplicateCredential.Message | Should -Be "Both ExecuteAsGMSA and (ExecuteAsCredential or BuiltInAccount) parameters have been specified. A task can run as a gMSA (Group Managed Service Account), a builtin service account or as a custom credential. Please modify your configuration to include just one of the three options.`r`nParameter name: ExecuteAsGMSA"
                     }
                 }
 
                 $testParameters.Remove('ExecuteAsCredential')
+
+                It 'Should return an error when both the ExecuteAsGMSA an ExecuteAsCredential ar specified' {
+                    try
+                    {
+                        Set-TargetResource @testParameters -ErrorVariable duplicateCredential
+                    }
+                    catch
+                    {
+                        # Error from Set-TargetResource expected
+                    }
+                    finally
+                    {
+                        $duplicateCredential.Message | Should -Be "Both ExecuteAsGMSA and (ExecuteAsCredential or BuiltInAccount) parameters have been specified. A task can run as a gMSA (Group Managed Service Account), a builtin service account or as a custom credential. Please modify your configuration to include just one of the three options.`r`nParameter name: ExecuteAsGMSA"
+                    }
+                }
+
+                $testParameters.Remove('BuiltInAccount')
 
                 It 'Should call Register-ScheduledTask with the name of the Group Managed Service Account' {
                     Set-TargetResource @testParameters

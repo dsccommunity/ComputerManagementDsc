@@ -77,7 +77,12 @@ $script:localizedData = Get-LocalizedData `
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
-        as the local system account.
+        as the local system account. Cannot be used in combination with ExecuteAsGMSA.
+        Not used in Get-TargetResource.
+
+    .PARAMETER ExecuteAsGMSA
+        The gMSA (Group Managed Service Account) this task should execute as. Cannot be
+        used in combination with ExecuteAsCredential.
         Not used in Get-TargetResource.
 
     .PARAMETER DaysInterval
@@ -274,6 +279,10 @@ function Get-TargetResource
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
+
+        [Parameter()]
+        [System.String]
+        $ExecuteAsGMSA,
 
         [Parameter()]
         [System.UInt32]
@@ -511,6 +520,7 @@ function Get-TargetResource
             ScheduleType                    = $returnScheduleType
             RepeatInterval                  = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Interval
             ExecuteAsCredential             = $task.Principal.UserId
+            ExecuteAsGMSA                   = $task.Principal.UserId -replace '^.+\\|@.+', $null
             Enable                          = $settings.Enabled
             DaysInterval                    = $trigger.DaysInterval
             RandomDelay                     = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.RandomDelay
@@ -600,7 +610,11 @@ function Get-TargetResource
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
-        as the local system account.
+        as the local system account. Cannot be used in combination with ExecuteAsGMSA.
+
+    .PARAMETER ExecuteAsGMSA
+        The gMSA (Group Managed Service Account) this task should execute as. Cannot be
+        used in combination with ExecuteAsCredential.
 
     .PARAMETER DaysInterval
         Specifies the interval between the days in the schedule. An interval of 1 produces
@@ -779,6 +793,10 @@ function Set-TargetResource
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
+
+        [Parameter()]
+        [System.String]
+        $ExecuteAsGMSA,
 
         [Parameter()]
         [System.UInt32]
@@ -974,6 +992,13 @@ function Set-TargetResource
             New-InvalidArgumentException `
                 -Message ($script:localizedData.OnEventSubscriptionError) `
                 -ArgumentName EventSubscription
+        }
+
+        if ($ExecuteAsCredential -and ($ExecuteAsGMSA -or $BuiltInAccount))
+        {
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.gMSAandCredentialError) `
+                -ArgumentName ExecuteAsGMSA
         }
 
         # Configure the action
@@ -1218,12 +1243,18 @@ function Set-TargetResource
         # Prepare the register arguments
         $registerArguments = @{}
 
+        $username = $null
         if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
         {
             #the validateset on BuiltInAccount has already checked the non null value to be 'LOCAL SERVICE', 'NETWORK SERVICE' or 'SYSTEM'
             $username = 'NT AUTHORITY\' + $BuiltInAccount
             $registerArguments.Add('User', $username)
             $LogonType = 'ServiceAccount'
+        }
+        elseif ($PSBoundParameters.ContainsKey('ExecuteAsGMSA'))
+        {
+            $username = $ExecuteAsGMSA
+            $LogonType = 'Password'
         }
         elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
         {
@@ -1380,7 +1411,11 @@ function Set-TargetResource
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
-        as the local system account.
+        as the local system account. Cannot be used in combination with ExecuteAsGMSA.
+
+    .PARAMETER ExecuteAsGMSA
+        The gMSA (Group Managed Service Account) this task should execute as. Cannot be
+        used in combination with ExecuteAsCredential.
 
     .PARAMETER DaysInterval
         Specifies the interval between the days in the schedule. An interval of 1 produces
@@ -1560,6 +1595,10 @@ function Test-TargetResource
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
+
+        [Parameter()]
+        [System.String]
+        $ExecuteAsGMSA,
 
         [Parameter()]
         [System.UInt32]
@@ -1790,6 +1829,21 @@ function Test-TargetResource
         #The WeeksInterval parameter is defaulted to 1, even when the property is unset/undefined for the current task returned from Get-TargetResouce
         #initialise a missing or null WeeksInterval to spurious calls to Set-TargetResouce
         $currentValues.WeeksInterval = $PSBoundParameters['WeeksInterval']
+    }
+
+    if ($PSBoundParameters.ContainsKey('ExecuteAsGMSA'))
+    {
+        <#
+            There is a difference in W2012R2 and W2016 behaviour,
+            W2012R2 returns the gMSA including the DOMAIN prefix,
+            W2016 returns this without. So to be sure strip off the
+            domain part in Get & Test. This means we either need to
+            remove everything before \ in the case of the DOMAIN\User
+            format, or we need to remove everything after @ in case
+            when the UPN format (User@domain.fqdn) is used.
+        #>
+
+        $PSBoundParameters['ExecuteAsGMSA'] = $PSBoundParameters.ExecuteAsGMSA -replace '^.+\\|@.+', $null
     }
 
     $desiredValues = $PSBoundParameters
