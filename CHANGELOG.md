@@ -11,15 +11,10 @@
     
     `ExecuteAsCredential = ([pscredential]::new('NT AUTHORITY\NETWORK SERVICE', (ConvertTo-SecureString -String 'TEST' -AsPlainText -Force -ErrorAction Stop)))`
     
-    was the above requires either:
-    
+    was the above requires either:    
       * The configuration to be compiled with PSDscAllowPlainTextPassword = $true (not secure)
-      * The resultant MOF file to be encrytpted (additional complexity that may not otherwise be required for a specific environment)
-      
-    Valid Values: 'SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE'.
-    
-    If set ExecuteAsCredential will be ignored and LogonType will be overwritten to 'SericeAccount'.
-    
+      * The resultant MOF file to be encrytpted (additional complexity that may not otherwise be required for a specific environment)       Valid Values: 'SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE'.    
+    If set ExecuteAsCredential will be ignored and LogonType will be overwritten to 'SericeAccount'.    
     Added Example [14-CreateScheduledTasksAsBuiltinServiceAccount.ps1](Modules/ComputerManagementDsc/Examples/Resources/ScheduledTask/14-CreateScheduledTasksAsBuiltinServiceAccount.ps1).
 
 
