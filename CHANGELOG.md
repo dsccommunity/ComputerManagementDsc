@@ -6,18 +6,15 @@
   - IdleWaitTimeout returned from Get-TargetResource always null - See [Issue #186](https://github.com/PowerShell/ComputerManagementDsc/issues/186).
   - Added Property BuiltInAccount  
     Used for running the Scheduled Task as one of the built in service accounts.    
+    Valid Values: 'SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE'.    
+    If set ExecuteAsCredential will be ignored and LogonType will be overwritten to 'SericeAccount'.    
+    Added Example [14-CreateScheduledTasksAsBuiltinServiceAccount.ps1](Modules/ComputerManagementDsc/Examples/Resources/ScheduledTask/14-CreateScheduledTasksAsBuiltinServiceAccount.ps1).
     The name BuiltInAccount and it's pattern of use is based on the property of the same name in the [Service DSCR](https://github.com/PowerShell/PSDscResources#service).    
     The reason for defining a new property and not using the alternative eg:
     
     `ExecuteAsCredential = ([pscredential]::new('NT AUTHORITY\NETWORK SERVICE', (ConvertTo-SecureString -String 'TEST' -AsPlainText -Force -ErrorAction Stop)))`
     
-    was the above requires either:    
-      * The configuration to be compiled with PSDscAllowPlainTextPassword = $true (not secure)
-      * The resultant MOF file to be encrytpted (additional complexity that may not otherwise be required for a specific environment)       
-    Valid Values: 'SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE'.    
-    If set ExecuteAsCredential will be ignored and LogonType will be overwritten to 'SericeAccount'.    
-    Added Example [14-CreateScheduledTasksAsBuiltinServiceAccount.ps1](Modules/ComputerManagementDsc/Examples/Resources/ScheduledTask/14-CreateScheduledTasksAsBuiltinServiceAccount.ps1).
-
+    was the above requires either; the configuration to be compiled with PSDscAllowPlainTextPassword = $true (not secure) or the resultant MOF file to be encrytpted (additional complexity that may not otherwise be required for a specific environment)
 
 ## 5.2.0.0
 
