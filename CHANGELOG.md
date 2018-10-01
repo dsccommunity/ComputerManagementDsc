@@ -5,6 +5,7 @@
 - ScheduledTask:
   - IdleWaitTimeout returned from Get-TargetResource always null - See [Issue #186](https://github.com/PowerShell/ComputerManagementDsc/issues/186).
   - Added Property BuiltInAccount
+  
     -Used for running the Scheduled Task as one of the built in service accounts
     -The name BuiltInAccount and it's pattern of use is based on the property of the same name in the [Service DSCR](https://github.com/PowerShell/PSDscResources#service)
     -The reason for defining a new property and not using the alternative eg:
