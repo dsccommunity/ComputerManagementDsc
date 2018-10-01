@@ -2020,7 +2020,7 @@ try
             }
 
             Context 'When a scheduled task is configured to SynchronizeAcrossTimeZone and the ScheduleType is not Once, Daily or Weekly' {
-                $startTimeString           = '2018-10-01T01:00:00'
+                $startTimeString              = '2018-10-01T01:00:00'
                 $testParameters = @{
                     TaskName                  = 'Test task'
                     TaskPath                  = '\Test\'
