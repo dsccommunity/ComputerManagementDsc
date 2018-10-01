@@ -994,7 +994,7 @@ function Set-TargetResource
                 -ArgumentName EventSubscription
         }
 
-        if ($ExecuteAsCredential -and ($ExecuteAsGMSA -or $BuiltInAccount))
+        if ($ExecuteAsGMSA -and ($ExecuteAsCredential -or $BuiltInAccount))
         {
             New-InvalidArgumentException `
                 -Message ($script:localizedData.gMSAandCredentialError) `
