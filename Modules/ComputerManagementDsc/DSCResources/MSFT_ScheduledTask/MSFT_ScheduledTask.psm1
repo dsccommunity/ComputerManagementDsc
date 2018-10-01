@@ -547,7 +547,8 @@ function Get-TargetResource
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
         }
 
-        if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount')) {
+        if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
+        {
             $result.Add('BuiltInAccount', $task.Principal.UserId)
         }
 
@@ -930,9 +931,9 @@ function Set-TargetResource
             and the action executable isn't specified then disable the task
         #>
         if ($currentValues.Ensure -eq 'Present' `
-            -and $currentValues.Enable `
-            -and -not $Enable `
-            -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
+                -and $currentValues.Enable `
+                -and -not $Enable `
+                -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
         {
             Write-Verbose -Message ($script:localizedData.DisablingExistingScheduledTask -f $TaskName, $TaskPath)
             Disable-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
@@ -1217,7 +1218,8 @@ function Set-TargetResource
         # Prepare the register arguments
         $registerArguments = @{}
 
-        if ($PSBoundParameters.ContainsKey('BuiltInAccount')) {
+        if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
+        {
             #the validateset on BuiltInAccount has already checked the non null value to be 'LOCAL SERVICE', 'NETWORK SERVICE' or 'SYSTEM'
             $username = 'NT AUTHORITY\' + $BuiltInAccount
             $registerArguments.Add('User', $username)
@@ -1318,8 +1320,8 @@ function Set-TargetResource
 
             # Register the scheduled task
 
-            $registerArguments.Add('TaskName',$TaskName)
-            $registerArguments.Add('TaskPath',$TaskPath)
+            $registerArguments.Add('TaskName', $TaskName)
+            $registerArguments.Add('TaskPath', $TaskPath)
             $registerArguments.Add('InputObject', $scheduledTask)
 
             $null = Register-ScheduledTask @registerArguments
@@ -1761,13 +1763,14 @@ function Test-TargetResource
         return $false
     }
 
-    if ($PSBoundParameters.ContainsKey('BuiltInAccount')) {
+    if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
+    {
 
         $PSBoundParameters.User = $BuiltInAccount
         $currentValues.User = $BuiltInAccount
 
-        $PSBoundParameters['LogonType'] ='ServiceAccount'
-        $currentValues['LogonType'] ='ServiceAccount'
+        $PSBoundParameters['LogonType'] = 'ServiceAccount'
+        $currentValues['LogonType'] = 'ServiceAccount'
     }
     elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
     {
@@ -1778,11 +1781,12 @@ function Test-TargetResource
     else
     {
         # must be running as System, login type is ServiceAccount
-        $PSBoundParameters['LogonType'] ='ServiceAccount'
-        $currentValues['LogonType'] ='ServiceAccount'
+        $PSBoundParameters['LogonType'] = 'ServiceAccount'
+        $currentValues['LogonType'] = 'ServiceAccount'
     }
 
-    if ($PSBoundParameters.ContainsKey('WeeksInterval') -and ((-not $currentValues.ContainsKey('WeeksInterval')) -or ($null -eq $currentValues['WeeksInterval']))) {
+    if ($PSBoundParameters.ContainsKey('WeeksInterval') -and ((-not $currentValues.ContainsKey('WeeksInterval')) -or ($null -eq $currentValues['WeeksInterval'])))
+    {
         #The WeeksInterval parameter is defaulted to 1, even when the property is unset/undefined for the current task returned from Get-TargetResouce
         #initialise a missing or null WeeksInterval to spurious calls to Set-TargetResouce
         $currentValues.WeeksInterval = $PSBoundParameters['WeeksInterval']
@@ -1790,7 +1794,8 @@ function Test-TargetResource
 
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
-    if ($desiredValues.ContainsKey('Verbose')) {
+    if ($desiredValues.ContainsKey('Verbose'))
+    {
         #initialise a missing or null Verbose to spurious calls to Set-TargetResouce
         $currentValues.Add('Verbose', $desiredValues['Verbose'])
     }
