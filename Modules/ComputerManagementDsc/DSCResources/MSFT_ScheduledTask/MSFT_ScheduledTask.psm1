@@ -64,6 +64,11 @@ $script:localizedData = Get-LocalizedData `
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
         AtLogon and AtStartup tasks. Not used in Get-TargetResource.
 
+    .PARAMETER SynchronizeAcrossTimeZone
+        Enable the scheduled task option to synchronize across time zones. This is enabled
+        by including the timezone offset in the scheduled task trigger. Defaults to false
+        which does not include the timezone offset.
+
     .PARAMETER Ensure
         Present if the task should exist, Absent if it should be removed.
 
@@ -258,6 +263,10 @@ function Get-TargetResource
         [Parameter()]
         [System.DateTime]
         $StartTime = [System.DateTime]::Today,
+
+        [Parameter()]
+        [System.Boolean]
+        $SynchronizeAcrossTimeZone = $false,
 
         [Parameter()]
         [System.String]
@@ -493,17 +502,20 @@ function Get-TargetResource
 
         if ($startAt)
         {
-            $startAt = [System.DateTime] $startAt
+            $stringSynchronizeAcrossTimeZone = Get-DateTimeString -Date $startAt -SynchronizeAcrossTimeZone $true
+            $returnSynchronizeAcrossTimeZone = $startAt -eq $stringSynchronizeAcrossTimeZone
         }
         else
         {
             $startAt = $StartTime
+            $returnSynchronizeAcrossTimeZone = $false
         }
 
         return @{
             TaskName                        = $task.TaskName
             TaskPath                        = $task.TaskPath
             StartTime                       = $startAt
+            SynchronizeAcrossTimeZone       = $returnSynchronizeAcrossTimeZone
             Ensure                          = 'Present'
             Description                     = $task.Description
             ActionExecutable                = $action.Execute
@@ -580,6 +592,11 @@ function Get-TargetResource
     .PARAMETER StartTime
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
         AtLogon and AtStartup tasks.
+
+    .PARAMETER SynchronizeAcrossTimeZone
+        Enable the scheduled task option to synchronize across time zones. This is enabled
+        by including the timezone offset in the scheduled task trigger. Defaults to false
+        which does not include the timezone offset.
 
     .PARAMETER Ensure
         Present if the task should exist, Absent if it should be removed.
@@ -755,6 +772,10 @@ function Set-TargetResource
         [Parameter()]
         [System.DateTime]
         $StartTime = [System.DateTime]::Today,
+
+        [Parameter()]
+        [System.Boolean]
+        $SynchronizeAcrossTimeZone = $false,
 
         [Parameter()]
         [System.String]
@@ -974,6 +995,12 @@ function Set-TargetResource
             New-InvalidArgumentException `
                 -Message ($script:localizedData.gMSAandCredentialError) `
                 -ArgumentName ExecuteAsGMSA
+        }
+
+        if($SynchronizeAcrossTimeZone -and ($ScheduleType -notin @('Once', 'Daily', 'Weekly'))) {
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.SynchronizeAcrossTimeZoneInvalidScheduleType) `
+                -ArgumentName SynchronizeAcrossTimeZone
         }
 
         # Configure the action
@@ -1304,6 +1331,29 @@ function Set-TargetResource
             $scheduledTask.Description = $Description
         }
 
+        if($scheduledTask.Triggers[0].StartBoundary)
+        {
+            <#
+                The way New-ScheduledTaskTrigger writes the StartBoundary has issues because it does not take
+                the setting "Synchronize across time zones" in consideration. What happens if synchronize across
+                time zone is enabled in the scheduled task GUI is that the time is written like this:
+
+                2018-09-27T18:45:08+02:00
+
+                When the setting synchronize across time zones is disabled, the time is written as:
+
+                2018-09-27T18:45:08
+
+                The problem in New-ScheduledTaskTrigger is that it always writes the time the format that
+                includes the full timezone offset (W2016 behaviour, W2012R2 does it the other way around).
+                Which means "Synchronize across time zones" is enabled by default on W2016 and disabled by
+                default on W2012R2. To prevent that, we are overwriting the StartBoundary here to insert
+                the time in the format we want it, so we can enable or disable "Synchronize across time zones".
+            #>
+
+            $scheduledTask.Triggers[0].StartBoundary = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
+        }
+
         if ($currentValues.Ensure -eq 'Present')
         {
             # Updating the scheduled task
@@ -1364,6 +1414,11 @@ function Set-TargetResource
     .PARAMETER StartTime
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
         AtLogon and AtStartup tasks.
+
+    .PARAMETER SynchronizeAcrossTimeZone
+        Enable the scheduled task option to synchronize across time zones. This is enabled
+        by including the timezone offset in the scheduled task trigger. Defaults to false
+        which does not include the timezone offset.
 
     .PARAMETER Ensure
         Present if the task should exist, Absent if it should be removed.
@@ -1540,6 +1595,10 @@ function Test-TargetResource
         [Parameter()]
         [System.DateTime]
         $StartTime = [System.DateTime]::Today,
+
+        [Parameter()]
+        [System.Boolean]
+        $SynchronizeAcrossTimeZone = $false,
 
         [Parameter()]
         [System.String]
@@ -1744,6 +1803,11 @@ function Test-TargetResource
         $PSBoundParameters['RestartInterval'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval).ToString()
     }
 
+    if ($ScheduleType -in @('Once', 'Daily', 'Weekly'))
+    {
+        $PSBoundParameters['StartTime'] = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
+    }
+
     $currentValues = Get-TargetResource @PSBoundParameters
 
     Write-Verbose -Message ($script:localizedData.GetCurrentTaskValuesMessage)
@@ -1943,4 +2007,43 @@ function Disable-ScheduledTask
     $existingTask = Get-ScheduledTask @PSBoundParameters
     $existingTask.Settings.Enabled = $false
     $null = $existingTask | Register-ScheduledTask @PSBoundParameters -Force
+}
+
+<#
+    .SYNOPSIS
+        Returns a formatted datetime string for use in ScheduledTask resource.
+
+    .PARAMETER Date
+        The date to format.
+
+    .PARAMETER SynchronizeAcrossTimeZone
+        Boolean to specifiy if the returned string is formatted in synchronize
+        across time zone format.
+#>
+Function Get-DateTimeString
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.DateTime]
+        $Date,
+
+        [Parameter(Mandatory = $true)]
+        [System.Boolean]
+        $SynchronizeAcrossTimeZone
+    )
+
+    $format = (Get-Culture).DateTimeFormat.SortableDateTimePattern
+
+    if($SynchronizeAcrossTimeZone)
+    {
+        $returnDate = (Get-Date -Date $Date -Format $format) + (Get-Date -Format 'zzz')
+    }
+    else
+    {
+        $returnDate = Get-Date -Date $Date -Format $format
+    }
+
+    return $returnDate
 }
