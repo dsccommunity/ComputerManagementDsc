@@ -970,9 +970,9 @@ function Set-TargetResource
             and the action executable isn't specified then disable the task
         #>
         if ($currentValues.Ensure -eq 'Present' `
-            -and $currentValues.Enable `
-            -and -not $Enable `
-            -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
+                -and $currentValues.Enable `
+                -and -not $Enable `
+                -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
         {
             Write-Verbose -Message ($script:localizedData.DisablingExistingScheduledTask -f $TaskName, $TaskPath)
             Disable-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
@@ -1401,8 +1401,8 @@ function Set-TargetResource
 
             # Register the scheduled task
 
-            $registerArguments.Add('TaskName',$TaskName)
-            $registerArguments.Add('TaskPath',$TaskPath)
+            $registerArguments.Add('TaskName', $TaskName)
+            $registerArguments.Add('TaskPath', $TaskPath)
             $registerArguments.Add('InputObject', $scheduledTask)
 
             $null = Register-ScheduledTask @registerArguments

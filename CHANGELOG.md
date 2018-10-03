@@ -10,7 +10,7 @@
     Valid Values: 'SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE'.
     If set ExecuteAsCredential will be ignored and LogonType will
     be overwritten to 'SericeAccount'.
-    Added Example [14-CreateScheduledTasksAsBuiltinServiceAccount.ps1](Modules/ComputerManagementDsc/Examples/Resources/ScheduledTask/14-CreateScheduledTasksAsBuiltinServiceAccount.ps1).
+    Added Example [16-CreateScheduledTasksAsBuiltinServiceAccount.ps1](Modules/ComputerManagementDsc/Examples/Resources/ScheduledTask/16-CreateScheduledTasksAsBuiltinServiceAccount.ps1).
     The name BuiltInAccount and it's pattern of use is based on
     the property of the same name in the [Service DSCR](https://github.com/PowerShell/PSDscResources#service).
     The reason for defining a new property and not using the
