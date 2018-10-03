@@ -176,18 +176,11 @@ function Test-TargetResource
         $Name
     )
 
-    $returnValue = $false
-
     Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingValidated -f $Name)
 
     $getTargetResourceResult = Get-TargetResource -IsSingleInstance $IsSingleInstance -Name $Name
 
-    if ($getTargetResourceResult.Name -eq $Name)
-    {
-        $returnValue = $true
-    }
-
-    return $returnValue
+    return $getTargetResourceResult.IsActive
 }
 
 Export-ModuleMember -Function *-TargetResource
