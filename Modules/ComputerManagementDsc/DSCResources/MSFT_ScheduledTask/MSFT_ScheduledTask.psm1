@@ -76,6 +76,10 @@ $script:localizedData = Get-LocalizedData `
         True if the task should be enabled, false if it should be disabled.
         Not used in Get-TargetResource.
 
+    .PARAMETER BuiltInAccount
+        Run the task as  one of the built in service accounts ('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE').
+        When set -ExecuteAsCredential will be ignored and -LogonType will be set to 'SericeAccount'
+
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
         as the local system account. Cannot be used in combination with ExecuteAsGMSA.
@@ -276,6 +280,10 @@ function Get-TargetResource
         [Parameter()]
         [System.Boolean]
         $Enable = $true,
+
+        [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
+        [String]
+        $BuiltInAccount,
 
         [Parameter()]
         [System.Management.Automation.PSCredential]
@@ -511,7 +519,7 @@ function Get-TargetResource
             $returnSynchronizeAcrossTimeZone = $false
         }
 
-        return @{
+        $result = @{
             TaskName                        = $task.TaskName
             TaskPath                        = $task.TaskPath
             StartTime                       = $startAt
@@ -538,7 +546,9 @@ function Get-TargetResource
             AllowStartIfOnBatteries         = -not $settings.DisallowStartIfOnBatteries
             Hidden                          = $settings.Hidden
             RunOnlyIfIdle                   = $settings.RunOnlyIfIdle
-            IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.IdleWaitTimeout
+            #$settings.IdleSettings.IdleWaitTimeout is always null, changed to WaitTimeout property to avoid Test-TargetResource returning a spurious value
+            #IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.IdleWaitTimeout
+            IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.WaitTimeout
             NetworkName                     = $settings.NetworkSettings.Name
             DisallowStartOnRemoteAppSession = $settings.DisallowStartOnRemoteAppSession
             StartWhenAvailable              = $settings.StartWhenAvailable
@@ -558,6 +568,13 @@ function Get-TargetResource
             EventSubscription               = $trigger.Subscription
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
         }
+
+        if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
+        {
+            $result.Add('BuiltInAccount', $task.Principal.UserId)
+        }
+
+        return $result
     }
 }
 
@@ -603,6 +620,10 @@ function Get-TargetResource
 
     .PARAMETER Enable
         True if the task should be enabled, false if it should be disabled.
+
+    .PARAMETER BuiltInAccount
+        Run the task as  one of the built in service accounts ('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE').
+        When set -ExecuteAsCredential will be ignored and -LogonType will be set to 'SericeAccount'
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
@@ -786,6 +807,10 @@ function Set-TargetResource
         [System.Boolean]
         $Enable = $true,
 
+        [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
+        [String]
+        $BuiltInAccount,
+
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
@@ -945,9 +970,9 @@ function Set-TargetResource
             and the action executable isn't specified then disable the task
         #>
         if ($currentValues.Ensure -eq 'Present' `
-            -and $currentValues.Enable `
-            -and -not $Enable `
-            -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
+                -and $currentValues.Enable `
+                -and -not $Enable `
+                -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
         {
             Write-Verbose -Message ($script:localizedData.DisablingExistingScheduledTask -f $TaskName, $TaskPath)
             Disable-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
@@ -990,7 +1015,7 @@ function Set-TargetResource
                 -ArgumentName EventSubscription
         }
 
-        if ($ExecuteAsCredential -and $ExecuteAsGMSA)
+        if ($ExecuteAsGMSA -and ($ExecuteAsCredential -or $BuiltInAccount))
         {
             New-InvalidArgumentException `
                 -Message ($script:localizedData.gMSAandCredentialError) `
@@ -1245,7 +1270,15 @@ function Set-TargetResource
         # Prepare the register arguments
         $registerArguments = @{}
 
-        if ($PSBoundParameters.ContainsKey('ExecuteAsGMSA'))
+        $username = $null
+        if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
+        {
+            #the validateset on BuiltInAccount has already checked the non null value to be 'LOCAL SERVICE', 'NETWORK SERVICE' or 'SYSTEM'
+            $username = 'NT AUTHORITY\' + $BuiltInAccount
+            $registerArguments.Add('User', $username)
+            $LogonType = 'ServiceAccount'
+        }
+        elseif ($PSBoundParameters.ContainsKey('ExecuteAsGMSA'))
         {
             $username = $ExecuteAsGMSA
             $LogonType = 'Password'
@@ -1269,6 +1302,7 @@ function Set-TargetResource
         }
         else
         {
+            #'NT AUTHORITY\SYSTEM' basically gives the schedule task admin privileges, should we default to 'NT AUTHORITY\LOCAL SERVICE' instead?
             $username = 'NT AUTHORITY\SYSTEM'
             $registerArguments.Add('User', $username)
             $LogonType = 'ServiceAccount'
@@ -1367,8 +1401,8 @@ function Set-TargetResource
 
             # Register the scheduled task
 
-            $registerArguments.Add('TaskName',$TaskName)
-            $registerArguments.Add('TaskPath',$TaskPath)
+            $registerArguments.Add('TaskName', $TaskName)
+            $registerArguments.Add('TaskPath', $TaskPath)
             $registerArguments.Add('InputObject', $scheduledTask)
 
             $null = Register-ScheduledTask @registerArguments
@@ -1425,6 +1459,10 @@ function Set-TargetResource
 
     .PARAMETER Enable
         True if the task should be enabled, false if it should be disabled.
+
+    .PARAMETER BuiltInAccount
+        Run the task as  one of the built in service accounts ('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE').
+        When set -ExecuteAsCredential will be ignored and -LogonType will be set to 'SericeAccount'
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
@@ -1608,6 +1646,10 @@ function Test-TargetResource
         [Parameter()]
         [System.Boolean]
         $Enable = $true,
+
+        [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
+        [String]
+        $BuiltInAccount,
 
         [Parameter()]
         [System.Management.Automation.PSCredential]
@@ -1824,11 +1866,33 @@ function Test-TargetResource
         return $false
     }
 
-    if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
+    if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
+    {
+
+        $PSBoundParameters.User = $BuiltInAccount
+        $currentValues.User = $BuiltInAccount
+
+        $PSBoundParameters['LogonType'] = 'ServiceAccount'
+        $currentValues['LogonType'] = 'ServiceAccount'
+    }
+    elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
     {
         # The password of the execution credential can not be compared
         $username = $ExecuteAsCredential.UserName
         $PSBoundParameters['ExecuteAsCredential'] = $username
+    }
+    else
+    {
+        # must be running as System, login type is ServiceAccount
+        $PSBoundParameters['LogonType'] = 'ServiceAccount'
+        $currentValues['LogonType'] = 'ServiceAccount'
+    }
+
+    if ($PSBoundParameters.ContainsKey('WeeksInterval') -and ((-not $currentValues.ContainsKey('WeeksInterval')) -or ($null -eq $currentValues['WeeksInterval'])))
+    {
+        #The WeeksInterval parameter is defaulted to 1, even when the property is unset/undefined for the current task returned from Get-TargetResouce
+        #initialise a missing or null WeeksInterval to spurious calls to Set-TargetResouce
+        $currentValues.WeeksInterval = $PSBoundParameters['WeeksInterval']
     }
 
     if ($PSBoundParameters.ContainsKey('ExecuteAsGMSA'))
@@ -1848,6 +1912,11 @@ function Test-TargetResource
 
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
+    if ($desiredValues.ContainsKey('Verbose'))
+    {
+        #initialise a missing or null Verbose to spurious calls to Set-TargetResouce
+        $currentValues.Add('Verbose', $desiredValues['Verbose'])
+    }
 
     Write-Verbose -Message ($script:localizedData.TestingDscParameterStateMessage)
 
