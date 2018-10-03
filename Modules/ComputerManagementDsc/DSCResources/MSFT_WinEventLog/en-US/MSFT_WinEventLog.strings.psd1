@@ -26,5 +26,6 @@ ConvertFrom-StringData -StringData @'
     SettingWinEventlogRetentionDaysSuccess      = Updating Logfile Retention for Eventlog '{0}' successfully to '{1}' days.
     SettingWinEventlogRetentionDaysFailed       = Updating Logfile Retention for Eventlog '{0}' to '{1}' failed.
     SetResourceIsInDesiredState                 = EventLog '{0}' is in desired state for configuration '{1}'.
+    EventlogLogRetentionDaysWrongMode           = Setting the Log Retention for Eventlog '{0}' failed. LogMode must be AutoBackup.
     TerminatingError                            = TerminatingError detected, Errormessage is '{0}' with Errorcategory '{1}'.
 '@

@@ -157,12 +157,19 @@ function Set-TargetResource
 
             if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
             {
-                $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} |
-                Select-Object MinimumRetentionDays
-
-                if ($LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+                if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName}))
                 {
-                    Set-LogRetentionDays -LogName $LogName -LogRetentionDays $LogRetentionDays
+                    $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} |
+                    Select-Object MinimumRetentionDays
+
+                    if ($LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+                    {
+                        Set-LogRetentionDays -LogName $LogName -LogRetentionDays $LogRetentionDays
+                    }
+                }
+                else
+                {
+                    Write-Verbose -Message ($localizedData.EventlogLogRetentionDaysWrongMode -f $LogName)
                 }
             }
 
@@ -289,17 +296,25 @@ function Test-TargetResource
 
         if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
         {
-            $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} |
-            Select-Object MinimumRetentionDays
-
-            if ($LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+            if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName}))
             {
-                Write-Verbose -Message ($localizedData.TestingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
-                $desiredState = $false
+                $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} |
+                Select-Object MinimumRetentionDays
+
+                if ($LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+                {
+                    Write-Verbose -Message ($localizedData.TestingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
+                    $desiredState = $false
+                }
+                else
+                {
+                    Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogRetentionDays')
+                }
             }
             else
             {
-                Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogRetentionDays')
+                Write-Verbose -Message ($localizedData.EventlogLogRetentionDaysWrongMode -f $LogName)
+                $desiredState = $false
             }
         }
 

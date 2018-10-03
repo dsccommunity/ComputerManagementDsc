@@ -115,8 +115,8 @@ configuration MSFT_WinEventLog_EnableBackupLog
         {
             LogName            = 'Microsoft-Windows-Backup'
             IsEnabled          = $true
-            LogMode            = 'Circular'
-            MaximumSizeInBytes = 2048kb
+            LogMode            = 'AutoBackup'
+            LogRetentionDays   = '30'
         }
     }
 }

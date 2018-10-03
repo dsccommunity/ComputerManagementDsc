@@ -181,29 +181,29 @@ try
             }
         }
 
-        Context 'Enable a Logfile other than Application Eventlog' {
+        Context 'Enable a Logfile other than Application Eventlog with Retention' {
             $CurrentConfig = 'MSFT_WinEventLog_EnableBackupLog'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
-
-            It 'Should compile a MOF file without error' {
+            
+            It 'Should compile a MOF file error' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should -Not -Throw
             }
-
-            It 'Should apply the MOF correctly' {
+            
+            It 'Should not apply the MOF' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                 } | Should -Not -Throw
             }
 
-            It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            It 'Should return a incompliant state' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $false
             }
         }
 
-        Context 'Disable a Logfile other than Application Eventlog' {
+        Context 'Disable a Logfile other than Application Eventlog with Retention' {
             $CurrentConfig = 'MSFT_WinEventLog_DisableBackupLog'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')

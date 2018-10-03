@@ -153,12 +153,8 @@ try
                 { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -LogRetentionDays 30 -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
             }
 
-            It 'Should return $true if LogRetentionDays is in desired state' {
-                Test-TargetResource -LogName 'Application' -LogRetentionDays 7 -IsEnabled $true | Should Be $true
-            }
-
             It 'Should return $false if LogRetentionDays is not in desired state' {
-                Test-TargetResource -LogName 'Application' -LogRetentionDays 13 -IsEnabled $true | Should Be $false
+                Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 13 -LogMode 'AutoBackup'  | Should Be $false
             }
 
             It 'Should not throw when passed an valid LogFilePath' {
@@ -226,13 +222,13 @@ try
 
                 It 'Sets LogRetentionDays to 32 days' {
                     Mock -CommandName Set-LogRetentionDays
-                    Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog'
+                    Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
                     Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
                 }
 
                 It 'LogRetentionDays is in desired state' {
                     Mock -CommandName Set-LogRetentionDays
-                    Set-TargetResource -LogRetentionDays '7' -IsEnabled $true -LogName 'TestLog'
+                    Set-TargetResource -LogRetentionDays '7' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
                     Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 0 -Scope It
                 }
 
