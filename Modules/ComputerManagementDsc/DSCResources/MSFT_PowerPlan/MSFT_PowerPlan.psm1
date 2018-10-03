@@ -67,12 +67,10 @@ function Get-TargetResource
         if ($plan.IsActive)
         {
             Write-Verbose -Message ($script:localizedData.PowerPlanIsActive -f $Name)
-            $activePlanName = $Name
         }
         else
         {
             Write-Verbose -Message ($script:localizedData.PowerPlanIsNotActive -f $Name)
-            $activePlanName = $null
         }
     }
     else
@@ -83,7 +81,8 @@ function Get-TargetResource
 
     return @{
         IsSingleInstance = $IsSingleInstance
-        Name             = $activePlanName
+        Name             = $Name
+        IsActive         = $plan.IsActive
     }
 }
 
