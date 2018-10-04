@@ -8,7 +8,7 @@
   - Added support to set the Synchronize Across Time Zone option. Fixes [Issue #109](https://github.com/PowerShell/ComputerManagementDsc/issues/109)
 - Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #189](https://github.com/PowerShell/ComputerManagementDsc/issues/189).
 - PowerPlan:
-  - Added IsActive Read-Only Property. Fixes [Issue #171](https://github.com/PowerShell/ComputerManagementDsc/issues/171)
+  - Added IsActive Read-Only Property - Fixes [Issue #171](https://github.com/PowerShell/ComputerManagementDsc/issues/171).
 
 ## 5.2.0.0
 
