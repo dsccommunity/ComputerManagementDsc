@@ -1743,36 +1743,12 @@ try
                     Verbose             = $true
                 }
 
-                It 'Should return an error when both the ExecuteAsGMSA an ExecuteAsCredential ar specified' {
-                    try
-                    {
-                        Set-TargetResource @testParameters -ErrorVariable duplicateCredential
-                    }
-                    catch
-                    {
-                        # Error from Set-TargetResource expected
-                    }
-                    finally
-                    {
-                        $duplicateCredential.Message | Should -Be "Both ExecuteAsGMSA and (ExecuteAsCredential or BuiltInAccount) parameters have been specified. A task can run as a gMSA (Group Managed Service Account), a builtin service account or as a custom credential. Please modify your configuration to include just one of the three options.`r`nParameter name: ExecuteAsGMSA"
-                    }
-                }
+                It 'Should throw expected exception' {
+                    $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.gMSAandCredentialError -ArgumentName 'ExecuteAsGMSA'
 
-                $testParameters.Remove('ExecuteAsCredential')
-
-                It 'Should return an error when both the ExecuteAsGMSA an ExecuteAsCredential ar specified' {
-                    try
-                    {
-                        Set-TargetResource @testParameters -ErrorVariable duplicateCredential
-                    }
-                    catch
-                    {
-                        # Error from Set-TargetResource expected
-                    }
-                    finally
-                    {
-                        $duplicateCredential.Message | Should -Be "Both ExecuteAsGMSA and (ExecuteAsCredential or BuiltInAccount) parameters have been specified. A task can run as a gMSA (Group Managed Service Account), a builtin service account or as a custom credential. Please modify your configuration to include just one of the three options.`r`nParameter name: ExecuteAsGMSA"
-                    }
+                    { Set-TargetResource @testParameters -ErrorVariable duplicateCredential } | Should -Throw $errorRecord
+                    $testParameters.Remove('ExecuteAsCredential')
+                    { Set-TargetResource @testParameters -ErrorVariable duplicateCredential } | Should -Throw $errorRecord
                 }
 
                 $testParameters.Remove('BuiltInAccount')
