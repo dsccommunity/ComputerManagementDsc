@@ -157,6 +157,32 @@ try
                 Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 13 -LogMode 'AutoBackup'  | Should Be $false
             }
 
+            It 'Should return $true if LogRetentionDays is in desired state' {
+                Mock -CommandName Get-WinEvent -MockWith {
+                    $properties = @{
+                        MaximumSizeInBytes = 1028kb
+                        IsEnabled          = $true
+                        LogMode            = 'AutoBackup'
+                        LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
+                        SecurityDescriptor = 'TestDescriptor'
+                        LogRetentionDays   = '7'
+                        LogName            = 'Application'
+                    }
+
+                    Write-Output (New-Object -TypeName PSObject -Property $properties)
+                }
+
+                Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 7 -LogMode 'AutoBackup'  | Should Be $true
+            }
+
+            It 'Should not throw when passed an invalid LogRetentionDays' {
+                { Test-TargetResource -LogName 'WrongLog' -LogMode 'AutoBackup' -LogRetentionDays 30 -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should not throw when passed an invalid LogMode with LogRetention' {
+                { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -LogRetentionDays 30 -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
+            }
+
             It 'Should not throw when passed an valid LogFilePath' {
                 { Test-TargetResource -LogName 'Application' -IsEnabled $true -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -ErrorAction Stop } | Should -Not -Throw
             }
@@ -179,6 +205,28 @@ try
 
             It 'Should return $false if SecurityDescriptor is not in desired state' {
                 Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestTestDescriptor' -IsEnabled $true | Should Be $false
+            }
+
+            It 'Should return $true if IsEnabled is in desired state' {
+                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should Be $true
+            }
+
+            It 'Should return $false if IsEnabled is not in desired state' {
+                Test-TargetResource -LogName 'Application' -IsEnabled $false | Should Be $false
+            }
+
+            It 'Should return $true if IsEnabled is not in desired state' {
+                Mock -CommandName Get-WinEvent -MockWith {
+                    $properties = @{
+                        MaximumSizeInBytes = 1028kb
+                        IsEnabled          = $false
+                        LogName            = 'Application'
+                    }
+
+                    Write-Output (New-Object -TypeName PSObject -Property $properties)
+                }
+
+                Test-TargetResource -LogName 'Application' -IsEnabled $false | Should Be $true
             }
         }
 
@@ -205,8 +253,6 @@ try
 
                 Write-Output (New-Object -TypeName PSObject -Property $params)
             }
-
-            Context 'When set is called and actual value does not match expected value' {
 
                 It 'Sets MaximumSizeInBytes to 1028kb' {
                     Mock -CommandName Set-MaximumSizeInBytes
@@ -244,6 +290,25 @@ try
                     Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 0 -Scope It
                 }
 
+                It 'IsEnabled is not in desired state' {
+                    Mock -CommandName Get-WinEvent -MockWith {
+                        $properties = @{
+                            MaximumSizeInBytes = 5000kb
+                            IsEnabled          = $false
+                            LogMode            = 'AutoBackup'
+                            LogFilePath        = 'c:\logs\test.evtx'
+                            SecurityDescriptor = 'TestDescriptor'
+                            LogRetentionDays   = '7'
+                            LogName            = 'TestLog'
+                        }
+
+                        Write-Output (New-Object -TypeName PSObject -Property $properties)
+                    }
+
+                    Set-TargetResource -IsEnabled $true -LogName 'TestLog'
+                    Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 1 -Scope It
+                }
+
                 It 'Sets LogMode to Circular' {
                     Mock -CommandName Set-LogMode
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogMode 'Circular'
@@ -279,7 +344,6 @@ try
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath 'c:\logs\test.evtx'
                     Assert-MockCalled -CommandName Set-LogFilePath -Exactly -Times 0 -Scope It
                 }
-            }
         }
     }
 }
