@@ -22,6 +22,44 @@ Configuration ScheduledTaskOnceCrossTimezone
     }
 }
 
+Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneDisabled
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskOnceSynchronizeAcrossTimeZoneDisabled
+        {
+            TaskName                  = 'Test task sync across time zone disabled'
+            TaskPath                  = '\ComputerManagementDsc\'
+            ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType              = 'Once'
+            StartTime                 = '2018-10-01T01:00:00'
+            SynchronizeAcrossTimeZone = $false
+            ActionWorkingPath         = (Get-Location).Path
+            Enable                    = $true
+        }
+    }
+}
+
+Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled
+        {
+            TaskName                  = 'Test task sync across time zone enabled'
+            TaskPath                  = '\ComputerManagementDsc\'
+            ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType              = 'Once'
+            StartTime                 = '2018-10-01T01:00:00'
+            SynchronizeAcrossTimeZone = $true
+            ActionWorkingPath         = (Get-Location).Path
+            Enable                    = $true
+        }
+    }
+}
+
 Configuration ScheduledTaskOnceAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
