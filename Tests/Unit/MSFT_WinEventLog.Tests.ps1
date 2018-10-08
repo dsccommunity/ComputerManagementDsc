@@ -254,96 +254,96 @@ try
                 Write-Output (New-Object -TypeName PSObject -Property $params)
             }
 
-                It 'Sets MaximumSizeInBytes to 1028kb' {
+            It 'Sets MaximumSizeInBytes to 1028kb' {
                     Mock -CommandName Set-MaximumSizeInBytes
                     Set-TargetResource -MaximumSizeInBytes 1028kb -IsEnabled $true -LogName 'TestLog'
                     Assert-MockCalled -CommandName Set-MaximumSizeInBytes -Exactly -Times 1 -Scope It
-                }
+            }
 
-                It 'MaximumSizeInBytes is in desired state' {
-                    Mock -CommandName Set-MaximumSizeInBytes
-                    Set-TargetResource -MaximumSizeInBytes 5000kb -IsEnabled $true -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-MaximumSizeInBytes -Exactly -Times 0 -Scope It
-                }
+            It 'MaximumSizeInBytes is in desired state' {
+                Mock -CommandName Set-MaximumSizeInBytes
+                Set-TargetResource -MaximumSizeInBytes 5000kb -IsEnabled $true -LogName 'TestLog'
+                Assert-MockCalled -CommandName Set-MaximumSizeInBytes -Exactly -Times 0 -Scope It
+            }
 
-                It 'Sets LogRetentionDays to 32 days' {
-                    Mock -CommandName Set-LogRetentionDays
-                    Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
-                    Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
-                }
+            It 'Sets LogRetentionDays to 32 days' {
+                Mock -CommandName Set-LogRetentionDays
+                Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
+                Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
+            }
 
-                It 'LogRetentionDays is in desired state' {
-                    Mock -CommandName Set-LogRetentionDays
-                    Set-TargetResource -LogRetentionDays '7' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
-                    Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 0 -Scope It
-                }
+            It 'LogRetentionDays is in desired state' {
+                Mock -CommandName Set-LogRetentionDays
+                Set-TargetResource -LogRetentionDays '7' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
+                Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 0 -Scope It
+            }
 
-                It 'Sets IsEnabled to false' {
-                    Mock -CommandName Set-IsEnabled
-                    Set-TargetResource -IsEnabled $false -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 1 -Scope It
-                }
+            It 'Sets IsEnabled to false' {
+                Mock -CommandName Set-IsEnabled
+                Set-TargetResource -IsEnabled $false -LogName 'TestLog'
+                Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 1 -Scope It
+            }
 
-                It 'IsEnabled is in desired state' {
-                    Mock -CommandName Set-IsEnabled
-                    Set-TargetResource -IsEnabled $true -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 0 -Scope It
-                }
+            It 'IsEnabled is in desired state' {
+                Mock -CommandName Set-IsEnabled
+                Set-TargetResource -IsEnabled $true -LogName 'TestLog'
+                Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 0 -Scope It
+            }
 
-                It 'IsEnabled is not in desired state' {
-                    Mock -CommandName Get-WinEvent -MockWith {
-                        $properties = @{
-                            MaximumSizeInBytes = 5000kb
-                            IsEnabled          = $false
-                            LogMode            = 'AutoBackup'
-                            LogFilePath        = 'c:\logs\test.evtx'
-                            SecurityDescriptor = 'TestDescriptor'
-                            LogRetentionDays   = '7'
-                            LogName            = 'TestLog'
-                        }
-
-                        Write-Output (New-Object -TypeName PSObject -Property $properties)
+            It 'IsEnabled is not in desired state' {
+                Mock -CommandName Get-WinEvent -MockWith {
+                    $properties = @{
+                        MaximumSizeInBytes = 5000kb
+                        IsEnabled          = $false
+                        LogMode            = 'AutoBackup'
+                        LogFilePath        = 'c:\logs\test.evtx'
+                        SecurityDescriptor = 'TestDescriptor'
+                        LogRetentionDays   = '7'
+                        LogName            = 'TestLog'
                     }
 
-                    Set-TargetResource -IsEnabled $true -LogName 'TestLog'
-                    Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 1 -Scope It
+                    Write-Output (New-Object -TypeName PSObject -Property $properties)
                 }
 
-                It 'Sets LogMode to Circular' {
-                    Mock -CommandName Set-LogMode
-                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogMode 'Circular'
-                    Assert-MockCalled -CommandName Set-LogMode -Exactly -Times 1 -Scope It
-                }
+                Set-TargetResource -IsEnabled $true -LogName 'TestLog'
+                Assert-MockCalled -CommandName Set-IsEnabled -Exactly -Times 1 -Scope It
+            }
 
-                It 'LogMode is in desired state' {
-                    Mock -CommandName Set-LogMode
-                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogMode 'AutoBackup'
-                    Assert-MockCalled -CommandName Set-LogMode -Exactly -Times 0 -Scope It
-                }
+            It 'Sets LogMode to Circular' {
+                Mock -CommandName Set-LogMode
+                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogMode 'Circular'
+                Assert-MockCalled -CommandName Set-LogMode -Exactly -Times 1 -Scope It
+            }
 
-                It 'Sets SecurityDescriptor to OtherTestDescriptor' {
-                    Mock -CommandName Set-SecurityDescriptor
-                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'OtherTestDescriptor'
-                    Assert-MockCalled -CommandName Set-SecurityDescriptor -Exactly -Times 1 -Scope It
-                }
+            It 'LogMode is in desired state' {
+                Mock -CommandName Set-LogMode
+                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogMode 'AutoBackup'
+                Assert-MockCalled -CommandName Set-LogMode -Exactly -Times 0 -Scope It
+            }
 
-                It 'SecurityDescriptor is in desired state' {
-                    Mock -CommandName Set-SecurityDescriptor
-                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'TestDescriptor'
-                    Assert-MockCalled -CommandName Set-SecurityDescriptor -Exactly -Times 0 -Scope It
-                }
+            It 'Sets SecurityDescriptor to OtherTestDescriptor' {
+                Mock -CommandName Set-SecurityDescriptor
+                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'OtherTestDescriptor'
+                Assert-MockCalled -CommandName Set-SecurityDescriptor -Exactly -Times 1 -Scope It
+            }
 
-                It 'Sets LogFilePath to default path' {
-                    Mock -CommandName Set-LogFilePath
-                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
-                    Assert-MockCalled -CommandName Set-LogFilePath -Exactly -Times 1 -Scope It
-                }
+            It 'SecurityDescriptor is in desired state' {
+                Mock -CommandName Set-SecurityDescriptor
+                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'TestDescriptor'
+                Assert-MockCalled -CommandName Set-SecurityDescriptor -Exactly -Times 0 -Scope It
+            }
 
-                It 'LogFilePath is in desired state' {
-                    Mock -CommandName Set-LogFilePath
-                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath 'c:\logs\test.evtx'
-                    Assert-MockCalled -CommandName Set-LogFilePath -Exactly -Times 0 -Scope It
-                }
+            It 'Sets LogFilePath to default path' {
+                Mock -CommandName Set-LogFilePath
+                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
+                Assert-MockCalled -CommandName Set-LogFilePath -Exactly -Times 1 -Scope It
+            }
+
+            It 'LogFilePath is in desired state' {
+                Mock -CommandName Set-LogFilePath
+                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath 'c:\logs\test.evtx'
+                Assert-MockCalled -CommandName Set-LogFilePath -Exactly -Times 0 -Scope It
+            }
         }
     }
 }

@@ -24,10 +24,9 @@ try
     #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $configFile
-
     Describe "$($script:DSCResourceName)_Integration" {
 
-        Context 'Set Eventlog to Logmode Retain with a MaximumSizeInBytes 1052672 Bytes' {
+        Context 'Set Eventlog to Logmode Retain' {
             $CurrentConfig = 'MSFT_WinEventLog_RetainSize'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
@@ -44,6 +43,10 @@ try
                 } | Should -Not -Throw
             }
 
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
             It 'Should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
             }
@@ -58,6 +61,10 @@ try
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
 
             It 'Should apply the MOF correctly' {
@@ -82,6 +89,10 @@ try
                 } | Should -Not -Throw
             }
 
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
             It 'Should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
@@ -102,6 +113,10 @@ try
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
 
             It 'Should apply the MOF correctly' {
@@ -126,6 +141,10 @@ try
                 } | Should -Not -Throw
             }
 
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
             It 'Should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
@@ -146,6 +165,10 @@ try
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
 
             It 'Should apply the MOF correctly' {
@@ -170,6 +193,10 @@ try
                 } | Should -Not -Throw
             }
 
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
             It 'Should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
@@ -185,13 +212,17 @@ try
             $CurrentConfig = 'MSFT_WinEventLog_EnableBackupLog'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
-            
+
             It 'Should compile a MOF file error' {
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should -Not -Throw
             }
-            
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
             It 'Should not apply the MOF' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
@@ -214,6 +245,10 @@ try
                 } | Should -Not -Throw
             }
 
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
             It 'Should apply the MOF correctly' {
                 {
                     Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
@@ -234,6 +269,10 @@ try
                 {
                     . $CurrentConfig -OutputPath $ConfigDir
                 } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
 
             It 'Should apply the MOF correctly' {
