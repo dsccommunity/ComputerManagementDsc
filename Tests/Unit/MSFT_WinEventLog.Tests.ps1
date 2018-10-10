@@ -26,7 +26,7 @@ try
     InModuleScope $script:DSCResourceName {
         $script:DSCResourceName = 'MSFT_WinEventLog'
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
 
             Mock -CommandName Get-WinEvent -MockWith {
                 $properties = @{
@@ -76,7 +76,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe "$($script:DSCResourceName)\Test-TargetResource" -Tag 'Test' {
 
             Mock -CommandName Get-WinEvent -MockWith {
                 $properties = @{
@@ -230,7 +230,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Set-TargetResource" {
+        Describe "$($script:DSCResourceName)\Set-TargetResource" -Tag 'Set' {
             Mock -CommandName Get-WinEvent -MockWith {
                 $properties = @{
                     MaximumSizeInBytes = 5000kb
@@ -343,6 +343,54 @@ try
                 Mock -CommandName Set-LogFilePath
                 Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath 'c:\logs\test.evtx'
                 Assert-MockCalled -CommandName Set-LogFilePath -Exactly -Times 0 -Scope It
+            }
+        }
+
+        Describe "$($script:DSCResourceName)\Set-IsEnabled" -Tag 'Helper' {
+            It 'Set-IsEnabled should output something' {
+                Mock -CommandName Write-Verbose
+                Set-TargetResource -IsEnabled $true -LogName 'Application'
+                Assert-MockCalled -CommandName Write-Verbose -Exactly -Times 1 -Scope It
+            }
+        }
+
+        Describe "$($script:DSCResourceName)\Set-MaximumSizeInBytes" -Tag 'Helper' {
+            It 'Set-MaximumSizeInBytes should output something' {
+                Mock -CommandName Write-Verbose
+                Test-TargetResource -MaximumSizeInBytes 5000kb -IsEnabled $true -LogName 'Application'
+                Assert-MockCalled -CommandName Write-Verbose -Exactly -Times 5 -Scope It
+            }
+        }
+
+        Describe "$($script:DSCResourceName)\Set-LogMode" -Tag 'Helper' {
+            It 'Set-LogMode should output something' {
+                Mock -CommandName Write-Verbose
+                Test-TargetResource -IsEnabled $true -LogName 'Application' -LogMode 'AutoBackup'
+                Assert-MockCalled -CommandName Write-Verbose -Exactly -Times 5 -Scope It
+            }
+        }
+
+        Describe "$($script:DSCResourceName)\Set-LogRetentionDays" -Tag 'Helper' {
+            It 'LogRetentionDays should output something' {
+                Mock -CommandName Write-Verbose
+                Test-TargetResource -LogRetentionDays '7' -IsEnabled $true -LogName 'Application' -LogMode 'Autobackup'
+                Assert-MockCalled -CommandName Write-Verbose -Exactly -Times 6 -Scope It
+            }
+        }
+
+        Describe "$($script:DSCResourceName)\Set-SecurityDescriptor" -Tag 'Helper' {
+            It 'Set-SecurityDescriptor should output something' {
+                Mock -CommandName Write-Verbose
+                Test-TargetResource -IsEnabled $true -LogName 'Application' -SecurityDescriptor 'TestDescriptor'
+                Assert-MockCalled -CommandName Write-Verbose -Exactly -Times 5 -Scope It
+            }
+        }
+
+        Describe "$($script:DSCResourceName)\Set-LogFilePath" -Tag 'Helper' {
+            It 'Set-LogFilePath should output something' {
+                Mock -CommandName Write-Verbose
+                Test-TargetResource -IsEnabled $true -LogName 'Application' -LogFilePath 'c:\logs\test.evtx'
+                Assert-MockCalled -CommandName Write-Verbose -Exactly -Times 5 -Scope It
             }
         }
     }
