@@ -1010,7 +1010,7 @@ try
                         Settings  = [pscustomobject] @{
                             Enabled            = $true
                             IdleSettings       = @{
-                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
+                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
                                 IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
@@ -1254,7 +1254,7 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             IdleSettings       = @{
-                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
+                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
                                 IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
@@ -1320,7 +1320,7 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             IdleSettings       = @{
-                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes + 1)M"
+                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes + 1)M"
                                 IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes + 1)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
@@ -1738,26 +1738,20 @@ try
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
                     ExecuteAsGMSA       = 'DOMAIN\gMSA$'
+                    BuiltInAccount      = 'NETWORK SERVICE'
                     ExecuteAsCredential = [pscredential]::new('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
                     Verbose             = $true
                 }
 
-                It 'Should return an error when both the ExecuteAsGMSA an ExecuteAsCredential ar specified' {
-                    try
-                    {
-                        Set-TargetResource @testParameters -ErrorVariable duplicateCredential
-                    }
-                    catch
-                    {
-                        # Error from Set-TargetResource expected
-                    }
-                    finally
-                    {
-                        $duplicateCredential.Message | Should -Be "Both ExecuteAsGMSA and ExecuteAsCredential parameters have been specified. A task can either run as a gMSA (Group Managed Service Account) or as a custom credential, not both. Please modify your configuration to include just one of the two.`r`nParameter name: ExecuteAsGMSA"
-                    }
+                It 'Should throw expected exception' {
+                    $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.gMSAandCredentialError -ArgumentName 'ExecuteAsGMSA'
+
+                    { Set-TargetResource @testParameters -ErrorVariable duplicateCredential } | Should -Throw $errorRecord
+                    $testParameters.Remove('ExecuteAsCredential')
+                    { Set-TargetResource @testParameters -ErrorVariable duplicateCredential } | Should -Throw $errorRecord
                 }
 
-                $testParameters.Remove('ExecuteAsCredential')
+                $testParameters.Remove('BuiltInAccount')
 
                 It 'Should call Register-ScheduledTask with the name of the Group Managed Service Account' {
                     Set-TargetResource @testParameters
