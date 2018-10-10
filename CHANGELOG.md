@@ -9,8 +9,9 @@
 - Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #189](https://github.com/PowerShell/ComputerManagementDsc/issues/189).
 - PowerPlan:
   - Added IsActive Read-Only Property - Fixes [Issue #171](https://github.com/PowerShell/ComputerManagementDsc/issues/171).
-  - InActive power plans are no longer returned with their Name set to null. Now, the name is
-    always returned and the Read-Only property of IsActive is set accordingly.
+  - InActive power plans are no longer returned with their Name set to null.
+    Now, the name is always returned and the Read-Only property of IsActive
+    is set accordingly.
 
 ## 5.2.0.0
 
