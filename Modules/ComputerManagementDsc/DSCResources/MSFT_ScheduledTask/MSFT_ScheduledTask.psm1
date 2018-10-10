@@ -1273,8 +1273,9 @@ function Set-TargetResource
         if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
         {
             <#
-            The validateset on BuiltInAccount has already checked the non-null
-            value to be 'LOCAL SERVICE', 'NETWORK SERVICE' or 'SYSTEM'
+                The validateset on BuiltInAccount has already checked the
+                non-null value to be 'LOCAL SERVICE', 'NETWORK SERVICE' or
+                'SYSTEM'
             #>
             $username = 'NT AUTHORITY\' + $BuiltInAccount
             $registerArguments.Add('User', $username)
@@ -1305,9 +1306,9 @@ function Set-TargetResource
         else
         {
             <#
-            'NT AUTHORITY\SYSTEM' basically gives the schedule task admin
-            privileges, should we default to 'NT AUTHORITY\LOCAL SERVICE'
-            instead?
+                'NT AUTHORITY\SYSTEM' basically gives the schedule task admin
+                privileges, should we default to 'NT AUTHORITY\LOCAL SERVICE'
+                instead?
             #>
             $username = 'NT AUTHORITY\SYSTEM'
             $registerArguments.Add('User', $username)
@@ -1897,10 +1898,10 @@ function Test-TargetResource
     if ($PSBoundParameters.ContainsKey('WeeksInterval') -and ((-not $currentValues.ContainsKey('WeeksInterval')) -or ($null -eq $currentValues['WeeksInterval'])))
     {
         <#
-        The WeeksInterval parameter is defaulted to 1, even when the property
-        is unset/undefined for the current task returned from Get-TargetResouce
-        initialise a missing or null WeeksInterval to spurious calls to
-        Set-TargetResouce
+            The WeeksInterval parameter is defaulted to 1, even when the
+            property is unset/undefined for the current task returned from
+            Get-TargetResouce initialise a missing or null WeeksInterval to
+            spurious calls to Set-TargetResouce
         #>
         $currentValues.WeeksInterval = $PSBoundParameters['WeeksInterval']
     }
@@ -1925,8 +1926,8 @@ function Test-TargetResource
     if ($desiredValues.ContainsKey('Verbose'))
     {
         <#
-        Initialise a missing or null Verbose to avoid spurious
-        calls to Set-TargetResouce
+            Initialise a missing or null Verbose to avoid spurious
+            calls to Set-TargetResouce
         #>
         $currentValues.Add('Verbose', $desiredValues['Verbose'])
     }
