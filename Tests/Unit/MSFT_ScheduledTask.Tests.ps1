@@ -1755,7 +1755,7 @@ try
                 It 'Should overwrite LogonType to "ServiceAccount"' {
                     Set-TargetResource @testParameters
                     Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
-                        $LogonType -ieq 'ServiceAccount'
+                        $Inputobject.Principal.LogonType -ieq 'ServiceAccount'
                     }
                 }
 

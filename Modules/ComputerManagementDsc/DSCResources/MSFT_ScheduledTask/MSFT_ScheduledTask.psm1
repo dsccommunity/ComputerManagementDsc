@@ -1875,9 +1875,11 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
     {
-
         $PSBoundParameters.User = $BuiltInAccount
         $currentValues.User = $BuiltInAccount
+
+        $PSBoundParameters.ExecuteAsCredential = $BuiltInAccount
+        $currentValues.ExecuteAsCredential = $BuiltInAccount
 
         $PSBoundParameters['LogonType'] = 'ServiceAccount'
         $currentValues['LogonType'] = 'ServiceAccount'
