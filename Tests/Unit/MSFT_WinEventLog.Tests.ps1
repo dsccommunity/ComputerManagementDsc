@@ -381,6 +381,15 @@ try
                 Set-LogFilePath -LogName 'Application' -LogFilePath 'C:\Temp' | Should -Be $null
             }
         }
+
+        $errorRecord = 'InvalidOperationException: You cannot call a method on a null-valued expression.'
+        Describe "$($script:DSCResourceName)\New-TerminatingError" -Tag 'Helper' {
+            It 'Tests the Private function' {
+                Mock -CommandName New-TerminatingError
+                New-TerminatingError -errorId 'GetWinEventLogFailed' -errorMessage 'You cannot call a method on a null-valued expression.' -errorCategory 'InvalidOperation'
+                Assert-MockCalled -CommandName New-TerminatingError -Exactly -Times 1 -Scope It
+            }
+        }
     }
 }
 finally
