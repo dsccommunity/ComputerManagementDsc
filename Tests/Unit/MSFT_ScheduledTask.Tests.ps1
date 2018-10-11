@@ -1729,6 +1729,69 @@ try
                 }
             }
 
+            Context 'When a scheduled task is created using a Built In Service Account' {
+                $testParameters = @{
+                    TaskName            = 'Test task'
+                    TaskPath            = '\Test\'
+                    ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType        = 'Once'
+                    RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
+                    BuiltInAccount      = 'NETWORK SERVICE'
+                    ExecuteAsCredential = [pscredential]::new('DEMO\WrongUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
+                    Verbose             = $true
+                }
+
+                It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+
+                        $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
+                    }
+                }
+
+                $testParameters.Add('LogonType', 'Password')
+
+                It 'Should overwrite LogonType to "ServiceAccount"' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $LogonType -ieq 'ServiceAccount'
+                    }
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Repetition = @{
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
+                                }
+                                CimClass   = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                        Principal = [pscustomobject] @{
+                            UserId = $testParameters.BuiltInAccount
+                            LogonType = 'ServiceAccount'
+                        }
+                    }
+                }
+
+                $testParameters.LogonType = 'Password'
+                It 'Should return true when BuiltInAccount set even if LogonType parameter different' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+            }
+
             Context 'When a scheduled task is created using a Group Managed Service Account' {
                 $testParameters = @{
                     TaskName            = 'Test task'
