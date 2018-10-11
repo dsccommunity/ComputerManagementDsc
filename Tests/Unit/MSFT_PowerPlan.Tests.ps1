@@ -57,6 +57,7 @@ try
                 $result = Get-TargetResource @testParameters
                 $result.IsSingleInstance | Should -Be 'Yes'
                 $result.Name | Should -Be $testParameters.Name
+                $result.IsActive | Should -Be $true
             }
         }
 
@@ -72,10 +73,11 @@ try
                     -Verifiable
             }
 
-            It 'Should not return any plan name' {
+            It 'Should return an inactive plan' {
                 $result = Get-TargetResource @testParameters
                 $result.IsSingleInstance | Should -Be 'Yes'
-                $result.Name | Should -Be $null
+                $result.Name | Should -Be $testParameters.Name
+                $result.IsActive | Should -Be $false
             }
         }
 

@@ -67,12 +67,10 @@ function Get-TargetResource
         if ($plan.IsActive)
         {
             Write-Verbose -Message ($script:localizedData.PowerPlanIsActive -f $Name)
-            $activePlanName = $Name
         }
         else
         {
             Write-Verbose -Message ($script:localizedData.PowerPlanIsNotActive -f $Name)
-            $activePlanName = $null
         }
     }
     else
@@ -83,7 +81,8 @@ function Get-TargetResource
 
     return @{
         IsSingleInstance = $IsSingleInstance
-        Name             = $activePlanName
+        Name             = $Name
+        IsActive         = $plan.IsActive
     }
 }
 
@@ -177,18 +176,11 @@ function Test-TargetResource
         $Name
     )
 
-    $returnValue = $false
-
     Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingValidated -f $Name)
 
     $getTargetResourceResult = Get-TargetResource -IsSingleInstance $IsSingleInstance -Name $Name
 
-    if ($getTargetResourceResult.Name -eq $Name)
-    {
-        $returnValue = $true
-    }
-
-    return $returnValue
+    return $getTargetResourceResult.IsActive
 }
 
 Export-ModuleMember -Function *-TargetResource
