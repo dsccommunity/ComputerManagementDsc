@@ -235,6 +235,20 @@ try
 
                 Test-TargetResource -LogName 'Application' -IsEnabled $false | Should Be $true
             }
+
+            It 'Should return $true if IsEnabled is not in desired state' {
+                Mock -CommandName Get-WinEvent -MockWith {
+                    $properties = @{
+                        MaximumSizeInBytes = 1028kb
+                        IsEnabled          = $true
+                        LogName            = 'Application'
+                    }
+
+                    Write-Output (New-Object -TypeName PSObject -Property $properties)
+                }
+
+                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should Be $false
+            }
         }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" -Tag 'Set' {
@@ -276,6 +290,12 @@ try
             It 'Sets LogRetentionDays to 32 days' {
                 Mock -CommandName Set-LogRetentionDays
                 Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
+                Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
+            }
+
+            It 'Sets LogRetentionDays to 32 days, wrong Logmode' {
+                Mock -CommandName Set-LogRetentionDays
+                Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog' -LogMode 'Circular'
                 Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
             }
 

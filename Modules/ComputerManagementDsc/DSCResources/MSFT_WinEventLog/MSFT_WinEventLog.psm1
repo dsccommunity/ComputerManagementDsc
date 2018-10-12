@@ -379,11 +379,10 @@ Function Set-IsEnabled
 
     Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
 
-    $log = Get-WinEvent -ListLog $LogName
-    $log.IsEnabled = $IsEnabled
-
     try
     {
+        $log = Get-WinEvent -ListLog $LogName
+        $log.IsEnabled = $IsEnabled
         $log.SaveChanges()
         Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
     }
@@ -420,11 +419,10 @@ Function Set-MaximumSizeInBytes
 
     Write-Verbose -Message ($localizedData.SettingEventlogLogSize -f $LogName, $MaximumSizeInBytes)
 
-    $log = Get-WinEvent -ListLog $LogName
-    $log.MaximumSizeInBytes = $MaximumSizeInBytes
-
     try
     {
+        $log = Get-WinEvent -ListLog $LogName
+        $log.MaximumSizeInBytes = $MaximumSizeInBytes
         $log.SaveChanges()
         Write-Verbose -Message ($localizedData.SettingWinEventlogMaximumSizeInBytesSuccess -f $LogName, $MaximumSizeInBytes)
     }
@@ -461,11 +459,10 @@ Function Set-LogMode
 
     Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode)
 
-    $log = Get-WinEvent -ListLog $LogName
-    $log.LogMode = $LogMode
-
     try
     {
+        $log = Get-WinEvent -ListLog $LogName
+        $log.LogMode = $LogMode
         $log.SaveChanges()
         Write-Verbose -Message ($localizedData.SettingWinEventlogLogModeSuccess -f $LogName, $LogMode)
     }
@@ -538,11 +535,10 @@ Function Set-SecurityDescriptor
 
     Write-Verbose -Message ($localizedData.SettingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
 
-    $log = Get-WinEvent -ListLog $LogName
-    $log.SecurityDescriptor = $SecurityDescriptor
-
     try
     {
+        $log = Get-WinEvent -ListLog $LogName
+        $log.SecurityDescriptor = $SecurityDescriptor
         $log.SaveChanges()
         Write-Verbose -Message ($localizedData.SettingWinEventlogSecurityDescriptorSuccess -f $LogName, $SecurityDescriptor)
     }
@@ -578,11 +574,10 @@ Function Set-LogFilePath
 
     Write-Verbose -Message ($localizedData.SettingEventlogLogFilePath -f $LogName, $LogFilePath)
 
-    $log = Get-WinEvent -ListLog $LogName
-    $log.LogFilePath = $LogFilePath
-
     try
     {
+        $log = Get-WinEvent -ListLog $LogName
+        $log.LogFilePath = $LogFilePath
         $log.SaveChanges()
         Write-Verbose -Message ($localizedData.SettingWinEventlogLogFilePathSuccess -f $LogName, $LogFilePath)
     }
