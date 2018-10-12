@@ -20,6 +20,13 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Unit
 #endregion HEADER
 
+$Script:invalidPolicyThrowMessage = @"
+Cannot validate argument on parameter 'ExecutionPolicy'. The argument `"badParam`" does
+not belong to the set `"Bypass,Restricted,AllSigned,RemoteSigned,Unrestricted`"
+specified by the ValidateSet attribute. Supply an argument that is in the set and then
+try the command again.
+"@
+
 # Begin Testing
 try
 {
@@ -350,11 +357,21 @@ try
             It 'Tests the Private function' {
                 Set-IsEnabled -LogName 'Application' -IsEnabled $true | Should -Be $null
             }
+
+            Mock -CommandName Get-WinEvent -MockWith { throw }
+            It "Should throw if we're unable to get a log" {
+                { Set-IsEnabled -LogName 'Application' -IsEnabled $true } | Should -Throw
+            }
         }
 
         Describe "$($script:DSCResourceName)\Set-MaximumSizeInBytes" -Tag 'Helper' {
             It 'Tests the Private function' {
                 Set-MaximumSizeInBytes -LogName 'Application' -MaximumSizeInBytes 2048kb | Should -Be $null
+            }
+
+            Mock -CommandName Get-WinEvent -MockWith { throw }
+            It "Should throw if we're unable to get a log" {
+                { Set-MaximumSizeInBytes -LogName 'Application' -MaximumSizeInBytes 2048kb } | Should -Throw
             }
         }
 
@@ -362,11 +379,21 @@ try
             It 'Tests the Private function' {
                 Set-LogMode -LogName 'Application' -LogMode 'Circular' | Should -Be $null
             }
+
+            Mock -CommandName Get-WinEvent -MockWith { throw }
+            It "Should throw if we're unable to get a log" {
+                { Set-LogMode -LogName 'Application' -LogMode 'Circular' } | Should -Throw
+            }
         }
 
         Describe "$($script:DSCResourceName)\Set-LogRetentionDays" -Tag 'Helper' {
             It 'Tests the Private function' {
                 Set-LogRetentionDays -LogName 'Application' -LogRetentionDays 30 | Should -Be $null
+            }
+
+            Mock -CommandName Limit-Eventlog -MockWith { throw }
+            It "Should throw if we're unable to get a log" {
+                {  Limit-Eventlog -LogName 'Application' -OverflowAction 'OverwriteOlder' -RetentionDays 30 } | Should -Throw
             }
         }
 
@@ -374,20 +401,33 @@ try
             It 'Tests the Private function' {
                 Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor 'Circular' | Should -Be $null
             }
+
+            Mock -CommandName Get-WinEvent -MockWith { throw }
+            It "Should throw if we're unable to get a log" {
+                { Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor 'Circular' } | Should -Throw
+            }
         }
 
         Describe "$($script:DSCResourceName)\Set-LogFilePath" -Tag 'Helper' {
             It 'Tests the Private function' {
                 Set-LogFilePath -LogName 'Application' -LogFilePath 'C:\Temp' | Should -Be $null
             }
+
+            Mock -CommandName Get-WinEvent -MockWith { throw }
+            It "Should throw if we're unable to get a log" {
+                { Set-LogFilePath -LogName 'Application' -LogFilePath 'C:\Temp' } | Should -Throw
+            }
         }
 
         $errorRecord = 'InvalidOperationException: You cannot call a method on a null-valued expression.'
         Describe "$($script:DSCResourceName)\New-TerminatingError" -Tag 'Helper' {
             It 'Tests the Private function' {
-                Mock -CommandName New-TerminatingError
-                New-TerminatingError -errorId 'GetWinEventLogFailed' -errorMessage 'You cannot call a method on a null-valued expression.' -errorCategory 'InvalidOperation'
-                Assert-MockCalled -CommandName New-TerminatingError -Exactly -Times 1 -Scope It
+                { New-TerminatingError -errorId 'TestFailure' -errorMessage 'TestFailureMessage' -errorCategory 'InvalidOperation' } | Should -Throw 'TestFailureMessage'
+            }
+
+            Mock -CommandName Get-WinEvent -MockWith { throw }
+            It "Should throw if we're unable to get a log" {
+                { Get-WinEvent -LogName 'SomeLog' -IsEnabled $true } | Should -Throw
             }
         }
     }
