@@ -20,13 +20,6 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Unit
 #endregion HEADER
 
-$Script:invalidPolicyThrowMessage = @"
-Cannot validate argument on parameter 'ExecutionPolicy'. The argument `"badParam`" does
-not belong to the set `"Bypass,Restricted,AllSigned,RemoteSigned,Unrestricted`"
-specified by the ValidateSet attribute. Supply an argument that is in the set and then
-try the command again.
-"@
-
 # Begin Testing
 try
 {
@@ -51,7 +44,7 @@ try
             $results = Get-TargetResource -LogName 'Application' -IsEnabled $true
 
             It 'Should return an hashtable' {
-                $results.GetType().Name | Should Be 'HashTable'
+                $results.GetType().Name | Should -Be 'HashTable'
             }
 
             It 'Should return a Logname Application' {
@@ -59,27 +52,27 @@ try
             }
 
             It 'Should return a MaximumSizeInBytes of 4096kb' {
-                $results.MaximumSizeInBytes | Should Be 4096kb
+                $results.MaximumSizeInBytes | Should -Be 4096kb
             }
 
             It 'Should return IsEnabled is true' {
-                $results.IsEnabled | should Be $true
+                $results.IsEnabled | should -Be $true
             }
 
             It 'Should return a LogMode is Circular' {
-                $results.LogMode | Should Be 'Circular'
+                $results.LogMode | Should -Be 'Circular'
             }
 
             It 'Should return a LogRetentionDays of 0' {
-                $results.LogRetentionDays | Should Be 0
+                $results.LogRetentionDays | Should -Be 0
             }
 
             It 'Should return a LogFilePath of %SystemRoot%\System32\Winevt\Logs\Application.evtx' {
-                $results.LogFilePath | Should Be "%SystemRoot%\System32\Winevt\Logs\Application.evtx"
+                $results.LogFilePath | Should -Be "%SystemRoot%\System32\Winevt\Logs\Application.evtx"
             }
 
             It 'Should return SecurityDescriptor with a value TestDescriptor' {
-                $results.SecurityDescriptor | Should Be 'TestDescriptor'
+                $results.SecurityDescriptor | Should -Be 'TestDescriptor'
             }
         }
 
@@ -121,11 +114,11 @@ try
             }
 
             It 'Should return $true if Logmode is in desired state' {
-                Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true | Should Be $true
+                Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true | Should -Be $true
             }
 
             It 'Should return $false if Logmode is not in desired state' {
-                Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true | Should Be $false
+                Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true | Should -Be $false
             }
 
             It 'Throws when passed an invalid MaximumSizeInBytes below 1028kb' {
@@ -137,11 +130,11 @@ try
             }
 
             It 'Should return $true if MaximumSizeInBytes is in desired state' {
-                Test-TargetResource -MaximumSizeInBytes 1028kb -LogName 'Application' -IsEnabled $true | Should Be $true
+                Test-TargetResource -MaximumSizeInBytes 1028kb -LogName 'Application' -IsEnabled $true | Should -Be $true
             }
 
             It 'Should return $false if MaximumSizeInBytes is not in desired state' {
-                Test-TargetResource -MaximumSizeInBytes 2048kb -LogName 'Application' -IsEnabled $true | Should Be $false
+                Test-TargetResource -MaximumSizeInBytes 2048kb -LogName 'Application' -IsEnabled $true | Should -Be $false
             }
 
             It 'Should not throw when passed an valid MaximumSizeInBytes' {
@@ -161,14 +154,14 @@ try
             }
 
             It 'Should return $false if LogRetentionDays is not in desired state' {
-                Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 13 -LogMode 'AutoBackup'  | Should Be $false
+                Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 13 -LogMode 'AutoBackup'  | Should -Be $false
             }
 
             It 'Should return $true if LogRetentionDays is in desired state' {
                 Mock -CommandName Get-WinEvent -MockWith {
                     $properties = @{
                         MaximumSizeInBytes = 1028kb
-                        IsEnabled          = $true
+                        IsEnabled          = $false
                         LogMode            = 'AutoBackup'
                         LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
                         SecurityDescriptor = 'TestDescriptor'
@@ -179,7 +172,7 @@ try
                     Write-Output (New-Object -TypeName PSObject -Property $properties)
                 }
 
-                Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 7 -LogMode 'AutoBackup'  | Should Be $true
+                Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 7 -LogMode 'AutoBackup'  | Should -Be $true
             }
 
             It 'Should not throw when passed an invalid LogRetentionDays' {
@@ -195,11 +188,11 @@ try
             }
 
             It 'Should return $true if LogFilePath is in desired state' {
-                Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -IsEnabled $true | Should Be $true
+                Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -IsEnabled $true | Should -Be $true
             }
 
             It 'Should return $false if LogFilePath is not in desired state' {
-                Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\OtherLogs\Application.evtx' -IsEnabled $true | Should Be $false
+                Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\OtherLogs\Application.evtx' -IsEnabled $true | Should -Be $false
             }
 
             It 'Should not throw when passed an valid SecurityDescriptor' {
@@ -207,19 +200,19 @@ try
             }
 
             It 'Should return $true if SecurityDescriptor is in desired state' {
-                Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestDescriptor' -IsEnabled $true | Should Be $true
+                Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestDescriptor' -IsEnabled $true | Should -Be $true
             }
 
             It 'Should return $false if SecurityDescriptor is not in desired state' {
-                Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestTestDescriptor' -IsEnabled $true | Should Be $false
+                Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestTestDescriptor' -IsEnabled $true | Should -Be $false
             }
 
             It 'Should return $true if IsEnabled is in desired state' {
-                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should Be $true
+                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $true
             }
 
             It 'Should return $false if IsEnabled is not in desired state' {
-                Test-TargetResource -LogName 'Application' -IsEnabled $false | Should Be $false
+                Test-TargetResource -LogName 'Application' -IsEnabled $false | Should -Be $false
             }
 
             It 'Should return $true if IsEnabled is not in desired state' {
@@ -233,7 +226,7 @@ try
                     Write-Output (New-Object -TypeName PSObject -Property $properties)
                 }
 
-                Test-TargetResource -LogName 'Application' -IsEnabled $false | Should Be $true
+                Test-TargetResource -LogName 'Application' -IsEnabled $false | Should -Be $true
             }
 
             It 'Should return $true if IsEnabled is not in desired state' {
@@ -247,7 +240,7 @@ try
                     Write-Output (New-Object -TypeName PSObject -Property $properties)
                 }
 
-                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should Be $false
+                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $false
             }
         }
 
@@ -296,7 +289,7 @@ try
             It 'Sets LogRetentionDays to 32 days, wrong Logmode' {
                 Mock -CommandName Set-LogRetentionDays
                 Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog' -LogMode 'Circular'
-                Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
+                Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 0 -Scope It
             }
 
             It 'LogRetentionDays is in desired state' {
@@ -419,12 +412,12 @@ try
 
         Describe "$($script:DSCResourceName)\Set-SecurityDescriptor" -Tag 'Helper' {
             It 'Tests the Private function' {
-                Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor 'Circular' | Should -Be $null
+                Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)' | Should -Be $null
             }
 
             Mock -CommandName Get-WinEvent -MockWith { throw }
             It "Should throw if we're unable to get a log" {
-                { Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor 'Circular' } | Should -Throw
+                { Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)' } | Should -Throw
             }
         }
 
