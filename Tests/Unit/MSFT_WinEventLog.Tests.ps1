@@ -63,8 +63,8 @@ try
                 $results.LogMode | Should -Be 'Circular'
             }
 
-            It 'Should return a LogRetentionDays of 0' {
-                $results.LogRetentionDays | Should -Be 0
+            It 'Should return a LogRetentionDays of 30' {
+                $results.LogRetentionDays | Should -Be 30
             }
 
             It 'Should return a LogFilePath of %SystemRoot%\System32\Winevt\Logs\Application.evtx' {
@@ -118,7 +118,7 @@ try
             }
 
             It 'Should return $false if Logmode is not in desired state' {
-                Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true | Should -Be $false
+                Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $false | Should -Be $false
             }
 
             It 'Throws when passed an invalid MaximumSizeInBytes below 1028kb' {
@@ -161,7 +161,7 @@ try
                 Mock -CommandName Get-WinEvent -MockWith {
                     $properties = @{
                         MaximumSizeInBytes = 1028kb
-                        IsEnabled          = $false
+                        IsEnabled          = $true
                         LogMode            = 'AutoBackup'
                         LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
                         SecurityDescriptor = 'TestDescriptor'
@@ -215,7 +215,7 @@ try
                 Test-TargetResource -LogName 'Application' -IsEnabled $false | Should -Be $false
             }
 
-            It 'Should return $true if IsEnabled is not in desired state' {
+            It 'Should return $false if IsEnabled is not in desired state' {
                 Mock -CommandName Get-WinEvent -MockWith {
                     $properties = @{
                         MaximumSizeInBytes = 1028kb
@@ -226,7 +226,7 @@ try
                     Write-Output (New-Object -TypeName PSObject -Property $properties)
                 }
 
-                Test-TargetResource -LogName 'Application' -IsEnabled $false | Should -Be $true
+                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $false
             }
 
             It 'Should return $true if IsEnabled is not in desired state' {
@@ -240,7 +240,7 @@ try
                     Write-Output (New-Object -TypeName PSObject -Property $properties)
                 }
 
-                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $false
+                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $true
             }
         }
 
@@ -373,7 +373,7 @@ try
 
             Mock -CommandName Get-WinEvent -MockWith { throw }
             It "Should throw if we're unable to get a log" {
-                { Set-IsEnabled -LogName 'Application' -IsEnabled $true } | Should -Throw
+                { Set-IsEnabled -LogName 'WrongLog' -IsEnabled $truelse } | Should -Throw
             }
         }
 
@@ -384,7 +384,7 @@ try
 
             Mock -CommandName Get-WinEvent -MockWith { throw }
             It "Should throw if we're unable to get a log" {
-                { Set-MaximumSizeInBytes -LogName 'Application' -MaximumSizeInBytes 2048kb } | Should -Throw
+                { Set-MaximumSizeInBytes -LogName 'NotExistingLog' -MaximumSizeInBytes 'StringValue' } | Should -Throw
             }
         }
 
@@ -395,7 +395,7 @@ try
 
             Mock -CommandName Get-WinEvent -MockWith { throw }
             It "Should throw if we're unable to get a log" {
-                { Set-LogMode -LogName 'Application' -LogMode 'Circular' } | Should -Throw
+                { Set-LogMode -LogName 'NotExistingLog' -LogMode 'BadValue' } | Should -Throw
             }
         }
 
@@ -412,12 +412,12 @@ try
 
         Describe "$($script:DSCResourceName)\Set-SecurityDescriptor" -Tag 'Helper' {
             It 'Tests the Private function' {
-                Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)' | Should -Be $null
+                Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor 'TestDescriptor' | Should -Be $null
             }
 
             Mock -CommandName Get-WinEvent -MockWith { throw }
             It "Should throw if we're unable to get a log" {
-                { Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)' } | Should -Throw
+                { Set-SecurityDescriptor -LogName 'Application' -SecurityDescriptor '' } | Should -Throw
             }
         }
 
@@ -428,7 +428,7 @@ try
 
             Mock -CommandName Get-WinEvent -MockWith { throw }
             It "Should throw if we're unable to get a log" {
-                { Set-LogFilePath -LogName 'Application' -LogFilePath 'C:\Temp' } | Should -Throw
+                { Set-LogFilePath -LogName 'Application' -LogFilePath '' } | Should Throw
             }
         }
 
@@ -440,7 +440,7 @@ try
 
             Mock -CommandName Get-WinEvent -MockWith { throw }
             It "Should throw if we're unable to get a log" {
-                { Get-WinEvent -LogName 'SomeLog' -IsEnabled $true } | Should -Throw
+                { New-TerminatingError -errorId 'TestFailure' -errorMessage 'TestFailureMessage' -errorCategory 'InvalidOperation'  } | Should -Throw
             }
         }
     }
