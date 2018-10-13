@@ -63,8 +63,8 @@ try
                 $results.LogMode | Should -Be 'Circular'
             }
 
-            It 'Should return a LogRetentionDays of 30' {
-                $results.LogRetentionDays | Should -Be 30
+            It 'Should return a LogRetentionDays of 0' {
+                $results.LogRetentionDays | Should -Be 0
             }
 
             It 'Should return a LogFilePath of %SystemRoot%\System32\Winevt\Logs\Application.evtx' {
