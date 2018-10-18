@@ -234,7 +234,7 @@ try
             }
         }
 
-        Context 'Disable a Logfile other than Application Eventlog with Retention' {
+        Context 'Disable a Logfile other than Application Eventlog with retention' {
             $CurrentConfig = 'MSFT_WinEventLog_DisableBackupLog'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')

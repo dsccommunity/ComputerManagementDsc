@@ -255,7 +255,19 @@ function Set-TargetResource
         }
         else
         {
-            Set-IsEnabled -LogName $LogName -IsEnabled $IsEnabled
+            Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
+
+            try
+            {
+                $log = Get-WinEvent -ListLog $LogName
+                $log.IsEnabled = $IsEnabled
+                $log.SaveChanges()
+                Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
+            }
+            catch
+            {
+                Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledFailed -f $LogName, $IsEnabled)
+            }
         }
     }
     catch
