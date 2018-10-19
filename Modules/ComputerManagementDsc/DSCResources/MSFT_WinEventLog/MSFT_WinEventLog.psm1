@@ -165,7 +165,7 @@ function Set-TargetResource
                 {
                     $log = Get-WinEvent -ListLog $LogName
                     $log.MaximumSizeInBytes = $MaximumSizeInBytes
-                    $log.SaveChanges()
+                    Save-LogFile -Log $log
                     Write-Verbose -Message ($localizedData.SettingWinEventlogMaximumSizeInBytesSuccess -f $LogName, $MaximumSizeInBytes)
                 }
                 catch
@@ -182,7 +182,7 @@ function Set-TargetResource
                 {
                     $log = Get-WinEvent -ListLog $LogName
                     $log.LogMode = $LogMode
-                    $log.SaveChanges()
+                    Save-LogFile -Log $log
                     Write-Verbose -Message ($localizedData.SettingWinEventlogLogModeSuccess -f $LogName, $LogMode)
                 }
                 catch
@@ -227,7 +227,7 @@ function Set-TargetResource
                 {
                     $log = Get-WinEvent -ListLog $LogName
                     $log.SecurityDescriptor = $SecurityDescriptor
-                    $log.SaveChanges()
+                    Save-LogFile -Log $log
                     Write-Verbose -Message ($localizedData.SettingWinEventlogSecurityDescriptorSuccess -f $LogName, $SecurityDescriptor)
                 }
                 catch
@@ -244,7 +244,7 @@ function Set-TargetResource
                 {
                     $log = Get-WinEvent -ListLog $LogName
                     $log.LogFilePath = $LogFilePath
-                    $log.SaveChanges()
+                    Save-LogFile -Log $log
                     Write-Verbose -Message ($localizedData.SettingWinEventlogLogFilePathSuccess -f $LogName, $LogFilePath)
                 }
                 catch
@@ -261,7 +261,7 @@ function Set-TargetResource
             {
                 $log = Get-WinEvent -ListLog $LogName
                 $log.IsEnabled = $IsEnabled
-                $log.SaveChanges()
+                Save-LogFile -Log $log
                 Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
             }
             catch
@@ -433,6 +433,74 @@ function Test-TargetResource
         }
     }
     return $desiredState
+}
+
+<#
+    .SYNOPSIS
+        Sets the desired resource state.
+
+    .PARAMETER LogName
+        Specifies the given name of a eventlog.
+
+    .PARAMETER LogFilePath
+        Specifies the given LogFilepath of a eventlog.
+#>
+Function Save-LogFile
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.Object]
+        $Log
+    )
+
+    try
+    {
+        $Log.SaveChanges()
+        Write-Verbose -Message ($localizedData.SaveWinEventlogSuccess)
+    }
+    catch
+    {
+        Write-Verbose -Message ($localizedData.SaveWinEventlogFailure)
+    }
+}
+
+<#
+    .SYNOPSIS
+        Sets the desired resource state.
+
+    .PARAMETER LogName
+        Specifies the given name of a eventlog.
+
+    .PARAMETER Retention
+        Specifies the given RetentionDays for LogMode Autobackup.
+#>
+Function Set-LogRetentionDays
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $LogName,
+
+        [Parameter(Mandatory = $true)]
+        [System.Int32]
+        $LogRetentionDays
+    )
+
+    Write-Verbose -Message ($localizedData.SettingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
+
+    try
+    {
+        Limit-Eventlog -LogName $LogName -OverflowAction 'OverwriteOlder' -RetentionDays $LogRetentionDays
+        Write-Verbose -Message ($localizedData.SettingWinEventlogRetentionDaysSuccess -f $LogName, $LogRetentionDays)
+    }
+    catch
+    {
+        Write-Verbose -Message ($localizedData.SettingWinEventlogRetentionDaysFailed -f $LogName, $LogRetentionDays)
+    }
 }
 
 Export-ModuleMember -Function *-TargetResource
