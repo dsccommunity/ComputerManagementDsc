@@ -200,17 +200,7 @@ function Set-TargetResource
 
                     if ($LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
                     {
-                        Write-Verbose -Message ($localizedData.SettingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
-
-                        try
-                        {
-                            Limit-Eventlog -LogName $LogName -OverflowAction 'OverwriteOlder' -RetentionDays $LogRetentionDays
-                            Write-Verbose -Message ($localizedData.SettingWinEventlogRetentionDaysSuccess -f $LogName, $LogRetentionDays)
-                        }
-                        catch
-                        {
-                            Write-Verbose -Message ($localizedData.SettingWinEventlogRetentionDaysFailed -f $LogName, $LogRetentionDays)
-                        }
+                        Set-LogRetentionDays -LogName $LogName -LogRetentionDays $LogRetentionDays
                     }
                 }
                 else

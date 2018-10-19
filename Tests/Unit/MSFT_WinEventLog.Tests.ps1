@@ -280,9 +280,9 @@ try
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
                 }
 
-                It 'Sets LogRetentionDays to 32 days' {
+                It 'Sets LogRetentionDays to 14 days' {
                     Mock -CommandName Set-LogRetentionDays
-                    Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
+                    Set-TargetResource -LogRetentionDays '14' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
                     Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
                 }
 
