@@ -340,6 +340,12 @@ try
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
                 }
 
+                It 'IsEnabled is not in desired state and should throw' {
+                    Mock -CommandName Save-LogFile
+                    Mock -CommandName Get-WinEvent -MockWith { throw }
+                    { Set-TargetResource -LogName 'SomeLog' -IsEnabled $false } | Should -Throw
+                }
+
                 It 'IsEnabled is not in desired state' {
                     Mock -CommandName Get-WinEvent -MockWith {
                         $properties = @{
