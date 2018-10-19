@@ -143,52 +143,25 @@ function Set-TargetResource
             if ($PSBoundParameters.ContainsKey('IsEnabled') -and $IsEnabled -ne $log.IsEnabled)
             {
                 Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
-
-                try
-                {
-                    $log = Get-WinEvent -ListLog $LogName
-                    $log.IsEnabled = $IsEnabled
-                    Save-LogFile -Log $log
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
-                }
-                catch
-                {
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledFailed -f $LogName, $IsEnabled)
-                }
+                $log.IsEnabled = $IsEnabled
+                Save-LogFile -Log $log
+                Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
             }
 
             if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $MaximumSizeInBytes -ne $log.MaximumSizeInBytes)
             {
                 Write-Verbose -Message ($localizedData.SettingEventlogLogSize -f $LogName, $MaximumSizeInBytes)
-
-                try
-                {
-                    $log = Get-WinEvent -ListLog $LogName
-                    $log.MaximumSizeInBytes = $MaximumSizeInBytes
-                    Save-LogFile -Log $log
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogMaximumSizeInBytesSuccess -f $LogName, $MaximumSizeInBytes)
-                }
-                catch
-                {
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogMaximumSizeInBytesFailed -f $LogName, $MaximumSizeInBytes)
-                }
+                $log.MaximumSizeInBytes = $MaximumSizeInBytes
+                Save-LogFile -Log $log
+                Write-Verbose -Message ($localizedData.SettingWinEventlogMaximumSizeInBytesSuccess -f $LogName, $MaximumSizeInBytes)
             }
 
             if ($PSBoundParameters.ContainsKey('LogMode') -and $LogMode -ne $log.LogMode)
             {
                 Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode)
-
-                try
-                {
-                    $log = Get-WinEvent -ListLog $LogName
-                    $log.LogMode = $LogMode
-                    Save-LogFile -Log $log
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogLogModeSuccess -f $LogName, $LogMode)
-                }
-                catch
-                {
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogLogModeFailed -f $LogName, $LogMode)
-                }
+                $log.LogMode = $LogMode
+                Save-LogFile -Log $log
+                Write-Verbose -Message ($localizedData.SettingWinEventlogLogModeSuccess -f $LogName, $LogMode)
             }
 
             if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
@@ -212,52 +185,25 @@ function Set-TargetResource
             if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $SecurityDescriptor -ne $log.SecurityDescriptor)
             {
                 Write-Verbose -Message ($localizedData.SettingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
-
-                try
-                {
-                    $log = Get-WinEvent -ListLog $LogName
-                    $log.SecurityDescriptor = $SecurityDescriptor
-                    Save-LogFile -Log $log
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogSecurityDescriptorSuccess -f $LogName, $SecurityDescriptor)
-                }
-                catch
-                {
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogSecurityDescriptorFailed -f $LogName, $SecurityDescriptor)
-                }
+                $log.SecurityDescriptor = $SecurityDescriptor
+                Save-LogFile -Log $log
+                Write-Verbose -Message ($localizedData.SettingWinEventlogSecurityDescriptorSuccess -f $LogName, $SecurityDescriptor)
             }
 
             if ($PSBoundParameters.ContainsKey('LogFilePath') -and $LogFilePath -ne $log.LogFilePath)
             {
                 Write-Verbose -Message ($localizedData.SettingEventlogLogFilePath -f $LogName, $LogFilePath)
-
-                try
-                {
-                    $log = Get-WinEvent -ListLog $LogName
-                    $log.LogFilePath = $LogFilePath
-                    Save-LogFile -Log $log
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogLogFilePathSuccess -f $LogName, $LogFilePath)
-                }
-                catch
-                {
-                    Write-Verbose -Message ($localizedData.SettingWinEventlogLogFilePathFailed -f $LogName, $LogFilePath)
-                }
+                $log.LogFilePath = $LogFilePath
+                Save-LogFile -Log $log
+                Write-Verbose -Message ($localizedData.SettingWinEventlogLogFilePathSuccess -f $LogName, $LogFilePath)
             }
         }
         else
         {
             Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
-
-            try
-            {
-                $log = Get-WinEvent -ListLog $LogName
-                $log.IsEnabled = $IsEnabled
-                Save-LogFile -Log $log
-                Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
-            }
-            catch
-            {
-                Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledFailed -f $LogName, $IsEnabled)
-            }
+            $log.IsEnabled = $IsEnabled
+            Save-LogFile -Log $log
+            Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
         }
     }
     catch
@@ -427,13 +373,10 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-        Sets the desired resource state.
+        Save the desired resource state.
 
-    .PARAMETER LogName
-        Specifies the given name of a eventlog.
-
-    .PARAMETER LogFilePath
-        Specifies the given LogFilepath of a eventlog.
+    .PARAMETER Log
+        Specifies the given object of a eventlog.
 #>
 Function Save-LogFile
 {
