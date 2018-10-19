@@ -280,6 +280,30 @@ try
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
                 }
 
+                It 'Sets SecurityDescriptor to OtherTestDescriptor' {
+                    Mock -CommandName Save-LogFile
+                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'OtherTestDescriptor'
+                    Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
+                }
+
+                It 'SecurityDescriptor is in desired state' {
+                    Mock -CommandName Save-LogFile
+                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'TestDescriptor'
+                    Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
+                }
+
+                It 'Sets LogFilePath to default path' {
+                    Mock -CommandName Save-LogFile
+                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
+                    Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
+                }
+
+                It 'LogFilePath is in desired state' {
+                    Mock -CommandName Save-LogFile
+                    Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath 'c:\logs\test.evtx'
+                    Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
+                }
+
                 It 'Sets LogRetentionDays to 14 days' {
                     Mock -CommandName Set-LogRetentionDays
                     Set-TargetResource -LogRetentionDays '14' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
@@ -313,6 +337,25 @@ try
                 It 'IsEnabled is not in desired state' {
                     Mock -CommandName Save-LogFile
                     Set-TargetResource -IsEnabled $false -LogName 'TestLog'
+                    Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
+                }
+
+                It 'IsEnabled is not in desired state' {
+                    Mock -CommandName Get-WinEvent -MockWith {
+                        $properties = @{
+                            MaximumSizeInBytes = 5000kb
+                            IsEnabled          = $false
+                            LogMode            = 'AutoBackup'
+                            LogFilePath        = 'c:\logs\test.evtx'
+                            SecurityDescriptor = 'TestDescriptor'
+                            LogRetentionDays   = '7'
+                            LogName            = 'TestLog'
+                        }
+
+                        Write-Output (New-Object -TypeName PSObject -Property $properties)
+                    }
+
+                    Set-TargetResource -IsEnabled $true -LogName 'TestLog'
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
                 }
 

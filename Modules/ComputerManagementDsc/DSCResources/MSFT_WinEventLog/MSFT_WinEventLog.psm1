@@ -148,7 +148,7 @@ function Set-TargetResource
                 {
                     $log = Get-WinEvent -ListLog $LogName
                     $log.IsEnabled = $IsEnabled
-                    $log.SaveChanges()
+                    Save-LogFile -Log $log
                     Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
                 }
                 catch
