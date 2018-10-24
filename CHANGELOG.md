@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.0.0.0
+
 - ScheduledTask:
   - Added support for Group Managed Service Accounts, implemented using the ExecuteAsGMSA
     parameter. Fixes [Issue #111](https://github.com/PowerShell/ComputerManagementDsc/issues/111)

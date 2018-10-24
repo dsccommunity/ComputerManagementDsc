@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-moduleVersion = '5.2.0.0'
+moduleVersion = '6.0.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,16 +49,16 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- PowershellExecutionPolicy:
-  - Updated to meet HQRM guidelines.
-  - Migrated the xPowershellExecutionPolicy from [xPowershellExecutionPolicy](https://github.com/PowerShell/xPowerShellExecutionPolicy)
-    and renamed to PowershellExecutionPolicy.
-  - Moved strings to localization file.
-- Changed the scope from Global to Script in MSFT_ScheduledTask.Integration.Tests.ps1
-- Changed the scope from Global to Script ComputerManagementDsc.Common.Tests.ps1
-- ScheduledTask:
-  - Added support for event based triggers, implemented using the ScheduleType OnEvent
-    fixes [Issue 167](https://github.com/PowerShell/ComputerManagementDsc/issues/167)
+        ReleaseNotes = '- ScheduledTask:
+  - Added support for Group Managed Service Accounts, implemented using the ExecuteAsGMSA
+    parameter. Fixes [Issue 111](https://github.com/PowerShell/ComputerManagementDsc/issues/111)
+  - Added support to set the Synchronize Across Time Zone option. Fixes [Issue 109](https://github.com/PowerShell/ComputerManagementDsc/issues/109)
+- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue 189](https://github.com/PowerShell/ComputerManagementDsc/issues/189).
+- BREAKING CHANGE: PowerPlan:
+  - Added IsActive Read-Only Property - Fixes [Issue 171](https://github.com/PowerShell/ComputerManagementDsc/issues/171).
+  - InActive power plans are no longer returned with their Name set to null.
+    Now, the name is always returned and the Read-Only property of IsActive
+    is set accordingly.
 
 '
 
@@ -66,6 +66,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 
