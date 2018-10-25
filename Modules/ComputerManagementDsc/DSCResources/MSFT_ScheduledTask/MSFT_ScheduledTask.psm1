@@ -64,6 +64,11 @@ $script:localizedData = Get-LocalizedData `
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
         AtLogon and AtStartup tasks. Not used in Get-TargetResource.
 
+    .PARAMETER SynchronizeAcrossTimeZone
+        Enable the scheduled task option to synchronize across time zones. This is enabled
+        by including the timezone offset in the scheduled task trigger. Defaults to false
+        which does not include the timezone offset.
+
     .PARAMETER Ensure
         Present if the task should exist, Absent if it should be removed.
 
@@ -73,7 +78,12 @@ $script:localizedData = Get-LocalizedData `
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
-        as the local system account.
+        as the local system account. Cannot be used in combination with ExecuteAsGMSA.
+        Not used in Get-TargetResource.
+
+    .PARAMETER ExecuteAsGMSA
+        The gMSA (Group Managed Service Account) this task should execute as. Cannot be
+        used in combination with ExecuteAsCredential.
         Not used in Get-TargetResource.
 
     .PARAMETER DaysInterval
@@ -255,6 +265,10 @@ function Get-TargetResource
         $StartTime = [System.DateTime]::Today,
 
         [Parameter()]
+        [System.Boolean]
+        $SynchronizeAcrossTimeZone = $false,
+
+        [Parameter()]
         [System.String]
         [ValidateSet('Present', 'Absent')]
         $Ensure = 'Present',
@@ -266,6 +280,10 @@ function Get-TargetResource
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
+
+        [Parameter()]
+        [System.String]
+        $ExecuteAsGMSA,
 
         [Parameter()]
         [System.UInt32]
@@ -484,17 +502,20 @@ function Get-TargetResource
 
         if ($startAt)
         {
-            $startAt = [System.DateTime] $startAt
+            $stringSynchronizeAcrossTimeZone = Get-DateTimeString -Date $startAt -SynchronizeAcrossTimeZone $true
+            $returnSynchronizeAcrossTimeZone = $startAt -eq $stringSynchronizeAcrossTimeZone
         }
         else
         {
             $startAt = $StartTime
+            $returnSynchronizeAcrossTimeZone = $false
         }
 
         return @{
             TaskName                        = $task.TaskName
             TaskPath                        = $task.TaskPath
             StartTime                       = $startAt
+            SynchronizeAcrossTimeZone       = $returnSynchronizeAcrossTimeZone
             Ensure                          = 'Present'
             Description                     = $task.Description
             ActionExecutable                = $action.Execute
@@ -503,6 +524,7 @@ function Get-TargetResource
             ScheduleType                    = $returnScheduleType
             RepeatInterval                  = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Interval
             ExecuteAsCredential             = $task.Principal.UserId
+            ExecuteAsGMSA                   = $task.Principal.UserId -replace '^.+\\|@.+', $null
             Enable                          = $settings.Enabled
             DaysInterval                    = $trigger.DaysInterval
             RandomDelay                     = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.RandomDelay
@@ -571,6 +593,11 @@ function Get-TargetResource
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
         AtLogon and AtStartup tasks.
 
+    .PARAMETER SynchronizeAcrossTimeZone
+        Enable the scheduled task option to synchronize across time zones. This is enabled
+        by including the timezone offset in the scheduled task trigger. Defaults to false
+        which does not include the timezone offset.
+
     .PARAMETER Ensure
         Present if the task should exist, Absent if it should be removed.
 
@@ -579,7 +606,11 @@ function Get-TargetResource
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
-        as the local system account.
+        as the local system account. Cannot be used in combination with ExecuteAsGMSA.
+
+    .PARAMETER ExecuteAsGMSA
+        The gMSA (Group Managed Service Account) this task should execute as. Cannot be
+        used in combination with ExecuteAsCredential.
 
     .PARAMETER DaysInterval
         Specifies the interval between the days in the schedule. An interval of 1 produces
@@ -743,6 +774,10 @@ function Set-TargetResource
         $StartTime = [System.DateTime]::Today,
 
         [Parameter()]
+        [System.Boolean]
+        $SynchronizeAcrossTimeZone = $false,
+
+        [Parameter()]
         [System.String]
         [ValidateSet('Present', 'Absent')]
         $Ensure = 'Present',
@@ -754,6 +789,10 @@ function Set-TargetResource
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
+
+        [Parameter()]
+        [System.String]
+        $ExecuteAsGMSA,
 
         [Parameter()]
         [System.UInt32]
@@ -949,6 +988,19 @@ function Set-TargetResource
             New-InvalidArgumentException `
                 -Message ($script:localizedData.OnEventSubscriptionError) `
                 -ArgumentName EventSubscription
+        }
+
+        if ($ExecuteAsCredential -and $ExecuteAsGMSA)
+        {
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.gMSAandCredentialError) `
+                -ArgumentName ExecuteAsGMSA
+        }
+
+        if($SynchronizeAcrossTimeZone -and ($ScheduleType -notin @('Once', 'Daily', 'Weekly'))) {
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.SynchronizeAcrossTimeZoneInvalidScheduleType) `
+                -ArgumentName SynchronizeAcrossTimeZone
         }
 
         # Configure the action
@@ -1193,7 +1245,12 @@ function Set-TargetResource
         # Prepare the register arguments
         $registerArguments = @{}
 
-        if ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
+        if ($PSBoundParameters.ContainsKey('ExecuteAsGMSA'))
+        {
+            $username = $ExecuteAsGMSA
+            $LogonType = 'Password'
+        }
+        elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
         {
             $username = $ExecuteAsCredential.UserName
             $registerArguments.Add('User', $username)
@@ -1274,6 +1331,29 @@ function Set-TargetResource
             $scheduledTask.Description = $Description
         }
 
+        if($scheduledTask.Triggers[0].StartBoundary)
+        {
+            <#
+                The way New-ScheduledTaskTrigger writes the StartBoundary has issues because it does not take
+                the setting "Synchronize across time zones" in consideration. What happens if synchronize across
+                time zone is enabled in the scheduled task GUI is that the time is written like this:
+
+                2018-09-27T18:45:08+02:00
+
+                When the setting synchronize across time zones is disabled, the time is written as:
+
+                2018-09-27T18:45:08
+
+                The problem in New-ScheduledTaskTrigger is that it always writes the time the format that
+                includes the full timezone offset (W2016 behaviour, W2012R2 does it the other way around).
+                Which means "Synchronize across time zones" is enabled by default on W2016 and disabled by
+                default on W2012R2. To prevent that, we are overwriting the StartBoundary here to insert
+                the time in the format we want it, so we can enable or disable "Synchronize across time zones".
+            #>
+
+            $scheduledTask.Triggers[0].StartBoundary = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
+        }
+
         if ($currentValues.Ensure -eq 'Present')
         {
             # Updating the scheduled task
@@ -1335,6 +1415,11 @@ function Set-TargetResource
         The time of day this task should start at - defaults to 12:00 AM. Not valid for
         AtLogon and AtStartup tasks.
 
+    .PARAMETER SynchronizeAcrossTimeZone
+        Enable the scheduled task option to synchronize across time zones. This is enabled
+        by including the timezone offset in the scheduled task trigger. Defaults to false
+        which does not include the timezone offset.
+
     .PARAMETER Ensure
         Present if the task should exist, Absent if it should be removed.
 
@@ -1343,7 +1428,11 @@ function Set-TargetResource
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
-        as the local system account.
+        as the local system account. Cannot be used in combination with ExecuteAsGMSA.
+
+    .PARAMETER ExecuteAsGMSA
+        The gMSA (Group Managed Service Account) this task should execute as. Cannot be
+        used in combination with ExecuteAsCredential.
 
     .PARAMETER DaysInterval
         Specifies the interval between the days in the schedule. An interval of 1 produces
@@ -1508,6 +1597,10 @@ function Test-TargetResource
         $StartTime = [System.DateTime]::Today,
 
         [Parameter()]
+        [System.Boolean]
+        $SynchronizeAcrossTimeZone = $false,
+
+        [Parameter()]
         [System.String]
         [ValidateSet('Present', 'Absent')]
         $Ensure = 'Present',
@@ -1519,6 +1612,10 @@ function Test-TargetResource
         [Parameter()]
         [System.Management.Automation.PSCredential]
         $ExecuteAsCredential,
+
+        [Parameter()]
+        [System.String]
+        $ExecuteAsGMSA,
 
         [Parameter()]
         [System.UInt32]
@@ -1706,6 +1803,11 @@ function Test-TargetResource
         $PSBoundParameters['RestartInterval'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval).ToString()
     }
 
+    if ($ScheduleType -in @('Once', 'Daily', 'Weekly'))
+    {
+        $PSBoundParameters['StartTime'] = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
+    }
+
     $currentValues = Get-TargetResource @PSBoundParameters
 
     Write-Verbose -Message ($script:localizedData.GetCurrentTaskValuesMessage)
@@ -1727,6 +1829,21 @@ function Test-TargetResource
         # The password of the execution credential can not be compared
         $username = $ExecuteAsCredential.UserName
         $PSBoundParameters['ExecuteAsCredential'] = $username
+    }
+
+    if ($PSBoundParameters.ContainsKey('ExecuteAsGMSA'))
+    {
+        <#
+            There is a difference in W2012R2 and W2016 behaviour,
+            W2012R2 returns the gMSA including the DOMAIN prefix,
+            W2016 returns this without. So to be sure strip off the
+            domain part in Get & Test. This means we either need to
+            remove everything before \ in the case of the DOMAIN\User
+            format, or we need to remove everything after @ in case
+            when the UPN format (User@domain.fqdn) is used.
+        #>
+
+        $PSBoundParameters['ExecuteAsGMSA'] = $PSBoundParameters.ExecuteAsGMSA -replace '^.+\\|@.+', $null
     }
 
     $desiredValues = $PSBoundParameters
@@ -1890,4 +2007,43 @@ function Disable-ScheduledTask
     $existingTask = Get-ScheduledTask @PSBoundParameters
     $existingTask.Settings.Enabled = $false
     $null = $existingTask | Register-ScheduledTask @PSBoundParameters -Force
+}
+
+<#
+    .SYNOPSIS
+        Returns a formatted datetime string for use in ScheduledTask resource.
+
+    .PARAMETER Date
+        The date to format.
+
+    .PARAMETER SynchronizeAcrossTimeZone
+        Boolean to specifiy if the returned string is formatted in synchronize
+        across time zone format.
+#>
+Function Get-DateTimeString
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.DateTime]
+        $Date,
+
+        [Parameter(Mandatory = $true)]
+        [System.Boolean]
+        $SynchronizeAcrossTimeZone
+    )
+
+    $format = (Get-Culture).DateTimeFormat.SortableDateTimePattern
+
+    if($SynchronizeAcrossTimeZone)
+    {
+        $returnDate = (Get-Date -Date $Date -Format $format) + (Get-Date -Format 'zzz')
+    }
+    else
+    {
+        $returnDate = Get-Date -Date $Date -Format $format
+    }
+
+    return $returnDate
 }

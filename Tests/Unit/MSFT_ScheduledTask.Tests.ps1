@@ -1528,7 +1528,7 @@ try
                         Settings = [pscustomobject] @{
                             Enabled = $true
                         }
-                    } 
+                    }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
@@ -1577,7 +1577,7 @@ try
                         Settings = [pscustomobject] @{
                             Enabled = $true
                         }
-                    } 
+                    }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
@@ -1652,7 +1652,7 @@ try
                         Settings = [pscustomobject] @{
                             Enabled = $true
                         }
-                    } 
+                    }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
@@ -1707,7 +1707,7 @@ try
                         Settings = [pscustomobject] @{
                             Enabled = $true
                         }
-                    } 
+                    }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
@@ -1726,6 +1726,313 @@ try
 
                 It 'When an EventSubscription cannot be parsed as valid XML an error is generated when changing the task' {
                     { Set-TargetResource @testParameters } | Should throw
+                }
+            }
+
+            Context 'When a scheduled task is created using a Group Managed Service Account' {
+                $testParameters = @{
+                    TaskName            = 'Test task'
+                    TaskPath            = '\Test\'
+                    ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType        = 'Once'
+                    RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
+                    ExecuteAsGMSA       = 'DOMAIN\gMSA$'
+                    ExecuteAsCredential = [pscredential]::new('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
+                    Verbose             = $true
+                }
+
+                It 'Should return an error when both the ExecuteAsGMSA an ExecuteAsCredential ar specified' {
+                    try
+                    {
+                        Set-TargetResource @testParameters -ErrorVariable duplicateCredential
+                    }
+                    catch
+                    {
+                        # Error from Set-TargetResource expected
+                    }
+                    finally
+                    {
+                        $duplicateCredential.Message | Should -Be "Both ExecuteAsGMSA and ExecuteAsCredential parameters have been specified. A task can either run as a gMSA (Group Managed Service Account) or as a custom credential, not both. Please modify your configuration to include just one of the two.`r`nParameter name: ExecuteAsGMSA"
+                    }
+                }
+
+                $testParameters.Remove('ExecuteAsCredential')
+
+                It 'Should call Register-ScheduledTask with the name of the Group Managed Service Account' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $User -eq $null -and  $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
+                    }
+                }
+
+                It 'Should set the LogonType to Password when a Group Managed Service Account is used' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $Inputobject.Principal.Logontype -eq 'Password'
+                    }
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Repetition = @{
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
+                                }
+                                CimClass   = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                        Principal = [pscustomobject] @{
+                            UserId = 'gMSA$'
+                        }
+                    }
+                }
+
+                It 'Should return true if the task is in desired state and given gMSA user in DOMAIN\User$ format' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+
+                $testParameters.ExecuteAsGMSA = 'gMSA$@domain.fqdn'
+
+                It 'Should return true if the task is in desired state and given gMSA user in UPN format' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+            }
+
+            Context 'When a scheduled task Group Managed Service Account is changed' {
+                $testParameters = @{
+                    TaskName            = 'Test task'
+                    TaskPath            = '\Test\'
+                    ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType        = 'Once'
+                    RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
+                    ExecuteAsGMSA       = 'DOMAIN\gMSA$'
+                    Verbose             = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Repetition = @{
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
+                                }
+                                CimClass   = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                        Principal = [pscustomobject] @{
+                            UserId = 'update_gMSA$'
+                        }
+                    }
+                }
+
+                It 'Should return false on Test-TargetResource if the task is not in desired state and given gMSA user in DOMAIN\User$ format' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                It 'Should call Set-ScheduledTask using the new Group Managed Service Account' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
+                    }
+                }
+
+                It 'Should set the LogonType to Password when a Group Managed Service Account is used' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $Inputobject.Principal.Logontype -eq 'Password'
+                    }
+                }
+            }
+
+            Context 'When a scheduled task is created and synchronize across time zone is disabled' {
+                $startTimeString           = '2018-10-01T01:00:00'
+                $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+                $testParameters = @{
+                    TaskName                  = 'Test task'
+                    TaskPath                  = '\Test\'
+                    ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime                 = Get-Date -Date $startTimeString
+                    SynchronizeAcrossTimeZone = $false
+                    ScheduleType              = 'Once'
+                    Verbose                   = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                StartBoundary = $startTimeString
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                    }
+                }
+
+                It 'Should return the time in string format and SynchronizeAcrossTimeZone with value false' {
+                    $result = Get-TargetResource @testParameters
+                    $result.StartTime | Should -Be $startTimeString
+                    $result.SynchronizeAcrossTimeZone | Should -Be $false
+                }
+
+                It 'Should return true given that startTime is set correctly' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                StartBoundary = $startTimeStringWithOffset
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                    }
+                }
+
+                It 'Should return false given that the task is configured with synchronize across time zone' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                Set-TargetResource @testParameters
+
+                It "Should set task trigger StartBoundary to $startTimeString" {
+                    Assert-MockCalled -CommandName Set-ScheduledTask -ParameterFilter {
+                        $InputObject.Triggers[0].StartBoundary -eq $startTimeString
+                    }
+                }
+            }
+
+            Context 'When a scheduled task is created and synchronize across time zone is enabled' {
+                $startTimeString           = '2018-10-01T01:00:00'
+                $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+                $testParameters = @{
+                    TaskName                  = 'Test task'
+                    TaskPath                  = '\Test\'
+                    ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime                 = Get-Date -Date $startTimeString
+                    SynchronizeAcrossTimeZone = $true
+                    ScheduleType              = 'Once'
+                    Verbose                   = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                StartBoundary = $startTimeStringWithOffset
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                    }
+                }
+
+                It 'Should return the time in string format and SynchronizeAcrossTimeZone with value true' {
+                    $result = Get-TargetResource @testParameters
+                    $result.StartTime | Should -Be $startTimeStringWithOffset
+                    $result.SynchronizeAcrossTimeZone | Should -Be $true
+                }
+
+                It 'Should return true given that startTime is set correctly' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                StartBoundary = $startTimeString
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                    }
+                }
+
+                It 'Should return false given that the task is configured with synchronize across time zone disabled' {
+                    Test-TargetResource @testParameters | Should -Be $false
+                }
+
+                Set-TargetResource @testParameters
+
+                It "Should set task trigger StartBoundary to $startTimeStringWithOffset" {
+                    Assert-MockCalled -CommandName Set-ScheduledTask -ParameterFilter {
+                        $InputObject.Triggers[0].StartBoundary -eq $startTimeStringWithOffset
+                    }
+                }
+            }
+
+            Context 'When a scheduled task is configured to SynchronizeAcrossTimeZone and the ScheduleType is not Once, Daily or Weekly' {
+                $startTimeString              = '2018-10-01T01:00:00'
+                $testParameters = @{
+                    TaskName                  = 'Test task'
+                    TaskPath                  = '\Test\'
+                    ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime                 = Get-Date -Date $startTimeString
+                    SynchronizeAcrossTimeZone = $true
+                    ScheduleType              = 'AtLogon'
+                    Verbose                   = $true
+                }
+
+                It 'Should throw when Set-TargetResource is called and SynchronizeAcrossTimeZone is used in combination with an unsupported trigger type' {
+                    { Set-TargetResource @testParamers } | Should Throw
                 }
             }
         }

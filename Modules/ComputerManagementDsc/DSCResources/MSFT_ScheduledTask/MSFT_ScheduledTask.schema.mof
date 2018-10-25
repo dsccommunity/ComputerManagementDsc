@@ -10,9 +10,11 @@ class MSFT_ScheduledTask : OMI_BaseResource
     [Write, Description("When should the task be executed"), ValueMap{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn", "OnEvent"}, Values{"Once", "Daily", "Weekly", "AtStartup", "AtLogOn", "OnEvent"}] string ScheduleType;
     [Write, Description("How many units (minutes, hours, days) between each run of this task?")] String RepeatInterval;
     [Write, Description("The time of day this task should start at - defaults to 12:00 AM. Not valid for AtLogon and AtStartup tasks")] DateTime StartTime;
+    [Write, Description("Enable the scheduled task option to synchronize across time zones. This is enabled by including the timezone offset in the scheduled task trigger. Defaults to false which does not include the timezone offset.")] boolean SynchronizeAcrossTimeZone;
     [Write, Description("Present if the task should exist, Absent if it should be removed"), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
     [Write, Description("True if the task should be enabled, false if it should be disabled")] boolean Enable;
     [Write, Description("The credential this task should execute as. If not specified defaults to running as the local system account"), EmbeddedInstance("MSFT_Credential")] string ExecuteAsCredential;
+    [Write, Description("The gMSA (Group Managed Service Account) this task should execute as. Cannot be used in combination with ExecuteAsCredential.")] string ExecuteAsGMSA;
     [Write, Description("Specifies the interval between the days in the schedule. An interval of 1 produces a daily schedule. An interval of 2 produces an every-other day schedule.")] Uint32 DaysInterval;
     [Write, Description("Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting.")] String RandomDelay;
     [Write, Description("Specifies how long the repetition pattern repeats after the task starts. May be set to `Indefinitely` to specify an indefinite duration.")] String RepetitionDuration;
