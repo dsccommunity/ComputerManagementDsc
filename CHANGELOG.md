@@ -8,11 +8,19 @@
   - Moved strings in localization file.
   - LogMode is now set with Limit-EventLog,
     fixing issue #18 "Cannot save changes to LogMode property"
+
+## 6.0.0.0
+
 - ScheduledTask:
   - Added support for Group Managed Service Accounts, implemented using the ExecuteAsGMSA
     parameter. Fixes [Issue #111](https://github.com/PowerShell/ComputerManagementDsc/issues/111)
   - Added support to set the Synchronize Across Time Zone option. Fixes [Issue #109](https://github.com/PowerShell/ComputerManagementDsc/issues/109)
 - Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #189](https://github.com/PowerShell/ComputerManagementDsc/issues/189).
+- BREAKING CHANGE: PowerPlan:
+  - Added IsActive Read-Only Property - Fixes [Issue #171](https://github.com/PowerShell/ComputerManagementDsc/issues/171).
+  - InActive power plans are no longer returned with their Name set to null.
+    Now, the name is always returned and the Read-Only property of IsActive
+    is set accordingly.
 
 ## 5.2.0.0
 
