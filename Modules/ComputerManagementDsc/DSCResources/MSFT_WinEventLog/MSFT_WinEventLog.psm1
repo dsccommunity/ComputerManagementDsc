@@ -15,25 +15,6 @@ $script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_WinEventLog' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
-function New-TerminatingError
-{
-    param
-    (
-        [Parameter(Mandatory = $true)]
-            [String]$errorId,
-
-            [Parameter(Mandatory = $true)]
-            [String]$errorMessage,
-
-            [Parameter(Mandatory = $true)]
-            [System.Management.Automation.ErrorCategory]$errorCategory
-        )
-
-    $exception   = New-Object System.InvalidOperationException $errorMessage
-    $errorRecord = New-Object System.Management.Automation.ErrorRecord $exception, $errorId, $errorCategory, $null
-    throw $errorRecord
-    }
-
 <#
     .SYNOPSIS
         Gets the current resource state.
@@ -57,16 +38,16 @@ function Get-TargetResource
     )
 
     $log = Get-WinEvent -ListLog $logName
-    $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} | Select-Object MinimumRetentionDays
+    $minimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} | Select-Object minimumRetentionDays
 
     $returnValue = @{
-        LogName = [System.String]$LogName
-        LogFilePath = [system.String]$log.LogFilePath
-        MaximumSizeInBytes = [System.Int64]$log.MaximumSizeInBytes
-        IsEnabled = [System.Boolean]$log.IsEnabled
-        LogMode = [System.String]$log.LogMode
-        LogRetentionDays = [System.Int32]$MinimumRetentionDays.MinimumRetentionDays
-        SecurityDescriptor = [System.String]$log.SecurityDescriptor
+        LogName = [System.String] $LogName
+        LogFilePath = [system.String] $log.LogFilePath
+        MaximumSizeInBytes = [System.Int64] $log.MaximumSizeInBytes
+        IsEnabled = [System.Boolean] $log.IsEnabled
+        LogMode = [System.String] $log.LogMode
+        LogRetentionDays = [System.Int32] $minimumRetentionDays.minimumRetentionDays
+        SecurityDescriptor = [System.String] $log.SecurityDescriptor
     }
 
     Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
@@ -168,10 +149,10 @@ function Set-TargetResource
             {
                 if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName}))
                 {
-                    $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} |
-                    Select-Object MinimumRetentionDays
+                    $minimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} |
+                    Select-Object minimumRetentionDays
 
-                    if ($LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+                    if ($LogRetentionDays -ne $minimumRetentionDays.minimumRetentionDays)
                     {
                         Set-LogRetentionDays -LogName $LogName -LogRetentionDays $LogRetentionDays
                     }
@@ -208,8 +189,8 @@ function Set-TargetResource
     }
     catch
     {
-        write-Debug "ERROR: $($_ | Format-List * -force | Out-String)"
-        New-TerminatingError -errorId 'GetWinEventLogFailed' -errorMessage $_.Exception -errorCategory InvalidOperation
+        New-InvalidOperationException `
+        -Message ($script:localizedData.TerminatingError -f 'InvalidOperation')
     }
 }
 
@@ -316,10 +297,10 @@ function Test-TargetResource
         {
             if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName}))
             {
-                $MinimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} |
-                Select-Object MinimumRetentionDays
+                $minimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} |
+                Select-Object minimumRetentionDays
 
-                if ($LogRetentionDays -ne $MinimumRetentionDays.MinimumRetentionDays)
+                if ($LogRetentionDays -ne $minimumRetentionDays.minimumRetentionDays)
                 {
                     Write-Verbose -Message ($localizedData.TestingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
                     $desiredState = $false

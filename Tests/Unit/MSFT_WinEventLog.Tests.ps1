@@ -378,18 +378,6 @@ try
                     {  Limit-Eventlog -LogName 'Application' -OverflowAction 'OverwriteOlder' -RetentionDays 30 } | Should -Throw
                 }
             }
-
-            $errorRecord = 'InvalidOperationException: You cannot call a method on a null-valued expression.'
-            Describe "$($script:DSCResourceName)\New-TerminatingError" -Tag 'Helper' {
-                It 'Tests the Private function' {
-                    { New-TerminatingError -errorId 'TestFailure' -errorMessage 'TestFailureMessage' -errorCategory 'InvalidOperation' } | Should -Throw 'TestFailureMessage'
-                }
-
-                Mock -CommandName Get-WinEvent -MockWith { throw }
-                It "Should throw if we're unable to get a log" {
-                    { Get-WinEvent -LogName 'SomeLog' -IsEnabled $true } | Should -Throw
-                }
-            }
         }
     }
 }

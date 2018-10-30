@@ -29,5 +29,5 @@ ConvertFrom-StringData -StringData @'
     EventlogLogRetentionDaysWrongMode           = Setting the Log Retention for Eventlog '{0}' failed. LogMode must be AutoBackup.
     SaveWinEventlogSuccess                      = Saving Settings succesful.
     SaveWinEventlogFailure                      = Saving settings failed.
-    TerminatingError                            = TerminatingError detected, Errormessage is '{0}' with Errorcategory '{1}'.
+    TerminatingError                            = TerminatingError detected, Errormessage is 'Logfile not found' with Errorcategory '{0}'.
 '@
