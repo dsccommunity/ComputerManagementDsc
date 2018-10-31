@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Update LICENSE file to match the Microsoft Open Source Team standard.
+  Fixes [Issue #197](https://github.com/PowerShell/ComputerManagementDsc/issues/197)
+
 ## 6.0.0.0
 
 - ScheduledTask:
