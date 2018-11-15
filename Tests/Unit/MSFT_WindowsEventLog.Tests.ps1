@@ -1,6 +1,6 @@
 #region HEADER
 $script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_WinEventLog'
+$script:DSCResourceName = 'MSFT_WindowsEventLog'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -24,7 +24,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_WinEventLog'
+        $script:DSCResourceName = 'MSFT_WindowsEventLog'
 
             Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
 
@@ -78,7 +78,7 @@ try
 
             Describe "$($script:DSCResourceName)\Test-TargetResource" -Tag 'Test' {
 
-                Mock -CommandName Get-WinEvent -MockWith {
+                Mock -CommandName Get-WindowsEvent -MockWith {
                     $properties = @{
                         MaximumSizeInBytes = 1028kb
                         IsEnabled          = $true

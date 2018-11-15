@@ -1,10 +1,10 @@
 # Integration Test Config Template Version: 1.0.0
-configuration MSFT_WinEventLog_Default
+configuration MSFT_WindowsEventLog_Default
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        WinEventLog Integration_Test
+        WindowsEventLog Integration_Test
         {
             LogName            = 'Application'
             IsEnabled          = $true
@@ -16,12 +16,12 @@ configuration MSFT_WinEventLog_Default
     }
 }
 
-configuration MSFT_WinEventLog_RetainSize
+configuration MSFT_WindowsEventLog_RetainSize
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        WinEventLog Integration_Test
+        WindowsEventLog Integration_Test
         {
             LogName            = 'Application'
             IsEnabled          = $true
@@ -31,12 +31,12 @@ configuration MSFT_WinEventLog_RetainSize
     }
 }
 
-configuration MSFT_WinEventLog_AutobackupLogRetention
+configuration MSFT_WindowsEventLog_AutobackupLogRetention
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        WinEventLog Integration_Test
+        WindowsEventLog Integration_Test
         {
             LogName            = 'Application'
             IsEnabled          = $true
@@ -46,12 +46,12 @@ configuration MSFT_WinEventLog_AutobackupLogRetention
     }
 }
 
-configuration MSFT_WinEventLog_CircularLogPath
+configuration MSFT_WindowsEventLog_CircularLogPath
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        WinEventLog Integration_Test
+        WindowsEventLog Integration_Test
         {
             LogName            = 'Application'
             IsEnabled          = $true
@@ -62,12 +62,12 @@ configuration MSFT_WinEventLog_CircularLogPath
     }
 }
 
-configuration MSFT_WinEventLog_EnableLog
+configuration MSFT_WindowsEventLog_EnableLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        WinEventLog Integration_Test
+        WindowsEventLog Integration_Test
         {
             LogName            = 'Microsoft-Windows-CAPI2/Operational'
             IsEnabled          = $true
@@ -77,12 +77,12 @@ configuration MSFT_WinEventLog_EnableLog
     }
 }
 
-configuration MSFT_WinEventLog_DisableLog
+configuration MSFT_WindowsEventLog_DisableLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        WinEventLog Integration_Test
+        WindowsEventLog Integration_Test
         {
             LogName            = 'Microsoft-Windows-CAPI2/Operational'
             IsEnabled          = $false
@@ -90,12 +90,12 @@ configuration MSFT_WinEventLog_DisableLog
     }
 }
 
-configuration MSFT_WinEventLog_CircularSecurityDescriptor
+configuration MSFT_WindowsEventLog_CircularSecurityDescriptor
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        WinEventLog Integration_Test
+        WindowsEventLog Integration_Test
         {
             LogName            = 'Application'
             IsEnabled          = $true
@@ -106,12 +106,12 @@ configuration MSFT_WinEventLog_CircularSecurityDescriptor
     }
 }
 
-configuration MSFT_WinEventLog_EnableBackupLog
+configuration MSFT_WindowsEventLog_EnableBackupLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        WinEventLog Integration_Test
+        WindowsEventLog Integration_Test
         {
             LogName            = 'Microsoft-Windows-Backup'
             IsEnabled          = $true
@@ -121,12 +121,12 @@ configuration MSFT_WinEventLog_EnableBackupLog
     }
 }
 
-configuration MSFT_WinEventLog_DisableBackupLog
+configuration MSFT_WindowsEventLog_DisableBackupLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        WinEventLog Integration_Test
+        WindowsEventLog Integration_Test
         {
             LogName            = 'Microsoft-Windows-Backup'
             IsEnabled          = $false

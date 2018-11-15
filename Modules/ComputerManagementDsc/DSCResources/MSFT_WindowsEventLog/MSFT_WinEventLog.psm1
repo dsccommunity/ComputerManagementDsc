@@ -12,7 +12,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
 
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_WinEventLog' `
+    -ResourceName 'MSFT_WindowsEventLog' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
@@ -20,7 +20,7 @@ $script:localizedData = Get-LocalizedData `
         Gets the current resource state.
 
     .PARAMETER LogName
-        Specifies the given name of a eventlog.
+        Specifies the given name of a Windows Event Log.
 #>
 function Get-TargetResource
 {
@@ -37,7 +37,7 @@ function Get-TargetResource
         $IsEnabled
     )
 
-    $log = Get-WinEvent -ListLog $logName
+    $log = Get-WindowsEvent -ListLog $logName
     $minimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} | Select-Object minimumRetentionDays
 
     $returnValue = @{
@@ -59,25 +59,25 @@ function Get-TargetResource
         Sets the desired resource state.
 
     .PARAMETER LogName
-        Specifies the given name of a eventlog.
+        Specifies the given name of a Windows Event Log.
 
     .PARAMETER MaximumSizeInBytes
-        Specifies the given maximum size in bytes for a specified eventlog.
+        Specifies the given maximum size in bytes for a specified Windows Event Log.
 
     .PARAMETER LogMode
-        Specifies the given LogMode for a specified eventlog.
+        Specifies the given LogMode for a specified Windows Event Log.
 
     .PARAMETER LogRetentionDays
         Specifies the given LogRetentionDays for the Logmode 'AutoBackup'.
 
     .PARAMETER SecurityDescriptor
-        Specifies the given SecurityDescriptor for a specified eventlog.
+        Specifies the given SecurityDescriptor for a specified Windows Event Log.
 
     .PARAMETER IsEnabled
-        Specifies the given state of a eventlog.
+        Specifies the given state of a Windows Event Log.
 
     .PARAMETER LogFilePath
-        Specifies the given LogFile path of a eventlog.
+        Specifies the given LogFile path of a Windows Event Log.
 #>
 function Set-TargetResource
 {
@@ -116,7 +116,7 @@ function Set-TargetResource
 
     try
     {
-        $log = Get-WinEvent -ListLog $LogName
+        $log = Get-WindowsEvent -ListLog $LogName
         Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
 
         if ($IsEnabled -eq $true)
@@ -126,7 +126,7 @@ function Set-TargetResource
                 Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
                 $log.IsEnabled = $IsEnabled
                 Save-LogFile -Log $log
-                Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
+                Write-Verbose -Message ($localizedData.SettingWindowsEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
             }
 
             if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $MaximumSizeInBytes -ne $log.MaximumSizeInBytes)
@@ -134,7 +134,7 @@ function Set-TargetResource
                 Write-Verbose -Message ($localizedData.SettingEventlogLogSize -f $LogName, $MaximumSizeInBytes)
                 $log.MaximumSizeInBytes = $MaximumSizeInBytes
                 Save-LogFile -Log $log
-                Write-Verbose -Message ($localizedData.SettingWinEventlogMaximumSizeInBytesSuccess -f $LogName, $MaximumSizeInBytes)
+                Write-Verbose -Message ($localizedData.SettingWindowsEventlogMaximumSizeInBytesSuccess -f $LogName, $MaximumSizeInBytes)
             }
 
             if ($PSBoundParameters.ContainsKey('LogMode') -and $LogMode -ne $log.LogMode)
@@ -142,7 +142,7 @@ function Set-TargetResource
                 Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode)
                 $log.LogMode = $LogMode
                 Save-LogFile -Log $log
-                Write-Verbose -Message ($localizedData.SettingWinEventlogLogModeSuccess -f $LogName, $LogMode)
+                Write-Verbose -Message ($localizedData.SettingWindowsEventlogLogModeSuccess -f $LogName, $LogMode)
             }
 
             if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
@@ -168,7 +168,7 @@ function Set-TargetResource
                 Write-Verbose -Message ($localizedData.SettingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
                 $log.SecurityDescriptor = $SecurityDescriptor
                 Save-LogFile -Log $log
-                Write-Verbose -Message ($localizedData.SettingWinEventlogSecurityDescriptorSuccess -f $LogName, $SecurityDescriptor)
+                Write-Verbose -Message ($localizedData.SettingWindowsEventlogSecurityDescriptorSuccess -f $LogName, $SecurityDescriptor)
             }
 
             if ($PSBoundParameters.ContainsKey('LogFilePath') -and $LogFilePath -ne $log.LogFilePath)
@@ -176,7 +176,7 @@ function Set-TargetResource
                 Write-Verbose -Message ($localizedData.SettingEventlogLogFilePath -f $LogName, $LogFilePath)
                 $log.LogFilePath = $LogFilePath
                 Save-LogFile -Log $log
-                Write-Verbose -Message ($localizedData.SettingWinEventlogLogFilePathSuccess -f $LogName, $LogFilePath)
+                Write-Verbose -Message ($localizedData.SettingWindowsEventlogLogFilePathSuccess -f $LogName, $LogFilePath)
             }
         }
         else
@@ -184,7 +184,7 @@ function Set-TargetResource
             Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
             $log.IsEnabled = $IsEnabled
             Save-LogFile -Log $log
-            Write-Verbose -Message ($localizedData.SettingWinEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
+            Write-Verbose -Message ($localizedData.SettingWindowsEventlogIsEnabledSuccess -f $LogName, $IsEnabled)
         }
     }
     catch
@@ -199,25 +199,25 @@ function Set-TargetResource
         Tests if the current resource state matches the desired resource state.
 
     .PARAMETER LogName
-        Specifies the given name of a eventlog.
+        Specifies the given name of a Windows Event Log.
 
     .PARAMETER MaximumSizeInBytes
-        Specifies the given maximum size in bytes for a specified eventlog.
+        Specifies the given maximum size in bytes for a specified Windows Event Log.
 
     .PARAMETER LogMode
-        Specifies the given LogMode for a specified eventlog.
+        Specifies the given LogMode for a specified evWindows Event Logentlog.
 
     .PARAMETER LogRetentionDays
         Specifies the given LogRetentionDays for the Logmode 'AutoBackup'.
 
     .PARAMETER SecurityDescriptor
-        Specifies the given SecurityDescriptor for a specified eventlog.
+        Specifies the given SecurityDescriptor for a specified Windows Event Log.
 
     .PARAMETER IsEnabled
-        Specifies the given state of a eventlog.
+        Specifies the given state of a Windows Event Log.
 
     .PARAMETER LogFilePath
-        Specifies the given LogFile path of a eventlog.
+        Specifies the given LogFile path of a Windows Event Log.
 #>
 function Test-TargetResource
 {
@@ -257,7 +257,7 @@ function Test-TargetResource
         $LogFilePath
     )
 
-    $log = Get-WinEvent -ListLog $LogName -ErrorAction SilentlyContinue
+    $log = Get-WindowsEvent -ListLog $LogName -ErrorAction SilentlyContinue
     $desiredState = $true
 
     if ($IsEnabled -eq $true)
@@ -319,7 +319,7 @@ function Test-TargetResource
 
         if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogLogFilePath -f $LogName, $LogFilePath)
+            Write-Verbose -Message ($localizedData.TestingWindowsEventlogLogFilePath -f $LogName, $LogFilePath)
             $desiredState = $false
         }
         else
@@ -329,7 +329,7 @@ function Test-TargetResource
 
         if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
         {
-            Write-Verbose -Message ($localizedData.TestingWinEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
+            Write-Verbose -Message ($localizedData.TestingWindowsEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
             $desiredState = $false
         }
         else
@@ -357,7 +357,7 @@ function Test-TargetResource
         Save the desired resource state.
 
     .PARAMETER Log
-        Specifies the given object of a eventlog.
+        Specifies the given object of a Windows Event Log.
 #>
 Function Save-LogFile
 {
@@ -372,11 +372,11 @@ Function Save-LogFile
     try
     {
         $Log.SaveChanges()
-        Write-Verbose -Message ($localizedData.SaveWinEventlogSuccess)
+        Write-Verbose -Message ($localizedData.SaveWindowsEventlogSuccess)
     }
     catch
     {
-        Write-Verbose -Message ($localizedData.SaveWinEventlogFailure)
+        Write-Verbose -Message ($localizedData.SaveWindowsEventlogFailure)
     }
 }
 
@@ -385,7 +385,7 @@ Function Save-LogFile
         Sets the desired resource state.
 
     .PARAMETER LogName
-        Specifies the given name of a eventlog.
+        Specifies the given name of a Windows Event Log.
 
     .PARAMETER Retention
         Specifies the given RetentionDays for LogMode Autobackup.
@@ -409,11 +409,11 @@ Function Set-LogRetentionDays
     try
     {
         Limit-Eventlog -LogName $LogName -OverflowAction 'OverwriteOlder' -RetentionDays $LogRetentionDays
-        Write-Verbose -Message ($localizedData.SettingWinEventlogRetentionDaysSuccess -f $LogName, $LogRetentionDays)
+        Write-Verbose -Message ($localizedData.SettingWindowsEventlogRetentionDaysSuccess -f $LogName, $LogRetentionDays)
     }
     catch
     {
-        Write-Verbose -Message ($localizedData.SettingWinEventlogRetentionDaysFailed -f $LogName, $LogRetentionDays)
+        Write-Verbose -Message ($localizedData.SettingWindowsEventlogRetentionDaysFailed -f $LogName, $LogRetentionDays)
     }
 }
 

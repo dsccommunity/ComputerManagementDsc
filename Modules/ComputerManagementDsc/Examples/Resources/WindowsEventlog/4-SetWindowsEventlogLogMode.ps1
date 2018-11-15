@@ -1,7 +1,7 @@
 <#
     .EXAMPLE
-    Example script that sets the application Eventlog
-    logmode to 'Autobackup' with 30 days retention.
+    Example script that sets the application Windows Event Log
+    logmode to 'Autobackup' with 30 days retention and enable it.
 #>
 Configuration Example
 {
@@ -9,12 +9,12 @@ Configuration Example
 
     Node localhost
     {
-        WinEventLog ApplicationEventlogSize
+        WindowsEventLog ApplicationEventlogSize
         {
             LogName            = 'Application'
             IsEnabled          = $true
             LogMode            = 'AutoBackup'
             LogRetentionDays   = 30
-        } # End of WinEventLog Resource
+        } # End of Windows Event Log Resource
     } # End of Node
 } # End of Configuration

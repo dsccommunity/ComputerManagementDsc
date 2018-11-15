@@ -1,8 +1,8 @@
 <#
     .EXAMPLE
-    Example script that sets the application eventlog
+    Example script that sets the application Windows Event Log
     to mode AutoBackup and logsize to a maximum size of 2048MB
-    with a logfile retention for 10 days.
+    with a logfile retention for 10 days and enable it.
 #>
 Configuration Example
 {
@@ -10,13 +10,13 @@ Configuration Example
 
     Node localhost
     {
-        WinEventLog ApplicationEventlogMode
+        WindowsEventLog ApplicationEventlogMode
         {
             LogName            = 'Microsoft-Windows-MSPaint/Admin'
             IsEnabled          = $true
             LogMode            = 'AutoBackup'
             LogRetentionDays   = '10'
             MaximumSizeInBytes = 2048kb
-        } # End of WinEventLog Resource
+        } # End of Windows Event Log Resource
     } # End of Node
 } # End of Configuration

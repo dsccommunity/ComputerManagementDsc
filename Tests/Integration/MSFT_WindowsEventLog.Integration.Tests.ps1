@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_WinEventLog'
+$script:DSCResourceName = 'MSFT_WindowsEventLog'
 
 #region HEADER
 # Integration Test Template Version: 1.1.1
@@ -27,7 +27,7 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
 
         Context 'Set Eventlog to Logmode Retain' {
-            $CurrentConfig = 'MSFT_WinEventLog_RetainSize'
+            $CurrentConfig = 'MSFT_WindowsEventLog_RetainSize'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
@@ -53,7 +53,7 @@ try
         }
 
         Context 'Set Eventlog to Logmode AutoBackup with LogRetentionDays of 30 days' {
-            $CurrentConfig = 'MSFT_WinEventLog_AutobackupLogRetention'
+            $CurrentConfig = 'MSFT_WindowsEventLog_AutobackupLogRetention'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
@@ -79,7 +79,7 @@ try
         }
 
         Context 'Set Eventlog to Logmode Circular, MaximumSizeInBytes 20971520, LogFilePath C:\temp\Application.evtx' {
-            $CurrentConfig = 'MSFT_WinEventLog_CircularLogPath'
+            $CurrentConfig = 'MSFT_WindowsEventLog_CircularLogPath'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
@@ -105,7 +105,7 @@ try
         }
 
         Context 'Set Eventlog to Default' {
-            $CurrentConfig = 'MSFT_WinEventLog_Default'
+            $CurrentConfig = 'MSFT_WindowsEventLog_Default'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
@@ -131,7 +131,7 @@ try
         }
 
         Context 'Enable a Logfile other than Application Eventlog' {
-            $CurrentConfig = 'MSFT_WinEventLog_EnableLog'
+            $CurrentConfig = 'MSFT_WindowsEventLog_EnableLog'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
@@ -157,7 +157,7 @@ try
         }
 
         Context 'Disable a Logfile other than Application Eventlog' {
-            $CurrentConfig = 'MSFT_WinEventLog_DisableLog'
+            $CurrentConfig = 'MSFT_WindowsEventLog_DisableLog'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
@@ -183,7 +183,7 @@ try
         }
 
         Context 'Set Eventlog to Logmode Circular with a SecurityDescriptor' {
-            $CurrentConfig = 'MSFT_WinEventLog_CircularSecurityDescriptor'
+            $CurrentConfig = 'MSFT_WindowsEventLog_CircularSecurityDescriptor'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
@@ -209,7 +209,7 @@ try
         }
 
         Context 'Enable a Logfile other than Application Eventlog with Retention' {
-            $CurrentConfig = 'MSFT_WinEventLog_EnableBackupLog'
+            $CurrentConfig = 'MSFT_WindowsEventLog_EnableBackupLog'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
@@ -235,7 +235,7 @@ try
         }
 
         Context 'Disable a Logfile other than Application Eventlog with retention' {
-            $CurrentConfig = 'MSFT_WinEventLog_DisableBackupLog'
+            $CurrentConfig = 'MSFT_WindowsEventLog_DisableBackupLog'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
@@ -261,7 +261,7 @@ try
         }
 
         Context 'Set Eventlog back to the default configuration' {
-            $CurrentConfig = 'MSFT_WinEventLog_Default'
+            $CurrentConfig = 'MSFT_WindowsEventLog_Default'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 

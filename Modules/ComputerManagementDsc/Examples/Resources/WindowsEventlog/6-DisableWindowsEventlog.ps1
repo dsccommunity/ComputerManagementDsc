@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    Example script that disables the given Eventlog
+    Example script that disables the given Windows Event Log.
 #>
 Configuration Example
 {
@@ -8,10 +8,10 @@ Configuration Example
 
     Node localhost
     {
-        WinEventLog Enable-DscAnalytic
+        WindowsEventLog Enable-DscAnalytic
         {
             LogName             = 'Microsoft-Windows-Dsc/Analytic'
             IsEnabled           = $false
-        } # End of WinEventLog Resource
+        } # End of Windows Event Log Resource
     } # End of Node
 } # End of Configuration
