@@ -37,7 +37,7 @@ function Get-TargetResource
         $IsEnabled
     )
 
-    $log = Get-WindowsEvent -ListLog $logName
+    $log = Get-WinEvent -ListLog $logName
     $minimumRetentionDays = Get-EventLog -List | Where-Object {$_.Log -eq $LogName} | Select-Object minimumRetentionDays
 
     $returnValue = @{
@@ -116,7 +116,7 @@ function Set-TargetResource
 
     try
     {
-        $log = Get-WindowsEvent -ListLog $LogName
+        $log = Get-WinEvent -ListLog $LogName
         Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
 
         if ($IsEnabled -eq $true)
@@ -257,7 +257,7 @@ function Test-TargetResource
         $LogFilePath
     )
 
-    $log = Get-WindowsEvent -ListLog $LogName -ErrorAction SilentlyContinue
+    $log = Get-WinEvent -ListLog $LogName -ErrorAction SilentlyContinue
     $desiredState = $true
 
     if ($IsEnabled -eq $true)
