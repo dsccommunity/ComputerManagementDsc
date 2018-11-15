@@ -20,7 +20,7 @@ The **ComputerManagementDsc** module contains the following resources:
 - **VirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
 - **PowerShellExecutionPolicy**: Specifies the desired PowerShell execution policy.
-- **WindowsEventLog**: This resource allows configuration of a specified 
+- **WindowsEventLog**: This resource allows configuration of a specified
   Windows Event Log.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).

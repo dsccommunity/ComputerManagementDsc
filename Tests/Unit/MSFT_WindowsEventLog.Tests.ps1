@@ -78,7 +78,7 @@ try
 
             Describe "$($script:DSCResourceName)\Test-TargetResource" -Tag 'Test' {
 
-                Mock -CommandName Get-WindowsEvent -MockWith {
+                Mock -CommandName Get-WinEvent -MockWith {
                     $properties = @{
                         MaximumSizeInBytes = 1028kb
                         IsEnabled          = $true
