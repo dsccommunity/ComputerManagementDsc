@@ -3,8 +3,8 @@
 class MSFT_WindowsEventLog : OMI_BaseResource
 {
     [Key, Description("Name of the Windows Event Log")] String LogName;
-    [Key, Description("State of the Windows Event Log")] Boolean IsEnabled;
-    [Write, Description("sizethat the Windows Event Log file is allowed to be When the file reaches this maximum size it is considered full")] Sint64 MaximumSizeInBytes;
+    [Write, Description("State of the Windows Event Log")] Boolean IsEnabled;
+    [Write, Description("sizet hat the Windows Event Log file is allowed to be when the file reaches this maximum size it is considered full")] Sint64 MaximumSizeInBytes;
     [Write, ValueMap{"AutoBackup","Circular","Retain"}, Values{"AutoBackup","Circular","Retain"}] String LogMode;
     [Write] String SecurityDescriptor;
     [Write] String LogFilePath;

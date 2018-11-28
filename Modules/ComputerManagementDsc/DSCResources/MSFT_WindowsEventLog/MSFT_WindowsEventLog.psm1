@@ -32,7 +32,7 @@ function Get-TargetResource
         [System.String]
         $LogName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.Boolean]
         $IsEnabled
     )
@@ -42,32 +42,25 @@ function Get-TargetResource
     if (!$log)
     {
         New-InvalidOperationException `
-        -Message ($script:localizedData.TerminatingError -f 'InvalidOperation')
+        -Message ($script:localizedData.TerminatingError -f $LogName)
+        return $null
     }
     else 
     {
         $logRetentionDays = (Get-EventLog -List | Where-Object -Filterscript {$_.Log -eq $LogName}).minimumRetentionDays
 
-        if (!$logRetentionDays)
-        {
-            New-InvalidOperationException `
-            -Message ($script:localizedData.TerminatingError -f 'InvalidOperation')
+        $returnValue = @{
+            LogName = [System.String] $LogName
+            LogFilePath = [system.String] $log.LogFilePath
+            MaximumSizeInBytes = [System.Int64] $log.MaximumSizeInBytes
+            IsEnabled = [System.Boolean] $log.IsEnabled
+            LogMode = [System.String] $log.LogMode
+            LogRetentionDays = [System.Int32] $logRetentionDays
+            SecurityDescriptor = [System.String] $log.SecurityDescriptor
         }
-        else 
-        {
-            $returnValue = @{
-                LogName = [System.String] $LogName
-                LogFilePath = [system.String] $log.LogFilePath
-                MaximumSizeInBytes = [System.Int64] $log.MaximumSizeInBytes
-                IsEnabled = [System.Boolean] $log.IsEnabled
-                LogMode = [System.String] $log.LogMode
-                LogRetentionDays = [System.Int32] $logRetentionDays
-                SecurityDescriptor = [System.String] $log.SecurityDescriptor
-            }
 
-            Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
-            return $returnValue
-        }
+        Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
+        return $returnValue
     }
 }
 
@@ -105,7 +98,7 @@ function Set-TargetResource
         [System.String]
         $LogName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.Boolean]
         $IsEnabled,
 
@@ -137,7 +130,7 @@ function Set-TargetResource
         if (!$log)
         {
             New-InvalidOperationException `
-            -Message ($script:localizedData.TerminatingError -f 'InvalidOperation')
+            -Message ($script:localizedData.TerminatingError -f $LogName)
         }
         else 
         {
@@ -214,7 +207,7 @@ function Set-TargetResource
     catch
     {
         New-InvalidOperationException `
-        -Message ($script:localizedData.TerminatingError -f 'InvalidOperation')
+        -Message ($script:localizedData.TerminatingError -f $LogName)
     }
 }
 
@@ -253,7 +246,7 @@ function Test-TargetResource
         [System.String]
         $LogName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.Boolean]
         $IsEnabled,
 
@@ -412,7 +405,7 @@ Function Save-LogFile
 
 <#
     .SYNOPSIS
-        Sets the desired resource state.
+        Sets the desired resource state for Log Retention.
 
     .PARAMETER LogName
         Specifies the given name of a Windows Event Log.
