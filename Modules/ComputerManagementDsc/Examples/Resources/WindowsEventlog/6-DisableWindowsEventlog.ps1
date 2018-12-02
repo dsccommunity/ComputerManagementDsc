@@ -4,9 +4,16 @@
 #>
 Configuration Example
 {
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
     Import-DSCResource -ModuleName ComputerManagementDsc
 
-    Node localhost
+    Node $NodeName
     {
         WindowsEventLog Enable-DscAnalytic
         {

@@ -2,13 +2,20 @@
     .EXAMPLE
     Example script that sets the application Windows Event Log
     logmode to 'Circular' with 30 days retention,
-    with a Security Desriptor and enable the log.
+    with a Security Desriptor and ensure it is enabled.
 #>
 Configuration Example
 {
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
     Import-DSCResource -ModuleName ComputerManagementDsc
 
-    Node localhost
+    Node $NodeName
     {
         WindowsEventLog ApplicationEventlogSize
         {

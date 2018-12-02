@@ -1,13 +1,20 @@
 <#
     .EXAMPLE
     Example script that sets the application Windows Event Log
-    logmode to 'Autobackup' with 30 days retention and enable it.
+    logmode to 'Autobackup' with 30 days retention and ensure it is enabled.
 #>
 Configuration Example
 {
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
     Import-DSCResource -ModuleName ComputerManagementDsc
 
-    Node localhost
+    Node $NodeName
     {
         WindowsEventLog ApplicationEventlogSize
         {
