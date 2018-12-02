@@ -261,7 +261,7 @@ function Test-TargetResource
     if (!$log)
     {
         New-InvalidOperationException `
-        -Message ($script:localizedData.WindowsEventLogNotFound -f $LogName)
+            -Message ($script:localizedData.WindowsEventLogNotFound -f $LogName)
     }
     else 
     {
