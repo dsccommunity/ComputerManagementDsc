@@ -22,7 +22,8 @@ $script:localizedData = Get-LocalizedData `
     .PARAMETER LogName
         Specifies the given name of a Windows Event Log.
 #>
-function Get-TargetResource {
+function Get-TargetResource
+{
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
@@ -37,8 +38,13 @@ function Get-TargetResource {
     )
 
     Get-WindowsEventLog -LogName $LogName
+
+    if (!$log)
+    {
+        exit
+    }
     
-    $log = Get-WinEvent -ListLog $LogName
+    #$log = Get-WinEvent -ListLog $LogName
     $logRetentionDays = (Get-EventLog -List | Where-Object -Property Log -eq $LogName).minimumRetentionDays
 
     $returnValue = @{
@@ -50,6 +56,7 @@ function Get-TargetResource {
         LogRetentionDays   = [System.Int32] $logRetentionDays
         SecurityDescriptor = [System.String] $log.SecurityDescriptor
     }
+
     Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
     return $returnValue
 }
@@ -79,7 +86,8 @@ function Get-TargetResource {
     .PARAMETER LogFilePath
         Specifies the given LogFile path of a Windows Event Log.
 #>
-function Set-TargetResource {
+function Set-TargetResource
+{
     [CmdletBinding()]
     param
     (
@@ -112,62 +120,82 @@ function Set-TargetResource {
         [System.String]
         $LogFilePath
     )
+    
+    Get-WindowsEventLog -LogName $LogName
 
-    $log = Get-WinEvent -ListLog $LogName
+    if (!$log)
+    {
+        exit
+    }
+    
+    #$log = Get-WinEvent -ListLog $LogName
     $shouldSaveLogFile = $false
 
     Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
 
-    if ($IsEnabled -eq $true) {
-        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $IsEnabled -ne $log.IsEnabled) {
+    if ($IsEnabled -eq $true)
+    {
+        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $IsEnabled -ne $log.IsEnabled)
+        {
             Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
             $log.IsEnabled = $IsEnabled
             $shouldSaveLogFile = $true
         }
 
-        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $MaximumSizeInBytes -ne $log.MaximumSizeInBytes) {
+        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $MaximumSizeInBytes -ne $log.MaximumSizeInBytes)
+        {
             Write-Verbose -Message ($localizedData.SettingEventlogLogSize -f $LogName, $MaximumSizeInBytes)
             $log.MaximumSizeInBytes = $MaximumSizeInBytes
             $shouldSaveLogFile = $true
         }
 
-        if ($PSBoundParameters.ContainsKey('LogMode') -and $LogMode -ne $log.LogMode) {
+        if ($PSBoundParameters.ContainsKey('LogMode') -and $LogMode -ne $log.LogMode)
+        {
             Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode)
             $log.LogMode = $LogMode
             $shouldSaveLogFile = $true
         }
 
-        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $SecurityDescriptor -ne $log.SecurityDescriptor) {
+        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $SecurityDescriptor -ne $log.SecurityDescriptor)
+        {
             Write-Verbose -Message ($localizedData.SettingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
             $log.SecurityDescriptor = $SecurityDescriptor
             $shouldSaveLogFile = $true
         }
 
-        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $LogFilePath -ne $log.LogFilePath) {
+        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $LogFilePath -ne $log.LogFilePath)
+        {
             Write-Verbose -Message ($localizedData.SettingEventlogLogFilePath -f $LogName, $LogFilePath)
             $log.LogFilePath = $LogFilePath
             $shouldSaveLogFile = $true
         }
     }
-    else {
+    else
+    {
         Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
         $log.IsEnabled = $IsEnabled
         $shouldSaveLogFile = $true
     }
 
-    if ($shouldSaveLogFile -eq $true) {
+    if ($shouldSaveLogFile -eq $true)
+    {
         Save-LogFile -Log $log
     }
 
-    if ($PSBoundParameters.ContainsKey('LogRetentionDays')) {
-        if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName})) {
+    if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
+    {
+
+        if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName}))
+        {
             $minimumRetentionDays = Get-EventLog -List | Where-Object -FilterScript {$_.Log -eq $LogName}
 
-            if ($LogRetentionDays -ne $minimumRetentionDays.minimumRetentionDays) {
+            if ($LogRetentionDays -ne $minimumRetentionDays.minimumRetentionDays)
+            {
                 Set-LogRetentionDays -LogName $LogName -LogRetentionDays $LogRetentionDays
             }
         }
-        else {
+        else
+        {
             Write-Verbose -Message ($localizedData.EventlogLogRetentionDaysWrongMode -f $LogName)
         }
     }
@@ -198,7 +226,8 @@ function Set-TargetResource {
     .PARAMETER LogFilePath
         Specifies the given LogFile path of a Windows Event Log.
 #>
-function Test-TargetResource {
+function Test-TargetResource
+{
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
@@ -235,75 +264,103 @@ function Test-TargetResource {
         $LogFilePath
     )
 
-    $log = Get-WinEvent -ListLog $LogName
+    Get-WindowsEventLog -LogName $LogName
+
+    if (!$log)
+    {
+        exit
+    }
+
+    #$log = Get-WinEvent -ListLog $LogName
 
     $desiredState = $true
 
-    if ($IsEnabled -eq $true) {
-        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled) {
+    if ($IsEnabled -eq $true)
+    {
+
+        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
+        {
             Write-Verbose -Message ($localizedData.TestingEventlogIsEnabled -f $LogName, $IsEnabled)
             $desiredState = $false
         }
-        else {
+        else
+        {
             Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'IsEnabled')
         }
 
-        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes) {
+        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
+        {
             Write-Verbose -Message ($localizedData.TestingEventlogMaximumSizeInBytes -f $LogName, $MaximumSizeInBytes)
             $desiredState = $false
         }
-        else {
+        else
+        {
             Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'MaximumSizeInBytes')
         }
 
-        if ($PSBoundParameters.ContainsKey('LogMode') -and $log.LogMode -ne $LogMode) {
+        if ($PSBoundParameters.ContainsKey('LogMode') -and $log.LogMode -ne $LogMode)
+        {
             Write-Verbose -Message ($localizedData.TestingEventlogLogMode -f $LogName, $LogMode)
             $desiredState = $false
         }
-        else {
+        else
+        {
             Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogMode')
         }
 
-        if ($PSBoundParameters.ContainsKey('LogRetentionDays')) {
-            if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName})) {
+        if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
+        {
+
+            if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName}))
+            {
                 $minimumRetentionDays = Get-EventLog -List | Where-Object -FilterScript {$_.Log -eq $LogName}
 
-                if ($LogRetentionDays -ne $minimumRetentionDays.minimumRetentionDays) {
+                if ($LogRetentionDays -ne $minimumRetentionDays.minimumRetentionDays)
+                {
                     Write-Verbose -Message ($localizedData.TestingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
                     $desiredState = $false
                 }
-                else {
+                else
+                {
                     Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogRetentionDays')
                 }
             }
-            else {
+            else
+            {
                 Write-Verbose -Message ($localizedData.EventlogLogRetentionDaysWrongMode -f $LogName)
                 $desiredState = $false
             }
         }
 
-        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath) {
+        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath)
+        {
             Write-Verbose -Message ($localizedData.TestingWindowsEventlogLogFilePath -f $LogName, $LogFilePath)
             $desiredState = $false
         }
-        else {
+        else
+        {
             Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogFilePath')
         }
 
-        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor) {
+        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
+        {
             Write-Verbose -Message ($localizedData.TestingWindowsEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
             $desiredState = $false
         }
-        else {
+        else
+        {
             Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'SecurityDescriptor')
         }
     }
-    else {
-        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled) {
+    else
+    {
+        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
+        {
             Write-Verbose -Message ($localizedData.TestingEventlogIsEnabled -f $LogName, $IsEnabled)
             $desiredState = $false
         }
-        else {
+        else
+        {
             Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'IsEnabled')
         }
     }
@@ -317,7 +374,8 @@ function Test-TargetResource {
     .PARAMETER Log
         Gets the specified Windows Event Log properties.
 #>
-Function Get-WindowsEventLog {
+Function Get-WindowsEventLog
+{
     [CmdletBinding()]
     param
     (
@@ -326,14 +384,15 @@ Function Get-WindowsEventLog {
         $LogName
     )
 
-    $log = Get-WinEvent -ListLog $LogName
-    if (!$log) {
+    $log = Get-WinEvent -ListLog $LogName -ErrorAction SilentlyContinue
+
+    if (!$log)
+    {
         New-InvalidOperationException `
             -Message ($script:localizedData.WindowsEventLogNotFound -f $LogName)
-        
-        return
     }
-    else {
+    else
+    {
         Write-Verbose -Message ($localizedData.WindowsEventLogFound -f $LogName)
         return $log
     }
@@ -346,7 +405,8 @@ Function Get-WindowsEventLog {
     .PARAMETER Log
         Specifies the given object of a Windows Event Log.
 #>
-Function Save-LogFile {
+Function Save-LogFile
+{
     [CmdletBinding()]
     param
     (
@@ -355,11 +415,13 @@ Function Save-LogFile {
         $Log
     )
 
-    try {
+    try
+    {
         $Log.SaveChanges()
         Write-Verbose -Message ($localizedData.SaveWindowsEventlogSuccess)
     }
-    catch {
+    catch
+    {
         Write-Verbose -Message ($localizedData.SaveWindowsEventlogFailure)
     }
 }
@@ -374,7 +436,8 @@ Function Save-LogFile {
     .PARAMETER Retention
         Specifies the given RetentionDays for LogMode Autobackup.
 #>
-Function Set-LogRetentionDays {
+Function Set-LogRetentionDays
+{
     [CmdletBinding()]
     param
     (
@@ -389,11 +452,13 @@ Function Set-LogRetentionDays {
 
     Write-Verbose -Message ($localizedData.SettingEventlogLogRetentionDays -f $LogName, $LogRetentionDays)
 
-    try {
+    try
+    {
         Limit-Eventlog -LogName $LogName -OverflowAction 'OverwriteOlder' -RetentionDays $LogRetentionDays
         Write-Verbose -Message ($localizedData.SettingWindowsEventlogRetentionDaysSuccess -f $LogName, $LogRetentionDays)
     }
-    catch {
+    catch
+    {
         Write-Verbose -Message ($localizedData.SettingWindowsEventlogRetentionDaysFailed -f $LogName, $LogRetentionDays)
     }
 }
