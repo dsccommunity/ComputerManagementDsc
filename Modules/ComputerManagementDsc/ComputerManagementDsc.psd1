@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-moduleVersion = '6.0.0.0'
+moduleVersion = '6.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,16 +49,9 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- ScheduledTask:
-  - Added support for Group Managed Service Accounts, implemented using the ExecuteAsGMSA
-    parameter. Fixes [Issue 111](https://github.com/PowerShell/ComputerManagementDsc/issues/111)
-  - Added support to set the Synchronize Across Time Zone option. Fixes [Issue 109](https://github.com/PowerShell/ComputerManagementDsc/issues/109)
-- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue 189](https://github.com/PowerShell/ComputerManagementDsc/issues/189).
-- BREAKING CHANGE: PowerPlan:
-  - Added IsActive Read-Only Property - Fixes [Issue 171](https://github.com/PowerShell/ComputerManagementDsc/issues/171).
-  - InActive power plans are no longer returned with their Name set to null.
-    Now, the name is always returned and the Read-Only property of IsActive
-    is set accordingly.
+        ReleaseNotes = '- Updated LICENSE file to match the Microsoft Open Source Team standard.
+  Fixes [Issue 197](https://github.com/PowerShell/ComputerManagementDsc/issues/197).
+- Explicitly removed extra hidden files from release package
 
 '
 
@@ -66,6 +59,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 
