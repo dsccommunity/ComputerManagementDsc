@@ -8,8 +8,12 @@
   - Moved strings in localization file.
   - LogMode is now set with Limit-EventLog,
   - Fixes [Issue #18] "Cannot save changes to LogMode property"
+
+## 6.1.0.0
+
 - Updated LICENSE file to match the Microsoft Open Source Team standard.
   Fixes [Issue #197](https://github.com/PowerShell/ComputerManagementDsc/issues/197).
+- Explicitly removed extra hidden files from release package
 
 ## 6.0.0.0
 
