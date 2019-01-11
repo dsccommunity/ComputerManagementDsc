@@ -491,6 +491,47 @@ function Set-TimeZoneUsingDotNet
     [Microsoft.PowerShell.TimeZone.TimeZone]::Set($TimeZoneId)
 } # function Set-TimeZoneUsingDotNet
 
+<#
+    .SYNOPSIS
+        This function gets all power plans/schemes available on the machine using the powercfg.exe utility and returns a custom object for each plan
+        It exists because the WMI classes are not available on all platforms (e.g on Server 2012 R2 core or nano server)
+
+    .NOTES
+        This function is used by the PowerPlan resource
+#>
+function Get-PowerPlans {
+    [CmdletBinding()]
+    param
+    (
+    )
+
+    $powercfgOutPut = Invoke-Expression -Command 'powercfg.exe /l'
+
+    $allPlans = @()
+
+    foreach($line in $powercfgOutPut)
+    {
+        if($line -match "^.*?:[ ]*(?'guid'.*?)[ ]*\((?'name'.*?)\)")
+        {
+            $plan = [PSCustomObject]@{
+                Name = [String]$Matches.name
+                Guid = [Guid]$Matches.guid
+                IsActive = $false
+            }
+
+            if($line -match "\*$")
+            {
+                $plan.IsActive = $true
+            }
+
+            $allPlans += $plan
+        }
+    }
+
+    return $allPlans
+}
+
+
 Export-ModuleMember -Function `
     Test-DscParameterState, `
     Test-DscObjectHasProperty, `
@@ -498,4 +539,5 @@ Export-ModuleMember -Function `
     Get-TimeZoneId, `
     Test-TimeZoneId, `
     Set-TimeZoneId, `
-    Set-TimeZoneUsingDotNet
+    Set-TimeZoneUsingDotNet, `
+    Get-PowerPlans

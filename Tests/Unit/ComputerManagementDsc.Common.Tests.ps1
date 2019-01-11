@@ -690,6 +690,76 @@ try
                 }
             }
         }
+
+        Describe 'ComputerManagementDsc.Common\Get-PowerPlans' {
+            Context 'When only the "Balanced" power plan is available (default on Windows 10 for example)' {
+                Mock `
+                    -CommandName Invoke-Expression `
+                    -MockWith {
+                        return @(
+                            "Existing Power Schemes (* Active)"
+                            "-----------------------------------"
+                            "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced) *"
+                        )
+                    } `
+                    -ParameterFilter {$Command -eq  'powercfg.exe /l'}
+
+                It 'Should not throw exception' {
+                    {Get-PowerPlans} | Should -Not -Throw
+                }
+
+                It 'Should return an object of type PSCustomObject' {
+                    Get-PowerPlans | Should -BeOfType [PSCustomObject]
+                }
+
+                It 'Should return only one object' {
+                    Get-PowerPlans | Should -HaveCount 1
+                }
+
+                It 'Should be the active plan (property "IsActive" of the returned object should be $true)' {
+                    (Get-PowerPlans).IsActive | Should -Be $true
+                }
+
+                It 'Should return a Object with the property "Name" with the value "Balanced"' {
+                    (Get-PowerPlans).Name  | Should -Be 'Balanced'
+                }
+            }
+
+            Context 'When three power plans are available (default on server OS)' {
+                Mock `
+                    -CommandName Invoke-Expression `
+                    -MockWith {
+                        return @(
+                            "Existing Power Schemes (* Active)"
+                            "-----------------------------------"
+                            "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced) *"
+                            "Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)"
+                            "Power Scheme GUID: a1841308-3541-4fab-bc81-f71556f20b4a  (Power saver)"
+                        )
+                    } `
+                    -ParameterFilter {$Command -eq  'powercfg.exe /l'}
+
+                It 'Should not throw exception' {
+                    {Get-PowerPlans} | Should -Not -Throw
+                }
+
+                It 'Should return an object of type PSCustomObject' {
+                    Get-PowerPlans | Should -BeOfType [PSCustomObject]
+                }
+
+                It 'Should return three objects' {
+                    Get-PowerPlans | Should -HaveCount 3
+                }
+
+                It 'Should be only have one plan marked as active' {
+                    Get-PowerPlans | Where-Object{$_.IsActive -eq $true} | Should -HaveCount 1
+                }
+
+                It 'Should be have the plan "Balanced" set as active' {
+                    (Get-PowerPlans | Where-Object{$_.IsActive -eq $true}).Name  | Should -Be 'Balanced'
+                }
+            }
+        }
     }
 }
 finally
