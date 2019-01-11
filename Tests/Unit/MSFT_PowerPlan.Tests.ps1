@@ -32,31 +32,58 @@ try
          $LocalizedData
     }
 
-    Describe "$($script:DSCResourceName)\Get-TargetResource" {
-        BeforeEach {
-            $testParameters = @{
-                IsSingleInstance = 'Yes'
-                Name             = 'High performance'
-                Verbose          = $true
-            }
-        }
+    $testCases =@(
+        #Power plan as name specified
+        @{
+            Type = 'Name'
+            Name = 'High performance'
+        },
 
+        #Power plan as Guid specified
+        @{
+            Type = 'Guid'
+            Name = '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+        }
+    )
+
+    Describe "$($script:DSCResourceName)\Get-TargetResource" {
         Context 'When the system is in the desired present state' {
             BeforeEach {
                 Mock `
-                    -CommandName Get-CimInstance `
+                    -CommandName Get-PowerPlans `
                     -MockWith {
-                    return New-Object Object |
-                        Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
-                } `
+                        return @(
+                            [PSCustomObject]@{
+                                Name = 'High performance'
+                                Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                                IsActive = $true
+                            },
+                            [PSCustomObject]@{
+                                Name = 'Balanced'
+                                Guid = [Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                                IsActive = $false
+                            },
+                            [PSCustomObject]@{
+                                Name = 'Power saver'
+                                Guid = [Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
+                                IsActive = $false
+                            }
+                        )
+                    } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
             }
 
-            It 'Should return the same values as passed as parameters' {
-                $result = Get-TargetResource @testParameters
+            It 'Should return the same values as passed as parameters (power plan specified as <Type>)' -TestCases $testCases {
+
+                Param(
+                    [String]
+                    $Name
+                )
+
+                $result = Get-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose
                 $result.IsSingleInstance | Should -Be 'Yes'
-                $result.Name | Should -Be $testParameters.Name
+                $result.Name | Should -Be $Name
                 $result.IsActive | Should -Be $true
             }
         }
@@ -64,53 +91,70 @@ try
         Context 'When the system is not in the desired present state' {
             BeforeEach {
                 Mock `
-                    -CommandName Get-CimInstance `
+                    -CommandName Get-PowerPlans `
                     -MockWith {
-                    return New-Object Object |
-                        Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
-                } `
+                        return @(
+                            [PSCustomObject]@{
+                                Name = 'High performance'
+                                Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                                IsActive = $false
+                            },
+                            [PSCustomObject]@{
+                                Name = 'Balanced'
+                                Guid = [Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                                IsActive = $false
+                            },
+                            [PSCustomObject]@{
+                                Name = 'Power saver'
+                                Guid = [Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
+                                IsActive = $true
+                            }
+                        )
+                    } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
             }
 
-            It 'Should return an inactive plan' {
-                $result = Get-TargetResource @testParameters
+            It 'Should return an inactive plan (power plan specified as <Type>)' -TestCases $testCases {
+
+                Param(
+                    [String]
+                    $Name
+                )
+
+                $result = Get-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose
                 $result.IsSingleInstance | Should -Be 'Yes'
-                $result.Name | Should -Be $testParameters.Name
+                $result.Name | Should -Be $Name
                 $result.IsActive | Should -Be $false
-            }
-        }
-
-        Context 'When the Get-CimInstance cannot retrive information about power plans' {
-            BeforeEach {
-                Mock `
-                    -CommandName Get-CimInstance `
-                    -MockWith { throw } `
-                    -ModuleName $script:DSCResourceName `
-                    -Verifiable
-            }
-
-            It 'Should throw the expected error' {
-                $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.PowerPlanCimError -f 'Win32_PowerPlan')
-
-                { Get-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
 
         Context 'When the preferred plan does not exist' {
             BeforeEach {
                 Mock `
-                    -CommandName Get-CimInstance `
+                    -CommandName Get-PowerPlans `
+                    -MockWith {
+                        return [PSCustomObject]@{
+                            Name = 'Balanced'
+                            Guid = [Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                            IsActive = $false
+                        }
+                    } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
             }
 
-            It 'Should throw the expected error' {
-                $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.PowerPlanNotFound -f $testParameters.Name)
+            It 'Should throw the expected error (power plan specified as <Type>)' -TestCases $testCases {
 
-                { Get-TargetResource @testParameters } | Should -Throw $errorRecord
+                Param(
+                    [String]
+                    $Name
+                )
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.PowerPlanNotFound -f $Name)
+
+                { Get-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose } | Should -Throw $errorRecord
             }
         }
 
@@ -119,67 +163,73 @@ try
 
     Describe "$($script:DSCResourceName)\Set-TargetResource" {
         BeforeEach {
-            $testParameters = @{
-                IsSingleInstance = 'Yes'
-                Name             = 'High performance'
-                Verbose          = $true
-            }
+            Mock `
+            -CommandName Get-PowerPlans `
+            -MockWith {
+                return @(
+                    [PSCustomObject]@{
+                        Name = 'High performance'
+                        Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                        IsActive = $false
+                    },
+                    [PSCustomObject]@{
+                        Name = 'Balanced'
+                        Guid = [Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                        IsActive = $false
+                    },
+                    [PSCustomObject]@{
+                        Name = 'Power saver'
+                        Guid = [Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
+                        IsActive = $true
+                    }
+                )
+            } `
+            -ModuleName $script:DSCResourceName `
+            -Verifiable
 
             Mock `
-                -CommandName Invoke-CimMethod `
-                -ModuleName $script:DSCResourceName `
-                -Verifiable
-
-            Mock `
-                -CommandName Get-CimInstance `
-                -MockWith {
-                    return New-Object `
-                        -TypeName Microsoft.Management.Infrastructure.CimInstance `
-                        -ArgumentList @('Win32_PowerPlan', 'dummyNamespace')
-                } `
-                -ModuleName $script:DSCResourceName `
-                -Verifiable
+            -CommandName Invoke-Expression `
+            -ParameterFilter {$Command -like 'powercfg.exe /S *'} `
+            -ModuleName $script:DSCResourceName `
+            -Verifiable
         }
 
         Context 'When the system is not in the desired present state' {
-            It 'Should call the mocked function Invoke-CimMethod exactly once' {
-                Set-TargetResource @testParameters
+            It 'Should call powercfg.exe /S only once (power plan specified as <Type>)' -TestCases $testCases {
 
-                Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 1 -Scope It -ModuleName $script:DSCResourceName
+                Param(
+                    [String]
+                    $Name
+                )
+
+                Set-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose
+
+                Assert-MockCalled -CommandName Invoke-Expression -Exactly -Times 1 -Scope It -ModuleName $script:DSCResourceName
             }
         }
 
-        Context 'When the Get-CimInstance cannot retrive information about power plans' {
+
+        Context 'When the powercfg.exe throws an error' {
             BeforeEach {
                 Mock `
-                    -CommandName Get-CimInstance `
-                    -MockWith { throw } `
+                    -CommandName Invoke-Expression `
+                    -MockWith { Throw 'powercfg : Invalid Parameters -- try "/?" for help' } `
+                    -ParameterFilter {$Command -like 'powercfg.exe /S *'} `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
             }
 
-            It 'Should throw the expected error' {
+            It 'Should catch the correct error thrown (power plan specified as <Type>)' -TestCases $testCases {
+
+                Param(
+                    [String]
+                    $Name
+                )
+
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.PowerPlanCimError -f 'Win32_PowerPlan')
+                    -Message ($LocalizedData.PowerPlanWasUnableToBeSet -f $Name, 'powercfg : Invalid Parameters -- try "/?" for help')
 
-                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
-            }
-        }
-
-        Context 'When the Invoke-CimMethod throws an error' {
-            BeforeEach {
-                Mock `
-                    -CommandName Invoke-CimMethod `
-                    -MockWith { throw 'Failed to set value' } `
-                    -ModuleName $script:DSCResourceName `
-                    -Verifiable
-            }
-
-            It 'Should catch the correct error thrown by Invoke-CimMethod' {
-                $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.PowerPlanWasUnableToBeSet -f $testParameters.Name, 'Failed to set value')
-
-                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
+                { Set-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose} | Should -Throw $errorRecord
             }
         }
 
@@ -187,45 +237,79 @@ try
     }
 
     Describe "$($script:DSCResourceName)\Test-TargetResource" {
-        BeforeEach {
-            $testParameters = @{
-                IsSingleInstance = 'Yes'
-                Name             = 'High performance'
-                Verbose          = $true
-            }
-        }
-
         Context 'When the system is in the desired present state' {
             BeforeEach {
                 Mock `
-                    -CommandName Get-CimInstance `
+                    -CommandName Get-PowerPlans `
                     -MockWith {
-                        return New-Object Object |
-                            Add-Member -MemberType NoteProperty -Name IsActive -Value $true -PassThru -Force
+                        return @(
+                            [PSCustomObject]@{
+                                Name = 'High performance'
+                                Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                                IsActive = $true
+                            },
+                            [PSCustomObject]@{
+                                Name = 'Balanced'
+                                Guid = [Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                                IsActive = $false
+                            },
+                            [PSCustomObject]@{
+                                Name = 'Power saver'
+                                Guid = [Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
+                                IsActive = $false
+                            }
+                        )
                     } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
             }
 
-            It 'Should return the the state as present ($true)' {
-                Test-TargetResource @testParameters | Should -Be $true
+            It 'Should return the the state as present ($true) (power plan specified as <Type>)' -TestCases $testCases {
+
+                Param(
+                    [String]
+                    $Name
+                )
+
+                Test-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose | Should -Be $true
             }
         }
 
         Context 'When the system is not in the desired state' {
             BeforeEach {
                 Mock `
-                    -CommandName Get-CimInstance `
+                    -CommandName Get-PowerPlans `
                     -MockWith {
-                        return New-Object Object |
-                            Add-Member -MemberType NoteProperty -Name IsActive -Value $false -PassThru -Force
+                        return @(
+                            [PSCustomObject]@{
+                                Name = 'High performance'
+                                Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                                IsActive = $false
+                            },
+                            [PSCustomObject]@{
+                                Name = 'Balanced'
+                                Guid = [Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                                IsActive = $false
+                            },
+                            [PSCustomObject]@{
+                                Name = 'Power saver'
+                                Guid = [Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
+                                IsActive = $true
+                            }
+                        )
                     } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
             }
 
-            It 'Should return the the state as absent ($false)' {
-                Test-TargetResource @testParameters | Should -Be $false
+            It 'Should return the the state as absent ($false) (power plan specified as <Type>)' -TestCases $testCases {
+
+                Param(
+                    [String]
+                    $Name
+                )
+
+                Test-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose | Should -Be $false
             }
         }
 

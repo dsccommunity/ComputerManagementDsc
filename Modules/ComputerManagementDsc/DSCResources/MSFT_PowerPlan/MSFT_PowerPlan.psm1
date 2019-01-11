@@ -110,10 +110,10 @@ function Set-TargetResource
     {
         try
         {
-            powercfg.exe /S $plan.Guid
-            if (-not $?)
+            Invoke-Expression -Command "powercfg.exe /S $($plan.Guid)" -ErrorVariable powerCfgError
+            if ($powerCfgError)
             {
-                Throw $error[0]
+                Throw $powerCfgError
             }
         }
         catch
