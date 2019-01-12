@@ -1,11 +1,15 @@
 # Versions
 
 ## Unreleased
+
 - PowerPlan:
-  - Added support to specify the desired power plan either as name or guid. Fixes [Issue #59](https://github.com/PowerShell/ComputerManagementDsc/issues/59)
-  - Changed the resource so it uses powercfg.exe instead of WMI/CIM to get und set power plans because WMI approach is not always working on all OS versions.
-  (The WMI approach does for example not work on Windows Server 2012 R2 Core, Nano Server, Windows Server 2019 and Windows 10)
-  Fixes [Issue #155](https://github.com/PowerShell/ComputerManagementDsc/issues/155) and [Issue #65](https://github.com/PowerShell/ComputerManagementDsc/issues/65)
+  - Added support to specify the desired power plan either as name or guid.
+    Fixes [Issue #59](https://github.com/PowerShell/ComputerManagementDsc/issues/59)
+  - Changed the resource so it uses powercfg.exe instead of WMI/CIM.
+  (Workaround fo rServer 2012R2 Core, Nano Server, Server 2019 and Windows 10)
+  Fixes [Issue #155](https://github.com/PowerShell/ComputerManagementDsc/issues/155)
+  and [Issue #65](https://github.com/PowerShell/ComputerManagementDsc/issues/65)
+
 ## 6.1.0.0
 
 - Updated LICENSE file to match the Microsoft Open Source Team standard.
