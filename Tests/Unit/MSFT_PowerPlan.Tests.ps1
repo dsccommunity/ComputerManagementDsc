@@ -189,7 +189,7 @@ try
 
             Mock `
             -CommandName Invoke-Expression `
-            -ParameterFilter {$Command -like 'powercfg.exe /S *'} `
+            -ParameterFilter {$Command -eq 'powercfg.exe /S 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'} `
             -ModuleName $script:DSCResourceName `
             -Verifiable
         }
@@ -208,23 +208,49 @@ try
             }
         }
 
-
-        Context 'When the powercfg.exe throws an error' {
+        Context 'When the preferred plan does not exist' {
             BeforeEach {
                 Mock `
-                    -CommandName Invoke-Expression `
-                    -MockWith { Throw 'powercfg : Invalid Parameters -- try "/?" for help' } `
-                    -ParameterFilter {$Command -like 'powercfg.exe /S *'} `
+                    -CommandName Get-PowerPlans `
+                    -MockWith {
+                        return [PSCustomObject]@{
+                            Name = 'Balanced'
+                            Guid = [Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                            IsActive = $false
+                        }
+                    } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
             }
 
+            It 'Should throw the expected error (power plan specified as <Type>)' -TestCases $testCases {
+
+                Param(
+                    [String]
+                    $Name
+                )
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.PowerPlanNotFound -f $Name)
+
+                { Set-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose } | Should -Throw $errorRecord
+            }
+        }
+
+        Context 'When the powercfg.exe throws an invalid parameters error' {
             It 'Should catch the correct error thrown (power plan specified as <Type>)' -TestCases $testCases {
 
                 Param(
                     [String]
                     $Name
                 )
+
+                Mock `
+                -CommandName Invoke-Expression `
+                -MockWith { Throw 'powercfg : Invalid Parameters -- try "/?" for help' } `
+                -ParameterFilter {$Command -like 'powercfg.exe /S *'} `
+                -ModuleName $script:DSCResourceName `
+                -Verifiable
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.PowerPlanWasUnableToBeSet -f $Name, 'powercfg : Invalid Parameters -- try "/?" for help')
