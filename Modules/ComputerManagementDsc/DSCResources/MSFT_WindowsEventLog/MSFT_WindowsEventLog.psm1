@@ -37,24 +37,18 @@ function Get-TargetResource
         $IsEnabled
     )
 
-    Get-WindowsEventLog -LogName $LogName
+    $Log = Get-WindowsEventLog -LogName $LogName
 
-    if (!$log)
-    {
-        exit
-    }
-    
-    #$log = Get-WinEvent -ListLog $LogName
     $logRetentionDays = (Get-EventLog -List | Where-Object -Property Log -eq $LogName).minimumRetentionDays
 
     $returnValue = @{
         LogName            = [System.String] $LogName
-        LogFilePath        = [system.String] $log.LogFilePath
-        MaximumSizeInBytes = [System.Int64] $log.MaximumSizeInBytes
-        IsEnabled          = [System.Boolean] $log.IsEnabled
-        LogMode            = [System.String] $log.LogMode
+        LogFilePath        = [system.String] $Log.LogFilePath
+        MaximumSizeInBytes = [System.Int64] $Log.MaximumSizeInBytes
+        IsEnabled          = [System.Boolean] $Log.IsEnabled
+        LogMode            = [System.String] $Log.LogMode
+        SecurityDescriptor = [System.String] $Log.SecurityDescriptor
         LogRetentionDays   = [System.Int32] $logRetentionDays
-        SecurityDescriptor = [System.String] $log.SecurityDescriptor
     }
 
     Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
@@ -121,65 +115,59 @@ function Set-TargetResource
         $LogFilePath
     )
     
-    Get-WindowsEventLog -LogName $LogName
+    $Log = Get-WindowsEventLog -LogName $LogName
 
-    if (!$log)
-    {
-        exit
-    }
-    
-    #$log = Get-WinEvent -ListLog $LogName
     $shouldSaveLogFile = $false
 
     Write-Verbose -Message ($localizedData.GettingEventlogName -f $LogName)
 
     if ($IsEnabled -eq $true)
     {
-        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $IsEnabled -ne $log.IsEnabled)
+        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $IsEnabled -ne $Log.IsEnabled)
         {
             Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
-            $log.IsEnabled = $IsEnabled
+            $Log.IsEnabled = $IsEnabled
             $shouldSaveLogFile = $true
         }
 
-        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $MaximumSizeInBytes -ne $log.MaximumSizeInBytes)
+        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $MaximumSizeInBytes -ne $Log.MaximumSizeInBytes)
         {
             Write-Verbose -Message ($localizedData.SettingEventlogLogSize -f $LogName, $MaximumSizeInBytes)
-            $log.MaximumSizeInBytes = $MaximumSizeInBytes
+            $Log.MaximumSizeInBytes = $MaximumSizeInBytes
             $shouldSaveLogFile = $true
         }
 
-        if ($PSBoundParameters.ContainsKey('LogMode') -and $LogMode -ne $log.LogMode)
+        if ($PSBoundParameters.ContainsKey('LogMode') -and $LogMode -ne $Log.LogMode)
         {
             Write-Verbose -Message ($localizedData.SettingEventlogLogMode -f $LogName, $LogMode)
-            $log.LogMode = $LogMode
+            $Log.LogMode = $LogMode
             $shouldSaveLogFile = $true
         }
 
-        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $SecurityDescriptor -ne $log.SecurityDescriptor)
+        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $SecurityDescriptor -ne $Log.SecurityDescriptor)
         {
             Write-Verbose -Message ($localizedData.SettingEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
-            $log.SecurityDescriptor = $SecurityDescriptor
+            $Log.SecurityDescriptor = $SecurityDescriptor
             $shouldSaveLogFile = $true
         }
 
-        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $LogFilePath -ne $log.LogFilePath)
+        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $LogFilePath -ne $Log.LogFilePath)
         {
             Write-Verbose -Message ($localizedData.SettingEventlogLogFilePath -f $LogName, $LogFilePath)
-            $log.LogFilePath = $LogFilePath
+            $Log.LogFilePath = $LogFilePath
             $shouldSaveLogFile = $true
         }
     }
     else
     {
         Write-Verbose -Message ($localizedData.SettingEventlogIsEnabled -f $LogName, $IsEnabled)
-        $log.IsEnabled = $IsEnabled
+        $Log.IsEnabled = $IsEnabled
         $shouldSaveLogFile = $true
     }
 
     if ($shouldSaveLogFile -eq $true)
     {
-        Save-LogFile -Log $log
+        Save-LogFile -Log $Log
     }
 
     if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
@@ -264,21 +252,14 @@ function Test-TargetResource
         $LogFilePath
     )
 
-    Get-WindowsEventLog -LogName $LogName
-
-    if (!$log)
-    {
-        exit
-    }
-
-    #$log = Get-WinEvent -ListLog $LogName
+    $Log = Get-WindowsEventLog -LogName $LogName
 
     $desiredState = $true
 
     if ($IsEnabled -eq $true)
     {
 
-        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
+        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $Log.IsEnabled -ne $IsEnabled)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogIsEnabled -f $LogName, $IsEnabled)
             $desiredState = $false
@@ -288,7 +269,7 @@ function Test-TargetResource
             Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'IsEnabled')
         }
 
-        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
+        if ($PSBoundParameters.ContainsKey('MaximumSizeInBytes') -and $Log.MaximumSizeInBytes -ne $MaximumSizeInBytes)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogMaximumSizeInBytes -f $LogName, $MaximumSizeInBytes)
             $desiredState = $false
@@ -332,7 +313,7 @@ function Test-TargetResource
             }
         }
 
-        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $log.LogFilePath -ne $LogFilePath)
+        if ($PSBoundParameters.ContainsKey('LogFilePath') -and $Log.LogFilePath -ne $LogFilePath)
         {
             Write-Verbose -Message ($localizedData.TestingWindowsEventlogLogFilePath -f $LogName, $LogFilePath)
             $desiredState = $false
@@ -342,7 +323,7 @@ function Test-TargetResource
             Write-Verbose -Message ($localizedData.SetResourceIsInDesiredState -f $LogName, 'LogFilePath')
         }
 
-        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $log.SecurityDescriptor -ne $SecurityDescriptor)
+        if ($PSBoundParameters.ContainsKey('SecurityDescriptor') -and $Log.SecurityDescriptor -ne $SecurityDescriptor)
         {
             Write-Verbose -Message ($localizedData.TestingWindowsEventlogSecurityDescriptor -f $LogName, $SecurityDescriptor)
             $desiredState = $false
@@ -354,7 +335,7 @@ function Test-TargetResource
     }
     else
     {
-        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
+        if ($PSBoundParameters.ContainsKey('IsEnabled') -and $Log.IsEnabled -ne $IsEnabled)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogIsEnabled -f $LogName, $IsEnabled)
             $desiredState = $false
@@ -384,9 +365,9 @@ Function Get-WindowsEventLog
         $LogName
     )
 
-    $log = Get-WinEvent -ListLog $LogName -ErrorAction SilentlyContinue
+    $script:Log = Get-WinEvent -ListLog $LogName
 
-    if (!$log)
+    if (!$Log)
     {
         New-InvalidOperationException `
             -Message ($script:localizedData.WindowsEventLogNotFound -f $LogName)
@@ -394,7 +375,7 @@ Function Get-WindowsEventLog
     else
     {
         Write-Verbose -Message ($localizedData.WindowsEventLogFound -f $LogName)
-        return $log
+        return $Log
     }
 }
 

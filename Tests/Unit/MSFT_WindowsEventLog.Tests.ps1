@@ -28,14 +28,15 @@ try
 
             Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
 
-                Mock -CommandName Get-WinEvent -MockWith {
+                Mock -CommandName Get-WindowsEventLog -MockWith {
                     $properties = @{
-                        MaximumSizeInBytes     = 4096kb
+                            MaximumSizeInBytes = 4096kb
                             IsEnabled          = $true
                             LogMode            = 'Circular'
                             LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
                             SecurityDescriptor = 'TestDescriptor'
                             LogRetentionDays   = '0'
+                            LogName            = 'Application'
                     }
 
                     Write-Output (New-Object -TypeName PSObject -Property $properties)
@@ -44,7 +45,7 @@ try
                 $results = Get-TargetResource -LogName 'Application' -IsEnabled $true
 
                 It 'Should return an hashtable' {
-                    $results.GetType().Name | Should -Be 'HashTable'
+                    $results.GetType().Name | Should -Be 'Hashtable'
                 }
 
                 It 'Should return a Logname Application' {
@@ -78,7 +79,7 @@ try
 
             Describe "$($script:DSCResourceName)\Test-TargetResource" -Tag 'Test' {
 
-                Mock -CommandName Get-WinEvent -MockWith {
+                Mock -CommandName Get-WindowsEventLog -MockWith {
                     $properties = @{
                         MaximumSizeInBytes = 1028kb
                         IsEnabled          = $true
@@ -158,7 +159,7 @@ try
                 }
 
                 It 'Should return $true if LogRetentionDays is in desired state' {
-                    Mock -CommandName Get-WinEvent -MockWith {
+                    Mock -CommandName Get-WindowsEventLog -MockWith {
                         $properties = @{
                             MaximumSizeInBytes = 1028kb
                             IsEnabled          = $true
@@ -216,7 +217,7 @@ try
                 }
 
                 It 'Should return $false if IsEnabled is not in desired state' {
-                    Mock -CommandName Get-WinEvent -MockWith {
+                    Mock -CommandName Get-WindowsEventLog -MockWith {
                         $properties = @{
                             MaximumSizeInBytes = 1028kb
                             IsEnabled          = $false
@@ -230,7 +231,7 @@ try
                 }
 
                 It 'Should return $true if IsEnabled is not in desired state' {
-                    Mock -CommandName Get-WinEvent -MockWith {
+                    Mock -CommandName Get-WindowsEventLog -MockWith {
                         $properties = @{
                             MaximumSizeInBytes = 1028kb
                             IsEnabled          = $true
@@ -245,7 +246,7 @@ try
             }
 
             Describe "$($script:DSCResourceName)\Set-TargetResource" -Tag 'Set' {
-                Mock -CommandName Get-WinEvent -MockWith {
+                Mock -CommandName Get-WindowsEventLog -MockWith {
                     $properties = @{
                         MaximumSizeInBytes = 5000kb
                         IsEnabled          = $true
@@ -342,12 +343,12 @@ try
 
                 It 'IsEnabled is not in desired state and should throw' {
                     Mock -CommandName Save-LogFile
-                    Mock -CommandName Get-WinEvent -MockWith { throw }
+                    Mock -CommandName Get-WindowsEventLog -MockWith { throw }
                     { Set-TargetResource -LogName 'SomeLog' -IsEnabled $false } | Should -Throw
                 }
 
                 It 'IsEnabled is not in desired state' {
-                    Mock -CommandName Get-WinEvent -MockWith {
+                    Mock -CommandName Get-WindowsEventLog -MockWith {
                         $properties = @{
                             MaximumSizeInBytes = 5000kb
                             IsEnabled          = $false
