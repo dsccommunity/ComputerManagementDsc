@@ -6,5 +6,4 @@ ConvertFrom-StringData @'
     PowerPlanNotFound = Unable to find the power plan '{0}'.
     PowerPlanIsBeingActivated = Activating power plan '{0}'.
     PowerPlanIsBeingValidated = Validating power plan '{0}'.
-    PowerPlanWasUnableToBeSet = Unable to set the power plan '{0}' to the active plan. Error message: {1}
 '@

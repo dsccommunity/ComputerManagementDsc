@@ -493,24 +493,48 @@ function Set-TimeZoneUsingDotNet
 
 <#
     .SYNOPSIS
-        This function gets all power plans/schemes available on the machine using the powercfg.exe utility and returns a custom object for each plan
-        It exists because the WMI classes are not available on all platforms (e.g on Server 2012 R2 core or nano server)
+        This function gets a power plans/schemes specified by its friendly name or GUID.
+        It returns a custom object with the properties of the power plan or
+        nothing if the powerplan does not exist on the computer.
+
+    .PARAMETER Name
+        Friendly name or GUID of a power plan to get.
 
     .NOTES
-        This function is used by the PowerPlan resource
+        The powercfg.exe utility is used here because the Win32_PowerPLan class has
+        issues on some platforms (e.g Server 2012 R2 core or Nano Server).
+        This function is used by the PowerPlan resource.
 #>
-function Get-PowerPlans {
+function Get-PowerPlan {
     [CmdletBinding()]
     param
     (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Name
     )
 
-    $powercfgOutPut = Invoke-Expression -Command 'powercfg.exe /l'
+    # Set to stop so that the errors from powercfg.exe are terminating
+    $ErrorActionPreference = 'Stop'
+
+    try {
+        $powercfgOutPut = & powercfg.exe /L
+    }
+    catch {
+        New-InvalidOperationException -ErrorRecord $_
+    }
+
+    if(($null -eq $powercfgOutPut) -or ('' -eq $powercfgOutPut))
+    {
+        New-InvalidOperationException -Message $script:localizedData.UnableToGetPowerPlans
+    }
 
     $allPlans = @()
 
     foreach($line in $powercfgOutPut)
     {
+
         if($line -match "^.*?:[ ]*(?'guid'.*?)[ ]*\((?'name'.*?)\)")
         {
             $plan = [PSCustomObject]@{
@@ -528,9 +552,45 @@ function Get-PowerPlans {
         }
     }
 
-    return $allPlans
+    $selectedPlan = $allPlans | Where-Object -FilterScript {
+        ($_.Name -eq $Name) -or
+        ($_.Guid -eq $Name)
+    }
+
+    $selectedPlan
 }
 
+<#
+    .SYNOPSIS
+        This function activates the desired power plan (specified by its GUID).
+
+    .PARAMETER Guid
+        GUID of a power plan to activate.
+
+    .NOTES
+        The powercfg.exe utility is used here because the Win32_PowerPLan class has
+        issues on some platforms (e.g Server 2012 R2 core or Nano Server).
+        This function is used by the PowerPlan resource.
+#>
+function Set-PowerPlan {
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.Guid]
+        $Guid
+    )
+
+    # Set to stop so that the errors from powercfg.exe are terminating
+    $ErrorActionPreference = 'Stop'
+
+    try {
+        & powercfg.exe /S $Guid
+    }
+    catch {
+        New-InvalidOperationException -ErrorRecord $_
+    }
+}
 
 Export-ModuleMember -Function `
     Test-DscParameterState, `
@@ -540,4 +600,5 @@ Export-ModuleMember -Function `
     Test-TimeZoneId, `
     Set-TimeZoneId, `
     Set-TimeZoneUsingDotNet, `
-    Get-PowerPlans
+    Get-PowerPlan, `
+    Set-PowerPlan

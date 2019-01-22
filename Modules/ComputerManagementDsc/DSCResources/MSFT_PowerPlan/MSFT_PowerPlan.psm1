@@ -46,7 +46,7 @@ function Get-TargetResource
         $Name
     )
 
-    $plan = Get-PowerPlans | Where-Object{($_.Name -eq $Name) -or ($_.Guid -eq $Name)}
+    $plan = Get-PowerPlan -Name $Name
 
     if ($plan)
     {
@@ -104,28 +104,16 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingActivated -f $Name)
 
-    $plan = Get-PowerPlans | Where-Object{($_.Name -eq $Name) -or ($_.Guid -eq $Name)}
+    $plan = Get-PowerPlan -Name $Name
 
     if($plan)
     {
-        try
-        {
-            Invoke-Expression -Command "powercfg.exe /S $($plan.Guid)" -ErrorVariable powerCfgError
-            if ($powerCfgError)
-            {
-                Throw $powerCfgError
-            }
-        }
-        catch
-        {
-            New-InvalidOperationException `
-                -Message ($script:localizedData.PowerPlanWasUnableToBeSet -f $Name, $_.Exception.Message)
-        }
+        Set-PowerPlan -Guid $plan.Guid
     }
     else
     {
         New-InvalidOperationException `
-        -Message ($script:localizedData.PowerPlanNotFound -f $Name)
+            -Message ($script:localizedData.PowerPlanNotFound -f $Name)
     }
 }
 

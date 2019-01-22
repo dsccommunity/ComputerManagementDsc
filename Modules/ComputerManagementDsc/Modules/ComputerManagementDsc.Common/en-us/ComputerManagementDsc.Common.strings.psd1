@@ -17,4 +17,5 @@ ConvertFrom-StringData @'
     SettingTimeZoneMessage             = Setting time zone to '{0}' using {1}.
     TimeZoneUpdatedMessage             = Time zone has been updated to '{0}'.
     AddingSetTimeZoneDotNetTypeMessage = Adding .NET Set time zone Type.
+    UnableToGetPowerPlans              = Unable to get available power plans with powercfg.exe /l. Unexpected empty output from powercfg.exe.
 '@

@@ -691,74 +691,326 @@ try
             }
         }
 
-        Describe 'ComputerManagementDsc.Common\Get-PowerPlans' {
-            Context 'When only the "Balanced" power plan is available (default on Windows 10 for example)' {
+        Describe 'ComputerManagementDsc.Common\Get-PowerPlan' {
+
+            $testCases =@(
+                # Power plan as name specified
+                @{
+                    Type = 'Friendly Name'
+                    Name = 'High performance'
+                },
+                # Power plan as Guid specified
+                @{
+                    Type = 'Guid'
+                    Name = '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                }
+            )
+
+            Context 'When the specified power plan is not available on the computer' {
                 Mock `
-                    -CommandName Invoke-Expression `
-                    -MockWith {
-                        return @(
-                            "Existing Power Schemes (* Active)"
-                            "-----------------------------------"
-                            "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced) *"
-                        )
-                    } `
-                    -ParameterFilter {$Command -eq  'powercfg.exe /l'}
+                -CommandName powercfg.exe `
+                -MockWith {
+                    return @(
+                        "Existing Power Schemes (* Active)"
+                        "-----------------------------------"
+                        "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced) *"
+                    )
+                } `
+                -Verifiable
 
-                It 'Should not throw exception' {
-                    {Get-PowerPlans} | Should -Not -Throw
+                It 'Should not throw any exception (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    {Get-PowerPlan -Name $Name} | Should -Not -Throw
                 }
 
-                It 'Should return an object of type PSCustomObject' {
-                    Get-PowerPlans | Should -BeOfType [PSCustomObject]
+                It 'Should return nothing (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    Get-PowerPlan -Name $Name | Should -HaveCount 0
+                    Get-PowerPlan -Name $Name | Should -Be $null
                 }
 
-                It 'Should return only one object' {
-                    Get-PowerPlans | Should -HaveCount 1
+                It 'Should call powercfg.exe once (power plan specified as <Type>)' -TestCases $testCases {
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    Get-PowerPlan -Name $Name
+                    Assert-MockCalled -CommandName powercfg.exe -Exactly -Times 1 -Scope It
                 }
 
-                It 'Should be the active plan (property "IsActive" of the returned object should be $true)' {
-                    (Get-PowerPlans).IsActive | Should -Be $true
-                }
-
-                It 'Should return a Object with the property "Name" with the value "Balanced"' {
-                    (Get-PowerPlans).Name  | Should -Be 'Balanced'
-                }
+                Assert-VerifiableMock
             }
 
-            Context 'When three power plans are available (default on server OS)' {
+            Context 'When the specified power plan is available on the computer and not active' {
+
                 Mock `
-                    -CommandName Invoke-Expression `
-                    -MockWith {
-                        return @(
-                            "Existing Power Schemes (* Active)"
-                            "-----------------------------------"
-                            "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced) *"
-                            "Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)"
-                            "Power Scheme GUID: a1841308-3541-4fab-bc81-f71556f20b4a  (Power saver)"
-                        )
-                    } `
-                    -ParameterFilter {$Command -eq  'powercfg.exe /l'}
+                -CommandName powercfg.exe `
+                -MockWith {
+                    return @(
+                        "Existing Power Schemes (* Active)"
+                        "-----------------------------------"
+                        "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced) *"
+                        "Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance)"
+                        "Power Scheme GUID: a1841308-3541-4fab-bc81-f71556f20b4a  (Power saver)"
+                    )
+                } `
+                -Verifiable
 
-                It 'Should not throw exception' {
-                    {Get-PowerPlans} | Should -Not -Throw
+                It 'Should not throw any exception (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    {Get-PowerPlan -Name $Name} | Should -Not -Throw
                 }
 
-                It 'Should return an object of type PSCustomObject' {
-                    Get-PowerPlans | Should -BeOfType [PSCustomObject]
+                It 'Should return one object of type PSCustomObject (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    $powerPlan = Get-PowerPlan -Name $Name
+                    $powerPlan | Should -BeOfType [PSCustomObject]
+                    $powerPlan | Should -HaveCount 1
                 }
 
-                It 'Should return three objects' {
-                    Get-PowerPlans | Should -HaveCount 3
+                It 'Should not be the active plan (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    $powerPlan = Get-PowerPlan -Name $Name
+                    $powerPlan.IsActive | Should -Be $false
                 }
 
-                It 'Should be only have one plan marked as active' {
-                    Get-PowerPlans | Where-Object{$_.IsActive -eq $true} | Should -HaveCount 1
+                It 'Should call powercfg.exe once (power plan specified as <Type>)' -TestCases $testCases {
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    Get-PowerPlan -Name $Name
+                    Assert-MockCalled -CommandName powercfg.exe -Exactly -Times 1 -Scope It
                 }
 
-                It 'Should be have the plan "Balanced" set as active' {
-                    (Get-PowerPlans | Where-Object{$_.IsActive -eq $true}).Name  | Should -Be 'Balanced'
-                }
+                Assert-VerifiableMock
             }
+
+            Context 'When the specified power plan is available on the computer and is active' {
+
+                Mock `
+                -CommandName powercfg.exe `
+                -MockWith {
+                    return @(
+                        "Existing Power Schemes (* Active)"
+                        "-----------------------------------"
+                        "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)"
+                        "Power Scheme GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (High performance) *"
+                        "Power Scheme GUID: a1841308-3541-4fab-bc81-f71556f20b4a  (Power saver)"
+                    )
+                } `
+                -Verifiable
+
+                It 'Should not throw any exception (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    {Get-PowerPlan -Name $Name} | Should -Not -Throw
+                }
+
+                It 'Should return one object of type PSCustomObject (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    $powerPlan = Get-PowerPlan -Name $Name
+                    $powerPlan | Should -BeOfType [PSCustomObject]
+                    $powerPlan | Should -HaveCount 1
+                }
+
+                It 'Should not be the active plan (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    $powerPlan = Get-PowerPlan -Name $Name
+                    $powerPlan.IsActive | Should -Be $true
+                }
+
+                It 'Should call powercfg.exe once (power plan specified as <Type>)' -TestCases $testCases {
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    Get-PowerPlan -Name $Name
+                    Assert-MockCalled -CommandName powercfg.exe -Exactly -Times 1 -Scope It
+                }
+
+                Assert-VerifiableMock
+            }
+
+            Context 'When the powercfg.exe throws an invalid parameters error' {
+
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                    [System.Management.Automation.RemoteException]::new('Invalid Parameters -- try "/?" for help'),
+                    'NativeCommandError',
+                    'NotSpecified',
+                    'Invalid Parameters -- try "/?" for help'
+                )
+
+                Mock `
+                -CommandName powercfg.exe `
+                -MockWith {
+                    throw $errorRecord
+                } `
+                -Verifiable
+
+                It 'Should throw the correct error (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    $invalidOperationRecord = Get-InvalidOperationRecord `
+                       -ErrorRecord $errorRecord
+
+                    {Get-PowerPlan -Name $Name} | Should -Throw $invalidOperationRecord
+                }
+
+                Assert-VerifiableMock
+            }
+
+            Context 'When powercfg.exe /L returns nothing' {
+
+                Mock `
+                -CommandName powercfg.exe `
+                -Verifiable
+
+                It 'Should throw the correct error (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    $invalidOperationRecord = Get-InvalidOperationRecord `
+                        -Message $localizedData.UnableToGetPowerPlans
+
+                    {Get-PowerPlan -Name $Name} | Should -Throw $invalidOperationRecord
+                }
+
+                Assert-VerifiableMock
+            }
+        }
+
+        Describe 'ComputerManagementDsc.Common\Set-PowerPlan' {
+            Context 'When the specified power plan cloud be activated successfully' {
+
+                Mock `
+                -CommandName powercfg.exe `
+                -Verifiable
+
+                [Guid]$powerPlanGuid = '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+
+                It 'Should not throw any exception (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    {Set-PowerPlan -Guid $powerPlanGuid} | Should -Not -Throw
+                }
+
+                It 'Should call powercfg.exe once (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    Set-PowerPlan -Guid $powerPlanGuid
+                    Assert-MockCalled -CommandName powercfg.exe -Exactly -Times 1 -Scope It
+                }
+
+                Assert-VerifiableMock
+            }
+
+            Context 'When the powercfg.exe throws an error while setting the specified power plan' {
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                    [System.Management.Automation.RemoteException]::new('Invalid Parameters -- try "/?" for help'),
+                    'NativeCommandError',
+                    'NotSpecified',
+                    'Invalid Parameters -- try "/?" for help'
+                )
+
+                [Guid]$powerPlanGuid = '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+
+                Mock `
+                -CommandName powercfg.exe `
+                -MockWith {
+                    throw $errorRecord
+                } `
+                -Verifiable
+
+                It 'Should throw the correct error (power plan specified as <Type>)' -TestCases $testCases {
+
+                    param
+                    (
+                        [String]
+                        $Name
+                    )
+
+                    $invalidOperationRecord = Get-InvalidOperationRecord `
+                        -ErrorRecord $errorRecord
+
+                    {Set-PowerPlan -Guid $powerPlanGuid} | Should -Throw $invalidOperationRecord
+                }
+
+                Assert-VerifiableMock
+            }
+
         }
     }
 }
