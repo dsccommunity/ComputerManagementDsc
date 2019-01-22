@@ -47,10 +47,10 @@ function Get-TargetResource
     )
 
     $desiredPowerPlan = Get-PowerPlan -PowerPlan $Name
-    $activePowerPlan = Get-ActivePowerPlan
 
     if($desiredPowerPlan)
     {
+        $activePowerPlan = Get-ActivePowerPlan
         if($activePowerPlan -eq $desiredPowerPlan.Guid)
         {
             Write-Verbose -Message ($script:localizedData.PowerPlanIsActive -f $desiredPowerPlan.FriendlyName)
