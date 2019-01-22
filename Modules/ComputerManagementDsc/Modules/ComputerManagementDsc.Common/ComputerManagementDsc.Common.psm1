@@ -493,13 +493,12 @@ function Set-TimeZoneUsingDotNet
 
 <#
     .SYNOPSIS
-        This function gets all available power plans/schemes or
-        a specific power plans specified by its friendly name.
-        The function returns an array with one or more hashtable(s)
-        containing the friendly name and GUID of the power plan(s).
+        This function gets all available power plans/schemes or a specific power plan
+        The function returns an array with one or more hashtable(s) containing
+        the friendly name and GUID of the power plan(s).
 
     .PARAMETER PowerPlanFriendlyName
-        Friendly name a power plan to get.
+        Friendly name or GUID of a power plan to get.
         When not specified the function will return all available power plans.
 
     .NOTES
@@ -515,7 +514,7 @@ function Get-PowerPlan {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [System.String]
-        $PowerPlanFriendlyName
+        $PowerPlan
     )
 
     $ErrorActionPreference = 'Stop'
@@ -586,28 +585,29 @@ function Get-PowerPlan {
     }
 
     # Now get the friendly name for each power plan so we can filter on name if needed.
-    $allPowerPlans = @()
+    $allAvailablePowerPlans = @()
     foreach($planGuid in $guids)
     {
         $planFriendlyName = Get-PowerPlanFriendlyName -PowerPlanGuid $planGuid
-        $powerPlan = @{
+        $availablePowerPlan = @{
             FriendlyName = $planFriendlyName
             Guid = $planGuid
         }
-        $allPowerPlans += $powerPlan
+        $allAvailablePowerPlans += $availablePowerPlan
     }
 
-    # If a friendly name is specified filter on it
-    if($PSBoundParameters.ContainsKey('PowerPlanFriendlyName')){
-        $selectedPowerPlan = $allPowerPlans | Where-Object -FilterScript {
-            $_.FriendlyName -eq $PowerPlanFriendlyName
+    # If a specific power plan is specified filter for it.
+    if($PSBoundParameters.ContainsKey('PowerPlan')){
+        $selectedPowerPlan = $allAvailablePowerPlans | Where-Object -FilterScript {
+            ($_.FriendlyName -eq $PowerPlan) -or
+            ($_.Guid -eq $PowerPlan)
         }
 
         return $selectedPowerPlan
     }
     else
     {
-        return $allPowerPlans
+        return $allAvailablePowerPlans
     }
 }
 

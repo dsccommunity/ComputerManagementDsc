@@ -46,29 +46,36 @@ function Get-TargetResource
         $Name
     )
 
-    $plan = Get-PowerPlan -Name $Name
+    $desiredPowerPlan = Get-PowerPlan -PowerPlan $Name
+    $activePowerPlan = Get-ActivePowerPlan
 
-    if ($plan)
+    if($desiredPowerPlan)
     {
-        if ($plan.IsActive)
+        if($activePowerPlan -eq $desiredPowerPlan.Guid)
         {
-            Write-Verbose -Message ($script:localizedData.PowerPlanIsActive -f $Name)
+            Write-Verbose -Message ($script:localizedData.PowerPlanIsActive -f $desiredPowerPlan.FriendlyName)
+
+            return @{
+                IsSingleInstance = $IsSingleInstance
+                Name             = $Name
+                IsActive         = $true
+            }
         }
         else
         {
-            Write-Verbose -Message ($script:localizedData.PowerPlanIsNotActive -f $Name)
+            Write-Verbose -Message ($script:localizedData.PowerPlanIsNotActive -f $desiredPowerPlan.FriendlyName)
+
+            return @{
+                IsSingleInstance = $IsSingleInstance
+                Name             = $Name
+                IsActive         = $false
+            }
         }
     }
     else
     {
         New-InvalidOperationException `
             -Message ($script:localizedData.PowerPlanNotFound -f $Name)
-    }
-
-    return @{
-        IsSingleInstance = $IsSingleInstance
-        Name             = $Name
-        IsActive         = $plan.IsActive
     }
 }
 
@@ -104,11 +111,11 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingActivated -f $Name)
 
-    $plan = Get-PowerPlan -Name $Name
+    $desiredPowerPlan = Get-PowerPlan -PowerPlan $Name
 
-    if($plan)
+    if($desiredPowerPlan)
     {
-        Set-PowerPlan -Guid $plan.Guid
+        Set-ActivePowerPlan -PowerPlanGuid $desiredPowerPlan.Guid
     }
     else
     {
