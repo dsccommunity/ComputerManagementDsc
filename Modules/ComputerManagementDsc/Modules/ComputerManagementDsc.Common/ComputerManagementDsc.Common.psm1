@@ -493,102 +493,329 @@ function Set-TimeZoneUsingDotNet
 
 <#
     .SYNOPSIS
-        This function gets a power plans/schemes specified by its friendly name or GUID.
-        It returns a custom object with the properties of the power plan or
-        nothing if the powerplan does not exist on the computer.
+        This function gets all available power plans/schemes or
+        a specific power plans specified by its friendly name.
+        The function returns an array with one or more hashtable(s)
+        containing the friendly name and GUID of the power plan(s).
 
-    .PARAMETER Name
-        Friendly name or GUID of a power plan to get.
+    .PARAMETER PowerPlanFriendlyName
+        Friendly name a power plan to get.
+        When not specified the function will return all available power plans.
 
     .NOTES
-        The powercfg.exe utility is used here because the Win32_PowerPLan class has
-        issues on some platforms (e.g Server 2012 R2 core or Nano Server).
+        This function uses Platform Invoke (P/Invoke) mechanism to call native Windows APIs
+        because the Win32_PowerPlan WMI class has on some platforms issues or is unavailable at all.
+        (e.g Server 2012 R2 core or Nano Server).
         This function is used by the PowerPlan resource.
 #>
 function Get-PowerPlan {
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [System.String]
-        $Name
+        $PowerPlanFriendlyName
     )
 
-    # Set to stop so that the errors from powercfg.exe are terminating
     $ErrorActionPreference = 'Stop'
 
-    try {
-        $powercfgOutPut = & powercfg.exe /L
-    }
-    catch {
-        New-InvalidOperationException -ErrorRecord $_
-    }
+    # Define C# signature of PowerEnumerate function
+    $powerEnumerateDefinition = @'
+        [DllImport("powrprof.dll", CharSet = CharSet.Unicode)]
+        public static extern uint PowerEnumerate(
+            IntPtr RootPowerKey,
+            IntPtr SchemeGuid,
+            IntPtr SubGroupOfPowerSetting,
+            int AccessFlags,
+            uint Index,
+            IntPtr rBuffer,
+            ref uint BufferSize
+        );
+'@
 
-    if(($null -eq $powercfgOutPut) -or ('' -eq $powercfgOutPut))
+    # Create powerprof object with the static method PowerEnumerate
+    $powrprof = Add-Type `
+        -MemberDefinition $powerEnumerateDefinition `
+        -Name 'powrprof' `
+        -Namespace 'Win32Functions' `
+        -PassThru
+
+    $index = 0
+    $returnCode = 0
+    $guids = @()
+
+    # PowerEnumerate returns the GUID of the powerplan(s). Guid = 16 Bytes.
+    $bufferSize = 16
+
+    # The PowerEnumerate function returns only one guid at a time.
+    # So we have to loop here until error code 259 (no more data) is returned to get all power plan guids.
+    while ($returnCode -eq 0)
     {
-        New-InvalidOperationException -Message $script:localizedData.UnableToGetPowerPlans
-    }
+        try {
+            # Allocate buffer
+            $readBuffer = [System.Runtime.InteropServices.Marshal]::AllocHGlobal([int]$bufferSize)
 
-    $allPlans = @()
+            # Get Guid of the power plan using the native PowerEnumerate function
+            $returnCode = $powrprof::PowerEnumerate([System.IntPtr]::Zero,[System.IntPtr]::Zero,[System.IntPtr]::Zero,16,$index,$readBuffer,[ref]$bufferSize)
 
-    foreach($line in $powercfgOutPut)
-    {
+            # Create a managed Guid object form the unmanaged memory block
+            $planGuid = [System.Runtime.InteropServices.Marshal]::PtrToStructure($readBuffer, [System.Type][guid])
 
-        if($line -match "^.*?:[ ]*(?'guid'.*?)[ ]*\((?'name'.*?)\)")
-        {
-            $plan = [PSCustomObject]@{
-                Name = [String]$Matches.name
-                Guid = [Guid]$Matches.guid
-                IsActive = $false
+            # ReturnCode 259 from the native function means no more data
+            if ($ReturnCode -eq 259) {
+                break
             }
 
-            if($line -match "\*$")
+            # Check for non 0 return codes / errors form the native function
+            if ($returnCode -ne 0)
             {
-                $plan.IsActive = $true
+                # Create a Win32Exception object out of the return code
+                $win32Exception = ([ComponentModel.Win32Exception]::new([int]$returnCode))
+                New-InvalidOperationException `
+                    -Message ($script:localizedData.UnableToEnumeratingPowerSchemes -f $win32Exception.NativeErrorCode, $win32Exception.Message)
             }
 
-            $allPlans += $plan
+            $guids += $planGuid
         }
+        finally {
+            # Free up memory
+            [System.Runtime.InteropServices.Marshal]::FreeHGlobal($readBuffer)
+        }
+        $index++
     }
 
-    $selectedPlan = $allPlans | Where-Object -FilterScript {
-        ($_.Name -eq $Name) -or
-        ($_.Guid -eq $Name)
+    # Now get the friendly name for each power plan so we can filter on name if needed.
+    $allPowerPlans = @()
+    foreach($planGuid in $guids)
+    {
+        $planFriendlyName = Get-PowerPlanFriendlyName -PowerPlanGuid $planGuid
+        $powerPlan = @{
+            FriendlyName = $planFriendlyName
+            Guid = $planGuid
+        }
+        $allPowerPlans += $powerPlan
     }
 
-    $selectedPlan
+    # If a friendly name is specified filter on it
+    if($PSBoundParameters.ContainsKey('PowerPlanFriendlyName')){
+        $selectedPowerPlan = $allPowerPlans | Where-Object -FilterScript {
+            $_.FriendlyName -eq $PowerPlanFriendlyName
+        }
+
+        return $selectedPowerPlan
+    }
+    else
+    {
+        return $allPowerPlans
+    }
 }
 
 <#
     .SYNOPSIS
-        This function activates the desired power plan (specified by its GUID).
+        This function gets the friendly name of a power plan specified by its GUID.
+
+    .PARAMETER PowerPlanGuid
+        The GUID of a power plan.
+
+    .NOTES
+        This function uses Platform Invoke (P/Invoke) mechanism to call native Windows APIs
+        because the Win32_PowerPlan WMI class has on some platforms issues or is unavailable at all.
+        (e.g Server 2012 R2 core or Nano Server).
+        This function is used by the Get-PowerPlan function.
+#>
+function Get-PowerPlanFriendlyName
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.Guid]
+        $PowerPlanGuid
+    )
+
+    $ErrorActionPreference = 'Stop'
+
+    # Define C# signature of PowerReadFriendlyName function
+    $MethodDefinition = @'
+        [DllImport("powrprof.dll", CharSet = CharSet.Unicode)]
+        public static extern uint PowerReadFriendlyName(
+            IntPtr RootPowerKey,
+            Guid SchemeGuid,
+            IntPtr SubGroupOfPowerSettingGuid,
+            IntPtr PowerSettingGuid,
+            IntPtr Buffer,
+            ref uint BufferSize
+        );
+'@
+
+    # Create powerprof object with the static method PowerReadFriendlyName.
+    $powerprof = Add-Type `
+        -MemberDefinition $MethodDefinition `
+        -Name 'powerprof' `
+        -Namespace 'Win32Functions' `
+        -PassThru
+
+    # Define variable for buffer size which whe have frist to figure out.
+    $bufferSize = 0
+    $returnCode = 0
+
+    try
+    {
+        # Frist get needed buffer size by calling PowerReadFriendlyName
+        # with NULL value for 'Buffer' parameter to get the required buffer size.
+        $returnCode = $powerprof::PowerReadFriendlyName([System.IntPtr]::Zero, $PowerPlanGuid, [System.IntPtr]::Zero, [System.IntPtr]::Zero, [System.IntPtr]::Zero, [ref]$bufferSize)
+
+        if ($returnCode -eq 0)
+        {
+            try
+            {
+                # Now lets allocate the needed buffer size
+                $ptrName = [System.Runtime.InteropServices.Marshal]::AllocHGlobal([int]$bufferSize)
+
+                # Get the actual friendly name of the powerlan by calling PowerReadFriendlyName again.
+                # This time with the correct buffer size for the 'Buffer' parameter.
+                $returnCode = $powerprof::PowerReadFriendlyName([System.IntPtr]::Zero, $PowerPlanGuid, [System.IntPtr]::Zero, [System.IntPtr]::Zero, $ptrName, [ref]$bufferSize)
+                if ($returnCode -eq 0)
+                {
+                    #Create a managed String object form the unmanned memory block.
+                    $friendlyName = [System.Runtime.InteropServices.Marshal]::PtrToStringUni($ptrName)
+                    return $friendlyName
+                }
+                else
+                {
+                    throw [ComponentModel.Win32Exception]::new([int]$returnCode)
+                }
+            }
+            finally
+            {
+                # Make sure allocated memory is freed up again.
+                [System.Runtime.InteropServices.Marshal]::FreeHGlobal($ptrName)
+            }
+        }
+        else
+        {
+            throw [ComponentModel.Win32Exception]::new([int]$returnCode)
+        }
+    }
+    catch
+    {
+        New-InvalidOperationException `
+            -Message ($script:localizedData.UnableToGetPowerSchemeFriendlyName -f $PowerPlanGuid, $_.Exception.NativeErrorCode, $_.Exception.Message)
+    }
+}
+
+<#
+    .SYNOPSIS
+        This function gets the GUID of the currently active power plan.
+
+    .NOTES
+        This function uses Platform Invoke (P/Invoke) mechanism to call native Windows APIs
+        because the Win32_PowerPlan WMI class has on some platforms issues or is unavailable at all.
+        (e.g Server 2012 R2 core or Nano Server).
+        This function is used by the PowerPlan resource.
+#>
+function Get-ActivePowerPlan
+{
+    [CmdletBinding()]
+    param
+    (
+    )
+
+    $ErrorActionPreference = 'Stop'
+
+    # Define C# signature of PowerGetActiveScheme function
+    $powerGetActiveSchemeDefinition = @'
+        [DllImport("powrprof.dll", CharSet = CharSet.Unicode)]
+        public static extern uint PowerGetActiveScheme(IntPtr UserRootPowerKey, ref IntPtr ActivePolicyGuid);
+'@
+
+    $returnCode = 0
+
+    # Create powerprof object with the static method PowerGetActiveScheme
+    $powrprof = Add-Type `
+        -MemberDefinition $powerGetActiveSchemeDefinition `
+        -Name 'powrprof' `
+        -Namespace 'Win32Functions' `
+        -PassThru
+
+    try
+    {
+        # Get the GUID of the active power scheme
+        $activeSchemeGuid = [System.IntPtr]::Zero
+        $returnCode = $powrprof::PowerGetActiveScheme([System.IntPtr]::Zero, [ref]$activeSchemeGuid)
+
+        # Check for non 0 return codes / errors form the native function
+        if ($returnCode -ne 0)
+        {
+            # Create a Win32Exception object out of the return code
+            $win32Exception = ([ComponentModel.Win32Exception]::new([int]$returnCode))
+            New-InvalidOperationException `
+                -Message ($script:localizedData.FailedToGetActivePowerScheme -f $win32Exception.NativeErrorCode, $win32Exception.Message)
+        }
+
+        # Create a managed Guid object form the unmanaged memory block and return it
+        return [System.Runtime.InteropServices.Marshal]::PtrToStructure($activeSchemeGuid, [System.Type][guid])
+    }
+    finally
+    {
+        # Make sure allocated memory is freed up again.
+        [System.Runtime.InteropServices.Marshal]::FreeHGlobal($activeSchemeGuid)
+    }
+}
+
+<#
+    .SYNOPSIS
+        This function activates a specific power plan (specified by its GUID).
 
     .PARAMETER Guid
         GUID of a power plan to activate.
 
     .NOTES
-        The powercfg.exe utility is used here because the Win32_PowerPLan class has
-        issues on some platforms (e.g Server 2012 R2 core or Nano Server).
+        This function uses Platform Invoke (P/Invoke) mechanism to call native Windows APIs
+        because the Win32_PowerPlan WMI class has on some platforms issues or is unavailable at all.
+        (e.g Server 2012 R2 core or Nano Server).
         This function is used by the PowerPlan resource.
 #>
-function Set-PowerPlan {
+function Set-ActivePowerPlan {
     [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true)]
         [System.Guid]
-        $Guid
+        $PowerPlanGuid
     )
 
     # Set to stop so that the errors from powercfg.exe are terminating
     $ErrorActionPreference = 'Stop'
 
+    # Define C# signature of PowerSetActiveScheme function
+    $powerSetActiveSchemeDefinition = @'
+        [DllImport("powrprof.dll", CharSet = CharSet.Auto)]
+        public static extern uint PowerSetActiveScheme(
+            IntPtr RootPowerKey,
+            Guid SchemeGuid
+        );
+'@
+
+    # Create powerprof object with the static method PowerSetActiveScheme.
+    $powrprof = Add-Type -MemberDefinition $powerSetActiveSchemeDefinition -Name 'powrprof' -Namespace 'Win32Functions' -PassThru
+
     try {
-        & powercfg.exe /S $Guid
+
+        # Set the active power scheme with the native function
+        $returnCode = $powrprof::PowerSetActiveScheme([System.IntPtr]::Zero,$PowerPlanGuid)
+
+        # Check for non 0 return codes / errors form the native function
+        if ($returnCode -ne 0)
+        {
+            throw [ComponentModel.Win32Exception]::new([int]$returnCode)
+        }
     }
     catch {
-        New-InvalidOperationException -ErrorRecord $_
+        New-InvalidOperationException `
+            -Message ($script:localizedData.FailedToSetActivePowerScheme -f $PowerPlanGuid, $_.Exception.NativeErrorCode, $_.Exception.Message)
     }
 }
 
@@ -601,4 +828,5 @@ Export-ModuleMember -Function `
     Set-TimeZoneId, `
     Set-TimeZoneUsingDotNet, `
     Get-PowerPlan, `
-    Set-PowerPlan
+    Get-ActivePowerPlan, `
+    Set-ActivePowerPlan
