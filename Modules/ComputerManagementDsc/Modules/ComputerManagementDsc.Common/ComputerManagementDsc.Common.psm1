@@ -533,10 +533,10 @@ function Get-PowerPlan {
         );
 '@
 
-    # Create powerprof object with the static method PowerEnumerate
+    # Create Win32PowerEnumerate object with the static method PowerEnumerate
     $powrprof = Add-Type `
         -MemberDefinition $powerEnumerateDefinition `
-        -Name 'powrprof' `
+        -Name 'Win32PowerEnumerate' `
         -Namespace 'Win32Functions' `
         -PassThru
 
@@ -650,10 +650,10 @@ function Get-PowerPlanFriendlyName
         );
 '@
 
-    # Create powerprof object with the static method PowerReadFriendlyName.
+    # Create Win32PowerReadFriendlyName object with the static method PowerReadFriendlyName.
     $powerprof = Add-Type `
         -MemberDefinition $MethodDefinition `
-        -Name 'powerprof' `
+        -Name 'Win32PowerReadFriendlyName' `
         -Namespace 'Win32Functions' `
         -PassThru
 
@@ -733,10 +733,10 @@ function Get-ActivePowerPlan
 
     $returnCode = 0
 
-    # Create powerprof object with the static method PowerGetActiveScheme
+    # Create Win32PowerGetActiveScheme object with the static method PowerGetActiveScheme
     $powrprof = Add-Type `
         -MemberDefinition $powerGetActiveSchemeDefinition `
-        -Name 'powrprof' `
+        -Name 'Win32PowerGetActiveScheme' `
         -Namespace 'Win32Functions' `
         -PassThru
 
@@ -799,8 +799,8 @@ function Set-ActivePowerPlan {
         );
 '@
 
-    # Create powerprof object with the static method PowerSetActiveScheme.
-    $powrprof = Add-Type -MemberDefinition $powerSetActiveSchemeDefinition -Name 'powrprof' -Namespace 'Win32Functions' -PassThru
+    # Create Win32PowerSetActiveScheme object with the static method PowerSetActiveScheme.
+    $powrprof = Add-Type -MemberDefinition $powerSetActiveSchemeDefinition -Name 'Win32PowerSetActiveScheme' -Namespace 'Win32Functions' -PassThru
 
     try {
 
