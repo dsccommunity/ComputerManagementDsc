@@ -119,7 +119,7 @@ function Set-TargetResource
 
     if ($null -eq $log)
     {
-    return
+        return
     }
 
     $shouldSaveLogFile = $false
@@ -180,9 +180,13 @@ function Set-TargetResource
 
         if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName}))
         {
-            $minimumRetentionDays = Get-EventLog -List | Where-Object -FilterScript {$_.Log -eq $LogName}
+            $matchingEventLog = Get-EventLog -List | Where-Object -FilterScript {
+                $_.Log -eq $LogName
+            }
 
-            if ($LogRetentionDays -ne $minimumRetentionDays.minimumRetentionDays)
+            $minimumRetentionDaysForLog = $matchingEventLog.minimumRetentionDays
+
+            if ($LogRetentionDays -ne $minimumRetentionDaysForLog)
             {
                 Set-LogRetentionDays -LogName $LogName -LogRetentionDays $LogRetentionDays
             }
