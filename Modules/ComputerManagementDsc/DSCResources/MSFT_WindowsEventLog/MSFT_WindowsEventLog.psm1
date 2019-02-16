@@ -383,7 +383,7 @@ Function Get-WindowsEventLog
 
     if (!$log)
     {
-        New-InvalidOperationException `
+        Write-Warning `
             -Message ($script:localizedData.WindowsEventLogNotFound -f $LogName)
     }
     else
