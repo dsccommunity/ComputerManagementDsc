@@ -375,7 +375,7 @@ Function Get-WindowsEventLog
         $LogName
     )
 
-    $script:log = Get-WinEvent -ListLog $LogName
+    $log = Get-WinEvent -ListLog $LogName
 
     if (!$log)
     {
