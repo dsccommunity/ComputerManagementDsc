@@ -20,5 +20,5 @@ ConvertFrom-StringData -StringData @'
     SaveWindowsEventlogSuccess                 = Saving Windows Event Log settings successful.
     SaveWindowsEventlogFailure                 = Saving Windows Event Log settings failed.
     WindowsEventLogNotFound                    = Windows Event Log '{0}' is not found.
-    WindowsEventLogFound                       = Windows Event Log '{0}' is not found.
+    WindowsEventLogFound                       = Windows Event Log '{0}' was found.
 '@

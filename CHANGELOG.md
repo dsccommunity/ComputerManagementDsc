@@ -7,7 +7,7 @@
     and renamed to WindowsEventLog.
   - Moved strings in localization file.
   - LogMode is now set with Limit-EventLog,
-  - Fixes [Issue #18] "Cannot save changes to LogMode property"
+  - Fixes [Issue #18](https://github.com/PowerShell/ComputerManagementDsc/issues/18).
 
 ## 6.1.0.0
 

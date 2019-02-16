@@ -39,7 +39,7 @@ try
                             LogName            = 'Application'
                     }
 
-                    Write-Output (New-Object -TypeName PSObject -Property $properties)
+                    return (New-Object -TypeName PSObject -Property $properties)
                 }
 
                 $results = Get-TargetResource -LogName 'Application' -IsEnabled $true
@@ -90,7 +90,7 @@ try
                         LogName            = 'Application'
                     }
 
-                    Write-Output (New-Object -TypeName PSObject -Property $properties)
+                    return (New-Object -TypeName PSObject -Property $properties)
                 }
 
                 Mock -CommandName Get-EventLog -MockWith {
@@ -99,14 +99,14 @@ try
                         Log                  = 'Application'
                     }
 
-                    Write-Output (New-Object -TypeName PSObject -Property $params)
+                    return (New-Object -TypeName PSObject -Property $params)
                 }
 
                 It 'Should not throw when passed an valid Logname' {
                     { Test-TargetResource -LogName 'Application' -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
                 }
 
-                It 'Throws when passed an invalid LogMode' {
+                It 'Should throw when passed an invalid LogMode' {
                     { Test-TargetResource -LogName 'Application' -LogMode 'BadLogmode' -IsEnabled $true -ErrorAction Stop } | Should -Throw
                 }
 
@@ -122,11 +122,11 @@ try
                     Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $false | Should -Be $false
                 }
 
-                It 'Throws when passed an invalid MaximumSizeInBytes below 1028kb' {
+                It 'Should throw when passed an invalid MaximumSizeInBytes below 1028kb' {
                     { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -MaximumSizeInBytes 1027kb -ErrorAction Stop } | Should -Throw
                 }
 
-                It 'Throws when passed an invalid MaximumSizeInBytes above 18014398509481983kb' {
+                It 'Shoudl throw when passed an invalid MaximumSizeInBytes above 18014398509481983kb' {
                     { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -MaximumSizeInBytes 18014398509481983kb -ErrorAction Stop } | Should -Throw
                 }
 
@@ -142,11 +142,11 @@ try
                     { Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 1028kb -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
                 }
 
-                It 'Throws when passed an invalid LogRetentionDays below 1 day' {
+                It 'Should throw when passed an invalid LogRetentionDays below 1 day' {
                     { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true -LogRetentionDays 0  -ErrorAction Stop } | Should -Throw
                 }
 
-                It 'Throws when passed an invalid LogRetentionDays above 365 days' {
+                It 'Should throw when passed an invalid LogRetentionDays above 365 days' {
                     { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true -LogRetentionDays 366 -ErrorAction Stop } | Should -Throw
                 }
 
@@ -170,7 +170,7 @@ try
                             LogName            = 'Application'
                         }
 
-                        Write-Output (New-Object -TypeName PSObject -Property $properties)
+                        return (New-Object -TypeName PSObject -Property $properties)
                     }
 
                     Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 7 -LogMode 'AutoBackup'  | Should -Be $true
@@ -224,7 +224,7 @@ try
                             LogName            = 'Application'
                         }
 
-                        Write-Output (New-Object -TypeName PSObject -Property $properties)
+                        return (New-Object -TypeName PSObject -Property $properties)
                     }
 
                     Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $false
@@ -238,7 +238,7 @@ try
                             LogName            = 'Application'
                         }
 
-                        Write-Output (New-Object -TypeName PSObject -Property $properties)
+                        return (New-Object -TypeName PSObject -Property $properties)
                     }
 
                     Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $true
@@ -257,7 +257,7 @@ try
                         LogName            = 'TestLog'
                     }
 
-                    Write-Output (New-Object -TypeName PSObject -Property $properties)
+                    return (New-Object -TypeName PSObject -Property $properties)
                 }
 
                 Mock -CommandName Get-EventLog -MockWith {
@@ -266,10 +266,10 @@ try
                         Log                  = 'TestLog'
                     }
 
-                    Write-Output (New-Object -TypeName PSObject -Property $params)
+                    return (New-Object -TypeName PSObject -Property $params)
                 }
 
-                It 'Sets MaximumSizeInBytes to 1028kb' {
+                It 'Should set MaximumSizeInBytes to 1028kb' {
                         Mock -CommandName Save-LogFile
                         Set-TargetResource -MaximumSizeInBytes 1028kb -IsEnabled $true -LogName 'TestLog'
                         Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
@@ -281,7 +281,7 @@ try
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
                 }
 
-                It 'Sets SecurityDescriptor to OtherTestDescriptor' {
+                It 'Should set SecurityDescriptor to OtherTestDescriptor' {
                     Mock -CommandName Save-LogFile
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'OtherTestDescriptor'
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
@@ -293,7 +293,7 @@ try
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
                 }
 
-                It 'Sets LogFilePath to default path' {
+                It 'Should set LogFilePath to default path' {
                     Mock -CommandName Save-LogFile
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
@@ -305,25 +305,25 @@ try
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
                 }
 
-                It 'Sets LogRetentionDays to 14 days' {
+                It 'Should set LogRetentionDays to 14 days' {
                     Mock -CommandName Set-LogRetentionDays
                     Set-TargetResource -LogRetentionDays '14' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
                     Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
                 }
 
-                It 'Sets LogRetentionDays to 32 days, wrong Logmode' {
+                It 'Should set LogRetentionDays to 32 days, wrong Logmode' {
                     Mock -CommandName Set-LogRetentionDays
                     Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog' -LogMode 'Circular'
                     Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 0 -Scope It
                 }
 
-                It 'LogRetentionDays is in desired state' {
+                It 'Should set LogRetentionDays is in desired state' {
                     Mock -CommandName Set-LogRetentionDays
                     Set-TargetResource -LogRetentionDays '7' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
                     Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 0 -Scope It
                 }
 
-                It 'Sets IsEnabled to false' {
+                It 'Should set IsEnabled to false' {
                     Mock -CommandName Save-LogFile
                     Set-TargetResource -IsEnabled $false -LogName 'TestLog'
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
@@ -341,7 +341,7 @@ try
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
                 }
 
-                It 'IsEnabled is not in desired state and should throw' {
+                It 'Should throw if IsEnabled is not in desired state' {
                     Mock -CommandName Save-LogFile
                     Mock -CommandName Get-WindowsEventLog -MockWith { throw }
                     { Set-TargetResource -LogName 'SomeLog' -IsEnabled $false } | Should -Throw
@@ -359,7 +359,7 @@ try
                             LogName            = 'TestLog'
                         }
 
-                        Write-Output (New-Object -TypeName PSObject -Property $properties)
+                        return (New-Object -TypeName PSObject -Property $properties)
                     }
 
                     Set-TargetResource -IsEnabled $true -LogName 'TestLog'
@@ -368,14 +368,16 @@ try
 
             Describe "$($script:DSCResourceName)\Save-LogFile" -Tag 'Helper' {
                 Mock -CommandName Limit-Eventlog -MockWith { throw }
-                It "Should throw if we're unable to get a log" {
+                
+                It 'Should throw if we are unable to get a log' {
                     {  Limit-Eventlog -LogName 'Application' -OverflowAction 'OverwriteOlder' -RetentionDays 30 } | Should -Throw
                 }
             }
 
             Describe "$($script:DSCResourceName)\Set-LogRetentionDays" -Tag 'Helper' {
                 Mock -CommandName Limit-Eventlog -MockWith { throw }
-                It "Should throw if we're unable to get a log" {
+                
+                It 'Should throw if we are unable to get a log' {
                     {  Limit-Eventlog -LogName 'Application' -OverflowAction 'OverwriteOlder' -RetentionDays 30 } | Should -Throw
                 }
             }
