@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.2.0.0
+
 - WindowsEventLog:
   - Migrated the xWinEventLog from [xWinEventLog](https://github.com/PowerShell/xWinEventLog)
     and renamed to WindowsEventLog.
