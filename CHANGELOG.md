@@ -10,6 +10,10 @@
   - Moved strings in localization file.
   - LogMode is now set with Limit-EventLog,
   - Fixes [Issue #18](https://github.com/PowerShell/ComputerManagementDsc/issues/18).
+- Updated examples to format required for publishing to PowerShell Gallery - fixes
+  [Issue #206](https://github.com/PowerShell/ComputerManagementDsc/issues/206).
+- Opted into Common Tests 'Validate Example Files To Be Published' and
+  'Validate Markdown Links'.
 
 ## 6.1.0.0
 
