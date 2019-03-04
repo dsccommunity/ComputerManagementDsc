@@ -10,6 +10,15 @@
     Fixes [Issue #155](https://github.com/PowerShell/ComputerManagementDsc/issues/155)
     and [Issue #65](https://github.com/PowerShell/ComputerManagementDsc/issues/65)
 
+## 6.2.0.0
+
+- WindowsEventLog:
+  - Migrated the xWinEventLog from [xWinEventLog](https://github.com/PowerShell/xWinEventLog)
+    and renamed to WindowsEventLog.
+  - Moved strings in localization file.
+  - LogMode is now set with Limit-EventLog,
+  - Fixes [Issue #18](https://github.com/PowerShell/ComputerManagementDsc/issues/18).
+
 ## 6.1.0.0
 
 - Updated LICENSE file to match the Microsoft Open Source Team standard.
