@@ -591,8 +591,8 @@ function Get-PowerPlanFriendlyName
     try
     {
         <#
-        Frist get needed buffer size by calling PowerReadFriendlyName
-        with NULL value for 'Buffer' parameter to get the required buffer size.
+            Frist get needed buffer size by calling PowerReadFriendlyName
+            with NULL value for 'Buffer' parameter to get the required buffer size.
         #>
         $returnCode = $powerprof::PowerReadFriendlyName(
             [System.IntPtr]::Zero,
@@ -610,8 +610,8 @@ function Get-PowerPlanFriendlyName
                 $ptrName = [System.Runtime.InteropServices.Marshal]::AllocHGlobal([System.Int32]$bufferSize)
 
                 <#
-                Get the actual friendly name of the powerlan by calling PowerReadFriendlyName again.
-                This time with the correct buffer size for the 'Buffer' parameter.
+                    Get the actual friendly name of the powerlan by calling PowerReadFriendlyName again.
+                    This time with the correct buffer size for the 'Buffer' parameter.
                 #>
                 $returnCode = $powerprof::PowerReadFriendlyName(
                     [System.IntPtr]::Zero,
@@ -763,8 +763,8 @@ function Get-PowerPlanUsingPInvoke
     $bufferSize = 16
 
     <#
-    The PowerEnumerate function returns only one guid at a time.
-    So we have to loop here until error code 259 (no more data) is returned to get all power plan guids.
+        The PowerEnumerate function returns only one guid at a time.
+        So we have to loop here until error code 259 (no more data) is returned to get all power plan GUIDs.
     #>
     while ($returnCode -ne 259)
     {
@@ -786,7 +786,7 @@ function Get-PowerPlanUsingPInvoke
             if ($returnCode -ne 0)
             {
                 # Create a Win32Exception object out of the return code
-                $win32Exception = ([ComponentModel.Win32Exception]::new([int]$returnCode))
+                $win32Exception = ([ComponentModel.Win32Exception]::new([System.Int32]$returnCode))
                 New-InvalidOperationException `
                     -Message ($script:localizedData.UnableToEnumeratingPowerSchemes -f $win32Exception.NativeErrorCode, $win32Exception.Message)
             }
@@ -820,7 +820,6 @@ function Get-PowerPlanUsingPInvoke
     Write-Verbose -Message ($script:localizedData.AllPowerPlansFound)
 
     return $allAvailablePowerPlans
-
 }
 
 <#

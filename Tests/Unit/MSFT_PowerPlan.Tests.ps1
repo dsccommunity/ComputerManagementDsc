@@ -52,28 +52,27 @@ try
                 Mock `
                     -CommandName Get-PowerPlan `
                     -MockWith {
-                        return @{
-                                FriendlyName = 'High performance'
-                                Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                            }
-                    } `
+                    return @{
+                        FriendlyName = 'High performance'
+                        Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                    }
+                } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
 
                 Mock `
-                -CommandName Get-ActivePowerPlan `
-                -MockWith {
-                    return [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                    -CommandName Get-ActivePowerPlan `
+                    -MockWith {
+                    return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                 } `
-                -ModuleName $script:DSCResourceName `
-                -Verifiable
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
             It 'Should return the same values as passed as parameters (power plan specified as <Type>)' -TestCases $testCases {
-
                 param
                 (
-                    [String]
+                    [System.String]
                     $Name
                 )
 
@@ -89,28 +88,28 @@ try
                 Mock `
                     -CommandName Get-PowerPlan `
                     -MockWith {
-                        return @{
-                                FriendlyName = 'High performance'
-                                Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                            }
-                    } `
+                    return @{
+                        FriendlyName = 'High performance'
+                        Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                    }
+                } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
 
                 Mock `
-                -CommandName Get-ActivePowerPlan `
-                -MockWith {
-                    return [Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                    -CommandName Get-ActivePowerPlan `
+                    -MockWith {
+                    return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
                 } `
-                -ModuleName $script:DSCResourceName `
-                -Verifiable
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
             It 'Should return an inactive plan (power plan specified as <Type>)' -TestCases $testCases {
 
                 param
                 (
-                    [String]
+                    [System.String]
                     $Name
                 )
 
@@ -133,7 +132,7 @@ try
 
                 param
                 (
-                    [String]
+                    [System.String]
                     $Name
                 )
 
@@ -143,35 +142,34 @@ try
                 { Get-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose } | Should -Throw $errorRecord
             }
 
-        Assert-VerifiableMock
+            Assert-VerifiableMock
+        }
     }
-    }
-    Describe "$($script:DSCResourceName)\Set-TargetResource" {
+
+    Describe "$($script:DSCResourceName)\Set-TargetReource" {
         BeforeEach {
             Mock `
                 -CommandName Get-PowerPlan `
                 -MockWith {
                     return @{
                             FriendlyName = 'High performance'
-                            Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                            Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                         }
                 } `
                 -ModuleName $script:DSCResourceName `
                 -Verifiable
 
             Mock `
-            -CommandName Set-ActivePowerPlan `
-            -ModuleName $script:DSCResourceName `
-            -Verifiable
+                -CommandName Set-ActivePowerPlan `
+                -ModuleName $script:DSCResourceName `
+                -Verifiable
         }
 
         Context 'When the system is not in the desired present state' {
-
             It 'Should call Get-PowerPlan once (power plan specified as <Type>)' -TestCases $testCases {
-
                 param
                 (
-                    [String]
+                    [System.String]
                     $Name
                 )
 
@@ -181,16 +179,21 @@ try
             }
 
             It 'Should call Set-ActivePowerPlan once (power plan specified as <Type>)' -TestCases $testCases {
-
                 param
                 (
-                    [String]
+                    [System.String]
                     $Name
                 )
 
                 Set-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose
 
-                Assert-MockCalled -CommandName Set-ActivePowerPlan -Exactly -Times 1 -Scope It -ModuleName $script:DSCResourceName
+                Assert-MockCalled `
+                    -CommandName Set-ActivePowerPlan `
+                    -Exactly `
+                    -Times 1 `
+                    -Scope It `
+                    -ModuleName $script:DSCResourceName `
+                    -ParameterFilter {$PowerPlanGuid -eq '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'}
             }
         }
 
@@ -203,10 +206,9 @@ try
             }
 
             It 'Should throw the expected error (power plan specified as <Type>)' -TestCases $testCases {
-
                 param
                 (
-                    [String]
+                    [System.String]
                     $Name
                 )
 
@@ -227,27 +229,26 @@ try
                     -MockWith {
                         return @{
                                 FriendlyName = 'High performance'
-                                Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                                Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                             }
                     } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
 
                 Mock `
-                -CommandName Get-ActivePowerPlan `
-                -MockWith {
-                    return [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                } `
-                -ModuleName $script:DSCResourceName `
-                -Verifiable
+                    -CommandName Get-ActivePowerPlan `
+                    -MockWith {
+                        return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                    } `
+                    -ModuleName $script:DSCResourceName `
+                    -Verifiable
             }
 
 
             It 'Should return the the state as present ($true) (power plan specified as <Type>)' -TestCases $testCases {
-
                 param
                 (
-                    [String]
+                    [System.String]
                     $Name
                 )
 
@@ -262,26 +263,25 @@ try
                     -MockWith {
                         return @{
                                 FriendlyName = 'High performance'
-                                Guid = [Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                                Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                             }
                     } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
 
-                    Mock `
+                Mock `
                     -CommandName Get-ActivePowerPlan `
                     -MockWith {
-                        return [Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                        return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
                     } `
                     -ModuleName $script:DSCResourceName `
                     -Verifiable
             }
 
             It 'Should return the the state as absent ($false) (power plan specified as <Type>)' -TestCases $testCases {
-
                 param
                 (
-                    [String]
+                    [System.String]
                     $Name
                 )
 
