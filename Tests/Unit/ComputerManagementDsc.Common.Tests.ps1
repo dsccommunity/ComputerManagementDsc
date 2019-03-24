@@ -692,15 +692,27 @@ try
         }
 
         Describe 'ComputerManagementDsc.Common\Get-PowerPlan' {
+            $mockBalancedPowerPlan = @{
+                FriendlyName = 'Balanced'
+                Guid         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+            }
+
+            $mockHighPerformancePowerPlan = @{
+                'FriendlyName' = 'High performance'
+                'Guid'         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+            }
+
+            $mockPowerSaverPowerPlan = @{
+                    'FriendlyName' = 'Power saver'
+                    'Guid'         = [System.Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
+            }
+
             Context 'Only one power plan is available and "PowerPlan" parameter is not specified' {
                 Mock `
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
-                    return @{
-                        'FriendlyName' = 'Balanced'
-                        'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                        return $mockBalancedPowerPlan
                     }
-                }
 
                 It 'Should not throw an exception' {
                     { Get-PowerPlan } | Should -Not -Throw
@@ -724,11 +736,8 @@ try
                 Mock `
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
-                    return @{
-                        'FriendlyName' = 'Balanced'
-                        'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                        return $mockBalancedPowerPlan
                     }
-                }
 
                 It 'Should not throw an exception' {
                     { Get-PowerPlan -PowerPlan '381b4222-f694-41f0-9685-ff5bb260df2e' } | Should -Not -Throw
@@ -753,11 +762,8 @@ try
                 Mock `
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
-                    return @{
-                        'FriendlyName' = 'Balanced'
-                        'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                        return $mockBalancedPowerPlan
                     }
-                }
 
                 It 'Should not throw an exception' {
                     { Get-PowerPlan -PowerPlan '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c' } | Should -Not -Throw
@@ -779,11 +785,8 @@ try
                 Mock `
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
-                    return @{
-                        'FriendlyName' = 'Balanced'
-                        'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                        return $mockBalancedPowerPlan
                     }
-                }
 
                 It 'Should not throw an exception' {
                     { Get-PowerPlan -PowerPlan 'Balanced' } | Should -Not -Throw
@@ -802,19 +805,14 @@ try
                     $result.FriendlyName | Should -Be 'Balanced'
                     $result.guid | Should -Be '381b4222-f694-41f0-9685-ff5bb260df2e'
                 }
-
-
             }
 
             Context 'Only one power plan is available and "PowerPlan" parameter is specified as name of a not available plan' {
                 Mock `
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
-                    return @{
-                        'FriendlyName' = 'Balanced'
-                        'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                        return $mockBalancedPowerPlan
                     }
-                }
 
                 It 'Should not throw an exception' {
                     { Get-PowerPlan -PowerPlan 'High performance' } | Should -Not -Throw
@@ -837,18 +835,9 @@ try
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
                         return @(
-                            @{
-                                'FriendlyName' = 'Balanced'
-                                'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
-                            },
-                            @{
-                                'FriendlyName' = 'High performance'
-                                'Guid'         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                            },
-                            @{
-                                'FriendlyName' = 'Power saver'
-                                'Guid'         = [System.Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
-                            }
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
                         )
                     }
 
@@ -872,21 +861,12 @@ try
                 Mock `
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
-                    return @(
-                        @{
-                            'FriendlyName' = 'Balanced'
-                            'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
-                        },
-                        @{
-                            'FriendlyName' = 'High performance'
-                            'Guid'         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                        },
-                        @{
-                            'FriendlyName' = 'Power saver'
-                            'Guid'         = [System.Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
-                        }
-                    )
-                }
+                        return @(
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
+                        )
+                    }
 
                 It 'Should not throw an exception' {
                     { Get-PowerPlan -PowerPlan '381b4222-f694-41f0-9685-ff5bb260df2e'} | Should -Not -Throw
@@ -911,21 +891,12 @@ try
                 Mock `
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
-                    return @(
-                        @{
-                            'FriendlyName' = 'Balanced'
-                            'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
-                        },
-                        @{
-                            'FriendlyName' = 'High performance'
-                            'Guid'         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                        },
-                        @{
-                            'FriendlyName' = 'Power saver'
-                            'Guid'         = [System.Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
-                        }
-                    )
-                }
+                        return @(
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
+                        )
+                    }
 
                 It 'Should not throw an exception' {
                     { Get-PowerPlan -PowerPlan '9c5e7fda-e8bf-4a96-9a85-a7e23a8c635c'} | Should -Not -Throw
@@ -947,21 +918,12 @@ try
                 Mock `
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
-                    return @(
-                        @{
-                            'FriendlyName' = 'Balanced'
-                            'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
-                        },
-                        @{
-                            'FriendlyName' = 'High performance'
-                            'Guid'         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                        },
-                        @{
-                            'FriendlyName' = 'Power saver'
-                            'Guid'         = [System.Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
-                        }
-                    )
-                }
+                        return @(
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
+                        )
+                    }
 
                 It 'Should not throw an exception' {
                     { Get-PowerPlan -PowerPlan 'High performance'} | Should -Not -Throw
@@ -986,21 +948,12 @@ try
                 Mock `
                     -CommandName Get-PowerPlanUsingPInvoke `
                     -MockWith {
-                    return @(
-                        @{
-                            'FriendlyName' = 'Balanced'
-                            'Guid'         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
-                        },
-                        @{
-                            'FriendlyName' = 'High performance'
-                            'Guid'         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                        },
-                        @{
-                            'FriendlyName' = 'Power saver'
-                            'Guid'         = [System.Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
-                        }
-                    )
-                }
+                        return @(
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
+                        )
+                    }
 
                 It 'Should not throw an exception' {
                     { Get-PowerPlan -PowerPlan 'Some unavailable plan'} | Should -Not -Throw
