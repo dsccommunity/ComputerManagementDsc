@@ -23,7 +23,7 @@ $script:localizedData = Get-LocalizedData `
         Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER Name
-        Specifies the name of the power plan to assign to the node.
+        Specifies the name or GUID of the power plan to assign to the node.
 
     .EXAMPLE
         Get-TargetResource -IsSingleInstance 'Yes' -Name 'High performance'
@@ -46,43 +46,34 @@ function Get-TargetResource
         $Name
     )
 
-    $getCimInstanceArguments = @{
-        Name   = 'root\cimv2\power'
-        Class  = 'Win32_PowerPlan'
-        Filter = "ElementName = '$Name'"
-    }
+    $desiredPowerPlan = Get-PowerPlan -PowerPlan $Name
 
-    try
+    if ($desiredPowerPlan)
     {
-        $plan = Get-CimInstance @getCimInstanceArguments
-    }
-    catch
-    {
-        New-InvalidOperationException `
-            -Message ($script:localizedData.PowerPlanCimError -f $getCimInstanceArguments.Class)
-    }
+        $activePowerPlan = Get-ActivePowerPlan
 
-    if ($plan)
-    {
-        if ($plan.IsActive)
+        if ($activePowerPlan -eq $desiredPowerPlan.Guid)
         {
-            Write-Verbose -Message ($script:localizedData.PowerPlanIsActive -f $Name)
+            Write-Verbose -Message ($script:localizedData.PowerPlanIsActive -f $desiredPowerPlan.FriendlyName)
+            $isActive = $true
         }
         else
         {
-            Write-Verbose -Message ($script:localizedData.PowerPlanIsNotActive -f $Name)
+            Write-Verbose -Message ($script:localizedData.PowerPlanIsNotActive -f $desiredPowerPlan.FriendlyName)
+            $isActive = $false
         }
+
+        return @{
+            IsSingleInstance = $IsSingleInstance
+            Name             = $Name
+            IsActive         = $isActive
+        }
+
     }
     else
     {
         New-InvalidOperationException `
             -Message ($script:localizedData.PowerPlanNotFound -f $Name)
-    }
-
-    return @{
-        IsSingleInstance = $IsSingleInstance
-        Name             = $Name
-        IsActive         = $plan.IsActive
     }
 }
 
@@ -94,7 +85,7 @@ function Get-TargetResource
         Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER Name
-        Specifies the name of the power plan to assign to the node.
+        Specifies the name or GUID of the power plan to assign to the node.
 
     .EXAMPLE
         Set-TargetResource -IsSingleInstance 'Yes' -Name 'High performance'
@@ -118,30 +109,16 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.PowerPlanIsBeingActivated -f $Name)
 
-    $getCimInstanceArguments = @{
-        Name   = 'root\cimv2\power'
-        Class  = 'Win32_PowerPlan'
-        Filter = "ElementName = '$Name'"
-    }
+    $desiredPowerPlan = Get-PowerPlan -PowerPlan $Name
 
-    try
+    if ($desiredPowerPlan)
     {
-        $plan = Get-CimInstance @getCimInstanceArguments
+        Set-ActivePowerPlan -PowerPlanGuid $desiredPowerPlan.Guid
     }
-    catch
+    else
     {
         New-InvalidOperationException `
-            -Message ($script:localizedData.PowerPlanCimError -f $getCimInstanceArguments.Class)
-    }
-
-    try
-    {
-        $plan | Invoke-CimMethod -MethodName Activate
-    }
-    catch
-    {
-        New-InvalidOperationException `
-            -Message ($script:localizedData.PowerPlanWasUnableToBeSet -f $Name, $_.Exception.Message)
+            -Message ($script:localizedData.PowerPlanNotFound -f $Name)
     }
 }
 
@@ -153,7 +130,7 @@ function Set-TargetResource
         Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER Name
-        Specifies the name of the power plan to assign to the node.
+        Specifies the name or GUID of the power plan to assign to the node.
 
     .EXAMPLE
         Test-TargetResource -IsSingleInstance 'Yes' -Name 'High performance'

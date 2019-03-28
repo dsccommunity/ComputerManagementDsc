@@ -690,6 +690,287 @@ try
                 }
             }
         }
+
+        Describe 'ComputerManagementDsc.Common\Get-PowerPlan' {
+            $mockBalancedPowerPlan = @{
+                FriendlyName = 'Balanced'
+                Guid         = [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+            }
+
+            $mockHighPerformancePowerPlan = @{
+                'FriendlyName' = 'High performance'
+                'Guid'         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+            }
+
+            $mockPowerSaverPowerPlan = @{
+                    'FriendlyName' = 'Power saver'
+                    'Guid'         = [System.Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
+            }
+
+            Context 'Only one power plan is available and "PowerPlan" parameter is not specified' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return $mockBalancedPowerPlan
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan } | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return exactly one hashtable' {
+                    $result = Get-PowerPlan
+                    $result | Should -BeOfType [System.Collections.Hashtable]
+                    $result | Should -HaveCount 1
+                }
+
+            }
+
+            Context 'Only one power plan is available and "PowerPlan" parameter is specified as Guid of the available plan' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return $mockBalancedPowerPlan
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan -PowerPlan '381b4222-f694-41f0-9685-ff5bb260df2e' } | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return a hashtable with the name and guid fo the power plan' {
+                    $result = Get-PowerPlan -PowerPlan '381b4222-f694-41f0-9685-ff5bb260df2e'
+                    $result | Should -BeOfType [System.Collections.Hashtable]
+                    $result | Should -HaveCount 1
+                    $result.FriendlyName | Should -Be 'Balanced'
+                    $result.guid | Should -Be '381b4222-f694-41f0-9685-ff5bb260df2e'
+                }
+            }
+
+            Context 'Only one power plan is available and "PowerPlan" parameter is specified as Guid of a not available plan' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return $mockBalancedPowerPlan
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan -PowerPlan '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c' } | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return nothing' {
+                    $result = Get-PowerPlan -PowerPlan '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                    $result | Should -BeNullOrEmpty
+                }
+            }
+
+            Context 'Only one power plan is available and "PowerPlan" parameter is specified as name of the available plan' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return $mockBalancedPowerPlan
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan -PowerPlan 'Balanced' } | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return a hashtable with the name and guid fo the power plan' {
+                    $result = Get-PowerPlan -PowerPlan 'Balanced'
+                    $result | Should -BeOfType [System.Collections.Hashtable]
+                    $result | Should -HaveCount 1
+                    $result.FriendlyName | Should -Be 'Balanced'
+                    $result.guid | Should -Be '381b4222-f694-41f0-9685-ff5bb260df2e'
+                }
+            }
+
+            Context 'Only one power plan is available and "PowerPlan" parameter is specified as name of a not available plan' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return $mockBalancedPowerPlan
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan -PowerPlan 'High performance' } | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return nothing' {
+                    $result = Get-PowerPlan -PowerPlan 'High performance'
+                    $result | Should -BeNullOrEmpty
+                }
+            }
+
+            Context 'Multiple power plans are available and "PowerPlan" parameter is not specified' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return @(
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
+                        )
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan } | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return an array with all available plans' {
+                    $result = Get-PowerPlan
+                    $result | Should -HaveCount 3
+                }
+            }
+
+            Context 'Multiple power plans are available and "PowerPlan" parameter is specified as Guid of an available plan' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return @(
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
+                        )
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan -PowerPlan '381b4222-f694-41f0-9685-ff5bb260df2e'} | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return a hashtable with the name and guid fo the power plan' {
+                    $result = Get-PowerPlan -PowerPlan '381b4222-f694-41f0-9685-ff5bb260df2e'
+                    $result | Should -BeOfType [System.Collections.Hashtable]
+                    $result | Should -HaveCount 1
+                    $result.FriendlyName | Should -Be 'Balanced'
+                    $result.guid | Should -Be '381b4222-f694-41f0-9685-ff5bb260df2e'
+                }
+            }
+
+            Context 'Multiple power plans are available and "PowerPlan" parameter is specified as Guid of a not available plan' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return @(
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
+                        )
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan -PowerPlan '9c5e7fda-e8bf-4a96-9a85-a7e23a8c635c'} | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return nothing' {
+                    $result = Get-PowerPlan -PowerPlan '9c5e7fda-e8bf-4a96-9a85-a7e23a8c635c'
+                    $result | Should -BeNullOrEmpty
+                }
+            }
+
+            Context 'Multiple power plans are available and "PowerPlan" parameter is specified as name of an available plan' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return @(
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
+                        )
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan -PowerPlan 'High performance'} | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return a hashtable with the name and guid fo the power plan' {
+                    $result = Get-PowerPlan -PowerPlan 'High performance'
+                    $result | Should -BeOfType [System.Collections.Hashtable]
+                    $result | Should -HaveCount 1
+                    $result.FriendlyName | Should -Be 'High performance'
+                    $result.guid | Should -Be '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                }
+            }
+
+            Context 'Multiple power plans are available and "PowerPlan" parameter is specified as name of a not available plan' {
+                Mock `
+                    -CommandName Get-PowerPlanUsingPInvoke `
+                    -MockWith {
+                        return @(
+                            $mockBalancedPowerPlan
+                            $mockHighPerformancePowerPlan
+                            $mockPowerSaverPowerPlan
+                        )
+                    }
+
+                It 'Should not throw an exception' {
+                    { Get-PowerPlan -PowerPlan 'Some unavailable plan'} | Should -Not -Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PowerPlanUsingPInvoke `
+                        -Exactly -Times 1
+                }
+
+                It 'Should return nothing' {
+                    $result = Get-PowerPlan -PowerPlan 'Some unavailable plan'
+                    $result | Should -BeNullOrEmpty
+                }
+            }
+        }
     }
 }
 finally

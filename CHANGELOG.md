@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- PowerPlan:
+  - Added support to specify the desired power plan either as name or guid.
+    Fixes [Issue #59](https://github.com/PowerShell/ComputerManagementDsc/issues/59)
+  - Changed the resource so it uses Windows APIs instead of WMI/CIM
+    (Workaround for Server 2012R2 Core, Nano Server, Server 2019 and Windows 10).
+    Fixes [Issue #155](https://github.com/PowerShell/ComputerManagementDsc/issues/155)
+    and [Issue #65](https://github.com/PowerShell/ComputerManagementDsc/issues/65)
+
 ## 6.2.0.0
 
 - WindowsEventLog:
