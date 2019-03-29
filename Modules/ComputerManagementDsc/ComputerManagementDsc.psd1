@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-moduleVersion = '5.2.0.0'
+moduleVersion = '6.2.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -12,7 +12,7 @@ Author = 'Microsoft Corporation'
 CompanyName = 'Microsoft Corporation'
 
 # Copyright statement for this module
-Copyright = '(c) 2018 Microsoft Corporation. All rights reserved.'
+Copyright = '(c) Microsoft Corporation. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'The ComputerManagementDsc module is originally part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit. This version has been modified for use in Azure. This module contains the xComputer and xDisk resources. These DSC Resources allow you to perform computer management tasks, like joining a domain or initializing disks.
@@ -49,16 +49,12 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- PowershellExecutionPolicy:
-  - Updated to meet HQRM guidelines.
-  - Migrated the xPowershellExecutionPolicy from [xPowershellExecutionPolicy](https://github.com/PowerShell/xPowerShellExecutionPolicy)
-    and renamed to PowershellExecutionPolicy.
-  - Moved strings to localization file.
-- Changed the scope from Global to Script in MSFT_ScheduledTask.Integration.Tests.ps1
-- Changed the scope from Global to Script ComputerManagementDsc.Common.Tests.ps1
-- ScheduledTask:
-  - Added support for event based triggers, implemented using the ScheduleType OnEvent
-    fixes [Issue 167](https://github.com/PowerShell/ComputerManagementDsc/issues/167)
+        ReleaseNotes = '- WindowsEventLog:
+  - Migrated the xWinEventLog from [xWinEventLog](https://github.com/PowerShell/xWinEventLog)
+    and renamed to WindowsEventLog.
+  - Moved strings in localization file.
+  - LogMode is now set with Limit-EventLog,
+  - Fixes [Issue 18](https://github.com/PowerShell/ComputerManagementDsc/issues/18).
 
 '
 
@@ -66,6 +62,9 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
+
+
 
 
 

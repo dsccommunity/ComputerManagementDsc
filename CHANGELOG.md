@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+- PowerPlan:
+  - Added support to specify the desired power plan either as name or guid.
+    Fixes [Issue #59](https://github.com/PowerShell/ComputerManagementDsc/issues/59)
+  - Changed the resource so it uses Windows APIs instead of WMI/CIM
+    (Workaround for Server 2012R2 Core, Nano Server, Server 2019 and Windows 10).
+    Fixes [Issue #155](https://github.com/PowerShell/ComputerManagementDsc/issues/155)
+    and [Issue #65](https://github.com/PowerShell/ComputerManagementDsc/issues/65)
+
+## 6.2.0.0
+
+- WindowsEventLog:
+  - Migrated the xWinEventLog from [xWinEventLog](https://github.com/PowerShell/xWinEventLog)
+    and renamed to WindowsEventLog.
+  - Moved strings in localization file.
+  - LogMode is now set with Limit-EventLog,
+  - Fixes [Issue #18](https://github.com/PowerShell/ComputerManagementDsc/issues/18).
+- Updated examples to format required for publishing to PowerShell Gallery - fixes
+  [Issue #206](https://github.com/PowerShell/ComputerManagementDsc/issues/206).
+- Opted into Common Tests 'Validate Example Files To Be Published' and
+  'Validate Markdown Links'.
+
+## 6.1.0.0
+
+- Updated LICENSE file to match the Microsoft Open Source Team standard.
+  Fixes [Issue #197](https://github.com/PowerShell/ComputerManagementDsc/issues/197).
+- Explicitly removed extra hidden files from release package
+
+## 6.0.0.0
+
 - ScheduledTask:
   - IdleWaitTimeout returned from Get-TargetResource always null - Fixes [Issue #186](https://github.com/PowerShell/ComputerManagementDsc/issues/186).
   - Added BuiltInAccount Property to allow running task as one of the build in
