@@ -9,8 +9,8 @@
     (Workaround for Server 2012R2 Core, Nano Server, Server 2019 and Windows 10).
     Fixes [Issue #155](https://github.com/PowerShell/ComputerManagementDsc/issues/155)
     and [Issue #65](https://github.com/PowerShell/ComputerManagementDsc/issues/65)
-- WindowsEventLog:
-  - Correct PSSA custom rule violations - fixes [Issue #209](https://github.com/PowerShell/ComputerManagementDsc/issues/209).
+- Correct PSSA custom rule violations - fixes [Issue #209](https://github.com/PowerShell/ComputerManagementDsc/issues/209).
+- Correct long example filenames for PowerShellExecutionPolicy examples.
 - Opted into Common Tests 'Required Script Analyzer Rules',
   'Flagged Script Analyzer Rules', 'New Error-Level Script Analyzer Rules'
   'Custom Script Analyzer Rules' and 'Relative Path Length'.
