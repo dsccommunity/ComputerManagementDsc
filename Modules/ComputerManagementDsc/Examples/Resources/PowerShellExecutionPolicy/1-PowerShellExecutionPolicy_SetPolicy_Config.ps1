@@ -21,7 +21,7 @@
     .DESCRIPTION
         This example shows how to configure powershell's execution policy for the specified execution policy scope.
 #>
-Configuration PowerShellExecutionPolicy_SetPowerShellExecutionPolicy_Config
+Configuration PowerShellExecutionPolicy_SetPolicy_Config
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 

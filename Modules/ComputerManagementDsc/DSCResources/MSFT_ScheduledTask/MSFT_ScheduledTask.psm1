@@ -997,7 +997,8 @@ function Set-TargetResource
                 -ArgumentName ExecuteAsGMSA
         }
 
-        if($SynchronizeAcrossTimeZone -and ($ScheduleType -notin @('Once', 'Daily', 'Weekly'))) {
+        if ($SynchronizeAcrossTimeZone -and ($ScheduleType -notin @('Once', 'Daily', 'Weekly')))
+        {
             New-InvalidArgumentException `
                 -Message ($script:localizedData.SynchronizeAcrossTimeZoneInvalidScheduleType) `
                 -ArgumentName SynchronizeAcrossTimeZone
