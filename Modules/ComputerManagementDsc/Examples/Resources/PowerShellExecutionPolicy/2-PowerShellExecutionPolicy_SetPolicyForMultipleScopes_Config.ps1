@@ -21,7 +21,7 @@
     .DESCRIPTION
         This example shows how to configure multiple powershell's execution policy for a specified execution policy scope.
 #>
-Configuration PowerShellExecutionPolicy_SetPowershellExecutionPolicyForMultipleScopes_Config
+Configuration PowerShellExecutionPolicy_SetPolicyForMultipleScopes_Config
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
