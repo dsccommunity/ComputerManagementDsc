@@ -20,6 +20,11 @@
 - Updated test header for all imtegration to version 1.3.3.
 - Enabled example publish to PowerShell Gallery by adding `gallery_api`
   environment variable to `AppVeyor.yml`.
+- Added new resource
+  - SmbShare (moved and improved from deprecated module xSmbShare).
+- Changes to ComputerManagementDsc.Common
+  - Updated Test-DscParameterState so it now can compare zero item
+    collections (arrays).
 
 ## 6.3.0.0
 
