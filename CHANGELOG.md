@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Changes to ComputerManagementDsc
+  - Added new resource
+    - SmbShare (moved and improved from deprecated module xSmbShare).
+  - Common helpers
+    - Updated Test-DscParameterState so it now can compare zero item
+      collections (arrays).
+
 ## 6.3.0.0
 
 - Correct PSSA custom rule violations - fixes [Issue #209](https://github.com/PowerShell/ComputerManagementDsc/issues/209).
