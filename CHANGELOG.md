@@ -13,7 +13,8 @@
 - Correct long example filenames for PowerShellExecutionPolicy examples.
 - Opted into Common Tests 'Required Script Analyzer Rules',
   'Flagged Script Analyzer Rules', 'New Error-Level Script Analyzer Rules'
-  'Custom Script Analyzer Rules' and 'Relative Path Length'.
+  'Custom Script Analyzer Rules' and 'Relative Path Length' -
+  fixes [Issue #152](https://github.com/PowerShell/ComputerManagementDsc/issues/152).
 
 ## 6.2.0.0
 
