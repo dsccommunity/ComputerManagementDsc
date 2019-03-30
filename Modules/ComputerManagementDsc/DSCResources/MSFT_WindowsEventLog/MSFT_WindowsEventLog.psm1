@@ -114,7 +114,7 @@ function Set-TargetResource
         [System.String]
         $LogFilePath
     )
-    
+
     $log = Get-WindowsEventLog -LogName $LogName
 
     if ($null -eq $log)
@@ -177,7 +177,6 @@ function Set-TargetResource
 
     if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
     {
-
         if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object {$_.Log -like $LogName}))
         {
             $matchingEventLog = Get-EventLog -List | Where-Object -FilterScript {
@@ -262,7 +261,7 @@ function Test-TargetResource
     )
 
     $log = Get-WindowsEventLog -LogName $LogName
-    
+
     if ($null -eq $log)
     {
         return
@@ -272,7 +271,6 @@ function Test-TargetResource
 
     if ($IsEnabled -eq $true)
     {
-
         if ($PSBoundParameters.ContainsKey('IsEnabled') -and $log.IsEnabled -ne $IsEnabled)
         {
             Write-Verbose -Message ($localizedData.TestingEventlogIsEnabled -f $LogName, $IsEnabled)
@@ -305,7 +303,6 @@ function Test-TargetResource
 
         if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
         {
-
             if ($LogMode -eq 'AutoBackup')
             {
                 $minimumRetentionDays = Get-EventLog -List | Where-Object -FilterScript { $_.Log -eq $LogName }
