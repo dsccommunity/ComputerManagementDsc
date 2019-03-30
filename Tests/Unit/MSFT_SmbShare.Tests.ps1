@@ -481,17 +481,17 @@ try
                     BeforeAll {
                         Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                Ensure                = 'Absent'
+                                Ensure = 'Absent'
                             }
                         }
                     }
 
                     It 'Should return $false when the desired state should ''Present''' {
                         $testTargetResourceParameters = @{
-                            Ensure                = 'Present'
-                            Name                  = $mockSmbShare.Name
-                            Path                  = $mockSmbShare.Path
-                            Verbose               = $true
+                            Ensure  = 'Present'
+                            Name    = $mockSmbShare.Name
+                            Path    = $mockSmbShare.Path
+                            Verbose = $true
                         }
 
                         $testTargetResourceResult = Test-TargetResource @testTargetResourceParameters
@@ -553,17 +553,17 @@ try
                     BeforeAll {
                         Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                Ensure                = 'Absent'
+                                Ensure = 'Absent'
                             }
                         }
                     }
 
                     It 'Should return $true when the desired state should ''Absent''' {
                         $testTargetResourceParameters = @{
-                            Ensure                = 'Absent'
-                            Name                  = $mockSmbShare.Name
-                            Path                  = $mockSmbShare.Path
-                            Verbose               = $true
+                            Ensure  = 'Absent'
+                            Name    = $mockSmbShare.Name
+                            Path    = $mockSmbShare.Path
+                            Verbose = $true
                         }
 
                         $testTargetResourceResult = Test-TargetResource @testTargetResourceParameters
