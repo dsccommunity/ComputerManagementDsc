@@ -56,8 +56,8 @@ function Get-TargetResource
         ContinuouslyAvailable = $false
         ShareState            = $null
         ShareType             = $null
-        ShadowCopy            = $null
-        Special               = $null
+        ShadowCopy            = $false
+        Special               = $false
         ChangeAccess          = @()
         ReadAccess            = @()
         FullAccess            = @()
@@ -76,8 +76,8 @@ function Get-TargetResource
         $returnValue['FolderEnumerationMode'] = $smbShare.FolderEnumerationMode
         $returnValue['CachingMode'] = $smbShare.CachingMode
         $returnValue['ContinuouslyAvailable'] = $smbShare.ContinuouslyAvailable
-        $returnValue['ShareState'] = $smbShare.ShareState
-        $returnValue['ShareType'] = $smbShare.ShareType
+        $returnValue['ShareState'] = [System.String] $smbShare.ShareState
+        $returnValue['ShareType'] = [System.String] $smbShare.ShareType
         $returnValue['ShadowCopy'] = $smbShare.ShadowCopy
         $returnValue['Special'] = $smbShare.Special
 

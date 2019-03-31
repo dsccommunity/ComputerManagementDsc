@@ -47,8 +47,10 @@ try
                 Add-Member -MemberType NoteProperty -Name 'Description' 'Dummy share for unit testing' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'ConcurrentUserLimit' -Value 10 -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'EncryptData' -Value $false -PassThru |
-                Add-Member -MemberType NoteProperty -Name 'FolderEnumerationMode' -Value 'AccessBased' -PassThru | # 0 AccessBased | 1 Unrestricted, but method expects text
-                Add-Member -MemberType NoteProperty -Name 'SharedState' -Value 1 -PassThru | # 0 Pending | 1 Online | 2 Offline
+                # 0 AccessBased | 1 Unrestricted
+                Add-Member -MemberType NoteProperty -Name 'FolderEnumerationMode' -Value 'AccessBased' -PassThru |
+                # 0 Pending | 1 Online | 2 Offline
+                Add-Member -MemberType NoteProperty -Name 'SharedState' -Value 'Online' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'ShadowCopy' -Value $false -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'CachingMode' -Value 'Manual' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'ContinuouslyAvailable' -Value $true -PassThru |
@@ -169,8 +171,8 @@ try
                     $getTargetResourceResult.ContinuouslyAvailable | Should -BeFalse
                     $getTargetResourceResult.ShareState            | Should -BeNullOrEmpty
                     $getTargetResourceResult.ShareType             | Should -BeNullOrEmpty
-                    $getTargetResourceResult.ShadowCopy            | Should -BeNullOrEmpty
-                    $getTargetResourceResult.Special               | Should -BeNullOrEmpty
+                    $getTargetResourceResult.ShadowCopy            | Should -BeFalse
+                    $getTargetResourceResult.Special               | Should -BeFalse
                     $getTargetResourceResult.ChangeAccess          | Should -HaveCount 0
                     $getTargetResourceResult.ReadAccess            | Should -HaveCount 0
                     $getTargetResourceResult.FullAccess            | Should -HaveCount 0
@@ -204,8 +206,8 @@ try
                                 ContinuouslyAvailable = $false
                                 ShareState            = $null
                                 ShareType             = $null
-                                ShadowCopy            = $null
-                                Special               = $null
+                                ShadowCopy            = $false
+                                Special               = $false
                                 FullAccess            = [System.String[]] @()
                                 ChangeAccess          = [System.String[]] @()
                                 ReadAccess            = [System.String[]] @()
