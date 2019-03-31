@@ -34,6 +34,7 @@ try
     Invoke-TestSetup
 
     InModuleScope $script:DSCResourceName {
+        $mockShareName = 'TestShare'
         $mockChangePermissionUserName = @('User1')
         $mockReadPermissionUserName = @('User2')
         $mockFullPermissionUserName = @('User3', 'User4')
@@ -41,7 +42,7 @@ try
 
         $mockSmbShare = (
             New-Object -TypeName Object |
-                Add-Member -MemberType NoteProperty -Name 'Name' -Value 'DummyShare' -PassThru |
+                Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'Path' -Value 'c:\temp' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'Description' 'Dummy share for unit testing' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'ConcurrentUserLimit' -Value 10 -PassThru |
@@ -54,37 +55,44 @@ try
                 Add-Member -MemberType NoteProperty -Name 'Special' -Value $false -PassThru -Force
         )
 
-        $mockChangePermissionUserName = 'User1'
         $mockSmbShareAccess = @(
             (
                 New-Object -TypeName Object |
-                    Add-Member -MemberType NoteProperty -Name 'Name' -Value 'DummyShare' -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
-                    Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockFullPermissionUserName -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockFullPermissionUserName[0] -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Allow' -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Full' -PassThru -Force
             ),
             (
                 New-Object -TypeName Object |
-                    Add-Member -MemberType NoteProperty -Name 'Name' -Value 'DummyShare' -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
-                    Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockChangePermissionUserName -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockFullPermissionUserName[1] -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Allow' -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Full' -PassThru -Force
+            ),
+            (
+                New-Object -TypeName Object |
+                    Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockChangePermissionUserName[0] -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Allow' -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Change' -PassThru -Force
             ),
             (
                 New-Object -TypeName Object |
-                    Add-Member -MemberType NoteProperty -Name 'Name' -Value 'DummyShare' -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
-                    Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockReadPermissionUserName -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockReadPermissionUserName[0] -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Allow' -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Read' -PassThru -Force
             ),
             (
                 New-Object -TypeName Object |
-                    Add-Member -MemberType NoteProperty -Name 'Name' -Value 'DummyShare' -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
-                    Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockNoPermissionUserName -PassThru |
+                    Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockNoPermissionUserName[0] -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Deny' -PassThru |
                     Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Full' -PassThru -Force
             )
@@ -172,135 +180,148 @@ try
             }
         }
 
-        # Describe 'MSFT_SmbShare\Set-TargetResource' -Tag 'Set' {
-        #     Context 'When the system is not in the desired state' {
-        #         BeforeAll {
-        #             # Per context-block initialization
-        #         }
+        Describe 'MSFT_SmbShare\Set-TargetResource' -Tag 'Set' {
+            Context 'When the system is not in the desired state' {
+                BeforeAll {
+                    Mock -CommandName New-SmbShare
+                    Mock -CommandName Set-SmbShare
+                    Mock -CommandName Remove-SmbShareAccessPermission
+                    Mock -CommandName Add-SmbShareAccessPermission
+                    Mock -CommandName Remove-SmbShare
+                }
 
-        #         # Set the testParameter collection
-        #         $testParameters = @{
-        #             ChangeAccess = $mockChangePermissionUserName
-        #             ReadAccess = $mockReadPermissionUserName
-        #             FullAccess = $mockFullPermissionUserName
-        #             NoAccess = $mockNoAccess
-        #             Name = $mockSmbShare.Name
-        #             Path = $mockSmbShare.Path
-        #             Description = $mockSmbShare.Description
-        #             ConcurrentUserLimit = $mockSmbShare.ConcurrentUserLimit
-        #             EncryptData = $mockSmbShare.EncryptData
-        #             FolderEnumerationMode = $mockSmbShare.FolderEnumerationMode
-        #             Ensure = 'Present'
-        #         }
+                Context 'When the configuration should be present' {
+                    BeforeAll {
+                        Mock -CommandName Get-TargetResource -MockWith {
+                            return @{
+                                Name                  = $mockShareName
+                                Path                  = $null
+                                Description           = $null
+                                ConcurrentUserLimit   = [System.UInt32] 0
+                                EncryptData           = $false
+                                FolderEnumerationMode = $null
+                                CachingMode           = $null
+                                ContinuouslyAvailable = $false
+                                ShareState            = $null
+                                ShareType             = $null
+                                ShadowCopy            = $null
+                                Special               = $null
+                                FullAccess            = [System.String[]] @()
+                                ChangeAccess          = [System.String[]] @()
+                                ReadAccess            = [System.String[]] @()
+                                NoAccess              = [System.String[]] @()
+                                Ensure                = 'Absent'
+                            }
+                        }
+                    }
 
-        #         # Init the script variables
-        #         $script:ChangeAccess = @()
-        #         $script:ReadAccess = @()
-        #         $script:FullAccess = @()
-        #         $script:NoAccess = @()
-        #         $script:ChangeAccess += $mockDefaultChangePermissionUserName
-        #         $script:ReadAccess += $mockDefaultReadPermissionUserName
-        #         $script:FullAccess += $mockDefaultFullPermissionUserName
-        #         $script:NoAccess += $mockDefaultNoPermissionUserName
+                    It 'Should call the correct mocks' {
+                        $setTargetResourceParameters = @{
+                            Name = $mockShareName
+                            Path = 'TestDrive:\Temp'
+                            Description = 'Some description'
+                            ConcurrentUserLimit = 2
+                            EncryptData = $false
+                            FolderEnumerationMode = 'AccessBased'
+                            CachingMode = 'Manual'
+                            ContinuouslyAvailable = $true
+                            ChangeAccess = $mockChangePermissionUserName
+                            ReadAccess = $mockReadPermissionUserName
+                            FullAccess = $mockFullPermissionUserName
+                            # Testing removal of empty collections
+                            NoAccess = @()
+                            Verbose = $true
+                        }
 
+                        { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
 
-        #         # Set mock function calls
-        #         Mock -CommandName Get-SmbShare -MockWith { return @($mockSmbShare)}
-        #         Mock -CommandName Get-SmbShareAccess -MockWith { return @($mockSmbShareAccess)}
-        #         Mock -CommandName Set-SmbShare -MockWith { return $null}
-        #         Mock -CommandName Grant-SmbShareAccess -MockWith {
-        #             # Declare local array -- use of this variable was necessary as the script: context was losing the fact it was an array in the mock
-        #             $localArray = @()
+                        Assert-MockCalled New-SmbShare -Exactly -Times 1 -Scope It
+                        Assert-MockCalled Set-SmbShare -Exactly -Times 0 -Scope It
+                        Assert-MockCalled Remove-SmbShare -Exactly -Times 0 -Scope It
+                    }
+                }
 
-        #             switch($AccessPermission)
-        #             {
-        #                 'Change'
-        #                 {
-        #                     $localArray += $script:ChangeAccess
-        #                     if ($localArray -notcontains $UserName)
-        #                     {
-        #                         $localArray += $UserName
-        #                     }
+                Context 'When the configuration should be absent' {
+                    BeforeAll {
+                        Mock -CommandName Get-TargetResource -MockWith {
+                            return @{
+                                Name                  = $mockShareName
+                                Ensure                = 'Present'
+                            }
+                        }
+                    }
 
-        #                     $script:ChangeAccess = $localArray
-        #                     break
-        #                 }
-        #                 'Read'
-        #                 {
-        #                     $localArray += $script:ReadAccess
-        #                     if($localArray -notcontains $UserName)
-        #                     {
-        #                         $localArray += $UserName
-        #                     }
-        #                     $script:ReadAccess = $localArray
-        #                     break
-        #                 }
-        #                 'Full'
-        #                 {
-        #                     $localArray += $script:FullAccess
-        #                     if($localArray -notcontains $UserName)
-        #                     {
-        #                         $localArray += $UserName
-        #                     }
-        #                     $script:FullAccess = $localArray
-        #                     break
-        #                 }
-        #             }
-        #         }
-        #         Mock Block-SmbShareAccess -MockWith {
-        #             $script:NoAccess += $UserName
-        #         }
-        #         Mock Revoke-SmbShareAccess -MockWith {
-        #             switch($AccessPermission)
-        #             {
-        #                 'Change'
-        #                 {
-        #                     # Remove from array
-        #                     $script:ChangeAccess = $script:ChangeAccess | Where-Object {$_ -ne $UserName}
-        #                     break
-        #                 }
-        #                 'Read'
-        #                 {
-        #                     $script:ReadAccess = $script:ReadAccess | Where-Object {$_ -ne $UserName}
-        #                     break
-        #                 }
-        #                 'Full'
-        #                 {
-        #                     $script:FullAccess = $script:FullAccess | Where-Object {$_ -ne $UserName}
-        #                     break
-        #                 }
-        #             }
-        #         }
-        #         Mock -CommandName Unblock-SmbShareAccess -MockWith {
-        #             $script:NoAccess = $script:NoAccess | Where-Object {$_ -ne $UserName}
-        #         }
+                    It 'Should call the correct mocks' {
+                        $setTargetResourceParameters = @{
+                            Name = $mockShareName
+                            Path = 'TestDrive:\Temp'
+                            Ensure = 'Absent'
+                            Verbose = $true
+                        }
 
+                        { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
 
+                        Assert-MockCalled New-SmbShare -Exactly -Times 0 -Scope It
+                        Assert-MockCalled Set-SmbShare -Exactly -Times 0 -Scope It
+                        Assert-MockCalled Remove-SmbShare -Exactly -Times 1 -Scope It
+                    }
+                }
 
-        #         It 'Should alter permissions' {
-        #             $result = Set-TargetResource @testParameters
-        #             $script:ChangeAccess | Should Be $mockChangePermissionUserName
-        #             $script:ReadAccess | Should Be $mockReadPermissionUserName
-        #             $script:FullAccess | Should Be $mockFullPermissionUserName
-        #             #$script:NoAccess | Should Be $mockNoPermissionUserName
-        #         }
+                Context 'When the configuration has a property that is not in desired state' {
+                    BeforeAll {
+                        Mock -CommandName Get-TargetResource -MockWith {
+                            return @{
+                                Name                  = $mockSmbShare.Name
+                                Path                  = $mockSmbShare.Path
+                                Description           = $mockSmbShare.Description
+                                ConcurrentUserLimit   = [System.UInt32] $mockSmbShare.ConcurrentUserLimit
+                                EncryptData           = $mockSmbShare.EncryptData
+                                FolderEnumerationMode = $mockSmbShare.FolderEnumerationMode
+                                CachingMode           = $mockSmbShare.CachingMode
+                                # Property that is not in desired state.
+                                ContinuouslyAvailable = $false
+                                ShareState            = $mockSmbShare.ShareState
+                                ShareType             = $mockSmbShare.ShareType
+                                ShadowCopy            = $mockSmbShare.ShadowCopy
+                                Special               = $mockSmbShare.Special
+                                FullAccess            = [System.String[]] $mockFullPermissionUserName
+                                ChangeAccess          = [System.String[]] $mockChangePermissionUserName
+                                ReadAccess            = [System.String[]] $mockReadPermissionUserName
+                                NoAccess              = [System.String[]] $mockNoPermissionUserName
+                                Ensure                = 'Present'
+                            }
+                        }
+                    }
 
-        #         It 'Should call the mock function Get-SmbShare' {
-        #             $result = Set-TargetResource @testParameters
-        #             Assert-MockCalled Get-SmbShare -Exactly -Times 1 -Scope It
-        #         }
+                    It 'Should call the correct mocks' {
+                        $setTargetResourceParameters = @{
+                            Name = $mockShareName
+                            Path = 'TestDrive:\Temp'
+                            Description = 'Some description'
+                            ConcurrentUserLimit = 2
+                            EncryptData = $false
+                            FolderEnumerationMode = 'AccessBased'
+                            CachingMode = 'Manual'
+                            ContinuouslyAvailable = $true
+                            ChangeAccess = $mockChangePermissionUserName
+                            ReadAccess = $mockReadPermissionUserName
+                            FullAccess = $mockFullPermissionUserName
+                            NoAccess = $mockNoPermissionUserName
+                            Verbose = $true
+                        }
 
-        #         It 'Should Call the mock function Get-SmbShareAccess' {
-        #             $result = Set-TargetResource @testParameters
-        #             Assert-MockCalled Get-SmbShareAccess -Exactly -Times 4 -Scope It
-        #         }
+                        { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
 
-        #         It 'Should call the mock function Set-SmbShare' {
-        #             $result = Set-TargetResource @testParameters
-        #             Assert-MockCalled Set-SmbShare -Exactly -Times 1 -Scope It
-        #         }
-        #     }
-        # }
+                        Assert-MockCalled Set-SmbShare -Exactly -Times 1 -Scope It
+                        Assert-MockCalled Remove-SmbShareAccessPermission -Exactly -Times 1 -Scope It
+                        Assert-MockCalled Add-SmbShareAccessPermission -Exactly -Times 1 -Scope It
+                        Assert-MockCalled New-SmbShare -Exactly -Times 0 -Scope It
+                        Assert-MockCalled Remove-SmbShare -Exactly -Times 0 -Scope It
+                    }
+                }
+
+            }
+        }
 
         Describe 'MSFT_SmbShare\Test-TargetResource' -Tag 'Test' {
             Context 'When the system is not in the desired state' {
@@ -568,6 +589,395 @@ try
 
                         $testTargetResourceResult = Test-TargetResource @testTargetResourceParameters
                         $testTargetResourceResult | Should -BeTrue
+                    }
+                }
+            }
+        }
+
+        Describe 'MSFT_SmbShare\Add-SmbShareAccessPermission' -Tag 'Helper' {
+            BeforeAll {
+                Mock -CommandName Grant-SmbShareAccess
+                Mock -CommandName Block-SmbShareAccess
+
+                Mock -CommandName Get-SmbShareAccess -MockWith {
+                    <#
+                        Mocked permission:
+
+                        Full = @('User3', 'User4')
+                        Change = @('User1')
+                        Read = @('User2')
+                        Denied = @('DeniedUser1')
+                    #>
+                    return $mockSmbShareAccess
+                }
+            }
+
+            Context 'When adding granted permissions to an SMB share' {
+                BeforeAll {
+                    $mockExpectedAccountToBeAdded = 'NewUser'
+                }
+
+                AfterEach {
+                    Assert-MockCalled -CommandName Block-SmbShareAccess -Exactly -Times 0 -Scope 'It'
+                }
+
+                Context 'When an account with full access should be added' {
+                    BeforeAll {
+                        $addSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            # User3 is an already present account. It should not be added.
+                            FullAccess = @('User3', $mockExpectedAccountToBeAdded)
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Add-SmbShareAccessPermission @addSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        <#
+                            Assert that Grant-SmbShareAccess is only called once, and
+                            that only time was with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -Exactly -Times 1 -Scope 'It'
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccessRight -eq 'Full' `
+                            -and $AccountName -eq $mockExpectedAccountToBeAdded
+                        } -Exactly -Times 1 -Scope 'It'
+                    }
+                }
+
+                Context 'When an account with change access should be added' {
+                    BeforeAll {
+                        $addSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            # User1 is an already present account. It should not be added.
+                            ChangeAccess = @('User1', $mockExpectedAccountToBeAdded)
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Add-SmbShareAccessPermission @addSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        <#
+                            Assert that Grant-SmbShareAccess is only called once, and
+                            that only time was with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -Exactly -Times 1 -Scope 'It'
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccessRight -eq 'Change' `
+                            -and $AccountName -eq $mockExpectedAccountToBeAdded
+                        } -Exactly -Times 1 -Scope 'It'
+                    }
+                }
+
+                Context 'When an account with read access should be added' {
+                    BeforeAll {
+                        $addSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            # User2 is an already present account. It should not be added.
+                            ReadAccess = @('User2', $mockExpectedAccountToBeAdded)
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Add-SmbShareAccessPermission @addSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        <#
+                            Assert that Grant-SmbShareAccess is only called once, and
+                            that only time was with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -Exactly -Times 1 -Scope 'It'
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccessRight -eq 'Read' `
+                            -and $AccountName -eq $mockExpectedAccountToBeAdded
+                        } -Exactly -Times 1 -Scope 'It'
+                    }
+                }
+
+                Context 'When accounts with different access should be added' {
+                    BeforeAll {
+                        $mockExpectedAccountToBeAdded1 = 'NweUser1'
+                        $mockExpectedAccountToBeAdded2 = 'NweUser2'
+                        $mockExpectedAccountToBeAdded3 = 'NweUser3'
+
+                        $addSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            # User1, User2, and User3 is an already present account. It should not be added.
+                            FullAccess = @('User3', $mockExpectedAccountToBeAdded1)
+                            ReadAccess = @('User2', $mockExpectedAccountToBeAdded2)
+                            ChangeAccess = @('User1', $mockExpectedAccountToBeAdded3)
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Add-SmbShareAccessPermission @addSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        <#
+                            Assert that Grant-SmbShareAccess is only called once, and
+                            that only time was with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -Exactly -Times 3 -Scope 'It'
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccessRight -eq 'Change' `
+                            -and $AccountName -eq $mockExpectedAccountToBeAdded3
+                        } -Exactly -Times 1 -Scope 'It'
+
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccessRight -eq 'Full' `
+                            -and $AccountName -eq $mockExpectedAccountToBeAdded1
+                        } -Exactly -Times 1 -Scope 'It'
+
+                        Assert-MockCalled -CommandName Grant-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccessRight -eq 'Read' `
+                            -and $AccountName -eq $mockExpectedAccountToBeAdded2
+                        } -Exactly -Times 1 -Scope 'It'
+                    }
+                }
+            }
+
+            Context 'When denying permissions on an SMB share' {
+                AfterEach {
+                    Assert-MockCalled -CommandName Grant-SmbShareAccess -Exactly -Times 0 -Scope 'It'
+                }
+
+                Context 'When an account with denied access should be revoked' {
+                    BeforeAll {
+                        $mockExpectedAccountToBeBlocked = 'NewDeniedUser'
+
+                        $removeSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            NoAccess = @('DeniedUser1', $mockExpectedAccountToBeBlocked)
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Add-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        <#
+                            Assert that Block-SmbShareAccess is only called once, and
+                            that only time was with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Block-SmbShareAccess -Exactly -Times 1 -Scope 'It'
+                        Assert-MockCalled -CommandName Block-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq $mockExpectedAccountToBeBlocked
+                        } -Exactly -Times 1 -Scope 'It'
+                    }
+                }
+            }
+        }
+
+        Describe 'MSFT_SmbShare\Remove-SmbShareAccessPermission' -Tag 'Helper' {
+            BeforeAll {
+                Mock -CommandName Revoke-SmbShareAccess
+                Mock -CommandName Unblock-SmbShareAccess
+
+                Mock -CommandName Get-SmbShareAccess -MockWith {
+                    <#
+                        Mocked permission:
+
+                        Full = @('User3', 'User4')
+                        Change = @('User1')
+                        Read = @('User2')
+                        Denied = @('DeniedUser1')
+                    #>
+                    return $mockSmbShareAccess
+                }
+            }
+
+            Context 'When revoking granted permissions from an SMB share' {
+                AfterEach {
+                    Assert-MockCalled -CommandName Unblock-SmbShareAccess -Exactly -Times 0 -Scope 'It'
+                }
+
+                Context 'When an account with full access should be removed' {
+                    BeforeAll {
+                        $mockExpectedAccountToBeRemoved = 'User4'
+
+                        $removeSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            FullAccess = @('User3')
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        <#
+                            Assert that Revoke-SmbShareAccess is only called once, and
+                            that only time was with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -Exactly -Times 1 -Scope 'It'
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq $mockExpectedAccountToBeRemoved
+                        } -Exactly -Times 1 -Scope 'It'
+                    }
+                }
+
+                Context 'When an all accounts with full access should be removed' {
+                    BeforeAll {
+                        $mockExpectedAccountToBeRemoved1 = 'User3'
+                        $mockExpectedAccountToBeRemoved2 = 'User4'
+
+                        $removeSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            FullAccess = @()
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mocks' {
+                        { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters  } | Should -Not -Throw
+
+                        <#
+                            Assert that Revoke-SmbShareAccess is called twice, and
+                            that both times it is called with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -Exactly -Times 2 -Scope 'It'
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq $mockExpectedAccountToBeRemoved1
+                        } -Exactly -Times 1 -Scope 'It'
+
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq $mockExpectedAccountToBeRemoved2
+                        } -Exactly -Times 1 -Scope 'It'
+                    }
+                }
+
+                Context 'When an account with change access should be removed' {
+                    BeforeAll {
+                        $mockExpectedAccountToBeRemoved = 'User1'
+
+                        $removeSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            ChangeAccess = @()
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        <#
+                            Assert that Revoke-SmbShareAccess is only called once, and
+                            that only time was with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -Exactly -Times 1 -Scope 'It'
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq $mockExpectedAccountToBeRemoved
+                        } -Exactly -Times 1 -Scope 'It'
+                    }
+                }
+
+                Context 'When an account with read access should be removed' {
+                    BeforeAll {
+                        $mockExpectedAccountToBeRemoved = 'User2'
+
+                        $removeSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            ReadAccess = @()
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        <#
+                            Assert that Revoke-SmbShareAccess is only called for each account,
+                            and each time with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -Exactly -Times 1 -Scope 'It'
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq $mockExpectedAccountToBeRemoved
+                        } -Exactly -Times 1 -Scope 'It'
+
+
+                    }
+                }
+
+                Context 'When an all granted access should be removed' {
+                    BeforeAll {
+                        $removeSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            FullAccess = @()
+                            ChangeAccess = @()
+                            ReadAccess = @()
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -Exactly -Times 4 -Scope 'It'
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq 'User1'
+                        } -Exactly -Times 1 -Scope 'It'
+
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq 'User2'
+                        } -Exactly -Times 1 -Scope 'It'
+
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq 'User3'
+                        } -Exactly -Times 1 -Scope 'It'
+
+                        Assert-MockCalled -CommandName Revoke-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq 'User4'
+                        } -Exactly -Times 1 -Scope 'It'
+                    }
+                }
+            }
+
+            Context 'When revoking denied permissions from an SMB share' {
+                AfterEach {
+                    Assert-MockCalled -CommandName Revoke-SmbShareAccess -Exactly -Times 0 -Scope 'It'
+                }
+
+                Context 'When an account with denied access should be revoked' {
+                    BeforeAll {
+                        $mockExpectedAccountToBeUnblocked = 'DeniedUser1'
+
+                        $removeSmbShareAccessPermissionParameters = @{
+                            Name = $mockShareName
+                            NoAccess = @()
+                            Verbose = $true
+                        }
+                    }
+
+                    It 'Should call the correct mock' {
+                        { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
+
+                        <#
+                            Assert that Block-SmbShareAccess is only called once, and
+                            that only time was with the correct parameters.
+                        #>
+                        Assert-MockCalled -CommandName Unblock-SmbShareAccess -Exactly -Times 1 -Scope 'It'
+                        Assert-MockCalled -CommandName Unblock-SmbShareAccess -ParameterFilter {
+                            $Name -eq $mockShareName `
+                            -and $AccountName -eq $mockExpectedAccountToBeUnblocked
+                        } -Exactly -Times 1 -Scope 'It'
                     }
                 }
             }
