@@ -254,7 +254,7 @@ try
                     It 'Should call the correct mocks' {
                         $setTargetResourceParameters = @{
                             Name = $mockShareName
-                            Path = 'TestDrive:\Temp'
+                            Path = 'AnyValue'
                             Ensure = 'Absent'
                             Verbose = $true
                         }
