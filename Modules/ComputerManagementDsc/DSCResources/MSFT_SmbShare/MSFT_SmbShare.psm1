@@ -235,157 +235,69 @@ function Set-TargetResource
         $Ensure = 'Present'
     )
 
-    $smbShareParameters = $PSBoundParameters.Clone()
+    <#
+        Copy the $PSBoundParameters to a new hash table, so we have the
+        original intact.
+    #>
+    $smbShareParameters = @{} + $PSBoundParameters
 
-    $smbShare = Get-SmbShare -Name $Name -ErrorAction 'SilentlyContinue'
-    if ($smbShare)
+    $getTargetResourceResult = Get-TargetResource -Name $Name -Path $Path
+    if ($getTargetResourceResult.Ensure -eq 'Present')
     {
-        Write-Verbose -Message "Share with name $Name exists"
+        Write-Verbose -Message ($script:localizedData.IsPresent -f $Name)
 
         if ($Ensure -eq 'Present')
         {
+            Write-Verbose -Message $script:localizedData.UpdatingProperties
+
             $parametersToRemove = $smbShareParameters.Keys |
                 Where-Object -FilterScript {
                     $_ -in ('ChangeAccess','ReadAccess','FullAccess','NoAccess','Ensure','Path')
                 }
+
+            # TODO: Make sure to remove parameters that already are in desired state.
 
             $parametersToRemove | ForEach-Object {
                 $smbShareParameters.Remove($_)
             }
 
             # Use Set-SmbShare for performing operations other than changing access
-            Set-SmbShare @smbShareParameters -Force
+            Set-SmbShare @smbShareParameters -Force -ErrorAction 'Stop'
 
-            <#
-                Get a collection of all accounts that currently have access
-                or are denied access
-            #>
-            $getSmbShareAccessResult = Get-SmbShareAccess -Name $Name
-
-            <#
-                First all access must be removed for accounts that should not
-                have permission, or should be unblocked (those that was denied
-                access). After that we add new accounts.
-
-                The switch-statement will loop through all items in the
-                collection.
-            #>
-            switch ($getSmbShareAccessResult.AccessControlType)
-            {
-                'Allow'
-                {
-                    $removeAccessPermissionParameters = @{
-                        Name = $Name
-                        UserName = $_.AccountName
-                    }
-
-                    if ($_.AccessRight -eq 'Change' -and $_.AccountName -notin $ChangeAccess)
-                    {
-                        $removeAccessPermissionParameters['AccessPermission'] = 'ChangeAccess'
-                        Remove-AccessPermission @removeAccessPermissionParameters
-                    }
-
-                    if ($_.AccessRight -eq 'Read' -and $_.AccountName -notin $ReadAccess)
-                    {
-                        $removeAccessPermissionParameters['AccessPermission'] = 'ReadAccess'
-                        Remove-AccessPermission @removeAccessPermissionParameters
-                    }
-
-                    if ($_.AccessRight -eq 'Full' -and $_.AccountName -notin $FullAccess)
-                    {
-                        $removeAccessPermissionParameters['AccessPermission'] = 'FullAccess'
-                        Remove-AccessPermission @removeAccessPermissionParameters
-                    }
-                }
-
-                'Deny'
-                {
-                    if ($_.AccessRight -eq 'Full' -and $_.AccountName -notin $NoAccess)
-                    {
-                        Remove-AccessPermission -Name $Name -UserName $_.AccountName -AccessPermission 'NoAccess'
-                    }
-                }
+            $smbShareAccessPermissionParameters = @{
+                Name = $Name
             }
 
-            # Update the collection after all accounts have been removed.
-            $getSmbShareAccessResult = Get-SmbShareAccess -Name $Name
-
-            if ($ChangeAccess)
+            if ($PSBoundParameters.ContainsKey('FullAccess'))
             {
-                # Get already added account names.
-                $changeAccessAccountNames = $getSmbShareAccessResult | Where-Object -FilterScript {
-                    $_.AccessControlType -eq 'Allow' `
-                    -and $_.AccessRight -eq 'Change'
-                }
-
-                $newAccountsToHaveChangeAccess = $ChangeAccess | Where-Object -FilterScript {
-                    $_ -notin $changeAccessAccountNames
-                }
-
-                # Add new accounts that should have change permission.
-                $newAccountsToHaveChangeAccess | ForEach-Object {
-                    Set-AccessPermission -Name $Name -AccessPermission 'ChangeAccess' -Username $_
-                }
+                $smbShareAccessPermissionParameters['FullAccess'] = $FullAccess
             }
 
-            if ($ReadAccess)
+            if ($PSBoundParameters.ContainsKey('ChangeAccess'))
             {
-                # Get already added account names.
-                $readAccessAccountNames = $getSmbShareAccessResult | Where-Object -FilterScript {
-                    $_.AccessControlType -eq 'Allow' `
-                    -and $_.AccessRight -eq 'Read'
-                }
-
-                $newAccountsToHaveReadAccess = $ReadAccess | Where-Object -FilterScript {
-                    $_ -notin $readAccessAccountNames
-                }
-
-                # Add new accounts that should have read permission.
-                $newAccountsToHaveReadAccess | ForEach-Object {
-                    Set-AccessPermission -Name $Name -AccessPermission 'ReadAccess' -Username $_
-                }
+                $smbShareAccessPermissionParameters['ChangeAccess'] = $ChangeAccess
             }
 
-            if ($FullAccess)
+            if ($PSBoundParameters.ContainsKey('ReadAccess'))
             {
-                # Get already added account names.
-                $fullAccessAccountNames = $getSmbShareAccessResult | Where-Object -FilterScript {
-                    $_.AccessControlType -eq 'Allow' `
-                    -and $_.AccessRight -eq 'Full'
-                }
-
-                $newAccountsToHaveFullAccess = $FullAccess | Where-Object -FilterScript {
-                    $_ -notin $fullAccessAccountNames
-                }
-
-                # Add new accounts that should have full permission.
-                $newAccountsToHaveFullAccess | ForEach-Object {
-                    Set-AccessPermission -Name $Name -AccessPermission 'FullAccess' -Username $_
-                }
+                $smbShareAccessPermissionParameters['ReadAccess'] = $ReadAccess
             }
 
-            if ($NoAccess)
+            if ($PSBoundParameters.ContainsKey('NoAccess'))
             {
-                # Get already added account names.
-                $noAccessAccountNames = $getSmbShareAccessResult | Where-Object -FilterScript {
-                    $_.AccessControlType -eq 'Deny' `
-                    -and $_.AccessRight -eq 'Full'
-                }
-
-                $newAccountsToHaveNoAccess = $NoAccess | Where-Object -FilterScript {
-                    $_ -notin $noAccessAccountNames
-                }
-
-                # Add new accounts that should be denied permission.
-                $newAccountsToHaveNoAccess | ForEach-Object {
-                    Set-AccessPermission -Name $Name -AccessPermission 'NoAccess' -Username $_
-                }
+                $smbShareAccessPermissionParameters['NoAccess'] = $NoAccess
             }
+
+            # We should only pass the access collections that the user want to enforce.
+            Remove-SmbShareAccessPermission @smbShareAccessPermissionParameters
+
+            Add-SmbShareAccessPermission @smbShareAccessPermissionParameters
         }
         else
         {
-            Write-Verbose "Removing share $Name to ensure it is Absent"
-            Remove-SmbShare -name $Name -Force
+            Write-Verbose -Message ($script:localizedData.RemoveShare -f $Name)
+
+            Remove-SmbShare -name $Name -Force -ErrorAction 'Stop'
         }
     }
     else
@@ -394,7 +306,7 @@ function Set-TargetResource
         {
             $smbShareParameters.Remove('Ensure')
 
-            Write-Verbose "Creating share $Name to ensure it is Present"
+            Write-Verbose -Message ($script:localizedData.CreateShare -f $Name)
 
             <#
                 Remove access collections that are empty, since that is
@@ -404,13 +316,11 @@ function Set-TargetResource
             {
                 if ($smbShareParameters.ContainsKey($accessProperty) -and -not $smbShareParameters[$accessProperty])
                 {
-                    Write-Verbose "Parameter $accessProperty is null or empty, removing from collection."
                     $smbShareParameters.Remove($accessProperty)
                 }
             }
 
-            # Pass the parameter collection to New-SmbShare
-            New-SmbShare @smbShareParameters
+            New-SmbShare @smbShareParameters -ErrorAction 'Stop'
         }
     }
 }
@@ -536,7 +446,11 @@ function Test-TargetResource
     {
         if ($Ensure -eq 'Present')
         {
-            Write-Verbose -Message ($script:localizedData.IsPresent -f $Name)
+            Write-Verbose -Message (
+                '{0} {1}' -f `
+                    ($script:localizedData.IsPresent -f $Name),
+                    $script:localizedData.EvaluatingProperties
+            )
 
             $valuesToCheck = @(
                 'Name'
@@ -575,67 +489,283 @@ function Test-TargetResource
     return $testTargetResourceResult
 }
 
-function Set-AccessPermission
+<#
+    .SYNOPSIS
+        Removes the access permission for accounts that are no longer part
+        of the respectively access collections (FullAccess, ChangeAccess,
+        ReadAccess, and NoAccess).
+
+    .PARAMETER Name
+        The name of the SMB share for which to remove access permission.
+
+    .PARAMETER FullAccess
+        A string collection of account names that _should have_ full access
+        permission. The accounts not in this collection will be removed from
+        the SMB share.
+
+    .PARAMETER ChangeAccess
+        A string collection of account names that _should have_ change access
+        permission. The accounts not in this collection will be removed from
+        the SMB share.
+
+    .PARAMETER ReadAccess
+        A string collection of account names that _should have_ read access
+        permission. The accounts not in this collection will be removed from
+        the SMB share.
+
+    .PARAMETER NoAccess
+        A string collection of account names that _should be_ denied access
+        to the SMB share. The accounts not in this collection will be removed
+        from the SMB share.
+
+    .NOTES
+        The access permission is only removed if the parameter was passed
+        into the function.
+#>
+function Remove-SmbShareAccessPermission
 {
-    [CmdletBinding()]
-    Param
+    param
     (
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
 
         [Parameter()]
         [System.String[]]
-        $UserName,
+        $FullAccess,
 
         [Parameter()]
-        [ValidateSet('ChangeAccess', 'FullAccess', 'ReadAccess', 'NoAccess')]
-        [System.String]
-        $AccessPermission
+        [System.String[]]
+        $ChangeAccess,
+
+        [Parameter()]
+        [System.String[]]
+        $ReadAccess,
+
+        [Parameter()]
+        [System.String[]]
+        $NoAccess
     )
 
-    $formattedString = '{0}{1}' -f $AccessPermission, 'Access'
-    Write-Verbose -Message "Setting $formattedString for $UserName"
+    <#
+        Get a collection of all accounts that currently have access
+        or are denied access
+    #>
+    $getSmbShareAccessResult = Get-SmbShareAccess -Name $Name
 
-    if ($AccessPermission -in ('ChangeAccess', 'ReadAccess', 'FullAccess'))
+    <#
+        First all access must be removed for accounts that should not
+        have permission, or should be unblocked (those that was denied
+        access). After that we add new accounts.
+    #>
+    foreach ($smbShareAccess in $getSmbShareAccessResult)
     {
-        Grant-SmbShareAccess -Name $Name -AccountName $UserName -AccessRight $AccessPermission -Force
-    }
-    else
-    {
-        Block-SmbShareAccess -Name $Name -AccountName $UserName -Force
+        switch ($smbShareAccess.AccessControlType)
+        {
+            'Allow'
+            {
+                $shouldRevokeAccess = $false
+
+                if ($smbShareAccess.AccessRight -eq 'Change')
+                {
+                    if ($PSBoundParameters.ContainsKey('ChangeAccess') -and $smbShareAccess.AccountName -notin $ChangeAccess)
+                    {
+                        $shouldRevokeAccess = $true
+                    }
+                }
+
+                if ($smbShareAccess.AccessRight -eq 'Read')
+                {
+                    if ($PSBoundParameters.ContainsKey('ReadAccess') -and $smbShareAccess.AccountName -notin $ReadAccess)
+                    {
+                        $shouldRevokeAccess = $true
+                    }
+                }
+
+                if ($smbShareAccess.AccessRight -eq 'Full')
+                {
+                    if ($PSBoundParameters.ContainsKey('FullAccess') -and $smbShareAccess.AccountName -notin $FullAccess)
+                    {
+                        $shouldRevokeAccess = $true
+                    }
+                }
+
+                if ($shouldRevokeAccess)
+                {
+                    Write-Verbose -Message ($script:localizedData.RevokeAccess -f $smbShareAccess.AccountName, $Name)
+
+                    Revoke-SmbShareAccess -Name $Name -AccountName $smbShareAccess.AccountName -Force -ErrorAction 'Stop'
+                }
+            }
+
+            'Deny'
+            {
+                if ($smbShareAccess.AccessRight -eq 'Full')
+                {
+                    if ($PSBoundParameters.ContainsKey('NoAccess') -and $smbShareAccess.AccountName -notin $NoAccess)
+                    {
+                        Write-Verbose -Message ($script:localizedData.UnblockAccess -f $smbShareAccess.AccountName, $Name)
+
+                        Unblock-SmbShareAccess -Name $Name -AccountName $smbShareAccess.AccountName -Force -ErrorAction 'Stop'
+                    }
+                }
+            }
+        }
     }
 }
 
-function Remove-AccessPermission
+<#
+    .SYNOPSIS
+        Add the access permission to the SMB share for accounts, in the
+        respectively access collections (FullAccess, ChangeAccess,
+        ReadAccess, and NoAccess), that do not yet have access.
+
+    .PARAMETER Name
+        The name of the SMB share to add access permission to.
+
+    .PARAMETER FullAccess
+        A string collection of account names that should have full access
+        permission. The accounts in this collection will be added to the
+        SMB share.
+
+    .PARAMETER ChangeAccess
+        A string collection of account names that should have change access
+        permission. The accounts in this collection will be added to the
+        SMB share.
+
+    .PARAMETER ReadAccess
+        A string collection of account names that should have read access
+        permission. The accounts in this collection will be added to the
+        SMB share.
+
+    .PARAMETER NoAccess
+        A string collection of account names that should be denied access
+        to the SMB share. The accounts in this collection will be added to
+        the SMB share.
+#>
+function Add-SmbShareAccessPermission
 {
-    [CmdletBinding()]
-    Param
+    param
     (
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
 
         [Parameter()]
         [System.String[]]
-        $UserName,
+        $FullAccess,
 
         [Parameter()]
-        [ValidateSet('ChangeAccess', 'FullAccess', 'ReadAccess', 'NoAccess')]
-        [System.String]
-        $AccessPermission
+        [System.String[]]
+        $ChangeAccess,
+
+        [Parameter()]
+        [System.String[]]
+        $ReadAccess,
+
+        [Parameter()]
+        [System.String[]]
+        $NoAccess
     )
 
-    $formattedString = '{0}{1}' -f $AccessPermission, 'Access'
+    # Update the collection after all accounts have been removed.
+    $getSmbShareAccessResult = Get-SmbShareAccess -Name $Name
 
-    Write-Debug -Message "Removing $formattedString for $UserName"
-
-    if ($AccessPermission -in ('ChangeAccess', 'ReadAccess', 'FullAccess'))
+    if ($PSBoundParameters.ContainsKey('ChangeAccess'))
     {
-        Revoke-SmbShareAccess -Name $Name -AccountName $UserName -Force
+        # Get already added account names.
+        $smbShareChangeAccessObjects = $getSmbShareAccessResult | Where-Object -FilterScript {
+            $_.AccessControlType -eq 'Allow' `
+            -and $_.AccessRight -eq 'Change'
+        }
+
+        # Get a collection of just the account names.
+        $changeAccessAccountNames = @($smbShareChangeAccessObjects.AccountName)
+
+        $newAccountsToHaveChangeAccess = $ChangeAccess | Where-Object -FilterScript {
+            $_ -notin $changeAccessAccountNames
+        }
+
+        $accessRight = 'Change'
+
+        # Add new accounts that should have change permission.
+        $newAccountsToHaveChangeAccess | ForEach-Object {
+            Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight, $_, $Name)
+
+            Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight -Force -ErrorAction 'Stop'
+        }
     }
-    else
+
+    if ($PSBoundParameters.ContainsKey('ReadAccess'))
     {
-        Unblock-SmbShareAccess -Name $Name -AccountName $UserName -Force
+        # Get already added account names.
+        $smbShareReadAccessObjects = $getSmbShareAccessResult | Where-Object -FilterScript {
+            $_.AccessControlType -eq 'Allow' `
+            -and $_.AccessRight -eq 'Read'
+        }
+
+        # Get a collection of just the account names.
+        $readAccessAccountNames = @($smbShareReadAccessObjects.AccountName)
+
+        $newAccountsToHaveReadAccess = $ReadAccess | Where-Object -FilterScript {
+            $_ -notin $readAccessAccountNames
+        }
+
+        $accessRight = 'Read'
+
+        # Add new accounts that should have read permission.
+        $newAccountsToHaveReadAccess | ForEach-Object {
+            Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight, $_, $Name)
+
+            Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight -Force -ErrorAction 'Stop'
+        }
+    }
+
+    if ($PSBoundParameters.ContainsKey('FullAccess'))
+    {
+        # Get already added account names.
+        $smbShareFullAccessObjects = $getSmbShareAccessResult | Where-Object -FilterScript {
+            $_.AccessControlType -eq 'Allow' `
+            -and $_.AccessRight -eq 'Full'
+        }
+
+        # Get a collection of just the account names.
+        $fullAccessAccountNames = @($smbShareFullAccessObjects.AccountName)
+
+        $newAccountsToHaveFullAccess = $FullAccess | Where-Object -FilterScript {
+            $_ -notin $fullAccessAccountNames
+        }
+
+        $accessRight = 'Full'
+
+        # Add new accounts that should have full permission.
+        $newAccountsToHaveFullAccess | ForEach-Object {
+            Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight, $_, $Name)
+
+            Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight -Force -ErrorAction 'Stop'
+        }
+    }
+
+    if ($PSBoundParameters.ContainsKey('NoAccess'))
+    {
+        # Get already added account names.
+        $smbShareNoAccessObjects = $getSmbShareAccessResult | Where-Object -FilterScript {
+            $_.AccessControlType -eq 'Deny' `
+            -and $_.AccessRight -eq 'Full'
+        }
+
+        # Get a collection of just the account names.
+        $noAccessAccountNames = @($smbShareNoAccessObjects.AccountName)
+
+        $newAccountsToHaveNoAccess = $NoAccess | Where-Object -FilterScript {
+            $_ -notin $noAccessAccountNames
+        }
+
+        # Add new accounts that should be denied permission.
+        $newAccountsToHaveNoAccess | ForEach-Object {
+            Write-Verbose -Message ($script:localizedData.DenyAccess -f $_, $Name)
+
+            Block-SmbShareAccess -Name $Name -AccountName  $_ -Force -ErrorAction 'Stop'
+        }
     }
 }
