@@ -452,21 +452,6 @@ function Test-TargetResource
                     $script:localizedData.EvaluatingProperties
             )
 
-            $valuesToCheck = @(
-                'Name'
-                'Path'
-                'Description'
-                'ConcurrentUserLimit'
-                'EncryptData'
-                'FolderEnumerationMode'
-                'CachingMode'
-                'ContinuouslyAvailable'
-                'FullAccess'
-                'ChangeAccess'
-                'ReadAccess'
-                'NoAccess'
-            )
-
             <#
                 Using $VerbosePreference so that the verbose messages in
                 Test-DscParameterState is outputted, if the user requested
@@ -475,7 +460,6 @@ function Test-TargetResource
             $testTargetResourceResult = Test-DscParameterState `
                 -CurrentValues $getTargetResourceResult `
                 -DesiredValues $PSBoundParameters `
-                -ValuesToCheck $valuesToCheck `
                 -Verbose:$VerbosePreference
         }
         else
