@@ -1745,7 +1745,6 @@ try
                 It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
                     Set-TargetResource @testParameters
                     Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
-
                         $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
                     }
                 }
@@ -1787,6 +1786,7 @@ try
                 }
 
                 $testParameters.LogonType = 'Password'
+
                 It 'Should return true when BuiltInAccount set even if LogonType parameter different' {
                     Test-TargetResource @testParameters | Should -Be $true
                 }

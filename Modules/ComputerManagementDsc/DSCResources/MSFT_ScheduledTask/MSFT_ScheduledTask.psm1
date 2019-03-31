@@ -281,6 +281,7 @@ function Get-TargetResource
         [System.Boolean]
         $Enable = $true,
 
+        [Parameter()]
         [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
         [System.String]
         $BuiltInAccount,
@@ -805,6 +806,7 @@ function Set-TargetResource
         [System.Boolean]
         $Enable = $true,
 
+        [Parameter()]
         [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
         [System.String]
         $BuiltInAccount,
@@ -1268,8 +1270,8 @@ function Set-TargetResource
 
         # Prepare the register arguments
         $registerArguments = @{}
-
         $username = $null
+
         if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
         {
             <#
@@ -1654,6 +1656,7 @@ function Test-TargetResource
         [System.Boolean]
         $Enable = $true,
 
+        [Parameter()]
         [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
         [System.String]
         $BuiltInAccount,
@@ -1897,13 +1900,17 @@ function Test-TargetResource
         $currentValues['LogonType'] = 'ServiceAccount'
     }
 
-    if ($PSBoundParameters.ContainsKey('WeeksInterval') -and ((-not $currentValues.ContainsKey('WeeksInterval')) -or ($null -eq $currentValues['WeeksInterval'])))
+    if ($PSBoundParameters.ContainsKey('WeeksInterval') `
+        -and ((-not $currentValues.ContainsKey('WeeksInterval')) -or ($null -eq $currentValues['WeeksInterval'])))
     {
         <#
-            The WeeksInterval parameter is defaulted to 1, even when the
-            property is unset/undefined for the current task returned from
-            Get-TargetResouce initialise a missing or null WeeksInterval to
-            spurious calls to Set-TargetResouce
+            The WeeksInterval parameter of this function defaults to 1,
+            even though the value of the WeeksInterval property maybe
+            unset/undefined in the object $currentValues returned from
+            Get-TargetResouce. To avoid Test-TargetResouce returning false
+            and generating spurious calls to Set-TargetResouce, default
+            an undefined $currentValues.WeeksInterval to the value of
+            $WeeksInterval.
         #>
         $currentValues.WeeksInterval = $PSBoundParameters['WeeksInterval']
     }
@@ -1925,6 +1932,7 @@ function Test-TargetResource
 
     $desiredValues = $PSBoundParameters
     $desiredValues.TaskPath = $TaskPath
+
     if ($desiredValues.ContainsKey('Verbose'))
     {
         <#
