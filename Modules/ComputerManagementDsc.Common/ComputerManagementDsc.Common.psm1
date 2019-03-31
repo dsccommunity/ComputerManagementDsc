@@ -188,7 +188,7 @@ function Test-DscParameterState
 
         if (-not $checkDesiredValue)
         {
-            Write-Verbose -Message ($script:localizedData.MatchEmptyCollectionMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
+            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
             continue
         }
 
