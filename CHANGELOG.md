@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.3.0.0
+
 - Correct PSSA custom rule violations - fixes [Issue #209](https://github.com/PowerShell/ComputerManagementDsc/issues/209).
 - Correct long example filenames for PowerShellExecutionPolicy examples.
 - Opted into Common Tests 'Required Script Analyzer Rules',
