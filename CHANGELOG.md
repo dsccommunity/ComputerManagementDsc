@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 6.3.0.0
+
+- Correct PSSA custom rule violations - fixes [Issue #209](https://github.com/PowerShell/ComputerManagementDsc/issues/209).
+- Correct long example filenames for PowerShellExecutionPolicy examples.
+- Opted into Common Tests 'Required Script Analyzer Rules',
+  'Flagged Script Analyzer Rules', 'New Error-Level Script Analyzer Rules'
+  'Custom Script Analyzer Rules' and 'Relative Path Length' -
+  fixes [Issue #152](https://github.com/PowerShell/ComputerManagementDsc/issues/152).
+- PowerPlan:
+  - Added support to specify the desired power plan either as name or guid.
+    Fixes [Issue #59](https://github.com/PowerShell/ComputerManagementDsc/issues/59)
+  - Changed the resource so it uses Windows APIs instead of WMI/CIM
+    (Workaround for Server 2012R2 Core, Nano Server, Server 2019 and Windows 10).
+    Fixes [Issue #155](https://github.com/PowerShell/ComputerManagementDsc/issues/155)
+    and [Issue #65](https://github.com/PowerShell/ComputerManagementDsc/issues/65)
+
 ## 6.2.0.0
 
 - WindowsEventLog:
@@ -10,6 +26,10 @@
   - Moved strings in localization file.
   - LogMode is now set with Limit-EventLog,
   - Fixes [Issue #18](https://github.com/PowerShell/ComputerManagementDsc/issues/18).
+- Updated examples to format required for publishing to PowerShell Gallery - fixes
+  [Issue #206](https://github.com/PowerShell/ComputerManagementDsc/issues/206).
+- Opted into Common Tests 'Validate Example Files To Be Published' and
+  'Validate Markdown Links'.
 
 ## 6.1.0.0
 
