@@ -58,11 +58,12 @@ function Get-TargetResource
         ShareType             = $null
         ShadowCopy            = $false
         Special               = $false
-        ChangeAccess          = @()
-        ReadAccess            = @()
-        FullAccess            = @()
-        NoAccess              = @()
     }
+
+    $accountsFullAccess   = [system.string[]] @()
+    $accountsChangeAccess = [system.string[]] @()
+    $accountsReadAccess   = [system.string[]] @()
+    $accountsNoAccess     = [system.string[]] @()
 
     $smbShare = Get-SmbShare -Name $Name -ErrorAction 'SilentlyContinue'
     if ($smbShare)
@@ -90,7 +91,7 @@ function Get-TargetResource
                 {
                     if ($access.AccessControlType -eq 'Allow')
                     {
-                        $returnValue['ChangeAccess'] += @($access.AccountName)
+                        $accountsChangeAccess += @($access.AccountName)
                     }
                 }
 
@@ -98,7 +99,7 @@ function Get-TargetResource
                 {
                     if ($access.AccessControlType -eq 'Allow')
                     {
-                        $returnValue['ReadAccess'] += @($access.AccountName)
+                        $accountsReadAccess += @($access.AccountName)
                     }
                 }
 
@@ -106,12 +107,12 @@ function Get-TargetResource
                 {
                     if ($access.AccessControlType -eq 'Allow')
                     {
-                        $returnValue['FullAccess'] += @($access.AccountName)
+                        $accountsFullAccess += @($access.AccountName)
                     }
 
                     if ($access.AccessControlType -eq 'Deny')
                     {
-                        $returnValue['NoAccess'] += @($access.AccountName)
+                        $accountsNoAccess += @($access.AccountName)
                     }
                 }
             }
@@ -121,6 +122,15 @@ function Get-TargetResource
     {
         Write-Verbose -Message ($script:localizedData.ShareNotFound -f $Name)
     }
+
+    <#
+        This adds either an empty array, or a populated array depending
+        if accounts with the respectively access was found.
+    #>
+    $returnValue['FullAccess'] = [System.String[]] $accountsFullAccess
+    $returnValue['ChangeAccess'] = [System.String[]] $accountsChangeAccess
+    $returnValue['ReadAccess'] = [System.String[]] $accountsReadAccess
+    $returnValue['NoAccess'] = [System.String[]] $accountsNoAccess
 
     return $returnValue
 }
@@ -235,6 +245,8 @@ function Set-TargetResource
         $Ensure = 'Present'
     )
 
+    Assert-AccessPermissionParameters @PSBoundParameters
+
     <#
         Copy the $PSBoundParameters to a new hash table, so we have the
         original intact.
@@ -309,8 +321,9 @@ function Set-TargetResource
             Write-Verbose -Message ($script:localizedData.CreateShare -f $Name)
 
             <#
-                Remove access collections that are empty, since that is
-                already the default for the cmdlet New-SmbShare.
+                Remove access collections that are empty, since empty
+                collections are not allowed to be provided to the cmdlet
+                New-SmbShare.
             #>
             foreach ($accessProperty in ('ChangeAccess','ReadAccess','FullAccess','NoAccess'))
             {
@@ -435,6 +448,8 @@ function Test-TargetResource
         [System.String]
         $Ensure = 'Present'
     )
+
+    Assert-AccessPermissionParameters @PSBoundParameters
 
     Write-Verbose -Message ($script:localizedData.TestTargetResourceMessage -f $Name)
 
@@ -750,6 +765,93 @@ function Add-SmbShareAccessPermission
             Write-Verbose -Message ($script:localizedData.DenyAccess -f $_, $Name)
 
             Block-SmbShareAccess -Name $Name -AccountName  $_ -Force -ErrorAction 'Stop'
+        }
+    }
+}
+
+<#
+    .SYNOPSIS
+        Assert that not only empty collections are passed in the
+        respectively access permission collections (FullAccess,
+        ChangeAccess, ReadAccess, and NoAccess).
+
+    .PARAMETER Name
+        The name of the SMB share to add access permission to.
+
+    .PARAMETER FullAccess
+        A string collection of account names that should have full access
+        permission. The accounts in this collection will be added to the
+        SMB share.
+
+    .PARAMETER ChangeAccess
+        A string collection of account names that should have change access
+        permission. The accounts in this collection will be added to the
+        SMB share.
+
+    .PARAMETER ReadAccess
+        A string collection of account names that should have read access
+        permission. The accounts in this collection will be added to the
+        SMB share.
+
+    .PARAMETER NoAccess
+        A string collection of account names that should be denied access
+        to the SMB share. The accounts in this collection will be added to
+        the SMB share.
+
+    .PARAMETER RemainingParameters
+        Container for the rest of the potentially splatted parameters from
+        the $PSBoundParameters object.
+
+    .NOTES
+        The group 'Everyone' is automatically given read access by
+        the cmdlet New-SmbShare if all access permission parameters
+        (FullAccess, ChangeAccess, ReadAccess, NoAccess) is set to @().
+        For that reason we are need either none of the parameters, or
+        at least one to specify an account.
+
+#>
+function Assert-AccessPermissionParameters
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $FullAccess,
+
+        [Parameter()]
+        [System.String[]]
+        $ChangeAccess,
+
+        [Parameter()]
+        [System.String[]]
+        $ReadAccess,
+
+        [Parameter()]
+        [System.String[]]
+        $NoAccess,
+
+        [Parameter(ValueFromRemainingArguments)]
+        [System.Collections.Generic.List`1[System.Object]]
+        $RemainingParameters
+    )
+
+    <#
+        First check if ReadAccess is monitored (part of the configuration).
+        If it is not monitored, then we don't need to worry if Everyone is
+        added.
+    #>
+    if ($PSBoundParameters.ContainsKey('ReadAccess') -and -not $ReadAccess)
+    {
+        $fullAccessHasNoMembers = $PSBoundParameters.ContainsKey('FullAccess') -and -not $FullAccess
+        $changeAccessHasNoMembers = $PSBoundParameters.ContainsKey('ChangeAccess') -and -not $ChangeAccess
+        $noAccessHasNoMembers = $PSBoundParameters.ContainsKey('NoAccess') -and -not $NoAccess
+        <#
+            If ReadAccess should have no members, then we need at least one
+            member in one of the other access permission collections.
+        #>
+        if ($fullAccessHasNoMembers -and $changeAccessHasNoMembers -and $noAccessHasNoMembers)
+        {
+            New-InvalidArgumentException -Message $script:localizedData.WrongAccessParameters -ArgumentName 'FullAccess, ChangeAccess, ReadAccess, NoAccess'
         }
     }
 }
