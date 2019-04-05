@@ -20,6 +20,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 #endregion
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'Modules' -ChildPath 'ComputerManagementDsc.Common')) -Force
 
 # Begin Testing
 try
