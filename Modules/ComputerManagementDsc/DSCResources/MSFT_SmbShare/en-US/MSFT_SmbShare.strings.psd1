@@ -14,4 +14,5 @@ ConvertFrom-StringData @'
     UnblockAccess = Revoking denied permission for account '{0}' on the SMB share with the name '{1}'.
     GrantAccess = Granting '{0}' permission for account '{1}' on the SMB share with the name '{2}'.
     DenyAccess = Denying permission for account '{0}' on the SMB share with the name '{1}'.
+    WrongAccessParameters = Not allowed to have all access permission parameters set to empty collections. Must either remove the access permission parameters completely, or add at least one member to one of the access permission parameters.
 '@

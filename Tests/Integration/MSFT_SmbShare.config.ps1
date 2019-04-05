@@ -19,8 +19,17 @@ else
                 NodeName        = 'localhost'
                 CertificateFile = $env:DscPublicCertificatePath
 
-                ShareName       = 'DscTestShare'
-                SharePath       = 'C:\DscTestShare'
+                ShareName1      = 'DscTestShare1'
+                SharePath1      = 'C:\DscTestShare1'
+
+                ShareName2      = 'DscTestShare2'
+                SharePath2      = 'C:\DscTestShare2'
+
+                UserName1       = ('{0}\SmbUser1' -f $env:COMPUTERNAME)
+                UserName2       = ('{0}\SmbUser2' -f $env:COMPUTERNAME)
+                UserName3       = ('{0}\SmbUser3' -f $env:COMPUTERNAME)
+                UserName4       = ('{0}\SmbUser4' -f $env:COMPUTERNAME)
+                Password        = 'P@ssw0rd1'
             }
         )
     }
@@ -33,24 +42,79 @@ else
 #>
 Configuration MSFT_SmbShare_Prerequisites_Config
 {
-    Import-DscResource -ModuleName 'PSDesiredStateConfiguration'
+    Import-DscResource -ModuleName 'PSDscResources'
 
     node $AllNodes.NodeName
     {
-        File DirectoryCopy
+        File 'CreateFolderToShare1'
         {
-            Ensure = 'Present'
-            Type = 'Directory'
-            DestinationPath = $Node.SharePath
+            Ensure          = 'Present'
+            Type            = 'Directory'
+            DestinationPath = $Node.SharePath1
+        }
+
+        File 'CreateFolderToShare2'
+        {
+            Ensure          = 'Present'
+            Type            = 'Directory'
+            DestinationPath = $Node.SharePath2
+        }
+
+        User 'CreateAccountUser1'
+        {
+            Ensure   = 'Present'
+            UserName = Split-Path -Path $Node.UserName1 -Leaf
+            Password = New-Object `
+                -TypeName System.Management.Automation.PSCredential `
+                -ArgumentList @(
+                (Split-Path -Path $Node.UserName1 -Leaf),
+                (ConvertTo-SecureString -String $Node.Password -AsPlainText -Force)
+            )
+        }
+
+        User 'CreateAccountUser2'
+        {
+            Ensure   = 'Present'
+            UserName = Split-Path -Path $Node.UserName2 -Leaf
+            Password = New-Object `
+                -TypeName System.Management.Automation.PSCredential `
+                -ArgumentList @(
+                (Split-Path -Path $Node.UserName2 -Leaf),
+                (ConvertTo-SecureString -String $Node.Password -AsPlainText -Force)
+            )
+        }
+
+        User 'CreateAccountUser3'
+        {
+            Ensure   = 'Present'
+            UserName = Split-Path -Path $Node.UserName3 -Leaf
+            Password = New-Object `
+                -TypeName System.Management.Automation.PSCredential `
+                -ArgumentList @(
+                (Split-Path -Path $Node.UserName3 -Leaf),
+                (ConvertTo-SecureString -String $Node.Password -AsPlainText -Force)
+            )
+        }
+
+        User 'CreateAccountUser4'
+        {
+            Ensure   = 'Present'
+            UserName = Split-Path -Path $Node.UserName4 -Leaf
+            Password = New-Object `
+                -TypeName System.Management.Automation.PSCredential `
+                -ArgumentList @(
+                (Split-Path -Path $Node.UserName1 -Leaf),
+                (ConvertTo-SecureString -String $Node.Password -AsPlainText -Force)
+            )
         }
     }
 }
 
 <#
     .SYNOPSIS
-        Create the share with default values.
+        Create the SMB share with default values, and no permissions.
 #>
-Configuration MSFT_SmbShare_CreateShare_Config
+Configuration MSFT_SmbShare_CreateShare1_Config
 {
     Import-DscResource -ModuleName 'ComputerManagementDsc'
 
@@ -58,17 +122,91 @@ Configuration MSFT_SmbShare_CreateShare_Config
     {
         SmbShare 'Integration_Test'
         {
-            Name = $Node.ShareName
-            Path = $Node.SharePath
+            Name = $Node.ShareName1
+            Path = $Node.SharePath1
         }
     }
 }
 
 <#
     .SYNOPSIS
-        Remove the share.
+        Create the SMB share with default values, and no permissions.
 #>
-Configuration MSFT_SmbShare_RemoveShare_Config
+Configuration MSFT_SmbShare_CreateShare2_Config
+{
+    Import-DscResource -ModuleName 'ComputerManagementDsc'
+
+    node $AllNodes.NodeName
+    {
+        SmbShare 'Integration_Test'
+        {
+            Name         = $Node.ShareName2
+            Path         = $Node.SharePath2
+            FullAccess   = @()
+            ChangeAccess = @($Node.UserName1)
+            ReadAccess   = @()
+            NoAccess     = @()
+        }
+    }
+}
+
+<#
+    .SYNOPSIS
+        Update all properties of the SMB share.
+#>
+Configuration MSFT_SmbShare_UpdateProperties_Config
+{
+    Import-DscResource -ModuleName 'ComputerManagementDsc'
+
+    node $AllNodes.NodeName
+    {
+        SmbShare 'Integration_Test'
+        {
+            Name                  = $Node.ShareName1
+            Path                  = $Node.SharePath1
+            FolderEnumerationMode = 'AccessBased'
+            CachingMode           = 'None'
+            ConcurrentUserLimit   = 20
+            #TODO: https://blog.workinghardinit.work/tag/continuously-available-file-shares/
+            #ContinuouslyAvailable = $true
+            Description           = 'A new description'
+            EncryptData           = $true
+            FullAccess            = @($Node.UserName1)
+            ChangeAccess          = @($Node.UserName2)
+            ReadAccess            = @($Node.UserName3)
+            NoAccess              = @($Node.UserName4)
+        }
+    }
+}
+
+<#
+    .SYNOPSIS
+        Remove permission, and no other properties should be changed.
+#>
+Configuration MSFT_SmbShare_RemovePermission_Config
+{
+    Import-DscResource -ModuleName 'ComputerManagementDsc'
+
+    node $AllNodes.NodeName
+    {
+        SmbShare 'Integration_Test'
+        {
+            Name         = $Node.ShareName1
+            Path         = $Node.SharePath1
+            FullAccess   = @()
+            ChangeAccess = @()
+            ReadAccess   = @('Everyone')
+            NoAccess     = @()
+        }
+    }
+}
+
+
+<#
+    .SYNOPSIS
+        Remove the share 1.
+#>
+Configuration MSFT_SmbShare_RemoveShare1_Config
 {
     Import-DscResource -ModuleName 'ComputerManagementDsc'
 
@@ -77,7 +215,26 @@ Configuration MSFT_SmbShare_RemoveShare_Config
         SmbShare 'Integration_Test'
         {
             Ensure = 'Absent'
-            Name   = $Node.ShareName
+            Name   = $Node.ShareName1
+            Path   = 'NotUsed_CanBeAnyValue'
+        }
+    }
+}
+
+<#
+    .SYNOPSIS
+        Remove the share 2.
+#>
+Configuration MSFT_SmbShare_RemoveShare2_Config
+{
+    Import-DscResource -ModuleName 'ComputerManagementDsc'
+
+    node $AllNodes.NodeName
+    {
+        SmbShare 'Integration_Test'
+        {
+            Ensure = 'Absent'
+            Name   = $Node.ShareName2
             Path   = 'NotUsed_CanBeAnyValue'
         }
     }
@@ -93,11 +250,18 @@ Configuration MSFT_SmbShare_Cleanup_Config
 
     node $AllNodes.NodeName
     {
-        File DirectoryCopy
+        File 'RemoveShareFolder1'
         {
-            Ensure = 'Absent'
-            Type = 'Directory'
-            DestinationPath = $Node.SharePath
+            Ensure          = 'Absent'
+            Type            = 'Directory'
+            DestinationPath = $Node.SharePath1
+        }
+
+        File 'RemoveShareFolder2s'
+        {
+            Ensure          = 'Absent'
+            Type            = 'Directory'
+            DestinationPath = $Node.SharePath2
         }
     }
 }
