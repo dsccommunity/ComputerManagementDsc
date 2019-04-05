@@ -12,6 +12,8 @@
   linked to it from README.MD instead.
 - Updated test header for all unit tests to version 1.2.4.
 - Updated test header for all imtegration to version 1.3.3.
+- Enabled example publish to PowerShell Gallery by adding `gallery_api`
+  environment variable to `AppVeyor.yml`.
 
 ## 6.3.0.0
 
