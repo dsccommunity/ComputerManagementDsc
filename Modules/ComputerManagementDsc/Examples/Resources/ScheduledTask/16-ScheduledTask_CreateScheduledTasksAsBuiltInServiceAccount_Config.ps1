@@ -27,7 +27,7 @@
         file c:\temp\seeme.txt.
         The contents of c:\temp\seeme.txt should be "NETWORK SERVICE".
 #>
-Configuration Example
+Configuration ScheduledTask_CreateScheduledTasksAsBuiltInServiceAccount_Config
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
