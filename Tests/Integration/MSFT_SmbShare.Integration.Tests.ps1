@@ -57,7 +57,7 @@ Describe "$($script:dcsResourceName)_Integration" {
         }
     }
 
-    $configurationName = "$($script:dcsResourceName)_CreateShare_Config"
+    $configurationName = "$($script:dcsResourceName)_CreateShare1_Config"
 
     Context ('When using configuration {0}' -f $configurationName) {
         It 'Should compile and apply the MOF without throwing' {
@@ -95,27 +95,29 @@ Describe "$($script:dcsResourceName)_Integration" {
             }
 
             $resourceCurrentState.Ensure | Should -Be 'Present'
-            $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName
-            $resourceCurrentState.Path | Should -Be $ConfigurationData.AllNodes.SharePath
+            $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName1
+            $resourceCurrentState.Path | Should -Be $ConfigurationData.AllNodes.SharePath1
             $resourceCurrentState.Description | Should -BeNullOrEmpty
             $resourceCurrentState.EncryptData | Should -BeFalse
-            $resourceCurrentState.FolderEnumerationMode | Should -Be 'Unrestricted'
+            $resourceCurrentState.ConcurrentUserLimit | Should -Be 0
+            $resourceCurrentState.Description | Should -BeNullOrEmpty
             $resourceCurrentState.CachingMode | Should -Be 'Manual'
             $resourceCurrentState.ContinuouslyAvailable | Should -BeFalse
             $resourceCurrentState.ShareState | Should -Be 'Online'
             $resourceCurrentState.ShareType | Should -Be 'FileSystemDirectory'
             $resourceCurrentState.ShadowCopy | Should -BeFalse
             $resourceCurrentState.Special | Should -BeFalse
-
-            # Default these access permissions are empty.
             $resourceCurrentState.FullAccess | Should -BeNullOrEmpty
             $resourceCurrentState.ChangeAccess | Should -BeNullOrEmpty
             $resourceCurrentState.NoAccess | Should -BeNullOrEmpty
 
-            # Default Everyone is added with Read access.
+            <#
+                By design of the cmdlet `New-SmbShare`, the Everyone group is
+                always added when not providing any access permission members
+                in the configuration.
+            #>
             $resourceCurrentState.ReadAccess | Should -HaveCount 1
-            $resourceCurrentState.ReadAccess[0] | Should -Be 'Everyone'
-
+            $resourceCurrentState.ReadAccess | Should -Contain 'Everyone'
         }
 
         It 'Should return $true when Test-DscConfiguration is run' {
@@ -123,7 +125,195 @@ Describe "$($script:dcsResourceName)_Integration" {
         }
     }
 
-    $configurationName = "$($script:dcsResourceName)_RemoveShare_Config"
+    $configurationName = "$($script:dcsResourceName)_CreateShare2_Config"
+
+    Context ('When using configuration {0}' -f $configurationName) {
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                $configurationParameters = @{
+                    OutputPath        = $TestDrive
+                    ConfigurationData = $ConfigurationData
+                }
+
+                & $configurationName @configurationParameters
+
+                $startDscConfigurationParameters = @{
+                    Path         = $TestDrive
+                    ComputerName = 'localhost'
+                    Wait         = $true
+                    Verbose      = $true
+                    Force        = $true
+                    ErrorAction  = 'Stop'
+                }
+
+                Start-DscConfiguration @startDscConfigurationParameters
+            } | Should -Not -Throw
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            {
+                $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+            } | Should -Not -Throw
+        }
+
+        It 'Should have set the resource and all the parameters should match' {
+            $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq $configurationName `
+                    -and $_.ResourceId -eq "[$($script:dscResourceFriendlyName)]Integration_Test"
+            }
+
+            $resourceCurrentState.Ensure | Should -Be 'Present'
+            $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName2
+            $resourceCurrentState.Path | Should -Be $ConfigurationData.AllNodes.SharePath2
+            $resourceCurrentState.Description | Should -BeNullOrEmpty
+            $resourceCurrentState.EncryptData | Should -BeFalse
+            $resourceCurrentState.ConcurrentUserLimit | Should -Be 0
+            $resourceCurrentState.Description | Should -BeNullOrEmpty
+            $resourceCurrentState.CachingMode | Should -Be 'Manual'
+            $resourceCurrentState.ContinuouslyAvailable | Should -BeFalse
+            $resourceCurrentState.ShareState | Should -Be 'Online'
+            $resourceCurrentState.ShareType | Should -Be 'FileSystemDirectory'
+            $resourceCurrentState.ShadowCopy | Should -BeFalse
+            $resourceCurrentState.Special | Should -BeFalse
+            $resourceCurrentState.FullAccess | Should -BeNullOrEmpty
+            $resourceCurrentState.ReadAccess | Should -BeNullOrEmpty
+            $resourceCurrentState.NoAccess | Should -BeNullOrEmpty
+
+            <#
+                By design of the cmdlet `New-SmbShare`, the Everyone group is
+                always added when using `ReadAccess = @()` in the configuration.
+            #>
+            $resourceCurrentState.ChangeAccess | Should -HaveCount 1
+            $resourceCurrentState.ChangeAccess | Should -Contain $ConfigurationData.AllNodes.UserName1
+        }
+
+        It 'Should return $true when Test-DscConfiguration is run' {
+            Test-DscConfiguration -Verbose | Should -Be 'True'
+        }
+    }
+
+    $configurationName = "$($script:dcsResourceName)_UpdateProperties_Config"
+
+    Context ('When using configuration {0}' -f $configurationName) {
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                $configurationParameters = @{
+                    OutputPath        = $TestDrive
+                    ConfigurationData = $ConfigurationData
+                }
+
+                & $configurationName @configurationParameters
+
+                $startDscConfigurationParameters = @{
+                    Path         = $TestDrive
+                    ComputerName = 'localhost'
+                    Wait         = $true
+                    Verbose      = $true
+                    Force        = $true
+                    ErrorAction  = 'Stop'
+                }
+
+                Start-DscConfiguration @startDscConfigurationParameters
+            } | Should -Not -Throw
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            {
+                $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+            } | Should -Not -Throw
+        }
+
+        It 'Should have set the resource and all the parameters should match' {
+            $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq $configurationName `
+                    -and $_.ResourceId -eq "[$($script:dscResourceFriendlyName)]Integration_Test"
+            }
+
+            $resourceCurrentState.Ensure | Should -Be 'Present'
+            $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName1
+            $resourceCurrentState.Path | Should -Be $ConfigurationData.AllNodes.SharePath1
+            $resourceCurrentState.Description | Should -Be 'A new description'
+            #$resourceCurrentState.EncryptData | Should -BeTrue
+            $resourceCurrentState.ConcurrentUserLimit | Should -Be 20
+            #$resourceCurrentState.FolderEnumerationMode | Should -Be 'AccessBased'
+            #$resourceCurrentState.CachingMode | Should -Be 'None'
+            #$resourceCurrentState.ContinuouslyAvailable | Should -BeTrue
+            $resourceCurrentState.ShareState | Should -Be 'Online'
+            $resourceCurrentState.ShareType | Should -Be 'FileSystemDirectory'
+            $resourceCurrentState.ShadowCopy | Should -BeFalse
+            $resourceCurrentState.Special | Should -BeFalse
+
+            $resourceCurrentState.FullAccess | Should -HaveCount 1
+            $resourceCurrentState.FullAccess | Should -Contain $ConfigurationData.AllNodes.UserName1
+
+            $resourceCurrentState.ChangeAccess | Should -HaveCount 1
+            $resourceCurrentState.ChangeAccess | Should -Contain $ConfigurationData.AllNodes.UserName2
+
+            $resourceCurrentState.ReadAccess | Should -HaveCount 1
+            $resourceCurrentState.ReadAccess | Should -Contain $ConfigurationData.AllNodes.UserName3
+
+            $resourceCurrentState.NoAccess | Should -HaveCount 1
+            $resourceCurrentState.NoAccess | Should -Contain $ConfigurationData.AllNodes.UserName4
+        }
+
+        It 'Should return $true when Test-DscConfiguration is run' {
+            Test-DscConfiguration -Verbose | Should -Be 'True'
+        }
+    }
+
+    $configurationName = "$($script:dcsResourceName)_RemovePermission_Config"
+
+    Context ('When using configuration {0}' -f $configurationName) {
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                $configurationParameters = @{
+                    OutputPath        = $TestDrive
+                    ConfigurationData = $ConfigurationData
+                }
+
+                & $configurationName @configurationParameters
+
+                $startDscConfigurationParameters = @{
+                    Path         = $TestDrive
+                    ComputerName = 'localhost'
+                    Wait         = $true
+                    Verbose      = $true
+                    Force        = $true
+                    ErrorAction  = 'Stop'
+                }
+
+                Start-DscConfiguration @startDscConfigurationParameters
+            } | Should -Not -Throw
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            {
+                $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+            } | Should -Not -Throw
+        }
+
+        It 'Should have set the resource and all the parameters should match' {
+            $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq $configurationName `
+                    -and $_.ResourceId -eq "[$($script:dscResourceFriendlyName)]Integration_Test"
+            }
+
+            $resourceCurrentState.Ensure | Should -Be 'Present'
+            $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName1
+            $resourceCurrentState.FullAccess | Should -BeNullOrEmpty
+            $resourceCurrentState.ChangeAccess | Should -BeNullOrEmpty
+            $resourceCurrentState.NoAccess | Should -BeNullOrEmpty
+
+            $resourceCurrentState.ReadAccess | Should -HaveCount 1
+            $resourceCurrentState.ReadAccess | Should -Contain 'Everyone'
+        }
+
+        It 'Should return $true when Test-DscConfiguration is run' {
+            Test-DscConfiguration -Verbose | Should -Be 'True'
+        }
+    }
+
+    $configurationName = "$($script:dcsResourceName)_RemoveShare1_Config"
 
     Context ('When using configuration {0}' -f $configurationName) {
         It 'Should compile and apply the MOF without throwing' {
@@ -161,7 +351,53 @@ Describe "$($script:dcsResourceName)_Integration" {
             }
 
             $resourceCurrentState.Ensure | Should -Be 'Absent'
-            $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName
+            $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName1
+        }
+
+        It 'Should return $true when Test-DscConfiguration is run' {
+            Test-DscConfiguration -Verbose | Should -Be 'True'
+        }
+    }
+
+    $configurationName = "$($script:dcsResourceName)_RemoveShare2_Config"
+
+    Context ('When using configuration {0}' -f $configurationName) {
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                $configurationParameters = @{
+                    OutputPath        = $TestDrive
+                    ConfigurationData = $ConfigurationData
+                }
+
+                & $configurationName @configurationParameters
+
+                $startDscConfigurationParameters = @{
+                    Path         = $TestDrive
+                    ComputerName = 'localhost'
+                    Wait         = $true
+                    Verbose      = $true
+                    Force        = $true
+                    ErrorAction  = 'Stop'
+                }
+
+                Start-DscConfiguration @startDscConfigurationParameters
+            } | Should -Not -Throw
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            {
+                $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+            } | Should -Not -Throw
+        }
+
+        It 'Should have set the resource and all the parameters should match' {
+            $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq $configurationName `
+                    -and $_.ResourceId -eq "[$($script:dscResourceFriendlyName)]Integration_Test"
+            }
+
+            $resourceCurrentState.Ensure | Should -Be 'Absent'
+            $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName2
         }
 
         It 'Should return $true when Test-DscConfiguration is run' {
