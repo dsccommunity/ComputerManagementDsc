@@ -153,6 +153,18 @@ Configuration MSFT_SmbShare_CreateShare2_Config
 <#
     .SYNOPSIS
         Update all properties of the SMB share.
+
+    .NOTES
+        The property ContinuouslyAvailable cannot be set to $true because that
+        property requires the share to be a cluster share in a Failover Cluster.
+
+        Log Name:      Microsoft-Windows-SMBServer/Operational
+        Event ID:      1800
+        Level:         Error
+        Description:
+        CA failure - Failed to set continuously available property on a new or
+        existing file share as the file share is not a cluster share.
+
 #>
 Configuration MSFT_SmbShare_UpdateProperties_Config
 {
@@ -167,8 +179,7 @@ Configuration MSFT_SmbShare_UpdateProperties_Config
             FolderEnumerationMode = 'AccessBased'
             CachingMode           = 'None'
             ConcurrentUserLimit   = 20
-            #TODO: https://blog.workinghardinit.work/tag/continuously-available-file-shares/
-            #ContinuouslyAvailable = $true
+            ContinuouslyAvailable = $false
             Description           = 'A new description'
             EncryptData           = $true
             FullAccess            = @($Node.UserName1)
