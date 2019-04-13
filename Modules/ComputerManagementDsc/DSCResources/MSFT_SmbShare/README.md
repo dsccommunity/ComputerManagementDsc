@@ -5,6 +5,17 @@ SMB shares.
 
 ## Requirements
 
+### Cluster Shares
+
+To property `ContinuouslyAvailable` can only be set to `$true` when
+the SMB share is a cluster share in a failover cluster. Also in the blog
+[SMB Transparent Failover – making file shares continuously available](https://blogs.technet.microsoft.com/filecab/2016/03/25/smb-transparent-failover-making-file-shares-continuously-available-2)
+by [Claus Joergensen](https://github.com/clausjor) it is mentioned that
+SMB Transparent Failover does not support cluster disks with 8.3 name
+generation enabled.
+
+### Access permissions
+
 It is not allowed to provide empty collections in the configuration for
 the access permissions parameters. The below configuration will throw an
 error.
