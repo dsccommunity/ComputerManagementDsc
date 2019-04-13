@@ -47,15 +47,15 @@ function Get-TargetResource
     $returnValue = @{
         Ensure                = 'Absent'
         Name                  = $Name
-        Path                  = $null
-        Description           = $null
+        Path                  = [System.String] $null
+        Description           = [System.String] $null
         ConcurrentUserLimit   = 0
         EncryptData           = $false
-        FolderEnumerationMode = $null
-        CachingMode           = $null
+        FolderEnumerationMode = [System.String] $null
+        CachingMode           = [System.String] $null
         ContinuouslyAvailable = $false
-        ShareState            = $null
-        ShareType             = $null
+        ShareState            = [System.String] $null
+        ShareType             = [System.String] $null
         ShadowCopy            = $false
         Special               = $false
     }
@@ -74,8 +74,8 @@ function Get-TargetResource
         $returnValue['Description'] = $smbShare.Description
         $returnValue['ConcurrentUserLimit'] = $smbShare.ConcurrentUserLimit
         $returnValue['EncryptData'] = $smbShare.EncryptData
-        $returnValue['FolderEnumerationMode'] = $smbShare.FolderEnumerationMode
-        $returnValue['CachingMode'] = $smbShare.CachingMode
+        $returnValue['FolderEnumerationMode'] = $smbShare.FolderEnumerationMode.ToString()
+        $returnValue['CachingMode'] = $smbShare.CachingMode.ToString()
         $returnValue['ContinuouslyAvailable'] = $smbShare.ContinuouslyAvailable
         $returnValue['ShareState'] = [System.String] $smbShare.ShareState
         $returnValue['ShareType'] = [System.String] $smbShare.ShareType
