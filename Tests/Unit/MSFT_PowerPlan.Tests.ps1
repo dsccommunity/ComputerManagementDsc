@@ -1,6 +1,6 @@
 #region HEADER
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_PowerPlan'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_PowerPlan'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -30,7 +30,7 @@ function Invoke-TestCleanup
 try
 {
     # Assign the localized data from the module into a local variable
-    $LocalizedData = InModuleScope $script:DSCResourceName {
+    $LocalizedData = InModuleScope $script:dscResourceName {
          $LocalizedData
     }
 
@@ -48,7 +48,7 @@ try
         }
     )
 
-    Describe "$($script:DSCResourceName)\Get-TargetResource" {
+    Describe "$($script:dscResourceName)\Get-TargetResource" {
         Context 'When the system is in the desired present state' {
             BeforeEach {
                 Mock `
@@ -59,7 +59,7 @@ try
                         Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                     }
                 } `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -Verifiable
 
                 Mock `
@@ -67,7 +67,7 @@ try
                     -MockWith {
                     return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                 } `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -Verifiable
             }
 
@@ -95,7 +95,7 @@ try
                         Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                     }
                 } `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -Verifiable
 
                 Mock `
@@ -103,7 +103,7 @@ try
                     -MockWith {
                     return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
                 } `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -Verifiable
             }
 
@@ -126,7 +126,7 @@ try
             BeforeEach {
                 Mock `
                     -CommandName Get-PowerPlan `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -Verifiable
             }
 
@@ -148,7 +148,7 @@ try
         }
     }
 
-    Describe "$($script:DSCResourceName)\Set-TargetReource" {
+    Describe "$($script:dscResourceName)\Set-TargetReource" {
         BeforeEach {
             Mock `
                 -CommandName Get-PowerPlan `
@@ -158,12 +158,12 @@ try
                             Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                         }
                 } `
-                -ModuleName $script:DSCResourceName `
+                -ModuleName $script:dscResourceName `
                 -Verifiable
 
             Mock `
                 -CommandName Set-ActivePowerPlan `
-                -ModuleName $script:DSCResourceName `
+                -ModuleName $script:dscResourceName `
                 -Verifiable
         }
 
@@ -177,7 +177,7 @@ try
 
                 Set-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose
 
-                Assert-MockCalled -CommandName Get-PowerPlan -Exactly -Times 1 -Scope It -ModuleName $script:DSCResourceName
+                Assert-MockCalled -CommandName Get-PowerPlan -Exactly -Times 1 -Scope It -ModuleName $script:dscResourceName
             }
 
             It 'Should call Set-ActivePowerPlan once (power plan specified as <Type>)' -TestCases $testCases {
@@ -194,7 +194,7 @@ try
                     -Exactly `
                     -Times 1 `
                     -Scope It `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -ParameterFilter {$PowerPlanGuid -eq '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'}
             }
         }
@@ -203,7 +203,7 @@ try
             BeforeEach {
                 Mock `
                 -CommandName Get-PowerPlan `
-                -ModuleName $script:DSCResourceName `
+                -ModuleName $script:dscResourceName `
                 -Verifiable
             }
 
@@ -223,7 +223,7 @@ try
 
         Assert-VerifiableMock
     }
-    Describe "$($script:DSCResourceName)\Test-TargetResource" {
+    Describe "$($script:dscResourceName)\Test-TargetResource" {
         Context 'When the system is in the desired present state' {
             BeforeEach {
                 Mock `
@@ -234,7 +234,7 @@ try
                                 Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                             }
                     } `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -Verifiable
 
                 Mock `
@@ -242,7 +242,7 @@ try
                     -MockWith {
                         return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                     } `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -Verifiable
             }
 
@@ -268,7 +268,7 @@ try
                                 Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                             }
                     } `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -Verifiable
 
                 Mock `
@@ -276,7 +276,7 @@ try
                     -MockWith {
                         return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
                     } `
-                    -ModuleName $script:DSCResourceName `
+                    -ModuleName $script:dscResourceName `
                     -Verifiable
             }
 

@@ -1,6 +1,6 @@
 #region HEADER
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_PowershellExecutionPolicy'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_PowershellExecutionPolicy'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -42,11 +42,11 @@ try
         The InModuleScope command allows you to perform white-box unit testing on the internal
         (non-exported) code of a Script Module.
     #>
-    InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_PowershellExecutionPolicy'
+    InModuleScope $script:dscResourceName {
+        $script:dscResourceName = 'MSFT_PowershellExecutionPolicy'
 
         #region Function Get-TargetResource
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        Describe "$($script:dscResourceName)\Get-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
                 { Get-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | Should -Throw $Script:invalidPolicyThrowMessage
@@ -71,7 +71,7 @@ try
         #endregion
 
         #region Function Test-TargetResource
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe "$($script:dscResourceName)\Test-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
                 { Test-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | Should -Throw $Script:invalidPolicyThrowMessage
@@ -103,7 +103,7 @@ try
         #endregion
 
         #region Function Set-TargetResource
-        Describe "$script:DSCResourceName\Set-TargetResource" {
+        Describe "$script:dscResourceName\Set-TargetResource" {
 
             It 'Throws when passed an invalid execution policy' {
                 { Set-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | Should -Throw $Script:invalidPolicyThrowMessage

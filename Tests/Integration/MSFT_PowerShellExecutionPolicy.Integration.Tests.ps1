@@ -1,7 +1,6 @@
 #region HEADER
-$script:dscModuleName = 'DscResource.Template'
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_PowerShellExecutionPolicy'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_PowerShellExecutionPolicy'
 
 # Integration Test Template Version: 1.3.3
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -21,14 +20,14 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Integration Tests
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile
 
-    Describe "$($script:DSCResourceName)_Integration" {
+    Describe "$($script:dscResourceName)_Integration" {
         #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
+                & "$($script:dscResourceName)_Config" -OutputPath $TestDrive
 
                 $startDscConfigurationParameters = @{
                     Path         = $TestDrive
@@ -52,7 +51,7 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
             $current.ExecutionPolicy      | Should Be 'RemoteSigned'
             $current.ExecutionPolicyScope | Should Be 'LocalMachine'

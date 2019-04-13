@@ -1,6 +1,6 @@
 #region HEADER
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_WindowsEventLog'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_WindowsEventLog'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -24,10 +24,10 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_WindowsEventLog'
+    InModuleScope $script:dscResourceName {
+        $script:dscResourceName = 'MSFT_WindowsEventLog'
 
-            Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
+            Describe "$($script:dscResourceName)\Get-TargetResource" -Tag 'Get' {
 
                 Mock -CommandName Get-WindowsEventLog -MockWith {
                     $properties = @{
@@ -78,7 +78,7 @@ try
                 }
             }
 
-            Describe "$($script:DSCResourceName)\Test-TargetResource" -Tag 'Test' {
+            Describe "$($script:dscResourceName)\Test-TargetResource" -Tag 'Test' {
 
                 Mock -CommandName Get-WindowsEventLog -MockWith {
                     $properties = @{
@@ -246,7 +246,7 @@ try
                 }
             }
 
-            Describe "$($script:DSCResourceName)\Set-TargetResource" -Tag 'Set' {
+            Describe "$($script:dscResourceName)\Set-TargetResource" -Tag 'Set' {
                 Mock -CommandName Get-WindowsEventLog -MockWith {
                     $properties = @{
                         MaximumSizeInBytes = 5000kb
@@ -367,7 +367,7 @@ try
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
                 }
 
-            Describe "$($script:DSCResourceName)\Save-LogFile" -Tag 'Helper' {
+            Describe "$($script:dscResourceName)\Save-LogFile" -Tag 'Helper' {
                 Mock -CommandName Limit-Eventlog -MockWith { throw }
 
                 It 'Should throw if we are unable to get a log' {
@@ -375,7 +375,7 @@ try
                 }
             }
 
-            Describe "$($script:DSCResourceName)\Set-LogRetentionDays" -Tag 'Helper' {
+            Describe "$($script:dscResourceName)\Set-LogRetentionDays" -Tag 'Helper' {
                 Mock -CommandName Limit-Eventlog -MockWith { throw }
 
                 It 'Should throw if we are unable to get a log' {

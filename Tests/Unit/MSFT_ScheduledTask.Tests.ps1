@@ -4,8 +4,8 @@ param
 )
 
 #region HEADER
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_ScheduledTask'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_ScheduledTask'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -34,8 +34,8 @@ try
 {
     #region Pester Tests
 
-    InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_ScheduledTask'
+    InModuleScope $script:dscResourceName {
+        $script:dscResourceName = 'MSFT_ScheduledTask'
 
         # Function to allow mocking pipeline input
         function Register-ScheduledTask
@@ -89,7 +89,7 @@ try
             )
         }
 
-        Describe $script:DSCResourceName {
+        Describe $script:dscResourceName {
             BeforeAll {
                 Mock -CommandName Register-ScheduledTask
                 Mock -CommandName Set-ScheduledTask

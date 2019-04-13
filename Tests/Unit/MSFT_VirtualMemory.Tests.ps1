@@ -1,6 +1,6 @@
 #region HEADER
-$script:DSCModuleName      = 'ComputerManagementDsc'
-$script:DSCResourceName    = 'MSFT_VirtualMemory'
+$script:dscModuleName      = 'ComputerManagementDsc'
+$script:dscResourceName    = 'MSFT_VirtualMemory'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 

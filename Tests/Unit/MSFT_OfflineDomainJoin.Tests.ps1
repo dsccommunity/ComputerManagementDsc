@@ -1,6 +1,6 @@
 #region HEADER
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_OfflineDomainJoin'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_OfflineDomainJoin'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -25,8 +25,8 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Pester Tests
-    InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_OfflineDomainJoin'
+    InModuleScope $script:dscResourceName {
+        $script:dscResourceName = 'MSFT_OfflineDomainJoin'
 
         $testOfflineDomainJoin = @{
             IsSingleInstance = 'Yes'
@@ -34,7 +34,7 @@ try
             Verbose          = $true
         }
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        Describe "$($script:dscResourceName)\Get-TargetResource" {
             It 'Should return the correct values' {
                 $result = Get-TargetResource `
                     @TestOfflineDomainJoin
@@ -44,7 +44,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Set-TargetResource" {
+        Describe "$($script:dscResourceName)\Set-TargetResource" {
             Context 'Domain is not joined' {
                 Mock -CommandName Test-Path -MockWith {
                     return $true
@@ -84,7 +84,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe "$($script:dscResourceName)\Test-TargetResource" {
             Context 'Domain is not joined' {
                 Mock -CommandName Test-Path -MockWith {
                     return $true
@@ -147,7 +147,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Join-Domain" {
+        Describe "$($script:dscResourceName)\Join-Domain" {
             Context 'Domain Join successful' {
                 Mock -CommandName djoin.exe -MockWith {
                     $script:LASTEXITCODE = 0

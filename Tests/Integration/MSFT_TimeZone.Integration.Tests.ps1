@@ -1,7 +1,6 @@
 #region HEADER
-$script:dscModuleName = 'DscResource.Template'
-$script:DSCModuleName      = 'ComputerManagementDsc'
-$script:DSCResourceName    = 'MSFT_TimeZone'
+$script:dscModuleName      = 'ComputerManagementDsc'
+$script:dscResourceName    = 'MSFT_TimeZone'
 
 # Integration Test Template Version: 1.3.3
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -28,10 +27,10 @@ tzutil.exe /s 'Eastern Standard Time'
 try
 {
     #region Integration Tests
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_Integration" {
+    Describe "$($script:dscResourceName)_Integration" {
         $configData = @{
             AllNodes = @(
                 @{
@@ -44,7 +43,7 @@ try
 
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" `
+                & "$($script:dscResourceName)_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
@@ -64,7 +63,7 @@ try
 
         It 'Should have set the configuration and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
             $current.TimeZone         | Should -Be $configData.AllNodes[0].TimeZone
             $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance

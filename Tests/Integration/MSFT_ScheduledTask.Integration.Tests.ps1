@@ -1,8 +1,7 @@
 #Requires -Version 5.0
 #region HEADER
-$script:dscModuleName = 'DscResource.Template'
-$Script:DSCModuleName = 'ComputerManagementDsc'
-$Script:DSCResourceName = 'MSFT_ScheduledTask'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_ScheduledTask'
 
 # Integration Test Template Version: 1.3.3
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -27,11 +26,11 @@ Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -P
 # Begin Testing
 try
 {
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Script:DSCResourceName).config.ps1"
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $ConfigFile
 
     #region Pester Tests
-    Describe $Script:DSCResourceName {
+    Describe $script:dscResourceName {
 
         $contexts = @{
             Once              = 'ScheduledTaskOnce'

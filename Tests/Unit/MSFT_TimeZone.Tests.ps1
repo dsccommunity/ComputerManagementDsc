@@ -1,6 +1,6 @@
 #region HEADER
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_TimeZone'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_TimeZone'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -25,10 +25,10 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Pester Tests
-    InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_TimeZone'
+    InModuleScope $script:dscResourceName {
+        $script:dscResourceName = 'MSFT_TimeZone'
 
-        Describe "$($script:DSCResourceName) MOF single instance schema" {
+        Describe "$($script:dscResourceName) MOF single instance schema" {
             It 'Should have mandatory IsSingleInstance parameter and one other parameter' {
                 $timeZoneResource = Get-DscResource -Name TimeZone
 
@@ -42,7 +42,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        Describe "$($script:dscResourceName)\Get-TargetResource" {
             Mock `
                 -CommandName Get-TimeZoneId `
                 -MockWith { 'Pacific Standard Time' }
@@ -61,7 +61,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Set-TargetResource" {
+        Describe "$($script:dscResourceName)\Set-TargetResource" {
             Mock `
                 -CommandName Set-TimeZoneId
 
@@ -98,7 +98,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe "$($script:dscResourceName)\Test-TargetResource" {
             Mock `
                 -ModuleName ComputerManagementDsc.Common `
                 -CommandName Get-TimeZoneId `
