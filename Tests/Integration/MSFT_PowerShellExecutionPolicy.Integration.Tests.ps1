@@ -1,34 +1,33 @@
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_PowerShellExecutionPolicy'
-
 #region HEADER
-# Integration Test Template Version: 1.1.1
-$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_PowerShellExecutionPolicy'
+
+# Integration Test Template Version: 1.3.3
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
 }
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
     -TestType Integration
-
 #endregion
 
 try
 {
     #region Integration Tests
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile
 
-    Describe "$($script:DSCResourceName)_Integration" {
+    Describe "$($script:dscResourceName)_Integration" {
         #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
+                & "$($script:dscResourceName)_Config" -OutputPath $TestDrive
 
                 $startDscConfigurationParameters = @{
                     Path         = $TestDrive
@@ -52,7 +51,7 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
             $current.ExecutionPolicy      | Should Be 'RemoteSigned'
             $current.ExecutionPolicyScope | Should Be 'LocalMachine'

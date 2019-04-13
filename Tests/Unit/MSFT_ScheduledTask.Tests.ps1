@@ -3,24 +3,26 @@ param
 (
 )
 
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_ScheduledTask'
+#region HEADER
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_ScheduledTask'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
-# Unit Test Template Version: 1.2.0
-$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
+# Unit Test Template Version: 1.2.4
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
 }
 
-Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
+    -ResourceType 'Mof' `
     -TestType Unit
 #endregion HEADER
 
@@ -32,8 +34,8 @@ try
 {
     #region Pester Tests
 
-    InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_ScheduledTask'
+    InModuleScope $script:dscResourceName {
+        $script:dscResourceName = 'MSFT_ScheduledTask'
 
         # Function to allow mocking pipeline input
         function Register-ScheduledTask
@@ -87,7 +89,7 @@ try
             )
         }
 
-        Describe $script:DSCResourceName {
+        Describe $script:dscResourceName {
             BeforeAll {
                 Mock -CommandName Register-ScheduledTask
                 Mock -CommandName Set-ScheduledTask

@@ -1,21 +1,23 @@
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_Computer'
+#region HEADER
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_Computer'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
-# Unit Test Template Version: 1.2.0
-$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
+# Unit Test Template Version: 1.2.4
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
 }
 
-Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
+    -ResourceType 'Mof' `
     -TestType Unit
 #endregion HEADER
 
@@ -24,10 +26,10 @@ try
 {
     #region Pester Tests
 
-    InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_Computer'
+    InModuleScope $script:dscResourceName {
+        $script:dscResourceName = 'MSFT_Computer'
 
-        Describe $script:DSCResourceName {
+        Describe $script:dscResourceName {
             # A real password isn't needed here - use this next line to avoid triggering PSSA rule
             $securePassword = New-Object -Type SecureString
             $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
@@ -40,7 +42,7 @@ try
                 'name'
             }
 
-            Context "$($script:DSCResourceName)\Test-TargetResource" {
+            Context "$($script:dscResourceName)\Test-TargetResource" {
                 Mock -CommandName Get-WMIObject -MockWith {
                     [PSCustomObject] @{
                         DomainName = 'ContosoLtd'
@@ -442,7 +444,7 @@ try
                 }
             }
 
-            Context "$($script:DSCResourceName)\Get-TargetResource" {
+            Context "$($script:dscResourceName)\Get-TargetResource" {
                 It 'should not throw' {
                     {
                         Get-TargetResource `
@@ -477,7 +479,7 @@ try
                 }
             }
 
-            Context "$($script:DSCResourceName)\Set-TargetResource" {
+            Context "$($script:dscResourceName)\Set-TargetResource" {
                 Mock -CommandName Rename-Computer
                 Mock -CommandName Add-Computer
                 Mock -CommandName Set-CimInstance
@@ -952,7 +954,7 @@ try
                 }
             }
 
-            Context "$($script:DSCResourceName)\Get-ComputerDomain" {
+            Context "$($script:dscResourceName)\Get-ComputerDomain" {
                 It 'Returns domain netbios or DNS name if domain member' {
                     Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
                         [PSCustomObject] @{
@@ -1034,7 +1036,7 @@ try
                 }
             }
 
-            Context "$($script:DSCResourceName)\Get-LogonServer" {
+            Context "$($script:dscResourceName)\Get-LogonServer" {
                 It 'Should return a non-empty string' {
                     Get-LogonServer | Should -Not -BeNullOrEmpty
                 }
