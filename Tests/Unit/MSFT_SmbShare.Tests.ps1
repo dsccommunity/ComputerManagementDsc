@@ -51,7 +51,8 @@ try
             # 0 AccessBased | 1 Unrestricted
             Add-Member -MemberType NoteProperty -Name 'FolderEnumerationMode' -Value 'AccessBased' -PassThru |
             # 0 Pending | 1 Online | 2 Offline
-            Add-Member -MemberType NoteProperty -Name 'SharedState' -Value 'Online' -PassThru |
+            Add-Member -MemberType NoteProperty -Name 'ShareState' -Value 'Online' -PassThru |
+            Add-Member -MemberType NoteProperty -Name 'ShareType' -Value 'FileSystemDirectory' -PassThru |
             Add-Member -MemberType NoteProperty -Name 'ShadowCopy' -Value $false -PassThru |
             Add-Member -MemberType NoteProperty -Name 'CachingMode' -Value 'Manual' -PassThru |
             Add-Member -MemberType NoteProperty -Name 'ContinuouslyAvailable' -Value $true -PassThru |
