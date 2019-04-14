@@ -3,13 +3,13 @@
         Integration tests for DSC resource SmbShare.
 #>
 
+#region HEADER
 $script:dscModuleName = 'ComputerManagementDsc'
 $script:dscResourceFriendlyName = 'SmbShare'
 $script:dscResourceName = "MSFT_$($script:dscResourceFriendlyName)"
 
-#region HEADER
 # Integration Test Template Version: 1.3.3
-$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -22,6 +22,8 @@ $TestEnvironment = Initialize-TestEnvironment `
     -DSCResourceName $script:dscResourceName `
     -TestType Integration
 #endregion
+
+#region HEADER
 
 $script:dscResourceFriendlyName = 'SmbShare'
 $script:dcsResourceName = "MSFT_$($script:dscResourceFriendlyName)"
