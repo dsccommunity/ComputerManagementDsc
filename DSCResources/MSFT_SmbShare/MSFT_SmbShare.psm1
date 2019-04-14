@@ -77,8 +77,8 @@ function Get-TargetResource
         $returnValue['FolderEnumerationMode'] = $smbShare.FolderEnumerationMode.ToString()
         $returnValue['CachingMode'] = $smbShare.CachingMode.ToString()
         $returnValue['ContinuouslyAvailable'] = $smbShare.ContinuouslyAvailable
-        $returnValue['ShareState'] = [System.String] $smbShare.ShareState
-        $returnValue['ShareType'] = [System.String] $smbShare.ShareType
+        $returnValue['ShareState'] = $smbShare.ShareState.ToString()
+        $returnValue['ShareType'] = $smbShare.ShareType.ToString()
         $returnValue['ShadowCopy'] = $smbShare.ShadowCopy
         $returnValue['Special'] = $smbShare.Special
 
