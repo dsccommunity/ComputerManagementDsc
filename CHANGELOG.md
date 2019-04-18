@@ -27,6 +27,7 @@
 - Updated test header for all imtegration to version 1.3.3.
 - Enabled example publish to PowerShell Gallery by adding `gallery_api`
   environment variable to `AppVeyor.yml`.
+- Opt-in to common test to validate localization. Fixed localization strings in resources.
 
 ## 6.3.0.0
 
