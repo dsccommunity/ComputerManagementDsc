@@ -28,6 +28,8 @@
 - Enabled example publish to PowerShell Gallery by adding `gallery_api`
   environment variable to `AppVeyor.yml`.
 - Opt-in to common test to validate localization. Fixed localization strings in resources.
+- PowerShellExecutionPolicy:
+  - Removed `SupportsShouldProcess` as it cannot be used with DSC.
 
 ## 6.3.0.0
 
