@@ -354,20 +354,20 @@ function Get-TimeZoneId
 
     if (Test-Command -Name 'Get-TimeZone' -Module 'Microsoft.PowerShell.Management')
     {
-        Write-Verbose -Message ($LocalizedData.GettingTimeZoneMessage -f 'Cmdlets')
+        Write-Verbose -Message ($script:localizedData.GettingTimeZoneMessage -f 'Cmdlets')
 
         $timeZone = (Get-TimeZone).StandardName
     }
     else
     {
-        Write-Verbose -Message ($LocalizedData.GettingTimeZoneMessage -f 'CIM')
+        Write-Verbose -Message ($script:localizedData.GettingTimeZoneMessage -f 'CIM')
 
         $timeZone = (Get-CimInstance `
                 -ClassName Win32_TimeZone `
                 -Namespace root\cimv2).StandardName
     }
 
-    Write-Verbose -Message ($LocalizedData.CurrentTimeZoneMessage -f $timeZone)
+    Write-Verbose -Message ($script:localizedData.CurrentTimeZoneMessage -f $timeZone)
 
     $timeZoneInfo = [System.TimeZoneInfo]::GetSystemTimeZones() |
         Where-Object -Property StandardName -EQ $timeZone
@@ -430,14 +430,14 @@ function Set-TimeZoneId
         if (Test-Command -Name 'Add-Type' -Module 'Microsoft.Powershell.Utility')
         {
             # We can use reflection to modify the time zone.
-            Write-Verbose -Message ($LocalizedData.SettingTimeZoneMessage -f $TimeZoneId, '.NET')
+            Write-Verbose -Message ($script:localizedData.SettingTimeZoneMessage -f $TimeZoneId, '.NET')
 
             Set-TimeZoneUsingDotNet -TimeZoneId $TimeZoneId
         }
         else
         {
             # For anything else use TZUTIL.EXE.
-            Write-Verbose -Message ($LocalizedData.SettingTimeZoneMessage -f $TimeZoneId, 'TZUTIL.EXE')
+            Write-Verbose -Message ($script:localizedData.SettingTimeZoneMessage -f $TimeZoneId, 'TZUTIL.EXE')
 
             try
             {
@@ -450,7 +450,7 @@ function Set-TimeZoneId
         } # if
     } # if
 
-    Write-Verbose -Message ($LocalizedData.TimeZoneUpdatedMessage -f $TimeZoneId)
+    Write-Verbose -Message ($script:localizedData.TimeZoneUpdatedMessage -f $TimeZoneId)
 } # function Set-TimeZoneId
 
 <#
@@ -477,7 +477,7 @@ function Set-TimeZoneUsingDotNet
     # Add the [TimeZoneHelper.TimeZone] type if it is not defined.
     if (-not ([System.Management.Automation.PSTypeName] 'TimeZoneHelper.TimeZone').Type)
     {
-        Write-Verbose -Message ($LocalizedData.AddingSetTimeZoneDotNetTypeMessage)
+        Write-Verbose -Message ($script:localizedData.AddingSetTimeZoneDotNetTypeMessage)
 
         $setTimeZoneCs = Get-Content `
             -Path (Join-Path -Path $PSScriptRoot -ChildPath 'SetTimeZone.cs') `
