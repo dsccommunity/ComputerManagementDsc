@@ -42,7 +42,7 @@ function Get-TargetResource
         $ExecutionPolicy
     )
 
-    Write-Verbose -Message ($localizedData.GettingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
+    Write-Verbose -Message ($script:localizedData.GettingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
 
     # Gets the execution policies for the current session.
     $returnValue = @{
@@ -82,18 +82,18 @@ function Set-TargetResource
 
     if ($PSCmdlet.ShouldProcess("$ExecutionPolicy","Set-ExecutionPolicy"))
     {
-        Write-Verbose -Message ($localizedData.SettingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
+        Write-Verbose -Message ($script:localizedData.SettingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
 
         try
         {
             Set-ExecutionPolicy -ExecutionPolicy $ExecutionPolicy -Scope $ExecutionPolicyScope -Force -ErrorAction Stop
-            Write-Verbose -Message ($localizedData.UpdatePowershellExecutionPolicySuccess -f $ExecutionPolicyScope, $ExecutionPolicy)
+            Write-Verbose -Message ($script:localizedData.UpdatePowershellExecutionPolicySuccess -f $ExecutionPolicyScope, $ExecutionPolicy)
         }
         catch
         {
             if ($_.FullyQualifiedErrorId -eq 'ExecutionPolicyOverride,Microsoft.PowerShell.Commands.SetExecutionPolicyCommand')
             {
-                Write-Verbose -Message ($localizedData.UpdatePowershellExecutionPolicySuccess -f $ExecutionPolicyScope, $ExecutionPolicy)
+                Write-Verbose -Message ($script:localizedData.UpdatePowershellExecutionPolicyFailed -f $ExecutionPolicyScope, $ExecutionPolicy)
             }
             else
             {
@@ -131,7 +131,7 @@ function Test-TargetResource
         $ExecutionPolicy
     )
 
-    Write-Verbose -Message ($localizedData.TestingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
+    Write-Verbose -Message ($script:localizedData.TestingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
 
     if ((Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
     {

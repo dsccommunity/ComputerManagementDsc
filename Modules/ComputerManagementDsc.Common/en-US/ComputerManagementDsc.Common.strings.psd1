@@ -14,7 +14,7 @@ ConvertFrom-StringData @'
     MatchElementValueMessage           = MATCH: Value [{0}] (type '{1}') for property '{2}' does match. Current state is '{3}' and desired state is '{4}'.
     TestDscParameterResultMessage      = Test-DscParameter result is '{0}'.
     CurrentTimeZoneMessage             = Current time zone is set to '{0}'
-    GettingTimeZoneCimMessage          = Getting current time zone using {0}.
+    GettingTimeZoneMessage             = Getting current time zone using {0}.
     SettingTimeZoneMessage             = Setting time zone to '{0}' using {1}.
     TimeZoneUpdatedMessage             = Time zone has been updated to '{0}'.
     AddingSetTimeZoneDotNetTypeMessage = Adding .NET Set time zone Type.
