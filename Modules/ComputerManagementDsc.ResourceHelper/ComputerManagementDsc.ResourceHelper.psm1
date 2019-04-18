@@ -1,5 +1,63 @@
 <#
     .SYNOPSIS
+        Retrieves the localized string data based on the machine's culture.
+        Falls back to en-US strings if the machine's culture is not supported.
+
+    .PARAMETER ResourceName
+        The name of the resource as it appears before '.strings.psd1' of the localized string file.
+
+        For example:
+            For WindowsOptionalFeature: MSFT_xWindowsOptionalFeature
+            For Service: MSFT_xServiceResource
+            For Registry: MSFT_xRegistryResource
+
+    .NOTES
+        Get-LocalizedData is called after this function declaration to be able to
+        use localized strings in the helper functions of this module.
+#>
+function Get-LocalizedData
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $ResourceName,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $ResourcePath
+    )
+
+    $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath $PSUICulture
+
+    if (-not (Test-Path -Path $localizedStringFileLocation))
+    {
+        # Fallback to en-US
+        $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath 'en-US'
+    }
+
+    Import-LocalizedData `
+        -BindingVariable 'localizedData' `
+        -FileName "$ResourceName.strings.psd1" `
+        -BaseDirectory $localizedStringFileLocation
+
+    return $localizedData
+}
+
+<#
+    Import localization strings. This must be called after the function declaration
+    of Get-LocalizedData to be able to use localized strings in the helper
+    functions of this module.
+#>
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'ComputerManagementDsc.ResourceHelper' `
+    -ResourcePath $PSScriptRoot
+
+<#
+    .SYNOPSIS
     Tests if the current machine is a Nano server.
 #>
 function Test-IsNanoServer
@@ -102,51 +160,6 @@ function New-InvalidOperationException
     }
     $errorRecordToThrow = New-Object @newObjectParams
     throw $errorRecordToThrow
-}
-
-<#
-    .SYNOPSIS
-        Retrieves the localized string data based on the machine's culture.
-        Falls back to en-US strings if the machine's culture is not supported.
-
-    .PARAMETER ResourceName
-        The name of the resource as it appears before '.strings.psd1' of the localized string file.
-
-        For example:
-            For WindowsOptionalFeature: MSFT_xWindowsOptionalFeature
-            For Service: MSFT_xServiceResource
-            For Registry: MSFT_xRegistryResource
-#>
-function Get-LocalizedData
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $ResourceName,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $ResourcePath
-    )
-
-    $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath $PSUICulture
-
-    if (-not (Test-Path -Path $localizedStringFileLocation))
-    {
-        # Fallback to en-US
-        $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath 'en-US'
-    }
-
-    Import-LocalizedData `
-        -BindingVariable 'localizedData' `
-        -FileName "$ResourceName.strings.psd1" `
-        -BaseDirectory $localizedStringFileLocation
-
-    return $localizedData
 }
 
 Export-ModuleMember -Function `

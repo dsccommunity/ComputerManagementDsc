@@ -21,12 +21,10 @@ ConvertFrom-StringData @'
     CreateTemporaryTriggerMessage = Creating temporary trigger to get MSFT_TaskRepetitionPattern CIM instance.
     TriggerUnexpectedTypeError = Trigger object that was created was of unexpected type '{0}'.
     CreateScheduledTaskPrincipalMessage = Creating scheduled task principal for account '{0}' using logon type '{1}'.
-    RemovePreviousScheduledTaskMessage = Removing previous scheduled task '{0}' from '{1}'.
     CreateNewScheduledTaskMessage = Creating new scheduled task '{0}' in '{1}'.
     ConfigureTaskEventTrigger = Setting up an event based trigger on task {0}.
     IgnoreRandomDelayWithTriggerTypeOnEvent = The parameter RandomDelay in task {0} is ignored. A random delay is not supported when the trigger type is set to OnEvent.
     SetRepetitionTriggerMessage = Setting repetition trigger settings on task '{0}' in '{1}'.
-    RegisterScheduledTaskMessage = Registering the scheduled task '{0}' in '{1}'.
     RetrieveScheduledTaskMessage = Retrieving the scheduled task '{0}' from '{1}'.
     RemoveScheduledTaskMessage = Removing scheduled task '{0}' from '{1}'.
     UpdateScheduledTaskMessage = Updating scheduled task '{0}' in '{1}'.
