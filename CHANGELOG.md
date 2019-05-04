@@ -24,12 +24,17 @@
 - Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md and
   linked to it from README.MD instead.
 - Updated test header for all unit tests to version 1.2.4.
-- Updated test header for all imtegration to version 1.3.3.
+- Updated test header for all integration to version 1.3.3.
 - Enabled example publish to PowerShell Gallery by adding `gallery_api`
   environment variable to `AppVeyor.yml`.
-- Opt-in to common test to validate localization. Fixed localization strings in resources.
+- Opt-in to common test to validate localization. Fixed localization strings
+  in resources - Fixes [Issue #217](https://github.com/PowerShell/ComputerManagementDsc/issues/217).
 - PowerShellExecutionPolicy:
-  - Removed `SupportsShouldProcess` as it cannot be used with DSC.
+  - Removed `SupportsShouldProcess` as it cannot be used with DSC - Fixes
+    [Issue #219](https://github.com/PowerShell/ComputerManagementDsc/issues/219).
+- Combined all ComputerManagementDsc.ResourceHelper module functions into
+  ComputerManagementDsc.Common module - Fixes [Issue #218](https://github.com/PowerShell/ComputerManagementDsc/issues/218).
+  - Minor code cleanup against style guideline.
 
 ## 6.3.0.0
 

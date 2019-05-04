@@ -1,12 +1,159 @@
-# Import the ComputerManagement Resource Helper Module
-Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
-        -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
-            -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
+<#
+    .SYNOPSIS
+        Retrieves the localized string data based on the machine's culture.
+        Falls back to en-US strings if the machine's culture is not supported.
 
-# Import Localization Strings
-$script:localizedData = Get-LocalizedData `
-    -ResourceName 'ComputerManagementDsc.Common' `
-    -ResourcePath $PSScriptRoot
+    .PARAMETER ResourceName
+        The name of the resource as it appears before '.strings.psd1' of the localized string file.
+
+        For example:
+            For WindowsOptionalFeature: MSFT_xWindowsOptionalFeature
+            For Service: MSFT_xServiceResource
+            For Registry: MSFT_xRegistryResource
+
+    .NOTES
+        Get-LocalizedData is called after this function declaration to be able to
+        use localized strings in the helper functions of this module.
+#>
+function Get-LocalizedData
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $ResourceName,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $ResourcePath
+    )
+
+    $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath $PSUICulture
+
+    if (-not (Test-Path -Path $localizedStringFileLocation))
+    {
+        # Fallback to en-US
+        $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath 'en-US'
+    }
+
+    Import-LocalizedData `
+        -BindingVariable 'localizedData' `
+        -FileName "$ResourceName.strings.psd1" `
+        -BaseDirectory $localizedStringFileLocation
+
+    return $localizedData
+}
+
+<#
+    .SYNOPSIS
+    Tests if the current machine is a Nano server.
+#>
+function Test-IsNanoServer
+{
+    if(Test-Command -Name Get-ComputerInfo)
+    {
+        $computerInfo = Get-ComputerInfo
+
+        if('Server' -eq $computerInfo.OsProductType `
+            -and 'NanoServer' -eq $computerInfo.OsServerLevel)
+        {
+            return $true
+        }
+    }
+
+    return $false
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an invalid argument exception
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown
+
+    .PARAMETER ArgumentName
+        The name of the invalid argument that is causing this error to be thrown
+#>
+function New-InvalidArgumentException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $Message,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $ArgumentName
+    )
+
+    $argumentException = New-Object -TypeName 'ArgumentException' -ArgumentList @( $Message,
+        $ArgumentName )
+    $newObjectParams = @{
+        TypeName = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @( $argumentException, $ArgumentName, 'InvalidArgument', $null )
+    }
+    $errorRecord = New-Object @newObjectParams
+
+    throw $errorRecord
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an invalid operation exception
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown
+
+    .PARAMETER ErrorRecord
+        The error record containing the exception that is causing this terminating error
+#>
+function New-InvalidOperationException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $Message)
+    {
+        $invalidOperationException = New-Object -TypeName 'InvalidOperationException'
+    }
+    elseif ($null -eq $ErrorRecord)
+    {
+        $invalidOperationException =
+            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message )
+    }
+    else
+    {
+        $invalidOperationException =
+            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message,
+                $ErrorRecord.Exception )
+    }
+
+    $newObjectParams = @{
+        TypeName = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @( $invalidOperationException.ToString(), 'MachineStateIncorrect',
+            'InvalidOperation', $null )
+    }
+    $errorRecordToThrow = New-Object @newObjectParams
+    throw $errorRecordToThrow
+}
 
 <#
     .SYNOPSIS
@@ -21,7 +168,7 @@ $script:localizedData = Get-LocalizedData `
 function Remove-CommonParameter
 {
     [OutputType([System.Collections.Hashtable])]
-    [cmdletbinding()]
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -521,7 +668,7 @@ function Get-PowerPlan
     [OutputType([System.Collections.Hashtable[]])]
     param
     (
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $PowerPlan
@@ -876,7 +1023,6 @@ function Set-ActivePowerPlan
 
     try
     {
-
         # Set the active power scheme with the native function
         $returnCode = $powrprof::PowerSetActiveScheme([System.IntPtr]::Zero,$PowerPlanGuid)
 
@@ -893,14 +1039,24 @@ function Set-ActivePowerPlan
     }
 }
 
-Export-ModuleMember -Function `
-    Test-DscParameterState, `
-    Test-DscObjectHasProperty, `
-    Test-Command, `
-    Get-TimeZoneId, `
-    Test-TimeZoneId, `
-    Set-TimeZoneId, `
-    Set-TimeZoneUsingDotNet, `
-    Get-PowerPlan, `
-    Get-ActivePowerPlan, `
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'ComputerManagementDsc.Common' `
+    -ResourcePath $PSScriptRoot
+
+Export-ModuleMember -Function @(
+    Test-DscParameterState
+    Test-DscObjectHasProperty
+    Test-Command
+    Get-TimeZoneId
+    Test-TimeZoneId
+    Set-TimeZoneId
+    Set-TimeZoneUsingDotNet
+    Get-PowerPlan
+    Get-ActivePowerPlan
     Set-ActivePowerPlan
+    Test-IsNanoServer
+    New-InvalidArgumentException
+    New-InvalidOperationException
+    Get-LocalizedData
+)
