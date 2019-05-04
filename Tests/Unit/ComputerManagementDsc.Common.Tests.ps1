@@ -995,9 +995,9 @@ try
                         return 'sv-SE'
                     } -Verifiable
 
-                    { Get-LocalizedData -ResourceName 'DummyResource' -ResourcePath 'TestDrive:\DummyPath' } | Should -Not -Throw
+                    { Get-LocalizedData -ResourceName 'DummyResource' } | Should -Not -Throw
 
-                    Assert-MockCalled -CommandName Join-Path -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Join-Path -Exactly -Times 3 -Scope It
                     Assert-MockCalled -CommandName Test-Path -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Import-LocalizedData -Exactly -Times 1 -Scope It
                 }
@@ -1010,11 +1010,43 @@ try
                         return $ChildPath
                     } -Verifiable
 
-                    { Get-LocalizedData -ResourceName 'DummyResource' -ResourcePath 'TestDrive:\DummyPath' } | Should -Not -Throw
+                    { Get-LocalizedData -ResourceName 'DummyResource' } | Should -Not -Throw
 
-                    Assert-MockCalled -CommandName Join-Path -Exactly -Times 2 -Scope It
+                    Assert-MockCalled -CommandName Join-Path -Exactly -Times 4 -Scope It
                     Assert-MockCalled -CommandName Test-Path -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Import-LocalizedData -Exactly -Times 1 -Scope It
+                }
+
+                Context 'When $ScriptRoot is set to a path' {
+                    $mockExpectedLanguagePath = 'sv-SE'
+                    $mockTestPathReturnValue = $true
+
+                    It 'Should call Import-LocalizedData with sv-SE language' {
+                        Mock -CommandName Join-Path -MockWith {
+                            return 'sv-SE'
+                        } -Verifiable
+
+                        { Get-LocalizedData -ResourceName 'DummyResource' -ScriptRoot '.' } | Should -Not -Throw
+
+                        Assert-MockCalled -CommandName Join-Path -Exactly -Times 1 -Scope It
+                        Assert-MockCalled -CommandName Test-Path -Exactly -Times 1 -Scope It
+                        Assert-MockCalled -CommandName Import-LocalizedData -Exactly -Times 1 -Scope It
+                    }
+
+                    $mockExpectedLanguagePath = 'en-US'
+                    $mockTestPathReturnValue = $false
+
+                    It 'Should call Import-LocalizedData and fallback to en-US if sv-SE language does not exist' {
+                        Mock -CommandName Join-Path -MockWith {
+                            return $ChildPath
+                        } -Verifiable
+
+                        { Get-LocalizedData -ResourceName 'DummyResource' -ScriptRoot '.' } | Should -Not -Throw
+
+                        Assert-MockCalled -CommandName Join-Path -Exactly -Times 2 -Scope It
+                        Assert-MockCalled -CommandName Test-Path -Exactly -Times 1 -Scope It
+                        Assert-MockCalled -CommandName Import-LocalizedData -Exactly -Times 1 -Scope It
+                    }
                 }
             }
 
@@ -1027,7 +1059,7 @@ try
                 $mockTestPathReturnValue = $true
 
                 It 'Should call Import-LocalizedData with en-US language' {
-                    { Get-LocalizedData -ResourceName 'DummyResource' -ResourcePath 'TestDrive:\DummyPath' } | Should -Not -Throw
+                    { Get-LocalizedData -ResourceName 'DummyResource' } | Should -Not -Throw
                 }
             }
 

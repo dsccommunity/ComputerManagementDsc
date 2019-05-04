@@ -6,9 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
 # Import Localization Strings.
-$script:localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_TimeZone' `
-    -ResourcePath (Split-Path -Parent $script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_TimeZone'
 
 <#
     .SYNOPSIS
