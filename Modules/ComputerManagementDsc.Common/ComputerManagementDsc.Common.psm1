@@ -1045,18 +1045,18 @@ $script:localizedData = Get-LocalizedData `
     -ResourcePath $PSScriptRoot
 
 Export-ModuleMember -Function @(
-    Test-DscParameterState
-    Test-DscObjectHasProperty
-    Test-Command
-    Get-TimeZoneId
-    Test-TimeZoneId
-    Set-TimeZoneId
-    Set-TimeZoneUsingDotNet
-    Get-PowerPlan
-    Get-ActivePowerPlan
-    Set-ActivePowerPlan
-    Test-IsNanoServer
-    New-InvalidArgumentException
-    New-InvalidOperationException
-    Get-LocalizedData
+    'Test-DscParameterState'
+    'Test-DscObjectHasProperty'
+    'Test-Command'
+    'Get-TimeZoneId'
+    'Test-TimeZoneId'
+    'Set-TimeZoneId'
+    'Set-TimeZoneUsingDotNet'
+    'Get-PowerPlan'
+    'Get-ActivePowerPlan'
+    'Set-ActivePowerPlan'
+    'Test-IsNanoServer'
+    'New-InvalidArgumentException'
+    'New-InvalidOperationException'
+    'Get-LocalizedData'
 )
