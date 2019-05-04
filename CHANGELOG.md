@@ -35,11 +35,15 @@
 - Combined all ComputerManagementDsc.ResourceHelper module functions into
   ComputerManagementDsc.Common module - Fixes [Issue #218](https://github.com/PowerShell/ComputerManagementDsc/issues/218).
   - Minor code cleanup against style guideline.
-  - Remove code from `New-InvalidOperationException` becuase it was a
+  - Remove code from `New-InvalidOperationException` because it was a
     code path that could never could be used due to that the parameter
     validation prevented the helper function being called that way.
   - Updated all `Get-LocalizationData` to latest version from
     [DSCResource.Template](https://github.com/PowerShell/DSCResource.Template).
+  - Fixed an issue with the helper function `Test-IsNanoServer` that
+    prevented it to work. Though the helper function is not used, so this
+    issue was not caught until now when unit tests was added.
+  - Improved code coverage.
 
 ## 6.3.0.0
 
