@@ -6,9 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_WindowsEventLog' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WindowsEventLog'
 
 <#
     .SYNOPSIS

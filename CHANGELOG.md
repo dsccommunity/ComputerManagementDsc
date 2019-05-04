@@ -38,6 +38,8 @@
   - Remove code from `New-InvalidOperationException` becuase it was a
     code path that could never could be used due to that the parameter
     validation prevented the helper function being called that way.
+  - Updated all `Get-LocalizationData` to latest version from
+    [DSCResource.Template](https://github.com/PowerShell/DSCResource.Template).
 
 ## 6.3.0.0
 
