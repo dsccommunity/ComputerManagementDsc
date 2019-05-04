@@ -35,6 +35,9 @@
 - Combined all ComputerManagementDsc.ResourceHelper module functions into
   ComputerManagementDsc.Common module - Fixes [Issue #218](https://github.com/PowerShell/ComputerManagementDsc/issues/218).
   - Minor code cleanup against style guideline.
+  - Remove code from `New-InvalidOperationException` becuase it was a
+    code path that could never could be used due to that the parameter
+    validation prevented the helper function being called that way.
 
 ## 6.3.0.0
 

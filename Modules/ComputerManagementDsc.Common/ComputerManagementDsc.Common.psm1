@@ -130,11 +130,7 @@ function New-InvalidOperationException
         $ErrorRecord
     )
 
-    if ($null -eq $Message)
-    {
-        $invalidOperationException = New-Object -TypeName 'InvalidOperationException'
-    }
-    elseif ($null -eq $ErrorRecord)
+    if ($null -eq $ErrorRecord)
     {
         $invalidOperationException =
             New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message )
