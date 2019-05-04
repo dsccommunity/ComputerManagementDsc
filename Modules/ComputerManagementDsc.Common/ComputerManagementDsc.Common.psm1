@@ -65,11 +65,11 @@ function Get-LocalizedData
 #>
 function Test-IsNanoServer
 {
-    if(Test-Command -Name Get-ComputerInfo)
+    if (Test-Command -Name Get-ComputerInfo -Module 'Microsoft.PowerShell.Management')
     {
         $computerInfo = Get-ComputerInfo
 
-        if('Server' -eq $computerInfo.OsProductType `
+        if ('Server' -eq $computerInfo.OsProductType `
             -and 'NanoServer' -eq $computerInfo.OsServerLevel)
         {
             return $true

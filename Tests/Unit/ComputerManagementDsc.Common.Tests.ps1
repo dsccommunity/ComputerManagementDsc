@@ -1126,6 +1126,52 @@ try
 
             Assert-VerifiableMock
         }
+
+        Describe 'DscResource.LocalizationHelper\Test-IsNanoServer' {
+            Context 'When the cmdlet Get-ComputerInfo does not exist' {
+                BeforeAll {
+                    Mock -CommandName Test-Command {
+                        return $false
+                    }
+                }
+
+                Test-IsNanoServer | Should -Be $false
+            }
+
+            Context 'When the current computer is a Nano server' {
+                BeforeAll {
+                    Mock -CommandName Test-Command {
+                        return $true
+                    }
+
+                    Mock -CommandName Get-ComputerInfo {
+                        return @{
+                            OsProductType = 'Server'
+                            OsServerLevel = 'NanoServer'
+                        }
+                    }
+                }
+
+                Test-IsNanoServer | Should -Be $true
+            }
+
+            Context 'When the current computer is not a Nano server' {
+                BeforeAll {
+                    Mock -CommandName Test-Command {
+                        return $true
+                    }
+
+                    Mock -CommandName Get-ComputerInfo {
+                        return @{
+                            OsProductType = 'Server'
+                            OsServerLevel = 'FullServer'
+                        }
+                    }
+                }
+
+                Test-IsNanoServer | Should -Be $false
+            }
+        }
     }
 }
 finally
