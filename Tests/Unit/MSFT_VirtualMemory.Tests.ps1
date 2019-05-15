@@ -1,34 +1,38 @@
 #region HEADER
-$script:DSCModuleName      = 'ComputerManagementDsc'
-$script:DSCResourceName    = 'MSFT_VirtualMemory'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_VirtualMemory'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
-# Unit Test Template Version: 1.2.0
-$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
+# Unit Test Template Version: 1.2.4
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
 }
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName  `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
+    -ResourceType 'Mof' `
     -TestType Unit
 #endregion HEADER
 
-function Invoke-TestSetup {
+function Invoke-TestSetup
+{
 }
 
-function Invoke-TestCleanup {
+function Invoke-TestCleanup
+{
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
 }
 
 # Begin Testing
-try {
+try
+{
     Invoke-TestSetup
 
     InModuleScope 'MSFT_VirtualMemory' {
@@ -36,7 +40,8 @@ try {
             Remove-CimInstance overridden to enable PSObject
             to be passed to mocked version.
         #>
-        function Remove-CimInstance {
+        function Remove-CimInstance
+        {
             param
             (
                 $InputObject
@@ -57,14 +62,14 @@ try {
         $mockAutomaticPagefileEnabled = {
             [PSObject] @{
                 AutomaticManagedPageFile = $true
-                Name = $testPageFileName
+                Name                     = $testPageFileName
             }
         }
 
         $mockAutomaticPagefileDisabled = {
             [PSObject] @{
                 AutomaticManagedPageFile = $false
-                Name = $testPageFileName
+                Name                     = $testPageFileName
             }
         }
 
@@ -82,27 +87,27 @@ try {
 
         $parameterFilterSetPageFileSetting = {
             $Namespace -eq 'root\cimv2' -and `
-            $Query -eq "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $testDrive'" -and `
-            $Property.InitialSize -eq $testInitialSize -and `
-            $Property.MaximumSize -eq $testMaximumSize
+                $Query -eq "Select * from Win32_PageFileSetting where SettingID='pagefile.sys @ $testDrive'" -and `
+                $Property.InitialSize -eq $testInitialSize -and `
+                $Property.MaximumSize -eq $testMaximumSize
         }
 
         $parameterFilterEnableAutoManagePaging = {
             $Namespace -eq 'root\cimv2' -and `
-            $Query -eq 'Select * from Win32_ComputerSystem' -and `
-            $Property.AutomaticManagedPageFile -eq $True
+                $Query -eq 'Select * from Win32_ComputerSystem' -and `
+                $Property.AutomaticManagedPageFile -eq $True
         }
 
         $parameterFilterDisableAutoManagePaging = {
             $Namespace -eq 'root\cimv2' -and `
-            $Query -eq 'Select * from Win32_ComputerSystem' -and `
-            $Property.AutomaticManagedPageFile -eq $False
+                $Query -eq 'Select * from Win32_ComputerSystem' -and `
+                $Property.AutomaticManagedPageFile -eq $False
         }
 
         $parameterFilterNewPageFileSetting = {
             $Namespace -eq 'root\cimv2' -and `
-            $ClassName -eq 'Win32_PageFileSetting' -and `
-            $Property.Name -eq $testPageFileName
+                $ClassName -eq 'Win32_PageFileSetting' -and `
+                $Property.Name -eq $testPageFileName
         }
 
         $parameterFilterComputerSystem = {
@@ -111,7 +116,7 @@ try {
 
         $parameterFilterPageFileSetting = {
             $ClassName -eq 'Win32_PageFileSetting' -and `
-            $Filter -eq "SettingID='pagefile.sys @ $testDrive'"
+                $Filter -eq "SettingID='pagefile.sys @ $testDrive'"
         }
 
         Describe 'MSFT_VirtualMemory\Get-TargetResource' {
@@ -180,12 +185,12 @@ try {
                     -CommandName Get-PageFileSetting `
                     -ParameterFilter $parameterFilterGetPageFileSetting `
                     -MockWith {
-                        [PSObject] @{
-                            InitialSize = 0
-                            MaximumSize = 0
-                            Name        = "$testDrive\"
-                        }
+                    [PSObject] @{
+                        InitialSize = 0
+                        MaximumSize = 0
+                        Name        = "$testDrive\"
                     }
+                }
 
                 It 'Should return a expected type and drive letter' {
                     $result = Get-TargetResource @testParameters
@@ -216,12 +221,12 @@ try {
                     -CommandName Get-PageFileSetting `
                     -ParameterFilter $parameterFilterGetPageFileSetting `
                     -MockWith {
-                        [PSObject] @{
-                            InitialSize = 10
-                            MaximumSize = 20
-                            Name        = "$testDrive\"
-                        }
+                    [PSObject] @{
+                        InitialSize = 10
+                        MaximumSize = 20
+                        Name        = "$testDrive\"
                     }
+                }
 
                 It 'Should return expected type and drive letter' {
                     $result = Get-TargetResource @testParameters
@@ -257,10 +262,10 @@ try {
                 Mock `
                     -CommandName Join-Path `
                     -ParameterFilter {
-                        $Path -eq "$testDrive\" -and `
+                    $Path -eq "$testDrive\" -and `
                         $ChildPath -eq 'pagefile.sys'
-                    } `
-                    -MockWith { "$testDrive\pagefile.sys"}
+                } `
+                    -MockWith { "$testDrive\pagefile.sys" }
 
             }
 
@@ -321,10 +326,10 @@ try {
                     Mock `
                         -CommandName Set-PageFileSetting `
                         -ParameterFilter {
-                            $Drive -eq $testDrive -and `
+                        $Drive -eq $testDrive -and `
                             $InitialSize -eq $testInitialSize -and `
                             $MaximumSize -eq $testMaximumSize
-                        }
+                    }
 
                     It 'Should not throw an exception' {
                         $testParameters = @{
@@ -362,10 +367,10 @@ try {
                         Assert-MockCalled `
                             -CommandName Set-PageFileSetting `
                             -ParameterFilter {
-                                $Drive -eq $testDrive -and `
+                            $Drive -eq $testDrive -and `
                                 $InitialSize -eq $testInitialSize -and `
                                 $MaximumSize -eq $testMaximumSize
-                            } `
+                        } `
                             -Exactly -Times 1
                     }
                 }
@@ -392,10 +397,10 @@ try {
                     Mock `
                         -CommandName Set-PageFileSetting `
                         -ParameterFilter {
-                            $Drive -eq $testDrive -and `
+                        $Drive -eq $testDrive -and `
                             $InitialSize -eq $testInitialSize -and `
                             $MaximumSize -eq $testMaximumSize
-                        }
+                    }
 
                     It 'Should not throw an exception' {
                         $testParameters = @{
@@ -433,10 +438,10 @@ try {
                         Assert-MockCalled `
                             -CommandName Set-PageFileSetting `
                             -ParameterFilter {
-                                $Drive -eq $testDrive -and `
+                            $Drive -eq $testDrive -and `
                                 $InitialSize -eq $testInitialSize -and `
                                 $MaximumSize -eq $testMaximumSize
-                            } `
+                        } `
                             -Exactly -Times 1
                     }
                 }
@@ -463,14 +468,14 @@ try {
                         Mock `
                             -CommandName Set-PageFileSetting `
                             -ParameterFilter {
-                                $Drive -eq $testDrive
-                            }
+                            $Drive -eq $testDrive
+                        }
 
                         It 'Should not throw an exception' {
                             $testParameters = @{
-                                Drive       = $testDrive
-                                Type        = 'SystemManagedSize'
-                                Verbose     = $true
+                                Drive   = $testDrive
+                                Type    = 'SystemManagedSize'
+                                Verbose = $true
                             }
 
                             { Set-TargetResource @testParameters } | Should -Not -Throw
@@ -500,8 +505,8 @@ try {
                             Assert-MockCalled `
                                 -CommandName Set-PageFileSetting `
                                 -ParameterFilter {
-                                    $Drive -eq $testDrive
-                                } `
+                                $Drive -eq $testDrive
+                            } `
                                 -Exactly -Times 1
                         }
                     }
@@ -529,14 +534,14 @@ try {
                     Mock `
                         -CommandName Set-PageFileSetting `
                         -ParameterFilter {
-                            $Drive -eq $testDrive
-                        }
+                        $Drive -eq $testDrive
+                    }
 
                     It 'Should not throw an exception' {
                         $testParameters = @{
-                            Drive       = $testDrive
-                            Type        = 'SystemManagedSize'
-                            Verbose     = $true
+                            Drive   = $testDrive
+                            Type    = 'SystemManagedSize'
+                            Verbose = $true
                         }
 
                         { Set-TargetResource @testParameters } | Should -Not -Throw
@@ -566,8 +571,8 @@ try {
                         Assert-MockCalled `
                             -CommandName Set-PageFileSetting `
                             -ParameterFilter {
-                                $Drive -eq $testDrive
-                            } `
+                            $Drive -eq $testDrive
+                        } `
                             -Exactly -Times 1
                     }
                 }
@@ -592,9 +597,9 @@ try {
 
                         It 'Should not throw an exception' {
                             $testParameters = @{
-                                Drive       = $testDrive
-                                Type        = 'NoPagingFile'
-                                Verbose     = $true
+                                Drive   = $testDrive
+                                Type    = 'NoPagingFile'
+                                Verbose = $true
                             }
 
                             { Set-TargetResource @testParameters } | Should -Not -Throw
@@ -643,9 +648,9 @@ try {
 
                     It 'Should not throw an exception' {
                         $testParameters = @{
-                            Drive       = $testDrive
-                            Type        = 'NoPagingFile'
-                            Verbose     = $true
+                            Drive   = $testDrive
+                            Type    = 'NoPagingFile'
+                            Verbose = $true
                         }
 
                         { Set-TargetResource @testParameters } | Should -Not -Throw
@@ -750,12 +755,12 @@ try {
                         -CommandName Get-PageFileSetting `
                         -ParameterFilter $parameterFilterGetPageFileSetting `
                         -MockWith {
-                            [PSObject] @{
-                                InitialSize = 0
-                                MaximumSize = 0
-                                Name        = "$testDrive\"
-                            }
+                        [PSObject] @{
+                            InitialSize = 0
+                            MaximumSize = 0
+                            Name        = "$testDrive\"
                         }
+                    }
 
                     It 'Should return true' {
                         $testParameters = @{
@@ -793,12 +798,12 @@ try {
                         -CommandName Get-PageFileSetting `
                         -ParameterFilter $parameterFilterGetPageFileSetting `
                         -MockWith {
-                            [PSObject] @{
-                                InitialSize = $testInitialSize
-                                MaximumSize = $testMaximumSize
-                                Name        = "$testDrive\"
-                            }
+                        [PSObject] @{
+                            InitialSize = $testInitialSize
+                            MaximumSize = $testMaximumSize
+                            Name        = "$testDrive\"
                         }
+                    }
 
                     It 'Should return true' {
                         $testParameters = @{
@@ -865,12 +870,12 @@ try {
                         -CommandName Get-PageFileSetting `
                         -ParameterFilter $parameterFilterGetPageFileSetting `
                         -MockWith {
-                            [PSObject] @{
-                                InitialSize = $testInitialSize
-                                MaximumSize = $testMaximumSize
-                                Name        = "$testDrive\"
-                            }
+                        [PSObject] @{
+                            InitialSize = $testInitialSize
+                            MaximumSize = $testMaximumSize
+                            Name        = "$testDrive\"
                         }
+                    }
 
                     It 'Should return false' {
                         $testParameters = @{
@@ -908,12 +913,12 @@ try {
                         -CommandName Get-PageFileSetting `
                         -ParameterFilter $parameterFilterGetPageFileSetting `
                         -MockWith {
-                            [PSObject] @{
-                                InitialSize = $testInitialSize
-                                MaximumSize = $testMaximumSize
-                                Name        = "$testDrive\"
-                            }
+                        [PSObject] @{
+                            InitialSize = $testInitialSize
+                            MaximumSize = $testMaximumSize
+                            Name        = "$testDrive\"
                         }
+                    }
 
                     It 'Should return false' {
                         $testParameters = @{
@@ -951,12 +956,12 @@ try {
                         -CommandName Get-PageFileSetting `
                         -ParameterFilter $parameterFilterGetPageFileSetting `
                         -MockWith {
-                            [PSObject] @{
-                                InitialSize = $testInitialSize
-                                MaximumSize = $testMaximumSize
-                                Name        = "$testDrive\"
-                            }
+                        [PSObject] @{
+                            InitialSize = $testInitialSize
+                            MaximumSize = $testMaximumSize
+                            Name        = "$testDrive\"
                         }
+                    }
 
                     It 'Should return false' {
                         $testParameters = @{
@@ -994,12 +999,12 @@ try {
                         -CommandName Get-PageFileSetting `
                         -ParameterFilter $parameterFilterGetPageFileSetting `
                         -MockWith {
-                            [PSObject] @{
-                                InitialSize = $testInitialSize
-                                MaximumSize = $testMaximumSize
-                                Name        = "$testDrive\"
-                            }
+                        [PSObject] @{
+                            InitialSize = $testInitialSize
+                            MaximumSize = $testMaximumSize
+                            Name        = "$testDrive\"
                         }
+                    }
 
                     It 'Should return false' {
                         $testParameters = @{
@@ -1034,12 +1039,12 @@ try {
                         -CommandName Get-CimInstance `
                         -ParameterFilter $parameterFilterPageFileSetting `
                         -MockWith {
-                            [PSObject] @{
-                                InitialSize = $testInitialSize
-                                MaximumSize = $testMaximumSize
-                                Name        = "$testDrive\"
-                            }
+                        [PSObject] @{
+                            InitialSize = $testInitialSize
+                            MaximumSize = $testMaximumSize
+                            Name        = "$testDrive\"
                         }
+                    }
 
                     It 'Should return the expected object' {
                         $result = Get-PageFileSetting -Drive $testDrive -Verbose
@@ -1070,7 +1075,7 @@ try {
                                 -InitialSize $testInitialSize `
                                 -MaximumSize $testMaximumSize `
                                 -Verbose
-                         } | Should -Not -Throw
+                        } | Should -Not -Throw
                     }
 
                     It 'Should call the correct mocks' {
@@ -1139,6 +1144,7 @@ try {
         }
     }
 }
-finally {
+finally
+{
     Invoke-TestCleanup
 }

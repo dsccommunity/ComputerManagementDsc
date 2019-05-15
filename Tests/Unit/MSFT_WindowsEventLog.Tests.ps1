@@ -1,32 +1,33 @@
 #region HEADER
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_WindowsEventLog'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_WindowsEventLog'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
-# Unit Test Template Version: 1.2.0
-$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
+# Unit Test Template Version: 1.2.4
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
 }
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName  `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
+    -ResourceType 'Mof' `
     -TestType Unit
 #endregion HEADER
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_WindowsEventLog'
+    InModuleScope $script:dscResourceName {
+        $script:dscResourceName = 'MSFT_WindowsEventLog'
 
-            Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
+            Describe "$($script:dscResourceName)\Get-TargetResource" -Tag 'Get' {
 
                 Mock -CommandName Get-WindowsEventLog -MockWith {
                     $properties = @{
@@ -77,7 +78,7 @@ try
                 }
             }
 
-            Describe "$($script:DSCResourceName)\Test-TargetResource" -Tag 'Test' {
+            Describe "$($script:dscResourceName)\Test-TargetResource" -Tag 'Test' {
 
                 Mock -CommandName Get-WindowsEventLog -MockWith {
                     $properties = @{
@@ -245,7 +246,7 @@ try
                 }
             }
 
-            Describe "$($script:DSCResourceName)\Set-TargetResource" -Tag 'Set' {
+            Describe "$($script:dscResourceName)\Set-TargetResource" -Tag 'Set' {
                 Mock -CommandName Get-WindowsEventLog -MockWith {
                     $properties = @{
                         MaximumSizeInBytes = 5000kb
@@ -366,17 +367,17 @@ try
                     Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
                 }
 
-            Describe "$($script:DSCResourceName)\Save-LogFile" -Tag 'Helper' {
+            Describe "$($script:dscResourceName)\Save-LogFile" -Tag 'Helper' {
                 Mock -CommandName Limit-Eventlog -MockWith { throw }
-                
+
                 It 'Should throw if we are unable to get a log' {
                     {  Limit-Eventlog -LogName 'Application' -OverflowAction 'OverwriteOlder' -RetentionDays 30 } | Should -Throw
                 }
             }
 
-            Describe "$($script:DSCResourceName)\Set-LogRetentionDays" -Tag 'Helper' {
+            Describe "$($script:dscResourceName)\Set-LogRetentionDays" -Tag 'Helper' {
                 Mock -CommandName Limit-Eventlog -MockWith { throw }
-                
+
                 It 'Should throw if we are unable to get a log' {
                     {  Limit-Eventlog -LogName 'Application' -OverflowAction 'OverwriteOlder' -RetentionDays 30 } | Should -Throw
                 }

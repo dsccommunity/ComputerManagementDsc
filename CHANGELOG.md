@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 6.4.0.0
+
+- ScheduledTask:
+  - IdleWaitTimeout returned from Get-TargetResource always null - Fixes [Issue #186](https://github.com/PowerShell/ComputerManagementDsc/issues/186).
+  - Added BuiltInAccount Property to allow running task as one of the build in
+    service accounts - Fixes [Issue #130](https://github.com/PowerShell/ComputerManagementDsc/issues/130).
+- Refactored module folder structure to move resource to root folder of
+  repository and remove test harness - fixes [Issue #188](https://github.com/PowerShell/ComputerManagementDsc/issues/188).
+- Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md and
+  linked to it from README.MD instead.
+- Updated test header for all unit tests to version 1.2.4.
+- Updated test header for all imtegration to version 1.3.3.
+- Enabled example publish to PowerShell Gallery by adding `gallery_api`
+  environment variable to `AppVeyor.yml`.
+
 ## 6.3.0.0
 
 - Correct PSSA custom rule violations - fixes [Issue #209](https://github.com/PowerShell/ComputerManagementDsc/issues/209).

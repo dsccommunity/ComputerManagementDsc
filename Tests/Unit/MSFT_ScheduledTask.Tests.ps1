@@ -3,24 +3,26 @@ param
 (
 )
 
-$script:DSCModuleName = 'ComputerManagementDsc'
-$script:DSCResourceName = 'MSFT_ScheduledTask'
+#region HEADER
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'MSFT_ScheduledTask'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
-# Unit Test Template Version: 1.2.0
-$script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\ComputerManagementDsc'
+# Unit Test Template Version: 1.2.4
+$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
 }
 
-Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
 
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
+    -ResourceType 'Mof' `
     -TestType Unit
 #endregion HEADER
 
@@ -32,8 +34,8 @@ try
 {
     #region Pester Tests
 
-    InModuleScope $script:DSCResourceName {
-        $script:DSCResourceName = 'MSFT_ScheduledTask'
+    InModuleScope $script:dscResourceName {
+        $script:dscResourceName = 'MSFT_ScheduledTask'
 
         # Function to allow mocking pipeline input
         function Register-ScheduledTask
@@ -87,7 +89,7 @@ try
             )
         }
 
-        Describe $script:DSCResourceName {
+        Describe $script:dscResourceName {
             BeforeAll {
                 Mock -CommandName Register-ScheduledTask
                 Mock -CommandName Set-ScheduledTask
@@ -1010,7 +1012,7 @@ try
                         Settings  = [pscustomobject] @{
                             Enabled            = $true
                             IdleSettings       = @{
-                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
+                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
                                 IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
@@ -1254,7 +1256,7 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             IdleSettings       = @{
-                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
+                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
                                 IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
@@ -1320,7 +1322,7 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             IdleSettings       = @{
-                                IdleWaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes + 1)M"
+                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes + 1)M"
                                 IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes + 1)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
@@ -1729,6 +1731,69 @@ try
                 }
             }
 
+            Context 'When a scheduled task is created using a Built In Service Account' {
+                $testParameters = @{
+                    TaskName            = 'Test task'
+                    TaskPath            = '\Test\'
+                    ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType        = 'Once'
+                    RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
+                    BuiltInAccount      = 'NETWORK SERVICE'
+                    ExecuteAsCredential = [pscredential]::new('DEMO\WrongUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
+                    Verbose             = $true
+                }
+
+                It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
+                    }
+                }
+
+                $testParameters.Add('LogonType', 'Password')
+
+                It 'Should overwrite LogonType to "ServiceAccount"' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $Inputobject.Principal.LogonType -ieq 'ServiceAccount'
+                    }
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Repetition = @{
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
+                                }
+                                CimClass   = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                        Principal = [pscustomobject] @{
+                            UserId = $testParameters.BuiltInAccount
+                            LogonType = 'ServiceAccount'
+                        }
+                    }
+                }
+
+                $testParameters.LogonType = 'Password'
+
+                It 'Should return true when BuiltInAccount set even if LogonType parameter different' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+            }
+
             Context 'When a scheduled task is created using a Group Managed Service Account' {
                 $testParameters = @{
                     TaskName            = 'Test task'
@@ -1738,26 +1803,20 @@ try
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
                     ExecuteAsGMSA       = 'DOMAIN\gMSA$'
+                    BuiltInAccount      = 'NETWORK SERVICE'
                     ExecuteAsCredential = [pscredential]::new('DEMO\RightUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
                     Verbose             = $true
                 }
 
-                It 'Should return an error when both the ExecuteAsGMSA an ExecuteAsCredential ar specified' {
-                    try
-                    {
-                        Set-TargetResource @testParameters -ErrorVariable duplicateCredential
-                    }
-                    catch
-                    {
-                        # Error from Set-TargetResource expected
-                    }
-                    finally
-                    {
-                        $duplicateCredential.Message | Should -Be "Both ExecuteAsGMSA and ExecuteAsCredential parameters have been specified. A task can either run as a gMSA (Group Managed Service Account) or as a custom credential, not both. Please modify your configuration to include just one of the two.`r`nParameter name: ExecuteAsGMSA"
-                    }
+                It 'Should throw expected exception' {
+                    $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.gMSAandCredentialError -ArgumentName 'ExecuteAsGMSA'
+
+                    { Set-TargetResource @testParameters -ErrorVariable duplicateCredential } | Should -Throw $errorRecord
+                    $testParameters.Remove('ExecuteAsCredential')
+                    { Set-TargetResource @testParameters -ErrorVariable duplicateCredential } | Should -Throw $errorRecord
                 }
 
-                $testParameters.Remove('ExecuteAsCredential')
+                $testParameters.Remove('BuiltInAccount')
 
                 It 'Should call Register-ScheduledTask with the name of the Group Managed Service Account' {
                     Set-TargetResource @testParameters

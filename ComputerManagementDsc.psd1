@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-moduleVersion = '6.3.0.0'
+moduleVersion = '6.4.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,19 +49,18 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Correct PSSA custom rule violations - fixes [Issue 209](https://github.com/PowerShell/ComputerManagementDsc/issues/209).
-- Correct long example filenames for PowerShellExecutionPolicy examples.
-- Opted into Common Tests "Required Script Analyzer Rules",
-  "Flagged Script Analyzer Rules", "New Error-Level Script Analyzer Rules"
-  "Custom Script Analyzer Rules" and "Relative Path Length" -
-  fixes [Issue 152](https://github.com/PowerShell/ComputerManagementDsc/issues/152).
-- PowerPlan:
-  - Added support to specify the desired power plan either as name or guid.
-    Fixes [Issue 59](https://github.com/PowerShell/ComputerManagementDsc/issues/59)
-  - Changed the resource so it uses Windows APIs instead of WMI/CIM
-    (Workaround for Server 2012R2 Core, Nano Server, Server 2019 and Windows 10).
-    Fixes [Issue 155](https://github.com/PowerShell/ComputerManagementDsc/issues/155)
-    and [Issue 65](https://github.com/PowerShell/ComputerManagementDsc/issues/65)
+        ReleaseNotes = '- ScheduledTask:
+  - IdleWaitTimeout returned from Get-TargetResource always null - Fixes [Issue 186](https://github.com/PowerShell/ComputerManagementDsc/issues/186).
+  - Added BuiltInAccount Property to allow running task as one of the build in
+    service accounts - Fixes [Issue 130](https://github.com/PowerShell/ComputerManagementDsc/issues/130).
+- Refactored module folder structure to move resource to root folder of
+  repository and remove test harness - fixes [Issue 188](https://github.com/PowerShell/ComputerManagementDsc/issues/188).
+- Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md and
+  linked to it from README.MD instead.
+- Updated test header for all unit tests to version 1.2.4.
+- Updated test header for all imtegration to version 1.3.3.
+- Enabled example publish to PowerShell Gallery by adding `gallery_api`
+  environment variable to `AppVeyor.yml`.
 
 '
 
@@ -69,6 +68,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 
