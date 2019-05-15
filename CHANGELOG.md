@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.4.0.0
+
 - ScheduledTask:
   - IdleWaitTimeout returned from Get-TargetResource always null - Fixes [Issue #186](https://github.com/PowerShell/ComputerManagementDsc/issues/186).
   - Added BuiltInAccount Property to allow running task as one of the build in
