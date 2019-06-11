@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- xComputer:
+  - Fix for 'Directory Service is Busy' Error When Joining a Domain and Renaming
+    a Computer when JoinOU is specified - Fixes [Issue #221](https://github.com/PowerShell/ComputerManagementDsc/issues/221)
+
 ## 6.4.0.0
 
 - ScheduledTask:
