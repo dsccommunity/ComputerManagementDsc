@@ -251,7 +251,26 @@ function Set-TargetResource
                 }
 
                 # Rename the computer, and join it to the domain.
-                Add-Computer @addComputerParameters
+                try
+                {
+                    Add-Computer @addComputerParameters
+                }
+                catch [System.InvalidOperationException]
+                {
+                    if ($_.Exception -like '*The directory service is busy*')
+                    {
+                        Write-Verbose -Message $script:localizedData.DirectoryBusyMessage
+                        Rename-Computer -NewName $Name -DomainCredential $Credential
+                    }
+                    else
+                    {
+                        New-InvalidOperationException -ErrorRecord $_
+                    }
+                }
+                catch
+                {
+                    New-InvalidOperationException -ErrorRecord $_
+                }
 
                 if ($rename)
                 {
