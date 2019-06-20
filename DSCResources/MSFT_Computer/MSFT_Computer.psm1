@@ -251,15 +251,17 @@ function Set-TargetResource
                 }
 
                 # Rename the computer, and join it to the domain.
+                $script:FailToRenameAfterJoinDomainErrorId = 'FailToRenameAfterJoinDomain,Microsoft.PowerShell.Commands.AddComputerCommand'
                 try
                 {
                     Add-Computer @addComputerParameters
                 }
                 catch [System.InvalidOperationException]
                 {
-                    if ($_.Exception -like '*The directory service is busy*')
+                    # If the rename failed during the domain join, re-try the rename
+                    if ($_.FullyQualifiedErrorId -eq $script:FailToRenameAfterJoinDomainErrorId)
                     {
-                        Write-Verbose -Message $script:localizedData.DirectoryBusyMessage
+                        Write-Verbose -Message $script:localizedData.FailToRenameAfterJoinDomainMessage
                         Rename-Computer -NewName $Name -DomainCredential $Credential
                     }
                     else
@@ -269,7 +271,7 @@ function Set-TargetResource
                 }
                 catch
                 {
-                    New-InvalidOperationException -ErrorRecord $_
+                    throw $_
                 }
 
                 if ($rename)

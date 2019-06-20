@@ -680,11 +680,17 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
                 }
 
-                It 'Should Try a separate rename if the domain is busy' {
+                It 'Should try a separate rename if ''FailToRenameAfterJoinDomain'' occured during domain join' {
+                    $message = "Computer '' was successfully joined to the new domain '', but renaming it to '' failed with the following error message: The directory service is busy."
+                    $exception = [System.InvalidOperationException]::new($message)
+                    $errorID = 'FailToRenameAfterJoinDomain,Microsoft.PowerShell.Commands.AddComputerCommand'
+                    $errorCategory = [Management.Automation.ErrorCategory]::InvalidOperation
+                    $errorRecord = [System.Management.Automation.ErrorRecord]::new($exception, $errorID, $errorCategory, $null)
+
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
-                            Domain       = 'Contoso';
-                            Workgroup    = 'Contoso';
+                            Domain       = 'Contoso'
+                            Workgroup    = 'Contoso'
                             PartOfDomain = $false
                         }
                     }
@@ -694,7 +700,7 @@ try
                     }
 
                     Mock -CommandName Add-Computer -MockWith {
-                        Throw [System.InvalidOperationException]::new('The directory service is busy')
+                        Throw $errorRecord
                     }
 
                     Set-TargetResource `
@@ -706,17 +712,16 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
-                    }
+                }
 
                 It 'Should Throw the correct error if Add-Computer errors with an unknown InvalidOperationException' {
-
                     $error = 'Unknown Error'
                     $errorRecord = [System.InvalidOperationException]::new($error)
 
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
-                            Domain       = 'Contoso';
-                            Workgroup    = 'Contoso';
+                            Domain       = 'Contoso'
+                            Workgroup    = 'Contoso'
                             PartOfDomain = $false
                         }
                     }
@@ -743,15 +748,14 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
-                    }
+                }
 
                 It 'Should Throw the correct error if Add-Computer errors with an unknown error' {
-
                     $errorRecord = 'Unknown Error'
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
-                            Domain       = 'Contoso';
-                            Workgroup    = 'Contoso';
+                            Domain       = 'Contoso'
+                            Workgroup    = 'Contoso'
                             PartOfDomain = $false
                         }
                     }
