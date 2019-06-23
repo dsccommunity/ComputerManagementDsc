@@ -565,7 +565,7 @@ function Remove-SmbShareAccessPermission
 
                 foreach ($accessRight in 'Change','Read','Full')
                 {
-                    $accessRightVariableName = "${accessRight}Access"
+                    $accessRightVariableName = '{0}Access' -f $accessRight
                     $shouldRevokeAccess = $shouldRevokeAccess `
                         -or (
                             $smbShareAccess.AccessRight -eq $accessRight `
