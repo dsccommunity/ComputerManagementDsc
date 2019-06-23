@@ -567,7 +567,11 @@ function Remove-SmbShareAccessPermission
                 {
                     $accessRightVariableName = "${accessRight}Access"
                     $shouldRevokeAccess = $shouldRevokeAccess `
-                        -or ($PSBoundParameters.ContainsKey($accessRightVariableName) -and $smbShareAccess.AccountName -notin $PSBoundParameters[$accessRightVariableName])
+                        -or (
+                            $smbShareAccess.AccessRight -eq $accessRight `
+                            -and $PSBoundParameters.ContainsKey($accessRightVariableName) `
+                            -and $smbShareAccess.AccountName -notin $PSBoundParameters[$accessRightVariableName]
+                        )
                 }
 
                 if ($shouldRevokeAccess)
