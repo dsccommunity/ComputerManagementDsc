@@ -19,7 +19,7 @@
 
 <#
     .DESCRIPTION
-        This example create an SMB share named 'Temp' for the path 'C:\Temp',
+        This example creates an SMB share named 'Temp' for the path 'C:\Temp',
         using the default values of the cmdlet `New-SmbShare`.
 
     .NOTES
