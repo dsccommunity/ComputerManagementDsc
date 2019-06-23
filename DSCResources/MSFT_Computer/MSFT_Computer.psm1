@@ -258,8 +258,11 @@ function Set-TargetResource
                 }
                 catch [System.InvalidOperationException]
                 {
-                    # If the rename failed during the domain join, re-try the rename
-                    if ($_.FullyQualifiedErrorId -eq $script:FailToRenameAfterJoinDomainErrorId)
+                    # If the rename failed during the domain join, re-try the rename.
+                    # References to this issue:
+                    # https://social.technet.microsoft.com/Forums/windowsserver/en-US/81105b18-b1ff-4fcc-ae5c-2c1a7cf7bf3d/addcomputer-to-domain-with-new-name-returns-error
+                    # https://powershell.org/forums/topic/the-directory-service-is-busy/
+                    if ($_.FullyQualifiedErrorId -eq $failToRenameAfterJoinDomainErrorId)
                     {
                         Write-Verbose -Message $script:localizedData.FailToRenameAfterJoinDomainMessage
                         Rename-Computer -NewName $Name -DomainCredential $Credential

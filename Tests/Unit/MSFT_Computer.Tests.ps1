@@ -683,7 +683,7 @@ try
                 It 'Should try a separate rename if ''FailToRenameAfterJoinDomain'' occured during domain join' {
                     $message = "Computer '' was successfully joined to the new domain '', but renaming it to '' failed with the following error message: The directory service is busy."
                     $exception = [System.InvalidOperationException]::new($message)
-                    $errorID = 'FailToRenameAfterJoinDomain,Microsoft.PowerShell.Commands.AddComputerCommand'
+                    $errorID = $failToRenameAfterJoinDomainErrorId
                     $errorCategory = [Management.Automation.ErrorCategory]::InvalidOperation
                     $errorRecord = [System.Management.Automation.ErrorRecord]::new($exception, $errorID, $errorCategory, $null)
 
