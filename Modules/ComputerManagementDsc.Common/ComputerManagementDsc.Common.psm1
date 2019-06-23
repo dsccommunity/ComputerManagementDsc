@@ -203,7 +203,7 @@ function Test-DscParameterState
             }
             <#
                 This evaluation needs to be performed before the next evaluation,
-                because we need to be able to handle a that the current value
+                because we need to be able to handle when the current value
                 is a zero item collection, meaning `-not $CurrentValues.$key`
                 would otherwise return $true in the next evaluation.
             #>

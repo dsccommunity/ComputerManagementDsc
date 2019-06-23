@@ -19,8 +19,12 @@
 
 <#
     .DESCRIPTION
-        This examples create a SMB share named 'Temp' for the path 'C:\Temp',
+        This examples create an SMB share named 'Temp' for the path 'C:\Temp',
         using the default values of the cmdlet `New-SmbShare`.
+
+    .NOTES
+        To know the default values, see the documentation for the cmdlet
+        `New-SmbShare`.
 #>
 Configuration SmbShare_CreateShare_Config
 {

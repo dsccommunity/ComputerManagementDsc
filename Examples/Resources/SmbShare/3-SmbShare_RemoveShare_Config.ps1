@@ -19,7 +19,7 @@
 
 <#
     .DESCRIPTION
-        This examples removes a SMB share named 'Temp'.
+        This example removes a SMB share named 'Temp'.
 
     .NOTES
         Path must be specified because it is a mandatory parameter,

@@ -7,7 +7,7 @@ SMB shares.
 
 ### Cluster Shares
 
-To property `ContinuouslyAvailable` can only be set to `$true` when
+The property `ContinuouslyAvailable` can only be set to `$true` when
 the SMB share is a cluster share in a failover cluster. Also in the blog
 [SMB Transparent Failover – making file shares continuously available](https://blogs.technet.microsoft.com/filecab/2016/03/25/smb-transparent-failover-making-file-shares-continuously-available-2)
 by [Claus Joergensen](https://github.com/clausjor) it is mentioned that
@@ -17,8 +17,8 @@ generation enabled.
 ### Access permissions
 
 It is not allowed to provide empty collections in the configuration for
-the access permissions parameters. The below configuration will throw an
-error.
+the access permissions parameters. The configuration below will cause an
+exception to be thrown.
 
 ```powershell
 SmbShare 'Integration_Test'
@@ -35,6 +35,6 @@ SmbShare 'Integration_Test'
 The access permission parameters must either be all removed to manage
 the access permission manually, or add at least one member to one of
 the access permission parameters. If all the access permission parameters
-are removed, then by design of the cmdlet `New-SmbShare` it will add
+are removed, then by design, the cmdlet New-SmbShare will add
 the *Everyone* group with read access permission to the SMB share.
 To prevent that, add a member to either access permission parameters.

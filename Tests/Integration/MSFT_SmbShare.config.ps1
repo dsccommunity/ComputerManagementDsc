@@ -42,7 +42,7 @@ else
 #>
 Configuration MSFT_SmbShare_Prerequisites_Config
 {
-    Import-DscResource -ModuleName 'PSDscResources'
+    Import-DscResource -ModuleName 'PSDesiredStateConfiguration'
 
     node $AllNodes.NodeName
     {
@@ -273,6 +273,30 @@ Configuration MSFT_SmbShare_Cleanup_Config
             Ensure          = 'Absent'
             Type            = 'Directory'
             DestinationPath = $Node.SharePath2
+        }
+
+        User 'RemoveAccountUser1'
+        {
+            Ensure   = 'Absent'
+            UserName = Split-Path -Path $Node.UserName1 -Leaf
+        }
+
+        User 'RemoveAccountUser2'
+        {
+            Ensure   = 'Absent'
+            UserName = Split-Path -Path $Node.UserName2 -Leaf
+        }
+
+        User 'RemoveAccountUser3'
+        {
+            Ensure   = 'Absent'
+            UserName = Split-Path -Path $Node.UserName3 -Leaf
+        }
+
+        User 'RemoveAccountUser4'
+        {
+            Ensure   = 'Absent'
+            UserName = Split-Path -Path $Node.UserName4 -Leaf
         }
     }
 }
