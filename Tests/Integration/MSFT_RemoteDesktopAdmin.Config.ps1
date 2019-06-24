@@ -4,7 +4,8 @@ Configuration setToDenied
     node "localhost" {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
-            Ensure = 'Absent'
+            IsSingleInstance = 'Yes'
+            Ensure           = 'Absent'
         }
     }
 }
@@ -15,7 +16,8 @@ Configuration setToAllowed
     node "localhost" {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
-            Ensure = 'Present'
+            IsSingleInstance = 'Yes'
+            Ensure           = 'Present'
         }
     }
 }
@@ -26,8 +28,9 @@ Configuration setToAllowedSecure
     node "localhost" {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
-            Ensure         = 'Present'
-            Authentication = 'Secure'
+            IsSingleInstance = 'Yes'
+            Ensure           = 'Present'
+            Authentication   = 'Secure'
         }
     }
 }
@@ -38,8 +41,9 @@ Configuration setToAllowedNonSecure
     node "localhost" {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
-            Ensure         = 'Present'
-            Authentication = 'NonSecure'
+            IsSingleInstance = 'Yes'
+            Ensure           = 'Present'
+            Authentication   = 'NonSecure'
         }
     }
 }
