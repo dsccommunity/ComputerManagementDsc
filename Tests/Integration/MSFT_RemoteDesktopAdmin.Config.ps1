@@ -28,9 +28,9 @@ Configuration setToAllowedSecure
     node "localhost" {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
-            IsSingleInstance = 'Yes'
-            Ensure           = 'Present'
-            Authentication   = 'Secure'
+            IsSingleInstance     = 'Yes'
+            Ensure               = 'Present'
+            UserAuthentication   = 'Secure'
         }
     }
 }
@@ -41,9 +41,9 @@ Configuration setToAllowedNonSecure
     node "localhost" {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
-            IsSingleInstance = 'Yes'
-            Ensure           = 'Present'
-            Authentication   = 'NonSecure'
+            IsSingleInstance     = 'Yes'
+            Ensure               = 'Present'
+            UserAuthentication   = 'NonSecure'
         }
     }
 }
