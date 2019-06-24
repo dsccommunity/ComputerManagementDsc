@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- RemoteDesktopAdmin:
+  - New resource for configuring Remote Desktop for Administration - [Issue #224](https://github.com/PowerShell/ComputerManagementDsc/issues/224).
+
 ## 6.4.0.0
 
 - ScheduledTask:
