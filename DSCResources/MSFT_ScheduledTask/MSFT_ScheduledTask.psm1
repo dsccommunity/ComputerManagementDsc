@@ -2075,35 +2075,6 @@ function ConvertTo-TimeSpanStringFromScheduledTaskString
 
 <#
     .SYNOPSIS
-        Helper function to disable an existing scheduled task.
-
-    .PARAMETER TaskName
-        The name of the task to disable.
-
-    .PARAMETER TaskPath
-        The path to the task to disable.
-#>
-function Disable-ScheduledTask
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $TaskName,
-
-        [Parameter()]
-        [System.String]
-        $TaskPath = '\'
-    )
-
-    $existingTask = Get-ScheduledTask @PSBoundParameters
-    $existingTask.Settings.Enabled = $false
-    $null = $existingTask | Register-ScheduledTask @PSBoundParameters -Force
-}
-
-<#
-    .SYNOPSIS
         Returns a formatted datetime string for use in ScheduledTask resource.
 
     .PARAMETER Date
