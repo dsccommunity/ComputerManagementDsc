@@ -7,6 +7,10 @@
     config is using built-in Disable-ScheduledTask PowerShell. function which works as expected
  
 
+- xComputer:
+  - Fix for 'directory service is busy' error when joining a domain and renaming
+    a computer when JoinOU is specified - Fixes [Issue #221](https://github.com/PowerShell/ComputerManagementDsc/issues/221).
+
 ## 6.4.0.0
 
 - ScheduledTask:

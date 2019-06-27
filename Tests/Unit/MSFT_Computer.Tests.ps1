@@ -481,12 +481,13 @@ try
 
             Context "$($script:dscResourceName)\Set-TargetResource" {
                 Mock -CommandName Rename-Computer
-                Mock -CommandName Add-Computer
                 Mock -CommandName Set-CimInstance
 
                 It 'Throws if both DomainName and WorkGroupName are specified' {
                     $errorRecord = Get-InvalidOperationRecord `
                         -Message ($LocalizedData.DomainNameAndWorkgroupNameError)
+
+                    Mock -CommandName Add-Computer
 
                     {
                         Set-TargetResource `
@@ -504,6 +505,8 @@ try
                     $errorRecord = Get-InvalidArgumentRecord `
                         -Message ($LocalizedData.CredentialsNotSpecifiedError) `
                         -ArgumentName 'Credentials'
+
+                    Mock -CommandName Add-Computer
 
                     {
                         Set-TargetResource `
@@ -529,6 +532,8 @@ try
                         'contoso.com'
                     }
 
+                    Mock -CommandName Add-Computer
+
                     Set-TargetResource `
                         -Name $notComputerName `
                         -DomainName 'adventure-works.com' `
@@ -553,6 +558,8 @@ try
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         'contoso.com'
                     }
+
+                    Mock -CommandName Add-Computer
 
                     Set-TargetResource `
                         -Name $notComputerName `
@@ -580,6 +587,8 @@ try
                         'contoso.com'
                     }
 
+                    Mock -CommandName Add-Computer
+
                     Set-TargetResource `
                         -Name $notComputerName `
                         -WorkGroupName 'contoso' `
@@ -604,6 +613,8 @@ try
                         ''
                     }
 
+                    Mock -CommandName Add-Computer
+
                     Set-TargetResource `
                         -Name $notComputerName `
                         -DomainName 'Contoso.com' `
@@ -627,6 +638,8 @@ try
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         ''
                     }
+
+                    Mock -CommandName Add-Computer
 
                     Set-TargetResource `
                         -Name $notComputerName `
@@ -653,6 +666,8 @@ try
                         ''
                     }
 
+                    Mock -CommandName Add-Computer
+
                     Set-TargetResource `
                         -Name $notComputerName `
                         -DomainName 'Contoso.com' `
@@ -664,6 +679,110 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
                 }
+
+                It 'Should try a separate rename if ''FailToRenameAfterJoinDomain'' occured during domain join' {
+                    $message = "Computer '' was successfully joined to the new domain '', but renaming it to '' failed with the following error message: The directory service is busy."
+                    $exception = [System.InvalidOperationException]::new($message)
+                    $errorID = $failToRenameAfterJoinDomainErrorId
+                    $errorCategory = [Management.Automation.ErrorCategory]::InvalidOperation
+                    $errorRecord = [System.Management.Automation.ErrorRecord]::new($exception, $errorID, $errorCategory, $null)
+
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso'
+                            Workgroup    = 'Contoso'
+                            PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
+
+                    Mock -CommandName Add-Computer -MockWith {
+                        Throw $errorRecord
+                    }
+
+                    Set-TargetResource `
+                        -Name $notComputerName `
+                        -DomainName 'Contoso.com' `
+                        -JoinOU 'OU=Computers,DC=contoso,DC=com' `
+                        -Credential $credential | Should -BeNullOrEmpty
+
+                    Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                }
+
+                It 'Should Throw the correct error if Add-Computer errors with an unknown InvalidOperationException' {
+                    $error = 'Unknown Error'
+                    $errorRecord = [System.InvalidOperationException]::new($error)
+
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso'
+                            Workgroup    = 'Contoso'
+                            PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
+
+                    Mock -CommandName Add-Computer -MockWith {
+                        Throw $errorRecord
+                    }
+
+                    Mock -CommandName New-InvalidOperationException -MockWith {
+                        Throw $errorRecord
+                    }
+
+                    { Set-TargetResource `
+                        -Name $notComputerName `
+                        -DomainName 'Contoso.com' `
+                        -JoinOU 'OU=Computers,DC=contoso,DC=com' `
+                        -Credential $credential
+                    } | Should -Throw $error
+
+                    Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                }
+
+                It 'Should Throw the correct error if Add-Computer errors with an unknown error' {
+                    $errorRecord = 'Unknown Error'
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso'
+                            Workgroup    = 'Contoso'
+                            PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        ''
+                    }
+
+                    Mock -CommandName Add-Computer -MockWith {
+                        Throw $errorRecord
+                    }
+
+                    Mock -CommandName New-InvalidOperationException -MockWith {
+                        Throw $errorRecord
+                    }
+
+                    { Set-TargetResource `
+                            -Name $notComputerName `
+                            -DomainName 'Contoso.com' `
+                            -JoinOU 'OU=Computers,DC=contoso,DC=com' `
+                            -Credential $credential
+                    } | Should -Throw $errorRecord
+
+                    Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    }
 
                 It 'Changes ComputerName and changes Workgroup to new Workgroup' {
                     Mock -CommandName Get-WMIObject -MockWith {
@@ -677,6 +796,8 @@ try
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         ''
                     }
+
+                    Mock -CommandName Add-Computer
 
                     Set-TargetResource `
                         -Name $notComputerName `
@@ -700,6 +821,8 @@ try
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         'contoso.com'
                     }
+
+                    Mock -CommandName Add-Computer
 
                     Set-TargetResource `
                         -Name $env:COMPUTERNAME `
@@ -727,6 +850,8 @@ try
                         'contoso.com'
                     }
 
+                    Mock -CommandName Add-Computer
+
                     Set-TargetResource `
                         -Name 'localhost' `
                         -DomainName 'adventure-works.com' `
@@ -752,6 +877,8 @@ try
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         'contoso.com'
                     }
+
+                    Mock -CommandName Add-Computer
 
                     Set-TargetResource `
                         -Name $env:COMPUTERNAME `
@@ -780,6 +907,8 @@ try
                         'contoso.com'
                     }
 
+                    Mock -CommandName Add-Computer
+
                     Set-TargetResource `
                         -Name 'localhost' `
                         -DomainName 'adventure-works.com' `
@@ -807,6 +936,8 @@ try
                         ''
                     }
 
+                    Mock -CommandName Add-Computer
+
                     Set-TargetResource `
                         -Name $env:COMPUTERNAME `
                         -WorkGroupName 'Contoso' `
@@ -832,6 +963,8 @@ try
                         ''
                     }
 
+                    Mock -CommandName Add-Computer
+
                     Set-TargetResource `
                         -Name 'localhost' `
                         -WorkGroupName 'Contoso' `
@@ -856,6 +989,8 @@ try
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         'contoso.com'
                     }
+
+                    Mock -CommandName Add-Computer
 
                     Set-TargetResource `
                         -Name $notComputerName `
