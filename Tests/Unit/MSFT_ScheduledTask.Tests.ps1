@@ -165,10 +165,6 @@ try
                     Test-TargetResource @testParameters | Should -Be $false
                 }
 
-                It 'Should remove the scheduled task in the set method' {
-                    Set-TargetResource @testParameters
-                    Assert-MockCalled Unregister-ScheduledTask
-                }
             }
 
             Context 'A built-in scheduled task exists and is enabled, but it should be disabled' {
@@ -1542,11 +1538,6 @@ try
 
                 It 'Should return false from the test method' {
                     Test-TargetResource @testParameters | Should -Be $false
-                }
-
-                It 'Should disable the scheduled task in the set method' {
-                    Set-TargetResource @testParameters
-                    Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
                 }
             }
 
