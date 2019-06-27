@@ -2,9 +2,9 @@
 
 ## Unreleased
 
- - ScheduledTask:
-  - Removed Disable-ScheduledTask helper function as it does not work with most of the built-in scheduled tasks - Fixes [Issue #137](https://github.com/PowerShell/ComputerManagementDsc/issues/137).
-  
+- ScheduledTask:
+  - Removed Disable-ScheduledTask helper function as it does not work with most of the built-in scheduled tasks
+    Removing the function means that built-in one is used instead which works as expected - Fixes [Issue #137](https://github.com/PowerShell/ComputerManagementDsc/issues/137).
 - xComputer:
   - Fix for 'directory service is busy' error when joining a domain and renaming
     a computer when JoinOU is specified - Fixes [Issue #221](https://github.com/PowerShell/ComputerManagementDsc/issues/221).
