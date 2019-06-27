@@ -205,11 +205,6 @@ try
                 It 'Should return false from the test method' {
                     Test-TargetResource @testParameters | Should -Be $false
                 }
-
-                It 'Should remove the scheduled task in the set method' {
-                    Set-TargetResource @testParameters
-                    Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
-                }
             }
 
             Context 'A built-in scheduled task exists, but it should be absent' {
