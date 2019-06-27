@@ -1,11 +1,11 @@
 # Versions
 
 ## Unreleased
-- ScheduledTask:
+
+ - ScheduledTask:
   - Removed Disable-ScheduledTask helper function as it does not work with most of
-    the built-in scheduled tasks, it fails with a CIM error. Removing this function means that
+	the built-in scheduled tasks, it fails with a CIM error. Removing this function means that
     config is using built-in Disable-ScheduledTask PowerShell. function which works as expected - Fixes [Issue #137](https://github.com/PowerShell/ComputerManagementDsc/issues/137).
- 
 
 - xComputer:
   - Fix for 'directory service is busy' error when joining a domain and renaming
