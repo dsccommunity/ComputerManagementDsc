@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Computer:
+  - Fix for 'directory service is busy' error when joining a domain and renaming
+    a computer when JoinOU is specified - Fixes [Issue #221](https://github.com/PowerShell/ComputerManagementDsc/issues/221).
 - RemoteDesktopAdmin:
   - New resource for configuring Remote Desktop for Administration - [Issue #224](https://github.com/PowerShell/ComputerManagementDsc/issues/224).
 

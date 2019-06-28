@@ -5,6 +5,7 @@ ConvertFrom-StringData @'
     RenamedComputerMessage = Renamed computer to '{0}'.
     RenamedComputerAndJoinedDomainMessage = Renamed computer to '{0}' and added to the domain '{1}'.
     JoinedDomainMessage = Added computer to domain '{0}'.
+    FailToRenameAfterJoinDomainMessage = Failed to rename the computer during the domain join. Re-trying the rename.
     RenamedComputerAndJoinedWorkgroupMessage = Renamed computer to '{0}' and addded to workgroup '{1}'.
     JoinedWorkgroupMessage = Added computer to workgroup '{0}'.
     CredentialsNotSpecifiedError = Must to specify credentials with domain.
