@@ -13,6 +13,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_Computer'
 
+$FailToRenameAfterJoinDomainErrorId = 'FailToRenameAfterJoinDomain,Microsoft.PowerShell.Commands.AddComputerCommand'
+
 <#
     .SYNOPSIS
         Gets the current state of the computer.
@@ -244,7 +246,32 @@ function Set-TargetResource
                 }
 
                 # Rename the computer, and join it to the domain.
-                Add-Computer @addComputerParameters
+                try
+                {
+                    Add-Computer @addComputerParameters
+                }
+                catch [System.InvalidOperationException]
+                {
+                    <#
+                        If the rename failed during the domain join, re-try the rename.
+                        References to this issue:
+                        https://social.technet.microsoft.com/Forums/windowsserver/en-US/81105b18-b1ff-4fcc-ae5c-2c1a7cf7bf3d/addcomputer-to-domain-with-new-name-returns-error
+                        https://powershell.org/forums/topic/the-directory-service-is-busy/
+                    #>
+                    if ($_.FullyQualifiedErrorId -eq $failToRenameAfterJoinDomainErrorId)
+                    {
+                        Write-Verbose -Message $script:localizedData.FailToRenameAfterJoinDomainMessage
+                        Rename-Computer -NewName $Name -DomainCredential $Credential
+                    }
+                    else
+                    {
+                        New-InvalidOperationException -ErrorRecord $_
+                    }
+                }
+                catch
+                {
+                    throw $_
+                }
 
                 if ($rename)
                 {

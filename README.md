@@ -52,3 +52,7 @@ branch, and be released to [PowerShell Gallery](https://www.powershellgallery.co
 ## Contributing
 
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
+
+## Change log
+
+A full list of changes in each version can be found in the [change log](CHANGELOG.md).
