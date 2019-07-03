@@ -120,7 +120,7 @@ try
                     }
                 }
 
-                It 'Should mock call to Get-SmbShare and return membership' {
+                It 'Should return the correct access memberships' {
                     $getTargetResourceResult = Get-TargetResource @testParameters
 
                     $getTargetResourceResult.ChangeAccess | Should -HaveCount 1
@@ -135,15 +135,8 @@ try
 
                     $getTargetResourceResult.NoAccess | Should -HaveCount 1
                     $getTargetResourceResult.NoAccess[0] | Should -BeIn $mockNoPermissionUserName
-                }
 
-                It 'Should call the mock function Get-SmbShare' {
-                    $getTargetResourceResult = Get-TargetResource @testParameters
                     Assert-MockCalled Get-SmbShare -Exactly -Times 1 -Scope It
-                }
-
-                It 'Should Call the mock function Get-SmbShareAccess' {
-                    $getTargetResourceResult = Get-TargetResource @testParameters
                     Assert-MockCalled Get-SmbShareAccess -Exactly -Times 1 -Scope It
                 }
             }
@@ -179,8 +172,9 @@ try
                     $getTargetResourceResult.ReadAccess | Should -HaveCount 0
                     $getTargetResourceResult.FullAccess | Should -HaveCount 0
                     $getTargetResourceResult.NoAccess | Should -HaveCount 0
-                }
 
+                    Assert-MockCalled Get-SmbShare -Exactly -Times 1 -Scope It
+                }
             }
         }
 
@@ -220,7 +214,7 @@ try
                     }
 
                     Context 'When no access permission is given' {
-                        It 'Should call the correct mocks' {
+                        It 'Should throw the correct error' {
                             $setTargetResourceParameters = @{
                                 Name                  = $mockShareName
                                 Path                  = 'TestDrive:\Temp'
@@ -347,13 +341,12 @@ try
                         Assert-MockCalled Remove-SmbShare -Exactly -Times 0 -Scope It
                     }
                 }
-
             }
         }
 
         Describe 'MSFT_SmbShare\Test-TargetResource' -Tag 'Test' {
             Context 'When the system is not in the desired state' {
-                Context 'When no members in provided in neither access permission collection' {
+                Context 'When no member are provided in any of the access permission collections' {
                     BeforeAll {
                         $testTargetResourceParameters = @{
                             Name                  = $mockShareName
@@ -680,7 +673,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Add-SmbShareAccessPermission @addSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -706,7 +699,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Add-SmbShareAccessPermission @addSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -732,7 +725,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Add-SmbShareAccessPermission @addSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -764,7 +757,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Add-SmbShareAccessPermission @addSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -809,7 +802,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Add-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -860,7 +853,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -887,7 +880,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mocks' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -918,7 +911,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -944,7 +937,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -972,7 +965,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         Assert-MockCalled -CommandName Revoke-SmbShareAccess -Exactly -Times 4 -Scope 'It'
@@ -1015,7 +1008,7 @@ try
                         }
                     }
 
-                    It 'Should call the correct mock' {
+                    It 'Should not throw an error and call the correct mocks' {
                         { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
 
                         <#
@@ -1092,7 +1085,7 @@ try
                     }
                 }
 
-                Context 'When providing no member in either of the access permission collections' {
+                Context 'When not providing any members in any of the access permission collections' {
                     It 'Should throw the correct error' {
                         # We must using splatting to test 'ValueFromRemainingArguments' parameter.
                         $assertAccessPermissionParameters = @{

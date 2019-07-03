@@ -2,14 +2,16 @@
 
 ## Unreleased
 
-- xComputer:
+- Computer:
   - Fix for 'directory service is busy' error when joining a domain and renaming
     a computer when JoinOU is specified - Fixes [Issue #221](https://github.com/PowerShell/ComputerManagementDsc/issues/221).
-- Added new resource
-  - SmbShare (moved and improved from deprecated module xSmbShare).
+- Added new resource SmbShare
+  - Moved and improved from deprecated module xSmbShare.
 - Changes to ComputerManagementDsc.Common
   - Updated Test-DscParameterState so it now can compare zero item
     collections (arrays).
+- Changes to WindowsEventLog
+  - Minor style guideline cleanup.
 
 ## 6.4.0.0
 

@@ -270,7 +270,7 @@ function Set-TargetResource
                     $_ -in ('ChangeAccess','ReadAccess','FullAccess','NoAccess','Ensure','Path')
                 }
 
-            $parametersToRemove | ForEach-Object {
+            $parametersToRemove | ForEach-Object -Process {
                 $smbShareParameters.Remove($_)
             }
 
@@ -672,7 +672,7 @@ function Add-SmbShareAccessPermission
         $accessRight = 'Change'
 
         # Add new accounts that should have change permission.
-        $newAccountsToHaveChangeAccess | ForEach-Object {
+        $newAccountsToHaveChangeAccess | ForEach-Object -Process {
             Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight, $_, $Name)
 
             Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight -Force -ErrorAction 'Stop'
@@ -697,7 +697,7 @@ function Add-SmbShareAccessPermission
         $accessRight = 'Read'
 
         # Add new accounts that should have read permission.
-        $newAccountsToHaveReadAccess | ForEach-Object {
+        $newAccountsToHaveReadAccess | ForEach-Object -Process {
             Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight, $_, $Name)
 
             Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight -Force -ErrorAction 'Stop'
@@ -722,7 +722,7 @@ function Add-SmbShareAccessPermission
         $accessRight = 'Full'
 
         # Add new accounts that should have full permission.
-        $newAccountsToHaveFullAccess | ForEach-Object {
+        $newAccountsToHaveFullAccess | ForEach-Object -Process {
             Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight, $_, $Name)
 
             Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight -Force -ErrorAction 'Stop'
@@ -745,7 +745,7 @@ function Add-SmbShareAccessPermission
         }
 
         # Add new accounts that should be denied permission.
-        $newAccountsToHaveNoAccess | ForEach-Object {
+        $newAccountsToHaveNoAccess | ForEach-Object -Process {
             Write-Verbose -Message ($script:localizedData.DenyAccess -f $_, $Name)
 
             Block-SmbShareAccess -Name $Name -AccountName  $_ -Force -ErrorAction 'Stop'
