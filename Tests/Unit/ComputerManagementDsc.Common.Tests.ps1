@@ -1103,30 +1103,6 @@ try
             Assert-VerifiableMock
         }
 
-        Describe 'DscResource.LocalizationHelper\New-InvalidOperationException' {
-        Context 'When calling with Message parameter only' {
-                It 'Should throw the correct error' {
-                    $mockErrorMessage = 'Mocked error'
-
-                    { New-InvalidOperationException -Message $mockErrorMessage } | Should -Throw $mockErrorMessage
-                }
-            }
-
-            Context 'When calling with both the Message and ErrorRecord parameter' {
-                It 'Should throw the correct error' {
-                    $mockErrorMessage = 'Mocked error'
-                    $mockExceptionErrorMessage = 'Mocked exception error message'
-
-                    $mockException = New-Object -TypeName System.Exception -ArgumentList $mockExceptionErrorMessage
-                    $mockErrorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList $mockException, $null, 'InvalidResult', $null
-
-                    { New-InvalidOperationException -Message $mockErrorMessage -ErrorRecord $mockErrorRecord } | Should -Throw ('System.InvalidOperationException: {0} ---> System.Exception: {1}' -f $mockErrorMessage, $mockExceptionErrorMessage)
-                }
-            }
-
-            Assert-VerifiableMock
-        }
-
         Describe 'DscResource.LocalizationHelper\Test-IsNanoServer' {
             Context 'When the cmdlet Get-ComputerInfo does not exist' {
                 BeforeAll {
