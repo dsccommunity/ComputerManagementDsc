@@ -36,8 +36,8 @@
   ComputerManagementDsc.Common module - Fixes [Issue #218](https://github.com/PowerShell/ComputerManagementDsc/issues/218).
   - Minor code cleanup against style guideline.
   - Remove code from `New-InvalidOperationException` because it was a
-    code path that could never could be used due to that the parameter
-    validation prevented the helper function being called that way.
+    code path that could never could be used due to the parameter
+    validation preventing the helper function being called that way.
   - Updated all `Get-LocalizationData` to latest version from
     [DSCResource.Template](https://github.com/PowerShell/DSCResource.Template).
   - Fixed an issue with the helper function `Test-IsNanoServer` that

@@ -2,6 +2,7 @@
     .SYNOPSIS
         Retrieves the localized string data based on the machine's culture.
         Falls back to en-US strings if the machine's culture is not supported.
+
     .PARAMETER ResourceName
         The name of the resource as it appears before '.strings.psd1' of the localized string file.
         For example:
@@ -9,9 +10,11 @@
             For Service: MSFT_ServiceResource
             For Registry: MSFT_RegistryResource
             For Helper: SqlServerDscHelper
+
     .PARAMETER ScriptRoot
         Optional. The root path where to expect to find the culture folder. This is only needed
         for localization in helper modules. This should not normally be used for resources.
+
     .NOTES
         To be able to use localization in the helper function, this function must
         be first in the file, before Get-LocalizedData is used by itself to load
@@ -61,7 +64,7 @@ function Get-LocalizedData
 
 <#
     .SYNOPSIS
-    Tests if the current machine is a Nano server.
+        Tests if the current machine is a Nano server.
 #>
 function Test-IsNanoServer
 {
