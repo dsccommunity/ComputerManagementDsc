@@ -33,7 +33,7 @@ function Remove-CommonParameter
     $commonParameters = [System.Management.Automation.PSCmdlet]::CommonParameters
     $commonParameters += [System.Management.Automation.PSCmdlet]::OptionalCommonParameters
 
-    $Hashtable.Keys | Where-Object { $_ -in $commonParameters } | ForEach-Object {
+    $Hashtable.Keys | Where-Object -FilterScript { $_ -in $commonParameters } | ForEach-Object -Process {
         $inputClone.Remove($_)
     }
 
@@ -118,7 +118,7 @@ function Test-DscParameterState
         }
         else
         {
-            $desiredType = [psobject] @{
+            $desiredType = [PSObject] @{
                 Name = 'Unknown'
             }
         }
@@ -129,7 +129,7 @@ function Test-DscParameterState
         }
         else
         {
-            $currentType = [psobject] @{
+            $currentType = [PSObject] @{
                 Name = 'Unknown'
             }
         }
@@ -196,15 +196,26 @@ function Test-DscParameterState
         {
             Write-Verbose -Message ($script:localizedData.TestDscParameterCompareMessage -f $key)
 
-            if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
+            if ($CurrentValues.$key.Count -eq 0 -and $DesiredValues.$key.Count -eq 0)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
-                $returnValue = $false
+                Write-Verbose -Message ($script:localizedData.MatchEmptyCollectionMessage -f $desiredType.Name, $key)
                 continue
             }
+            <#
+                This evaluation needs to be performed before the next evaluation,
+                because we need to be able to handle when the current value
+                is a zero item collection, meaning `-not $CurrentValues.$key`
+                would otherwise return $true in the next evaluation.
+            #>
             elseif ($CurrentValues.$key.Count -ne $DesiredValues.$key.Count)
             {
                 Write-Verbose -Message ($script:localizedData.NoMatchValueDifferentCountMessage -f $desiredType.Name, $key, $CurrentValues.$key.Count, $desiredValuesClean.$key.Count)
+                $returnValue = $false
+                continue
+            }
+            elseif (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
+            {
+                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
                 $returnValue = $false
                 continue
             }
@@ -221,7 +232,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $desiredType = [psobject]@{
+                        $desiredType = [PSObject]@{
                             Name = 'Unknown'
                         }
                     }
@@ -232,7 +243,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $currentType = [psobject]@{
+                        $currentType = [PSObject]@{
                             Name = 'Unknown'
                         }
                     }
