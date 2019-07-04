@@ -5,8 +5,15 @@
 - Computer:
   - Fix for 'directory service is busy' error when joining a domain and renaming
     a computer when JoinOU is specified - Fixes [Issue #221](https://github.com/PowerShell/ComputerManagementDsc/issues/221).
+- Added new resource SmbShare
+  - Moved and improved from deprecated module xSmbShare.
+- Changes to ComputerManagementDsc.Common
+  - Updated Test-DscParameterState so it now can compare zero item
+    collections (arrays).
+- Changes to WindowsEventLog
+  - Minor style guideline cleanup.
 - RemoteDesktopAdmin:
-  - New resource for configuring Remote Desktop for Administration - [Issue #224](https://github.com/PowerShell/ComputerManagementDsc/issues/224).
+  - New resource for configuring Remote Desktop for Administration - fixes [Issue #224](https://github.com/PowerShell/ComputerManagementDsc/issues/224).
 
 ## 6.4.0.0
 

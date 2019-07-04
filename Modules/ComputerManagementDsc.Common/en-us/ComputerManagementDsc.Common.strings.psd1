@@ -6,6 +6,7 @@ ConvertFrom-StringData @'
     NoMatchPsCredentialUsernameMessage = NOTMATCH: PSCredential username mismatch. Current state is '{0}' and desired state is '{1}'.
     NoMatchTypeMismatchMessage         = NOTMATCH: Type mismatch for property '{0}' Current state type is '{1}' and desired type is '{2}'.
     MatchValueMessage                  = MATCH: Value (type '{0}') for property '{1}' does match. Current state is '{2}' and desired state is '{3}'.
+    MatchEmptyCollectionMessage        = MATCH: Value (type '{0}') for property '{1}' does match. Current state and desired state both have zero items in the collection.
     NoMatchValueMessage                = NOTMATCH: Value (type '{0}') for property '{1}' does not match. Current state is '{2}' and desired state is '{3}'.
     NoMatchValueDifferentCountMessage  = NOTMATCH: Value (type '{0}') for property '{1}' does have a different count. Current state count is '{2}' and desired state count is '{3}'.
     NoMatchElementTypeMismatchMessage  = NOTMATCH: Type mismatch for property '{0}' Current state type of element [{1}] is '{2}' and desired type is '{3}'.
