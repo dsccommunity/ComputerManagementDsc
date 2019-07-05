@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
-# Import the ComputerManagementDsc Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
-            -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_PowershellExecutionPolicy' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_PowershellExecutionPolicy'
 
 <#
     .SYNOPSIS
@@ -32,17 +25,17 @@ function Get-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
+        [ValidateSet('CurrentUser','LocalMachine','MachinePolicy','Process','UserPolicy')]
         [System.String]
         $ExecutionPolicyScope,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
+        [ValidateSet('Bypass','Restricted','AllSigned','RemoteSigned','Unrestricted')]
         [System.String]
         $ExecutionPolicy
     )
 
-    Write-Verbose -Message ($localizedData.GettingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
+    Write-Verbose -Message ($script:localizedData.GettingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
 
     # Gets the execution policies for the current session.
     $returnValue = @{
@@ -66,39 +59,36 @@ function Get-TargetResource
 
 function Set-TargetResource
 {
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
+        [ValidateSet('CurrentUser','LocalMachine','MachinePolicy','Process','UserPolicy')]
         [System.String]
         $ExecutionPolicyScope,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
+        [ValidateSet('Bypass','Restricted','AllSigned','RemoteSigned','Unrestricted')]
         [System.String]
         $ExecutionPolicy
     )
 
-    if ($PSCmdlet.ShouldProcess("$ExecutionPolicy","Set-ExecutionPolicy"))
-    {
-        Write-Verbose -Message ($localizedData.SettingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
+    Write-Verbose -Message ($script:localizedData.SettingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
 
-        try
+    try
+    {
+        Set-ExecutionPolicy -ExecutionPolicy $ExecutionPolicy -Scope $ExecutionPolicyScope -Force -ErrorAction Stop
+        Write-Verbose -Message ($script:localizedData.UpdatePowershellExecutionPolicySuccess -f $ExecutionPolicyScope, $ExecutionPolicy)
+    }
+    catch
+    {
+        if ($_.FullyQualifiedErrorId -eq 'ExecutionPolicyOverride,Microsoft.PowerShell.Commands.SetExecutionPolicyCommand')
         {
-            Set-ExecutionPolicy -ExecutionPolicy $ExecutionPolicy -Scope $ExecutionPolicyScope -Force -ErrorAction Stop
-            Write-Verbose -Message ($localizedData.UpdatePowershellExecutionPolicySuccess -f $ExecutionPolicyScope, $ExecutionPolicy)
+            Write-Verbose -Message ($script:localizedData.UpdatePowershellExecutionPolicyFailed -f $ExecutionPolicyScope, $ExecutionPolicy)
         }
-        catch
+        else
         {
-            if ($_.FullyQualifiedErrorId -eq 'ExecutionPolicyOverride,Microsoft.PowerShell.Commands.SetExecutionPolicyCommand')
-            {
-                Write-Verbose -Message ($localizedData.UpdatePowershellExecutionPolicySuccess -f $ExecutionPolicyScope, $ExecutionPolicy)
-            }
-            else
-            {
-                throw
-            }
+            throw
         }
     }
 }
@@ -121,17 +111,17 @@ function Test-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy")]
+        [ValidateSet('CurrentUser','LocalMachine','MachinePolicy','Process','UserPolicy')]
         [System.String]
         $ExecutionPolicyScope,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted")]
+        [ValidateSet('Bypass','Restricted','AllSigned','RemoteSigned','Unrestricted')]
         [System.String]
         $ExecutionPolicy
     )
 
-    Write-Verbose -Message ($localizedData.TestingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
+    Write-Verbose -Message ($script:localizedData.TestingPowerShellExecutionPolicy -f $ExecutionPolicyScope, $ExecutionPolicy)
 
     if ((Get-ExecutionPolicy -Scope $ExecutionPolicyScope) -eq $ExecutionPolicy)
     {

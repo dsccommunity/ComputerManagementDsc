@@ -6,15 +6,16 @@ ConvertFrom-StringData @'
     NoMatchPsCredentialUsernameMessage = NOTMATCH: PSCredential username mismatch. Current state is '{0}' and desired state is '{1}'.
     NoMatchTypeMismatchMessage         = NOTMATCH: Type mismatch for property '{0}' Current state type is '{1}' and desired type is '{2}'.
     MatchValueMessage                  = MATCH: Value (type '{0}') for property '{1}' does match. Current state is '{2}' and desired state is '{3}'.
+    MatchEmptyCollectionMessage        = MATCH: Value (type '{0}') for property '{1}' does match. Current state and desired state both have zero items in the collection.
     NoMatchValueMessage                = NOTMATCH: Value (type '{0}') for property '{1}' does not match. Current state is '{2}' and desired state is '{3}'.
     NoMatchValueDifferentCountMessage  = NOTMATCH: Value (type '{0}') for property '{1}' does have a different count. Current state count is '{2}' and desired state count is '{3}'.
     NoMatchElementTypeMismatchMessage  = NOTMATCH: Type mismatch for property '{0}' Current state type of element [{1}] is '{2}' and desired type is '{3}'.
     NoMatchElementValueMismatchMessage = NOTMATCH: Value [{0}] (type '{1}') for property '{2}' does match. Current state is '{3}' and desired state is '{4}'.
     MatchElementValueMessage           = MATCH: Value [{0}] (type '{1}') for property '{2}' does match. Current state is '{3}' and desired state is '{4}'.
     TestDscParameterResultMessage      = Test-DscParameter result is '{0}'.
-    CurrentTimeZoneMessage             = Current time zone is set to '{0}'
-    GettingTimeZoneCimMessage          = Getting current time zone using {0}.
-    SettingTimeZoneMessage             = Setting time zone to '{0}' using {1}.
+    CurrentTimeZoneMessage             = Current time zone is set to '{0}'.
+    GettingTimeZoneMessage             = Getting current time zone using '{0}'.
+    SettingTimeZoneMessage             = Setting time zone to '{0}' using '{1}'.
     TimeZoneUpdatedMessage             = Time zone has been updated to '{0}'.
     AddingSetTimeZoneDotNetTypeMessage = Adding .NET Set time zone Type.
     UnableToEnumeratingPowerSchemes    = Error occurred while enumerating power schemes. Win32 error code: {0} - {1}
@@ -22,7 +23,7 @@ ConvertFrom-StringData @'
     FailedToGetActivePowerScheme       = Error occurred while getting active power scheme. Win32 error code: {0} - {1}
     FailedToSetActivePowerScheme       = Error occurred while activating power scheme with the GUID {0}. Win32 error code: {1} - {2}
     EnumeratingPowerPlans              = Enumerating all available power plans/schemes on the system using native Win32 function 'PowerEnumerate'.
-    PowerPlanFound                     = Found power scheme {0}. Getting friendly name.
-    PowerPlanFriendlyNameFound         = Friendly name is {0}.
+    PowerPlanFound                     = Found power scheme '{0}'. Getting friendly name.
+    PowerPlanFriendlyNameFound         = Friendly name is '{0}'.
     AllPowerPlansFound                 = Enumerating of available power schemes done.
 '@

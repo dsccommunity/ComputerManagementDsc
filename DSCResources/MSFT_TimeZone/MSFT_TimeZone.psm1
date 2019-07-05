@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
-# Import the ComputerManagementDsc Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
-            -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings.
-$LocalizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_TimeZone' `
-    -ResourcePath (Split-Path -Parent $script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_TimeZone'
 
 <#
     .SYNOPSIS
@@ -42,7 +35,7 @@ function Get-TargetResource
         $TimeZone
     )
 
-    Write-Verbose -Message ($LocalizedData.GettingTimeZoneMessage)
+    Write-Verbose -Message ($script:localizedData.GettingTimeZoneMessage)
 
     # Get the current time zone Id.
     $currentTimeZone = Get-TimeZoneId
@@ -86,12 +79,12 @@ function Set-TargetResource
 
     if ($currentTimeZone -ne $TimeZone)
     {
-        Write-Verbose -Message ($LocalizedData.SettingTimeZoneMessage)
+        Write-Verbose -Message ($script:localizedData.SettingTimeZoneMessage)
         Set-TimeZoneId -TimeZone $TimeZone
     }
     else
     {
-        Write-Verbose -Message ($LocalizedData.TimeZoneAlreadySetMessage -f $TimeZone)
+        Write-Verbose -Message ($script:localizedData.TimeZoneAlreadySetMessage -f $TimeZone)
     }
 }
 
@@ -122,7 +115,7 @@ function Test-TargetResource
         $TimeZone
     )
 
-    Write-Verbose -Message ($LocalizedData.TestingTimeZoneMessage)
+    Write-Verbose -Message ($script:localizedData.TestingTimeZoneMessage)
 
     return Test-TimeZoneId -TimeZoneId $TimeZone
 }

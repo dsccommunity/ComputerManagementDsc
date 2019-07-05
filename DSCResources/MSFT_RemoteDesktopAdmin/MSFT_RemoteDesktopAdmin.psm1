@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
-# Import the ComputerManagementDsc Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
-            -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_RemoteDesktopAdmin' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_RemoteDesktopAdmin'
 
 $script:tSRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
 $script:winStationsRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp'
