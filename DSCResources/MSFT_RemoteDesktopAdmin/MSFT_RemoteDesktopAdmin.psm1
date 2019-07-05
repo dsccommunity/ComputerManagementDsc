@@ -90,10 +90,10 @@ function Test-TargetResource
         [String]
         $IsSingleInstance,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateSet("Present", "Absent")]
         [System.String]
-        $Ensure,
+        $Ensure = 'Present',
 
         [Parameter()]
         [ValidateSet("NonSecure", "Secure")]
@@ -101,13 +101,13 @@ function Test-TargetResource
         $UserAuthentication
     )
 
-    $targetResource = Get-TargetResource -IsSingleInstance 'Yes' -Ensure $Ensure
+    $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
     $inDesiredState = $true
 
     if ($targetResource.Ensure -ne $Ensure)
     {
-        Write-Verbose -Message ($script:localizedData.PropertyMismatch `
-                -f 'Ensure', $Ensure, $targetResource.Ensure)
+        Write-Verbose -Message ($script:localizedData.NotInDesiredStateMessage `
+                -f $Ensure, $targetResource.Ensure)
 
         $inDesiredState = $false
     }
@@ -147,10 +147,10 @@ function Set-TargetResource
         [String]
         $IsSingleInstance,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateSet("Present", "Absent")]
         [System.String]
-        $Ensure,
+        $Ensure = 'Present',
 
         [Parameter()]
         [ValidateSet("NonSecure", "Secure")]
@@ -163,10 +163,12 @@ function Set-TargetResource
         "Present"
         {
             $fDenyTSConnectionsRegistry = 0
+            break
         }
         "Absent"
         {
             $fDenyTSConnectionsRegistry = 1
+            break
         }
     }
 
@@ -175,18 +177,20 @@ function Set-TargetResource
         "NonSecure"
         {
             $UserAuthenticationRegistry = 0
+            break
         }
         "Secure"
         {
             $UserAuthenticationRegistry = 1
+            break
         }
     }
 
-    $targetResource = Get-TargetResource -IsSingleInstance 'Yes' -Ensure $Ensure
+    $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
 
     if ($Ensure -ne $targetResource.Ensure)
     {
-        Write-Verbose -Message ($script:localizedData.SettingDenyRDPConnectionsMessage -f $fDenyTSConnections)
+        Write-Verbose -Message ($script:localizedData.SettingRemoteDesktopAdminMessage -f $Ensure)
         Set-ItemProperty -Path $script:tSRegistryKey -Name "fDenyTSConnections" -Value $fDenyTSConnectionsRegistry
     }
     if ($UserAuthentication -ne $targetResource.UserAuthentication)
