@@ -36,30 +36,48 @@ try
 
     InModuleScope $script:dscResourceName {
 
+        $mockGetTargetResourcePresentSecure = @{
+            IsSingleInstance   = 'Yes'
+            Ensure             = 'Present'
+            UserAuthentication = 'Secure'
+        }
+
+        $mockGetTargetResourcePresentNonSecure = @{
+            IsSingleInstance   = 'Yes'
+            Ensure             = 'Present'
+            UserAuthentication = 'NonSecure'
+        }
+
+        $mockGetTargetResourceAbsentNonSecure = @{
+            IsSingleInstance   = 'Yes'
+            Ensure             = 'Absent'
+            UserAuthentication = 'NonSecure'
+        }
+
         Describe 'MSFT_RemoteDesktopAdmin\Get-TargetResource' {
 
             Context "RemoteDesktopAdmin settings exist" {
                 It 'should return the correct values when Ensure is Present' {
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { [PSCustomObject] @{fDenyTSConnections = 0 } }
+                        -MockWith { @{fDenyTSConnections = 0} }
 
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'UserAuthentication' }
 
-                    $targetResource = Get-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present'
+                    $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
                     $targetResource.Ensure | Should -Be 'Present'
                 }
 
                 It 'should return the correct values when Ensure is Absent' {
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { [PSCustomObject] @{fDenyTSConnections = 1 } }
+                        -MockWith { @{fDenyTSConnections = 1} }
 
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'UserAuthentication' }
 
-                    $targetResource = Get-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent'
+                    $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
                     $targetResource.Ensure | Should -Be 'Absent'
                 }
 
@@ -68,10 +86,10 @@ try
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' }
 
                     Mock -CommandName Get-ItemProperty `
-                        -MockWith { [PSCustomObject] @{UserAuthentication = 0 } } `
+                        -MockWith { @{UserAuthentication = 0} } `
                         -ParameterFilter { $Name -eq 'UserAuthentication' }
 
-                    $result = Get-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present'
+                    $result = Get-TargetResource -IsSingleInstance 'Yes'
                     $result.UserAuthentication | Should -Be 'NonSecure'
                 }
 
@@ -80,10 +98,10 @@ try
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' }
 
                     Mock -CommandName Get-ItemProperty `
-                        -MockWith { [PSCustomObject] @{UserAuthentication = 1 } } `
+                        -MockWith { @{UserAuthentication = 1} } `
                         -ParameterFilter { $Name -eq 'UserAuthentication' }
 
-                    $result = Get-TargetResource -IsSingleInstance 'Yes'-Ensure 'Present'
+                    $result = Get-TargetResource -IsSingleInstance 'Yes'
                     $result.UserAuthentication | Should -Be 'Secure'
                 }
             }
@@ -93,15 +111,15 @@ try
             Context 'When the system is in the desired state' {
                 It 'Should return true when Ensure is present' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{Ensure = 'Present' } }
+                        -MockWith { $mockGetTargetResourcePresentSecure }
 
                     Test-TargetResource -IsSingleInstance 'yes' `
                         -Ensure "Present" | Should Be $true
                 }
 
                 It 'Should return true when Ensure is absent' {
-                    Mock -CommandName Get-TargetResource ` `
-                        -MockWith { [PSCustomObject] @{Ensure = 'Absent' } }
+                    Mock -CommandName Get-TargetResource `
+                        -MockWith { $mockGetTargetResourceAbsentNonSecure }
 
                     Test-TargetResource  -IsSingleInstance 'yes' `
                         -Ensure "Absent" | Should Be $true
@@ -109,24 +127,19 @@ try
 
                 It 'Should return true when User Authentication is Secure' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{
-                            Ensure             = 'Present'
-                            UserAuthentication = 'Secure'
-                        } }
+                        -MockWith { $mockGetTargetResourcePresentSecure }
 
                     Test-TargetResource  -IsSingleInstance 'yes' `
-                        -Ensure "Present" `
+                        -Ensure 'Present' `
                         -UserAuthentication 'Secure' | Should Be $true
                 }
 
                 It 'Should return true when User Authentication is NonSecure' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{
-                            Ensure             = 'Present'
-                            UserAuthentication = 'NonSecure'
-                        } }
+                        -MockWith { $mockGetTargetResourcePresentNonSecure }
+
                     Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure "Present" `
+                        -Ensure 'Present' `
                         -UserAuthentication 'NonSecure' | Should Be $true
                 }
             }
@@ -134,41 +147,35 @@ try
             Context 'When the system is not in the desired state' {
                 It 'Should return false when Ensure is present' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{Ensure = 'Present' } }
+                        -MockWith { $mockGetTargetResourcePresentSecure }
 
                     Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure "Absent" | Should Be $false
+                        -Ensure 'Absent' | Should Be $false
                 }
 
                 It 'Should return false when Ensure is absent' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{Ensure = 'Absent' } }
+                        -MockWith { $mockGetTargetResourceAbsenttNonSecure }
 
                     Test-TargetResource  -IsSingleInstance 'yes' `
-                        -Ensure "Present" | Should Be $false
+                        -Ensure 'Present' | Should Be $false
                 }
 
                 It 'Should return false if User Authentication is Secure' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{
-                            Ensure             = 'Present'
-                            UserAuthentication = 'Secure'
-                        } }
+                        -MockWith { $mockGetTargetResourcePresentSecure }
 
                     Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure "Present" `
+                        -Ensure 'Present' `
                         -UserAuthentication 'NonSecure' | Should Be $false
                 }
 
                 It 'Should return false if User Authentication is NonSecure' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{
-                            Ensure             = 'Present'
-                            UserAuthentication = 'NonSecure'
-                        } }
+                        -MockWith { $mockGetTargetResourcePresentNonSecure }
 
                     Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure "Present" `
+                        -Ensure 'Present' `
                         -UserAuthentication 'Secure' | Should Be $false
                 }
             }
@@ -182,10 +189,7 @@ try
 
                 It 'Should set the state to Present' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{
-                            Ensure             = 'Absent'
-                            UserAuthentication = 'NonSecure'
-                        } }
+                        -MockWith { $mockGetTargetResourceAbsentNonSecure }
 
                     Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Present'
                     Assert-MockCalled -CommandName Set-ItemProperty `
@@ -195,10 +199,7 @@ try
 
                 It 'Should set the state to Absent' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{
-                            Ensure             = 'Present'
-                            UserAuthentication = 'NonSecure'
-                        } }
+                        -MockWith { $mockGetTargetResourcePresentNonSecure }
 
                     Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Absent'
                     Assert-MockCalled -CommandName Set-ItemProperty `
@@ -208,10 +209,7 @@ try
 
                 It 'Should set UserAuthentication to Secure' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{
-                            Ensure             = 'Present'
-                            UserAuthentication = 'NonSecure'
-                        } }
+                        -MockWith { $mockGetTargetResourcePresentNonSecure }
 
                     Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Present' -UserAuthentication 'Secure'
                     Assert-MockCalled -CommandName Set-ItemProperty `
@@ -221,10 +219,7 @@ try
 
                 It 'Should set UserAuthentication to NonSecure' {
                     Mock -CommandName Get-TargetResource `
-                        -MockWith { [PSCustomObject] @{
-                            Ensure             = 'Present'
-                            UserAuthentication = 'Secure'
-                        } }
+                        -MockWith { $mockGetTargetResourcePresentSecure }
 
                     Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Present' -UserAuthentication 'NonSecure'
                     Assert-MockCalled -CommandName Set-ItemProperty `
