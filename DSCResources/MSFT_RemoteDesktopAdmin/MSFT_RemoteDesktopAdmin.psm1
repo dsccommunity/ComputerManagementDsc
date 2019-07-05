@@ -15,8 +15,8 @@ $script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_RemoteDesktopAdmin' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
-$tSRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
-$winStationsRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp'
+$script:tSRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
+$script:winStationsRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp'
 
 <#
     .SYNOPSIS
@@ -37,19 +37,15 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet('Yes')]
         [System.String]
-        $IsSingleInstance,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("Present", "Absent")]
-        [System.String]
-        $Ensure
+        $IsSingleInstance
     )
 
     Write-Verbose -Message $script:localizedData.GettingRemoteDesktopAdminSettingsMessage
-    $fDenyTSConnectionsRegistry = (Get-ItemProperty -Path $tSRegistryKey -Name 'fDenyTSConnections').fDenyTSConnections
-    $UserAuthenticationRegistry = (Get-ItemProperty -Path $winStationsRegistryKey -Name 'UserAuthentication').UserAuthentication
+    $fDenyTSConnectionsRegistry = (Get-ItemProperty -Path $script:tSRegistryKey -Name 'fDenyTSConnections').fDenyTSConnections
+    $UserAuthenticationRegistry = (Get-ItemProperty -Path $script:winStationsRegistryKey -Name 'UserAuthentication').UserAuthentication
 
     $targetResource = @{
+        IsSingleInstance   = $IsSingleInstance
         Ensure             = switch ($fDenyTSConnectionsRegistry)
         {
             0
@@ -73,7 +69,7 @@ function Get-TargetResource
             }
         }
     }
-    Return $targetResource
+    return $targetResource
 }
 
 <#
@@ -198,12 +194,12 @@ function Set-TargetResource
     if ($Ensure -ne $targetResource.Ensure)
     {
         Write-Verbose -Message ($script:localizedData.SettingDenyRDPConnectionsMessage -f $fDenyTSConnections)
-        Set-ItemProperty -Path $tSRegistryKey -Name "fDenyTSConnections" -Value $fDenyTSConnectionsRegistry
+        Set-ItemProperty -Path $script:tSRegistryKey -Name "fDenyTSConnections" -Value $fDenyTSConnectionsRegistry
     }
     if ($UserAuthentication -ne $targetResource.UserAuthentication)
     {
         Write-Verbose -Message ($script:localizedData.SettingUserAuthenticationMessage -f $UserAuthentication)
-        Set-ItemProperty -Path $winStationsRegistryKey -Name "UserAuthentication" -Value $UserAuthenticationRegistry
+        Set-ItemProperty -Path $script:winStationsRegistryKey -Name "UserAuthentication" -Value $UserAuthenticationRegistry
     }
 }
 
