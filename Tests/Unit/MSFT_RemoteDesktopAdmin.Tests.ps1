@@ -55,51 +55,54 @@ try
         }
 
         Describe 'MSFT_RemoteDesktopAdmin\Get-TargetResource' {
-
-            Context "RemoteDesktopAdmin settings exist" {
-                It 'should return the correct values when Ensure is Present' {
+            Context 'When Remote Desktop Admin settings exist' {
+                It 'Should return the correct values when Ensure is Present' {
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
                         -MockWith { @{fDenyTSConnections = 0} }
 
                     Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' }
+                        -ParameterFilter { $Name -eq 'UserAuthentication' } `
+                        -MockWith { @{UserAuthentication = 0} }
 
                     $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
                     $targetResource.Ensure | Should -Be 'Present'
                 }
 
-                It 'should return the correct values when Ensure is Absent' {
+                It 'Should return the correct values when Ensure is Absent' {
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
                         -MockWith { @{fDenyTSConnections = 1} }
 
                     Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' }
+                        -ParameterFilter { $Name -eq 'UserAuthentication' } `
+                        -MockWith { @{UserAuthentication = 0} }
 
                     $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
                     $targetResource.Ensure | Should -Be 'Absent'
                 }
 
-                It 'should return the correct values when UserAuthentication is NonSecure' {
+                It 'Should return the correct values when UserAuthentication is NonSecure' {
                     Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'fDenyTSConnections' }
+                        -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
+                        -MockWith { @{fDenyTSConnections = 0} }
 
                     Mock -CommandName Get-ItemProperty `
+                        -ParameterFilter { $Name -eq 'UserAuthentication' } `
                         -MockWith { @{UserAuthentication = 0} } `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' }
 
                     $result = Get-TargetResource -IsSingleInstance 'Yes'
                     $result.UserAuthentication | Should -Be 'NonSecure'
                 }
 
-                It 'should return the correct values when UserAuthentication is Secure' {
+                It 'Should return the correct values when UserAuthentication is Secure' {
                     Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'fDenyTSConnections' }
+                        -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
+                        -MockWith { @{fDenyTSConnections = 0} }
 
                     Mock -CommandName Get-ItemProperty `
+                        -ParameterFilter { $Name -eq 'UserAuthentication' } `
                         -MockWith { @{UserAuthentication = 1} } `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' }
 
                     $result = Get-TargetResource -IsSingleInstance 'Yes'
                     $result.UserAuthentication | Should -Be 'Secure'
@@ -114,7 +117,7 @@ try
                         -MockWith { $mockGetTargetResourcePresentSecure }
 
                     Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure "Present" | Should Be $true
+                        -Ensure 'Present' | Should Be $true
                 }
 
                 It 'Should return true when Ensure is absent' {
@@ -122,7 +125,7 @@ try
                         -MockWith { $mockGetTargetResourceAbsentNonSecure }
 
                     Test-TargetResource  -IsSingleInstance 'yes' `
-                        -Ensure "Absent" | Should Be $true
+                        -Ensure 'Absent' | Should Be $true
                 }
 
                 It 'Should return true when User Authentication is Secure' {
@@ -182,7 +185,7 @@ try
         }
 
         Describe 'MSFT_RemoteDesktopAdmin\Set-TargetResource' {
-            Context 'When the Ensure state has changed' {
+            Context 'When the state needs to be changed' {
                 BeforeEach {
                     Mock -CommandName Set-ItemProperty
                 }

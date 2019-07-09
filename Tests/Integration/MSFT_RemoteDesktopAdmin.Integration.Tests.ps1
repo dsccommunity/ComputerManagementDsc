@@ -46,6 +46,16 @@ try
             It 'Should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
             }
+
+            It 'Should return the correct values from Get-DscConfiguration' {
+                $Current = Get-DscConfiguration   | Where-Object -FilterScript {$_.ConfigurationName -eq $CurrentConfig}
+                $Current.IsSingleInstance   | Should -Be 'Yes'
+                $Current.Ensure             | Should -Be 'Absent'
+            }
+
+            It 'Should have set the correct registry values' {
+                (Get-ItemProperty -Path $script:tSRegistryKey -Name 'fDenyTSConnections').fDenyTSConnections | Should -Be 1
+            }
         }
 
         Context 'Set Remote Desktop for Administration to Allowed' {
@@ -67,6 +77,16 @@ try
 
             It 'Should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            }
+
+            It 'Should return the correct values from Get-DscConfiguration' {
+                $Current = Get-DscConfiguration   | Where-Object -FilterScript {$_.ConfigurationName -eq $CurrentConfig}
+                $Current.IsSingleInstance   | Should -Be 'Yes'
+                $Current.Ensure             | Should -Be 'Present'
+            }
+
+            It 'Should have set the correct registry values' {
+                (Get-ItemProperty -Path $script:tSRegistryKey -Name 'fDenyTSConnections').fDenyTSConnections | Should -Be 0
             }
         }
 
@@ -90,6 +110,18 @@ try
             It 'Should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
             }
+
+            It 'Should return the correct values from Get-DscConfiguration' {
+                $Current = Get-DscConfiguration   | Where-Object -FilterScript {$_.ConfigurationName -eq $CurrentConfig}
+                $Current.IsSingleInstance   | Should -Be 'Yes'
+                $Current.Ensure             | Should -Be 'Present'
+                $Current.UserAuthentication | Should -Be 'Secure'
+            }
+
+            It 'Should have set the correct registry values' {
+                (Get-ItemProperty -Path $script:tSRegistryKey -Name 'fDenyTSConnections').fDenyTSConnections | Should -Be 0
+                (Get-ItemProperty -Path $script:winStationsRegistryKey -Name 'UserAuthentication').UserAuthentication | Should -Be 1
+            }
         }
 
         Context 'Set Remote Desktop for Administration to Allowed with NonSecure Authentication' {
@@ -111,6 +143,18 @@ try
 
             It 'Should return a compliant state after being applied' {
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -Be $true
+            }
+
+            It 'Should return the correct values from Get-DscConfiguration' {
+                $Current = Get-DscConfiguration   | Where-Object -FilterScript {$_.ConfigurationName -eq $CurrentConfig}
+                $Current.IsSingleInstance   | Should -Be 'Yes'
+                $Current.Ensure             | Should -Be 'Present'
+                $Current.UserAuthentication | Should -Be 'NonSecure'
+            }
+
+            It 'Should have set the correct registry values' {
+                (Get-ItemProperty -Path $script:tSRegistryKey -Name 'fDenyTSConnections').fDenyTSConnections | Should -Be 0
+                (Get-ItemProperty -Path $script:winStationsRegistryKey -Name 'UserAuthentication').UserAuthentication | Should -Be 0
             }
         }
     }

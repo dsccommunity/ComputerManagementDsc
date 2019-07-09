@@ -1,7 +1,7 @@
-Configuration setToDenied
+configuration setToDenied
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node "localhost" {
+    node 'localhost' {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
             IsSingleInstance = 'Yes'
@@ -10,10 +10,10 @@ Configuration setToDenied
     }
 }
 
-Configuration setToAllowed
+configuration setToAllowed
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node "localhost" {
+    node 'localhost' {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
             IsSingleInstance = 'Yes'
@@ -22,10 +22,10 @@ Configuration setToAllowed
     }
 }
 
-Configuration setToAllowedSecure
+configuration setToAllowedSecure
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node "localhost" {
+    node 'localhost' {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
             IsSingleInstance     = 'Yes'
@@ -35,10 +35,10 @@ Configuration setToAllowedSecure
     }
 }
 
-Configuration setToAllowedNonSecure
+configuration setToAllowedNonSecure
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node "localhost" {
+    node 'localhost' {
         RemoteDesktopAdmin RemoteDesktopAdmin
         {
             IsSingleInstance     = 'Yes'
