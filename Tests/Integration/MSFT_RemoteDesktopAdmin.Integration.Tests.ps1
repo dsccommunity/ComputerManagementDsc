@@ -24,6 +24,9 @@ try
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile
 
+    $script:tSRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
+    $script:winStationsRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp'
+
     Describe "$($script:dscResourceName)_Integration" {
 
         Context 'Set Remote Desktop for Administration to Denied' {
