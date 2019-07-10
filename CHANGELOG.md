@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- ScheduledTask:
+  - Better compatibility with Group LogonType when passing BuiltIn groups through ExecuteAsCredential
+    - Primary use case is 'BUILTIN\Users'
 - Computer:
   - Fix for 'directory service is busy' error when joining a domain and renaming
     a computer when JoinOU is specified - Fixes [Issue #221](https://github.com/PowerShell/ComputerManagementDsc/issues/221).
