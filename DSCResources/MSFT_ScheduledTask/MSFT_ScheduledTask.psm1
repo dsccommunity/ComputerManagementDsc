@@ -1163,7 +1163,7 @@ function Set-TargetResource
             {
                 $triggerParameters.Add('AtLogOn', $true)
 
-                if (-not [System.String]::IsNullOrWhiteSpace($User))
+                if (-not [System.String]::IsNullOrWhiteSpace($User) -and $LogonType -ne 'Group')
                 {
                     $triggerParameters.Add('User', $User)
                 }
@@ -1284,7 +1284,6 @@ function Set-TargetResource
         elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
         {
             $username = $ExecuteAsCredential.UserName
-            $registerArguments.Add('User', $username)
 
             # If the LogonType is not specified then set it to password
             if ([System.String]::IsNullOrEmpty($LogonType))
@@ -1292,7 +1291,12 @@ function Set-TargetResource
                 $LogonType = 'Password'
             }
 
-            if ($LogonType -notin ('Interactive', 'S4U'))
+            if ($LogonType -ne 'Group')
+            {
+                $registerArguments.Add('User', $username)
+            }
+
+            if ($LogonType -notin ('Interactive', 'S4U', 'Group'))
             {
                 # Only set the password if the LogonType is not interactive or S4U
                 $registerArguments.Add('Password', $ExecuteAsCredential.GetNetworkCredential().Password)
@@ -1313,8 +1317,15 @@ function Set-TargetResource
         # Prepare the principal arguments
         $principalArguments = @{
             Id        = 'Author'
-            UserId    = $username
-            LogonType = $LogonType
+        }
+
+        if($LogonType -eq 'Group'){
+            $principalArguments.GroupId = $username
+        }
+
+        else{
+            $principalArguments.LogonType = $LogonType
+            $principalArguments.UserId = $username
         }
 
         # Set the Run Level if defined
