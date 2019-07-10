@@ -342,6 +342,24 @@ Configuration ScheduledTaskExecuteAsMod
     {
         ScheduledTask ScheduledTaskOnceMod
         {
+            TaskName            = 'Test task Logon with BuiltIn Group'
+            TaskPath            = '\ComputerManagementDsc\'
+            ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            LogonType           = 'Group'
+            ExecuteAsCredenital = New-Object System.Management.Automation.PSCredential ("Users", (ConvertTo-SecureString -AsPlainText -Force "Unused"))
+            ScheduleType        = 'AtLogOn'
+            RunLevel            = 'Limited'
+        }
+    }
+}
+
+Configuration ScheduledTaskExecuteAsMod
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskOnceMod
+        {
             TaskName         = 'Test task Logon'
             TaskPath         = '\ComputerManagementDsc\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
