@@ -335,7 +335,7 @@ Configuration ScheduledTaskStartupMod
     }
 }
 
-Configuration ScheduledTaskExecuteAsMod
+Configuration ScheduledTaskExecuteAsGroup
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
