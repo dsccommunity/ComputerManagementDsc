@@ -1319,11 +1319,12 @@ function Set-TargetResource
             Id        = 'Author'
         }
 
-        if($LogonType -eq 'Group'){
+        if ($LogonType -eq 'Group')
+        {
             $principalArguments.GroupId = $username
         }
-
-        else{
+        else
+        {
             $principalArguments.LogonType = $LogonType
             $principalArguments.UserId = $username
         }
