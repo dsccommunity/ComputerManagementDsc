@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.5.0.0
+
 - Computer:
   - Fix for 'directory service is busy' error when joining a domain and renaming
     a computer when JoinOU is specified - Fixes [Issue #221](https://github.com/PowerShell/ComputerManagementDsc/issues/221).
