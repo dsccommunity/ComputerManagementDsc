@@ -2104,6 +2104,7 @@ try
                     StartTime         = Get-Date -Date $startTimeString
                     ScheduleType      = 'AtLogon'
                     Delay             = '00:01:00'
+                    Enable            = $true
                     Verbose           = $true
                 }
 
@@ -2125,12 +2126,15 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $testParameters.Enable
+                        }
                     }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result.Enable | Should -Be $testParameters.Enable
                     $result.Ensure | Should -Be 'Present'
                     $result.StartTime | Should -Be $startTimeString
                     $result.ScheduleType | Should -Be 'AtLogon'
@@ -2151,6 +2155,7 @@ try
                     StartTime         = Get-Date -Date $startTimeString
                     ScheduleType      = 'AtStartup'
                     Delay             = '00:01:00'
+                    Enable            = $true
                     Verbose           = $true
                 }
 
@@ -2172,12 +2177,15 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $testParameters.Enable
+                        }
                     }
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result.Enable | Should -Be $testParameters.Enable
                     $result.Ensure | Should -Be 'Present'
                     $result.StartTime | Should -Be $startTimeString
                     $result.ScheduleType | Should -Be 'AtStartup'

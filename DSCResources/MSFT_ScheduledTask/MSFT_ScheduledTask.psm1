@@ -1187,11 +1187,6 @@ function Set-TargetResource
             $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
         }
 
-        if ($ScheduleType -in ('AtLogon', 'AtStartUp', 'OnEvent'))
-        {
-            $trigger.Delay = [System.Xml.XmlConvert]::ToString([timespan]$Delay)
-        }
-
         if (-not $trigger)
         {
             New-InvalidOperationException `
@@ -1258,6 +1253,16 @@ function Set-TargetResource
                     New-InvalidOperationException `
                         -Message ($script:localizedData.TriggerUnexpectedTypeError -f $trigger.GetType().FullName)
                 }
+            }
+        }
+
+        if ($trigger.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance')
+        {
+            # On W2016+ / W10+ the Delay property is supported on the AtLogon, AtStartup and OnEvent trigger types
+            $triggerSupportsDelayProperty = @('AtLogon', 'AtStartup', 'OnEvent')
+            if ($ScheduleType -in $triggerSupportsDelayProperty)
+            {
+                $trigger.Delay = [System.Xml.XmlConvert]::ToString([timespan]$Delay)
             }
         }
 
