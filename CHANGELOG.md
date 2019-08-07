@@ -31,6 +31,9 @@
     prevented it to work. Though the helper function is not used, so this
     issue was not caught until now when unit tests was added.
   - Improved code coverage.
+- Changes to ScheduledTask:
+  - Delay property not handled properly on AtLogon and AtStartup trigger - Fixes
+    [Issue #230](https://github.com/PowerShell/ComputerManagementDsc/issues/230)
 
 ## 6.4.0.0
 
