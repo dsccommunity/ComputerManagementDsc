@@ -1178,7 +1178,6 @@ function Set-TargetResource
                 $cimTriggerClass = Get-CimClass -ClassName MSFT_TaskEventTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskEventTrigger
                 $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
                 $trigger.Enabled = $true
-                $trigger.Delay = [System.Xml.XmlConvert]::ToString([timespan]$Delay)
                 $trigger.Subscription = $EventSubscription
             }
         }
@@ -1186,6 +1185,11 @@ function Set-TargetResource
         if ($ScheduleType -ne 'OnEvent')
         {
             $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
+        }
+
+        if ($ScheduleType -in ('AtLogon', 'AtStartUp', 'OnEvent'))
+        {
+            $trigger.Delay = [System.Xml.XmlConvert]::ToString([timespan]$Delay)
         }
 
         if (-not $trigger)
