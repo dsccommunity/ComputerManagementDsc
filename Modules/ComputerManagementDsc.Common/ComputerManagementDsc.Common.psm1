@@ -1,12 +1,170 @@
-# Import the ComputerManagement Resource Helper Module
-Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
-        -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
-            -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
+<#
+    .SYNOPSIS
+        Retrieves the localized string data based on the machine's culture.
+        Falls back to en-US strings if the machine's culture is not supported.
 
-# Import Localization Strings
-$script:localizedData = Get-LocalizedData `
-    -ResourceName 'ComputerManagementDsc.Common' `
-    -ResourcePath $PSScriptRoot
+    .PARAMETER ResourceName
+        The name of the resource as it appears before '.strings.psd1' of the localized string file.
+        For example:
+            For WindowsOptionalFeature: MSFT_WindowsOptionalFeature
+            For Service: MSFT_ServiceResource
+            For Registry: MSFT_RegistryResource
+            For Helper: SqlServerDscHelper
+
+    .PARAMETER ScriptRoot
+        Optional. The root path where to expect to find the culture folder. This is only needed
+        for localization in helper modules. This should not normally be used for resources.
+
+    .NOTES
+        To be able to use localization in the helper function, this function must
+        be first in the file, before Get-LocalizedData is used by itself to load
+        localized data for this helper module (see directly after this function).
+#>
+function Get-LocalizedData
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $ResourceName,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $ScriptRoot
+    )
+
+    if (-not $ScriptRoot)
+    {
+        $dscResourcesFolder = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'DSCResources'
+        $resourceDirectory = Join-Path -Path $dscResourcesFolder -ChildPath $ResourceName
+    }
+    else
+    {
+        $resourceDirectory = $ScriptRoot
+    }
+
+    $localizedStringFileLocation = Join-Path -Path $resourceDirectory -ChildPath $PSUICulture
+
+    if (-not (Test-Path -Path $localizedStringFileLocation))
+    {
+        # Fallback to en-US
+        $localizedStringFileLocation = Join-Path -Path $resourceDirectory -ChildPath 'en-US'
+    }
+
+    Import-LocalizedData `
+        -BindingVariable 'localizedData' `
+        -FileName "$ResourceName.strings.psd1" `
+        -BaseDirectory $localizedStringFileLocation
+
+    return $localizedData
+}
+
+<#
+    .SYNOPSIS
+        Tests if the current machine is a Nano server.
+#>
+function Test-IsNanoServer
+{
+    if (Test-Command -Name Get-ComputerInfo -Module 'Microsoft.PowerShell.Management')
+    {
+        $computerInfo = Get-ComputerInfo
+
+        if ('Server' -eq $computerInfo.OsProductType `
+            -and 'NanoServer' -eq $computerInfo.OsServerLevel)
+        {
+            return $true
+        }
+    }
+
+    return $false
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an invalid argument exception
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown
+
+    .PARAMETER ArgumentName
+        The name of the invalid argument that is causing this error to be thrown
+#>
+function New-InvalidArgumentException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $Message,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $ArgumentName
+    )
+
+    $argumentException = New-Object -TypeName 'ArgumentException' -ArgumentList @( $Message,
+        $ArgumentName )
+    $newObjectParams = @{
+        TypeName = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @( $argumentException, $ArgumentName, 'InvalidArgument', $null )
+    }
+    $errorRecord = New-Object @newObjectParams
+
+    throw $errorRecord
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an invalid operation exception
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown
+
+    .PARAMETER ErrorRecord
+        The error record containing the exception that is causing this terminating error
+#>
+function New-InvalidOperationException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $ErrorRecord)
+    {
+        $invalidOperationException =
+            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message )
+    }
+    else
+    {
+        $invalidOperationException =
+            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message,
+                $ErrorRecord.Exception )
+    }
+
+    $newObjectParams = @{
+        TypeName = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @( $invalidOperationException.ToString(), 'MachineStateIncorrect',
+            'InvalidOperation', $null )
+    }
+    $errorRecordToThrow = New-Object @newObjectParams
+    throw $errorRecordToThrow
+}
 
 <#
     .SYNOPSIS
@@ -21,7 +179,7 @@ $script:localizedData = Get-LocalizedData `
 function Remove-CommonParameter
 {
     [OutputType([System.Collections.Hashtable])]
-    [cmdletbinding()]
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -33,7 +191,7 @@ function Remove-CommonParameter
     $commonParameters = [System.Management.Automation.PSCmdlet]::CommonParameters
     $commonParameters += [System.Management.Automation.PSCmdlet]::OptionalCommonParameters
 
-    $Hashtable.Keys | Where-Object { $_ -in $commonParameters } | ForEach-Object {
+    $Hashtable.Keys | Where-Object -FilterScript { $_ -in $commonParameters } | ForEach-Object -Process {
         $inputClone.Remove($_)
     }
 
@@ -118,7 +276,7 @@ function Test-DscParameterState
         }
         else
         {
-            $desiredType = [psobject] @{
+            $desiredType = [PSObject] @{
                 Name = 'Unknown'
             }
         }
@@ -129,7 +287,7 @@ function Test-DscParameterState
         }
         else
         {
-            $currentType = [psobject] @{
+            $currentType = [PSObject] @{
                 Name = 'Unknown'
             }
         }
@@ -196,15 +354,26 @@ function Test-DscParameterState
         {
             Write-Verbose -Message ($script:localizedData.TestDscParameterCompareMessage -f $key)
 
-            if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
+            if ($CurrentValues.$key.Count -eq 0 -and $DesiredValues.$key.Count -eq 0)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
-                $returnValue = $false
+                Write-Verbose -Message ($script:localizedData.MatchEmptyCollectionMessage -f $desiredType.Name, $key)
                 continue
             }
+            <#
+                This evaluation needs to be performed before the next evaluation,
+                because we need to be able to handle when the current value
+                is a zero item collection, meaning `-not $CurrentValues.$key`
+                would otherwise return $true in the next evaluation.
+            #>
             elseif ($CurrentValues.$key.Count -ne $DesiredValues.$key.Count)
             {
                 Write-Verbose -Message ($script:localizedData.NoMatchValueDifferentCountMessage -f $desiredType.Name, $key, $CurrentValues.$key.Count, $desiredValuesClean.$key.Count)
+                $returnValue = $false
+                continue
+            }
+            elseif (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
+            {
+                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
                 $returnValue = $false
                 continue
             }
@@ -221,7 +390,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $desiredType = [psobject]@{
+                        $desiredType = [PSObject]@{
                             Name = 'Unknown'
                         }
                     }
@@ -232,7 +401,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $currentType = [psobject]@{
+                        $currentType = [PSObject]@{
                             Name = 'Unknown'
                         }
                     }
@@ -354,20 +523,20 @@ function Get-TimeZoneId
 
     if (Test-Command -Name 'Get-TimeZone' -Module 'Microsoft.PowerShell.Management')
     {
-        Write-Verbose -Message ($LocalizedData.GettingTimeZoneMessage -f 'Cmdlets')
+        Write-Verbose -Message ($script:localizedData.GettingTimeZoneMessage -f 'Cmdlets')
 
         $timeZone = (Get-TimeZone).StandardName
     }
     else
     {
-        Write-Verbose -Message ($LocalizedData.GettingTimeZoneMessage -f 'CIM')
+        Write-Verbose -Message ($script:localizedData.GettingTimeZoneMessage -f 'CIM')
 
         $timeZone = (Get-CimInstance `
                 -ClassName Win32_TimeZone `
                 -Namespace root\cimv2).StandardName
     }
 
-    Write-Verbose -Message ($LocalizedData.CurrentTimeZoneMessage -f $timeZone)
+    Write-Verbose -Message ($script:localizedData.CurrentTimeZoneMessage -f $timeZone)
 
     $timeZoneInfo = [System.TimeZoneInfo]::GetSystemTimeZones() |
         Where-Object -Property StandardName -EQ $timeZone
@@ -430,14 +599,14 @@ function Set-TimeZoneId
         if (Test-Command -Name 'Add-Type' -Module 'Microsoft.Powershell.Utility')
         {
             # We can use reflection to modify the time zone.
-            Write-Verbose -Message ($LocalizedData.SettingTimeZoneMessage -f $TimeZoneId, '.NET')
+            Write-Verbose -Message ($script:localizedData.SettingTimeZoneMessage -f $TimeZoneId, '.NET')
 
             Set-TimeZoneUsingDotNet -TimeZoneId $TimeZoneId
         }
         else
         {
             # For anything else use TZUTIL.EXE.
-            Write-Verbose -Message ($LocalizedData.SettingTimeZoneMessage -f $TimeZoneId, 'TZUTIL.EXE')
+            Write-Verbose -Message ($script:localizedData.SettingTimeZoneMessage -f $TimeZoneId, 'TZUTIL.EXE')
 
             try
             {
@@ -450,7 +619,7 @@ function Set-TimeZoneId
         } # if
     } # if
 
-    Write-Verbose -Message ($LocalizedData.TimeZoneUpdatedMessage -f $TimeZoneId)
+    Write-Verbose -Message ($script:localizedData.TimeZoneUpdatedMessage -f $TimeZoneId)
 } # function Set-TimeZoneId
 
 <#
@@ -477,7 +646,7 @@ function Set-TimeZoneUsingDotNet
     # Add the [TimeZoneHelper.TimeZone] type if it is not defined.
     if (-not ([System.Management.Automation.PSTypeName] 'TimeZoneHelper.TimeZone').Type)
     {
-        Write-Verbose -Message ($LocalizedData.AddingSetTimeZoneDotNetTypeMessage)
+        Write-Verbose -Message ($script:localizedData.AddingSetTimeZoneDotNetTypeMessage)
 
         $setTimeZoneCs = Get-Content `
             -Path (Join-Path -Path $PSScriptRoot -ChildPath 'SetTimeZone.cs') `
@@ -510,7 +679,7 @@ function Get-PowerPlan
     [OutputType([System.Collections.Hashtable[]])]
     param
     (
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $PowerPlan
@@ -865,7 +1034,6 @@ function Set-ActivePowerPlan
 
     try
     {
-
         # Set the active power scheme with the native function
         $returnCode = $powrprof::PowerSetActiveScheme([System.IntPtr]::Zero,$PowerPlanGuid)
 
@@ -882,14 +1050,24 @@ function Set-ActivePowerPlan
     }
 }
 
-Export-ModuleMember -Function `
-    Test-DscParameterState, `
-    Test-DscObjectHasProperty, `
-    Test-Command, `
-    Get-TimeZoneId, `
-    Test-TimeZoneId, `
-    Set-TimeZoneId, `
-    Set-TimeZoneUsingDotNet, `
-    Get-PowerPlan, `
-    Get-ActivePowerPlan, `
-    Set-ActivePowerPlan
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'ComputerManagementDsc.Common' `
+    -ScriptRoot $PSScriptRoot
+
+Export-ModuleMember -Function @(
+    'Test-DscParameterState'
+    'Test-DscObjectHasProperty'
+    'Test-Command'
+    'Get-TimeZoneId'
+    'Test-TimeZoneId'
+    'Set-TimeZoneId'
+    'Set-TimeZoneUsingDotNet'
+    'Get-PowerPlan'
+    'Get-ActivePowerPlan'
+    'Set-ActivePowerPlan'
+    'Test-IsNanoServer'
+    'New-InvalidArgumentException'
+    'New-InvalidOperationException'
+    'Get-LocalizedData'
+)

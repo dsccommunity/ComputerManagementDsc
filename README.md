@@ -16,6 +16,7 @@ The **ComputerManagementDsc** module contains the following resources:
   which is only available on Windows Server 2012/Windows 8 and above. DSC configurations
   containing this resource may be compiled on Windows Server 2008 R2/Windows 7 but
   can not be applied._
+- **SmbShare**: this resource is use to manage SMB shares on a machine.
 - **TimeZone**: this resource is used for setting the time zone on a machine.
 - **VirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
@@ -52,3 +53,7 @@ branch, and be released to [PowerShell Gallery](https://www.powershellgallery.co
 ## Contributing
 
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
+
+## Change log
+
+A full list of changes in each version can be found in the [change log](CHANGELOG.md).

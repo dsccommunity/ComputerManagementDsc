@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-moduleVersion = '6.4.0.0'
+moduleVersion = '6.5.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,18 +49,33 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- ScheduledTask:
-  - IdleWaitTimeout returned from Get-TargetResource always null - Fixes [Issue 186](https://github.com/PowerShell/ComputerManagementDsc/issues/186).
-  - Added BuiltInAccount Property to allow running task as one of the build in
-    service accounts - Fixes [Issue 130](https://github.com/PowerShell/ComputerManagementDsc/issues/130).
-- Refactored module folder structure to move resource to root folder of
-  repository and remove test harness - fixes [Issue 188](https://github.com/PowerShell/ComputerManagementDsc/issues/188).
-- Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md and
-  linked to it from README.MD instead.
-- Updated test header for all unit tests to version 1.2.4.
-- Updated test header for all imtegration to version 1.3.3.
-- Enabled example publish to PowerShell Gallery by adding `gallery_api`
-  environment variable to `AppVeyor.yml`.
+        ReleaseNotes = '- Computer:
+  - Fix for "directory service is busy" error when joining a domain and renaming
+    a computer when JoinOU is specified - Fixes [Issue 221](https://github.com/PowerShell/ComputerManagementDsc/issues/221).
+- Added new resource SmbShare
+  - Moved and improved from deprecated module xSmbShare.
+- Changes to ComputerManagementDsc.Common
+  - Updated Test-DscParameterState so it now can compare zero item
+    collections (arrays).
+- Changes to WindowsEventLog
+  - Minor style guideline cleanup.
+- Opt-in to common test to validate localization. Fixed localization strings
+  in resources - Fixes [Issue 217](https://github.com/PowerShell/ComputerManagementDsc/issues/217).
+- PowerShellExecutionPolicy:
+  - Removed `SupportsShouldProcess` as it cannot be used with DSC - Fixes
+    [Issue 219](https://github.com/PowerShell/ComputerManagementDsc/issues/219).
+- Combined all ComputerManagementDsc.ResourceHelper module functions into
+  ComputerManagementDsc.Common module - Fixes [Issue 218](https://github.com/PowerShell/ComputerManagementDsc/issues/218).
+  - Minor code cleanup against style guideline.
+  - Remove code from `New-InvalidOperationException` because it was a
+    code path that could never could be used due to the parameter
+    validation preventing the helper function being called that way.
+  - Updated all `Get-LocalizationData` to latest version from
+    [DSCResource.Template](https://github.com/PowerShell/DSCResource.Template).
+  - Fixed an issue with the helper function `Test-IsNanoServer` that
+    prevented it to work. Though the helper function is not used, so this
+    issue was not caught until now when unit tests was added.
+  - Improved code coverage.
 
 '
 
@@ -68,6 +83,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 
