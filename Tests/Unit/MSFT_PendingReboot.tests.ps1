@@ -184,7 +184,7 @@ try
             Context 'When a reboot is required' {
                 foreach ($rebootTrigger in $RebootTriggers)
                 {
-                    Context "When $($rebootTrigger.Description) triggers a reboot and is not skipped" {
+                    Context "When $($rebootTrigger.Description) requires a reboot and is not skipped" {
                         BeforeAll {
                             $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
                             $getPendingRebootStateMock.$($rebootTrigger.Name) = $true
@@ -208,10 +208,71 @@ try
                             } | Should -Not -Throw
                         }
 
-                        It 'Should return true' {
+                        It 'Should return false' {
                             $script:testTargetResourceResult | Should -BeFalse
                         }
                     }
+                }
+
+                foreach ($rebootTrigger in $RebootTriggers)
+                {
+                    Context "When $($rebootTrigger.Description) requires a reboot but is skipped" {
+                        BeforeAll {
+                            $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
+                            $getPendingRebootStateMock.$($rebootTrigger.Name) = $true
+                            $getPendingRebootStateMock."skip$($rebootTrigger.Name)" = $true
+
+                            Mock -CommandName Get-PendingRebootState `
+                                -MockWith {
+                                    $getPendingRebootStateMock
+                                } `
+                                -ModuleName 'MSFT_PendingReboot' `
+                                -Verifiable
+                        }
+
+                        It 'Should not throw an exception' {
+                            {
+                                $testTargetResourceParameters = $testTargetResourceDefaultParameters.Clone()
+                                $testTargetResourceParameters."skip$($rebootTrigger.Name)" = $true
+
+                                $script:testTargetResourceResult = Test-TargetResource `
+                                    @testTargetResourceParameters
+                            } | Should -Not -Throw
+                        }
+
+                        It 'Should return true' {
+                            $script:testTargetResourceResult | Should -BeTrue
+                        }
+                    }
+                }
+            }
+
+            Context 'When a reboot is not required' {
+                BeforeAll {
+                    Mock -CommandName Get-PendingRebootState `
+                        -MockWith {
+                            $getPendingRebootStateObject
+                        } `
+                        -ModuleName 'MSFT_PendingReboot' `
+                        -Verifiable
+                }
+
+                It 'Should not throw an exception' {
+                    {
+                        $testTargetResourceParameters = $testTargetResourceDefaultParameters.Clone()
+
+                        foreach ($rebootTrigger in $RebootTriggers)
+                        {
+                            $testTargetResourceParameters."skip$($rebootTrigger.Name)" = $false
+                        }
+
+                        $script:testTargetResourceResult = Test-TargetResource `
+                            @testTargetResourceParameters
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return true' {
+                    $script:testTargetResourceResult | Should -BeTrue
                 }
             }
         }

@@ -22,7 +22,8 @@ $script:rebootRegistryKeys = @{
 
 <#
     List of reboot triggers that will be checked when determining if reboot
-    is required.
+    is required. This is stored in a separate data file so that it can also
+    be used in testing.
 #>
 $script:resourceData = Import-LocalizedData `
     -BaseDirectory $PSScriptRoot `
@@ -172,10 +173,17 @@ function Test-TargetResource
     {
         $skipTrigger = (Get-Variable -Name ('Skip{0}' -f $rebootTrigger.Name)).Value
 
-        if (-not $skipTrigger -and $currentStatus.$($rebootTrigger.Name))
+        if ($currentStatus.$($rebootTrigger.Name))
         {
-            Write-Verbose -Message ($script:localizedData.RebootRequiredMessage -f $rebootTrigger.Description)
-            $isInDesiredState = $false
+            if ($skipTrigger)
+            {
+                Write-Verbose -Message ($script:localizedData.RebootRequiredButSkippedMessage -f $rebootTrigger.Description)
+            }
+            else
+            {
+                Write-Verbose -Message ($script:localizedData.RebootRequiredMessage -f $rebootTrigger.Description)
+                $isInDesiredState = $false
+            }
         }
     }
 
