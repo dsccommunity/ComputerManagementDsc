@@ -1727,7 +1727,7 @@ try
                 $testParameters.EventSubscription = 'InvalidXML'
 
                 It 'When an EventSubscription cannot be parsed as valid XML an error is generated when changing the task' {
-                    { Set-TargetResource @testParameters } | Should throw
+                    { Set-TargetResource @testParameters } | Should -Throw
                 }
             }
 
@@ -2091,7 +2091,7 @@ try
                 }
 
                 It 'Should throw when Set-TargetResource is called and SynchronizeAcrossTimeZone is used in combination with an unsupported trigger type' {
-                    { Set-TargetResource @testParamers } | Should Throw
+                    { Set-TargetResource @testParamers } | Should -Throw
                 }
             }
         }

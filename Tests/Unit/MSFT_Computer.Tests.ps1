@@ -1108,13 +1108,13 @@ try
                         netbios = $true
                     }
 
-                    Get-ComputerDomain @getComputerDomainParameters | Should Be 'CONTOSO'
+                    Get-ComputerDomain @getComputerDomainParameters | Should -Be 'CONTOSO'
 
                     $getComputerDomainParameters = @{
                         netbios = $false
                     }
 
-                    Get-ComputerDomain @getComputerDomainParameters | Should Be 'contoso.com'
+                    Get-ComputerDomain @getComputerDomainParameters | Should -Be 'contoso.com'
 
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 2 -Scope It
                     Assert-MockCalled -CommandName Get-Item -Exactly -Times 1 -Scope It
@@ -1138,13 +1138,13 @@ try
                         netbios = $true
                     }
 
-                    Get-ComputerDomain @getComputerDomainParameters | Should Be ''
+                    Get-ComputerDomain @getComputerDomainParameters | Should -Be ''
 
                     $getComputerDomainParameters = @{
                         netbios = $false
                     }
 
-                    Get-ComputerDomain @getComputerDomainParameters | Should Be ''
+                    Get-ComputerDomain @getComputerDomainParameters | Should -Be ''
 
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 2 -Scope It
                     Assert-MockCalled -CommandName Get-Item -Exactly -Times 0 -Scope It
@@ -1164,7 +1164,7 @@ try
                         }
                     }
 
-                    Get-ComputerDomain | Should Be "contoso.com"
+                    Get-ComputerDomain | Should -Be "contoso.com"
 
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Get-Item -Exactly -Times 0 -Scope It

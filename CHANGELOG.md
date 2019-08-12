@@ -17,6 +17,7 @@
   - Converted the call to `Invoke-WmiMethod` to `Invoke-CimMethod`.
   - Deleted the code that removes the `regRebootLocations` variable at the end of
     the resource as it appears to serve no purpose.
+- Correct all tests to meet Pester 4.0 standards.
 
 ## 6.5.0.0
 

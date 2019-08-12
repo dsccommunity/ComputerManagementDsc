@@ -1,6 +1,6 @@
 #region HEADER
 $script:dscModuleName = 'ComputerManagementDsc'
-$script:dscResourceName = 'MSFT_PowerShellExecutionPolicy'
+$script:dscResourceName = 'MSFT_PendingReboot'
 
 # Integration Test Template Version: 1.3.3
 $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -19,15 +19,31 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 try
 {
-    #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile
 
     Describe "$($script:dscResourceName)_Integration" {
-        #region DEFAULT TESTS
+        <#
+            These integration tests will not actually reboot the node
+            because that would terminate the tests and cause them to fail.
+
+            There does not appear to be a method of determining if the
+            reboot is in fact triggered, so this is not currently tested.
+        #>
+        $configData = @{
+            AllNodes = @(
+                @{
+                    NodeName   = 'localhost'
+                    RebootName = 'TestReboot'
+                }
+            )
+        }
+
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:dscResourceName)_Config" -OutputPath $TestDrive
+                & "$($script:dscResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
 
                 $startDscConfigurationParameters = @{
                     Path         = $TestDrive
@@ -47,18 +63,14 @@ try
                 Get-DscConfiguration -Verbose -ErrorAction Stop
             } | Should -Not -Throw
         }
-        #endregion
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
-            $current.ExecutionPolicy      | Should -Be 'RemoteSigned'
-            $current.ExecutionPolicyScope | Should -Be 'LocalMachine'
+            $current.Name | Should -Be $configData.AllNodes[0].RebootName
         }
     }
-    #endregion
-
 }
 finally
 {

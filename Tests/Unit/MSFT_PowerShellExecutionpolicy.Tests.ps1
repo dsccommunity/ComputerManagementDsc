@@ -55,7 +55,7 @@ try
             It 'Returns correct execution policy' {
                 Mock Get-ExecutionPolicy { 'Unrestricted' }
                 $result = Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy ) -ExecutionPolicyScope 'LocalMachine'
-                $result.ExecutionPolicy | Should be $(Get-ExecutionPolicy)
+                $result.ExecutionPolicy | Should -Be $(Get-ExecutionPolicy)
             }
 
             It 'Throws when passed an invalid execution policy ExecutionPolicyScope' {
@@ -64,8 +64,8 @@ try
 
             It 'Returns correct execution policy for the correct ExecutionPolicyScope' {
                 $result = Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy -Scope  'LocalMachine') -ExecutionPolicyScope  'LocalMachine'
-                $result.ExecutionPolicy | Should be $(Get-ExecutionPolicy -Scope 'LocalMachine')
-                $result.ExecutionPolicyScope | Should be 'LocalMachine'
+                $result.ExecutionPolicy | Should -Be $(Get-ExecutionPolicy -Scope 'LocalMachine')
+                $result.ExecutionPolicyScope | Should -Be 'LocalMachine'
             }
         }
         #endregion
@@ -79,12 +79,12 @@ try
 
             It 'Returns true when current policy matches desired policy' {
                 Mock Get-ExecutionPolicy { 'Unrestricted' }
-                Test-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy)  -ExecutionPolicyScope 'LocalMachine' | Should be $True
+                Test-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy)  -ExecutionPolicyScope 'LocalMachine' | Should -Be $True
             }
 
             It 'Returns false when current policy does not match desired policy' {
                 Mock -CommandName Get-ExecutionPolicy -MockWith { 'Restricted' }
-                Test-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' | Should be $false
+                Test-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' | Should -Be $false
             }
 
             It 'Throws when passed an invalid execution policy Scope' {
@@ -92,12 +92,12 @@ try
             }
 
             It 'Returns true when current policy matches desired policy with correct Scope' {
-                Test-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy)  -ExecutionPolicyScope 'LocalMachine' | Should be $True
+                Test-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy)  -ExecutionPolicyScope 'LocalMachine' | Should -Be $True
             }
 
             It 'Returns false when current policy does not match desired policy with correct ExecutionPolicyScope' {
                 Mock -CommandName Get-ExecutionPolicy -MockWith { 'Restricted' }
-                Test-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' | Should be $false
+                Test-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' | Should -Be $false
             }
         }
         #endregion
@@ -116,7 +116,7 @@ try
             It 'Catches execution policy scope warning exception' {
                 Mock -CommandName Set-ExecutionPolicy -MockWith { Throw 'ExecutionPolicyOverride,Microsoft.PowerShell.Commands.SetExecutionPolicyCommand' }
                 $result = Set-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine'
-                $result | should be $null
+                $result | Should -Be $null
             }
 
             It 'Throws non-caught exceptions' {
