@@ -7,7 +7,9 @@
     of the built-in scheduled tasks. Removing the function means that built-in
     one is used instead which works as expected - Fixes [Issue #137](https://github.com/PowerShell/ComputerManagementDsc/issues/137).
 - xComputer:
+
 =======
+
 ## 6.5.0.0
 
 - Computer:
