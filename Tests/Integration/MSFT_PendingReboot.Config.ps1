@@ -6,7 +6,12 @@ configuration MSFT_PendingReboot_config
     node $AllNodes.NodeName {
         PendingReboot TestReboot
         {
-            Name = $Node.RebootName
+            Name                        = $Node.RebootName
+            SkipComponentBasedServicing = $Node.SkipComponentBasedServicing
+            SkipWindowsUpdate           = $Node.SkipWindowsUpdate
+            SkipPendingFileRename       = $Node.SkipPendingFileRename
+            SkipPendingComputerRename   = $Node.SkipPendingComputerRename
+            SkipCcmClientSDK            = $Node.SkipCcmClientSDK
         }
     }
 }

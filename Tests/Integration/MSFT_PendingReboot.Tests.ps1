@@ -35,6 +35,11 @@ try
                 @{
                     NodeName   = 'localhost'
                     RebootName = 'TestReboot'
+                    SkipComponentBasedServicing = $false
+                    SkipWindowsUpdate           = $false
+                    SkipPendingFileRename       = $false
+                    SkipPendingComputerRename   = $false
+                    SkipCcmClientSDK            = $true
                 }
             )
         }
@@ -69,6 +74,17 @@ try
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
             $current.Name | Should -Be $configData.AllNodes[0].RebootName
+            $current.SkipComponentBasedServicing | Should -Be $configData.AllNodes[0].SkipComponentBasedServicing
+            $current.ComponentBasedServicing | Should -Be $true
+            $current.SkipWindowsUpdate | Should -Be $configData.AllNodes[0].SkipWindowsUpdate
+            $current.WindowsUpdate | Should -Be $false
+            $current.SkipPendingFileRename | Should -Be $configData.AllNodes[0].SkipPendingFileRename
+            $current.PendingFileRename | Should -Be $false
+            $current.SkipPendingComputerRename | Should -Be $configData.AllNodes[0].SkipPendingComputerRename
+            $current.PendingComputerRename | Should -Be $false
+            $current.SkipCcmClientSDK | Should -Be $configData.AllNodes[0].SkipCcmClientSDK
+            $current.CcmClientSDK | Should -Be $false
+            $current.RebootRequired | Should -Be $true
         }
     }
 }

@@ -19,7 +19,7 @@
 
 <#
     .DESCRIPTION
-        This examples joins a computer to a domain and allows the LCM
+        This example joins a computer to a domain and allows the LCM
         node to reboot after the join. The LCM must have been configured
         with the RebootNodeIfNeeded property set to $true.
 #>

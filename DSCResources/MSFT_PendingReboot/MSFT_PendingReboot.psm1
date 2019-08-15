@@ -11,25 +11,15 @@ Import-Module -Name (Join-Path -Path $modulePath `
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_PendingReboot'
 
-# Registry keys for checking reboot status
-$script:rebootRegistryKeys = @{
-    ComponentBasedServicing = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\'
-    WindowsUpdate           = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\'
-    PendingFileRename       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\'
-    ActiveComputerName      = 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName'
-    PendingComputerName     = 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName'
-}
-
 <#
-    List of reboot triggers that will be checked when determining if reboot
-    is required. This is stored in a separate data file so that it can also
-    be used in testing.
+    This data file contains a list of reboot triggers that will be checked
+    when determining if reboot is required. This is stored in a separate
+    data file so that it can also be used in testing.
 #>
-$script:resourceData = Import-LocalizedData `
-    -BaseDirectory $PSScriptRoot `
-    -FileName 'MSFT_PendingReboot.data.psd1'
-$script:rebootTriggers = $script:resourceData.RebootTriggers
-
+$script:localizedResourceData = Get-LocalizedData `
+    -ResourceName 'MSFT_PendingReboot' `
+    -Postfix 'data'
+$script:rebootTriggers = $script:localizedResourceData.RebootTriggers
 <#
     .SYNOPSIS
         Returns the current state of the pending reboot.
@@ -107,7 +97,12 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SettingPendingRebootStateMessage -f $Name)
 
-    $global:DSCMachineStatus = 1
+    $currentStatus = Get-PendingRebootState @PSBoundParameters
+
+    if ($currentStatus.RebootRequired)
+    {
+        $global:DSCMachineStatus = 1
+    }
 }
 
 <#
@@ -166,38 +161,141 @@ function Test-TargetResource
     Write-Verbose -Message ($script:localizedData.TestingPendingRebootStateMessage -f $Name)
 
     $currentStatus = Get-PendingRebootState @PSBoundParameters
-    $isInDesiredState = $true
 
-    # Loop through each reboot trigger and determine if it requires a reboot
-    foreach ($rebootTrigger in $script:rebootTriggers)
-    {
-        $skipTrigger = (Get-Variable -Name ('Skip{0}' -f $rebootTrigger.Name)).Value
-
-        if ($currentStatus.$($rebootTrigger.Name))
-        {
-            if ($skipTrigger)
-            {
-                Write-Verbose -Message ($script:localizedData.RebootRequiredButSkippedMessage -f $rebootTrigger.Description)
-            }
-            else
-            {
-                Write-Verbose -Message ($script:localizedData.RebootRequiredMessage -f $rebootTrigger.Description)
-                $isInDesiredState = $false
-            }
-        }
-    }
-
-    if ($isInDesiredState)
-    {
-        Write-Verbose -Message ($script:localizedData.NoRebootRequiredMessage)
-    }
-
-    return $isInDesiredState
+    return (-not $currentStatus.RebootRequired)
 }
 
 <#
     .SYNOPSIS
-        Returns the current state of the pending reboot.
+        Returns a hash table containing the current state of the pending reboot
+        triggers.
+
+    .PARAMETER Name
+        Specifies the name of this pending reboot check.
+
+    .PARAMETER SkipComponentBasedServicing
+        Specifies whether to skip reboots triggered by the Component-Based Servicing component.
+
+    .PARAMETER SkipWindowsUpdate
+        Specifies whether to skip reboots triggered by Windows Update.
+
+    .PARAMETER SkipPendingFileRename
+        Specifies whether to skip pending file rename reboots.
+
+    .PARAMETER SkipPendingComputerRename
+        Specifies whether to skip reboots triggered by a pending computer rename.
+
+    .PARAMETER SkipCcmClientSDK
+        Specifies whether to skip reboots triggered by the ConfigMgr client. Defaults to True.
+#>
+function Get-PendingRebootHashTable
+{
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $SkipComponentBasedServicing,
+
+        [Parameter()]
+        [System.Boolean]
+        $SkipWindowsUpdate,
+
+        [Parameter()]
+        [System.Boolean]
+        $SkipPendingFileRename,
+
+        [Parameter()]
+        [System.Boolean]
+        $SkipPendingComputerRename,
+
+        [Parameter()]
+        [System.Boolean]
+        $SkipCcmClientSDK = $true
+    )
+
+    # The list of registry keys that will be used to determine if a reboot is required
+    $rebootRegistryKeys = @{
+        ComponentBasedServicing = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\'
+        WindowsUpdate           = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\'
+        PendingFileRename       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\'
+        ActiveComputerName      = 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName'
+        PendingComputerName     = 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName'
+    }
+
+    $componentBasedServicingKeys = (Get-ChildItem -Path $rebootRegistryKeys.ComponentBasedServicing).Name
+
+    if ($componentBasedServicingKeys)
+    {
+        $componentBasedServicing = $componentBasedServicingKeys.Split('\') -contains 'RebootPending'
+    }
+    else
+    {
+        $componentBasedServicing = $false
+    }
+
+    $windowsUpdateKeys = (Get-ChildItem -Path $rebootRegistryKeys.WindowsUpdate).Name
+
+    if ($windowsUpdateKeys)
+    {
+        $windowsUpdate = $windowsUpdateKeys.Split('\') -contains 'RebootRequired'
+    }
+    else
+    {
+        $windowsUpdate = $false
+    }
+
+    $pendingFileRename = (Get-ItemProperty -Path $rebootRegistryKeys.PendingFileRename).PendingFileRenameOperations.Length -gt 0
+    $activeComputerName = (Get-ItemProperty -Path $rebootRegistryKeys.ActiveComputerName).ComputerName
+    $pendingComputerName = (Get-ItemProperty -Path $rebootRegistryKeys.PendingComputerName).ComputerName
+    $pendingComputerRename = $activeComputerName -ne $pendingComputerName
+
+    if (-not $SkipCcmClientSDK)
+    {
+        $invokeCimMethodParameters = @{
+            NameSpace   = 'ROOT\ccm\ClientSDK'
+            ClassName   = 'CCM_ClientUtilities'
+            Name        = 'DetermineIfRebootPending'
+            ErrorAction = 'Stop'
+        }
+
+        try
+        {
+            $ccmClientSDK = Invoke-CimMethod @invokeCimMethodParameters
+        }
+        catch
+        {
+            Write-Warning -Message ($script:localizedData.QueryCcmClientUtilitiesFailedMessage -f $_)
+        }
+    }
+
+    $ccmClientSDK = ($ccmClientSDK.ReturnValue -eq 0) -and ($ccmClientSDK.IsHardRebootPending -or $ccmClientSDK.RebootPending)
+
+    return @{
+        Name                        = $Name
+        SkipComponentBasedServicing = $SkipComponentBasedServicing
+        ComponentBasedServicing     = $componentBasedServicing
+        SkipWindowsUpdate           = $SkipWindowsUpdate
+        WindowsUpdate               = $windowsUpdate
+        SkipPendingFileRename       = $SkipPendingFileRename
+        PendingFileRename           = $pendingFileRename
+        SkipPendingComputerRename   = $SkipPendingComputerRename
+        PendingComputerRename       = $pendingComputerRename
+        SkipCcmClientSDK            = $SkipCcmClientSDK
+        CcmClientSDK                = $ccmClientSDK
+        RebootRequired              = $false
+    }
+}
+
+<#
+    .SYNOPSIS
+        Returns the current state of the pending reboot by assessing the result provided
+        in a pending reboot hash table.
 
     .PARAMETER Name
         Specifies the name of this pending reboot check.
@@ -248,67 +346,32 @@ function Get-PendingRebootState
         $SkipCcmClientSDK = $true
     )
 
-    $componentBasedServicingKeys = (Get-ChildItem -Path $script:rebootRegistryKeys.ComponentBasedServicing).Name
+    $pendingRebootState = Get-PendingRebootHashTable @PSBoundParameters
 
-    if ($componentBasedServicingKeys)
+    foreach ($rebootTrigger in $script:rebootTriggers)
     {
-        $componentBasedServicing = $componentBasedServicingKeys.Split('\') -contains 'RebootPending'
-    }
-    else
-    {
-        $componentBasedServicing = $false
-    }
+        $skipTriggerName = 'Skip{0}' -f $rebootTrigger.Name
+        $skipTrigger = $pendingRebootState.$skipTriggerName
 
-    $windowsUpdateKeys = (Get-ChildItem -Path $script:rebootRegistryKeys.WindowsUpdate).Name
-
-    if ($windowsUpdateKeys)
-    {
-        $windowsUpdate = $windowsUpdateKeys.Split('\') -contains 'RebootRequired'
-    }
-    else
-    {
-        $windowsUpdate = $false
-    }
-
-    $pendingFileRename = (Get-ItemProperty -Path $script:rebootRegistryKeys.PendingFileRename).PendingFileRenameOperations.Length -gt 0
-    $activeComputerName = (Get-ItemProperty -Path $script:rebootRegistryKeys.ActiveComputerName).ComputerName
-    $pendingComputerName = (Get-ItemProperty -Path $script:rebootRegistryKeys.PendingComputerName).ComputerName
-    $pendingComputerRename = $activeComputerName -ne $pendingComputerName
-
-    if (-not $SkipCcmClientSDK)
-    {
-        $invokeCimMethodParameters = @{
-            NameSpace   = 'ROOT\ccm\ClientSDK'
-            ClassName   = 'CCM_ClientUtilities'
-            Name        = 'DetermineIfRebootPending'
-            ErrorAction = 'Stop'
-        }
-
-        try
+        if ($skipTrigger)
         {
-            $ccmClientSDK = Invoke-CimMethod @invokeCimMethodParameters
+            Write-Verbose -Message ($script:localizedData.RebootRequiredButSkippedMessage -f $rebootTrigger.Description)
         }
-        catch
+        else
         {
-            Write-Warning -Message ($script:localizedData.QueryCcmClientUtilitiesFailedMessage -f $_)
+            if ($pendingRebootState.$($rebootTrigger.Name))
+            {
+                Write-Verbose -Message ($script:localizedData.RebootRequiredMessage -f $rebootTrigger.Description)
+                $pendingRebootState.rebootRequired = $true
+            }
+            else
+            {
+                Write-Verbose -Message ($script:localizedData.RebootNotRequiredMessage -f $rebootTrigger.Description)
+            }
         }
     }
 
-    $sccmSDK = ($ccmClientSDK.ReturnValue -eq 0) -and ($ccmClientSDK.IsHardRebootPending -or $ccmClientSDK.RebootPending)
-
-    return @{
-        Name                        = $Name
-        SkipComponentBasedServicing = $SkipComponentBasedServicing
-        ComponentBasedServicing     = $componentBasedServicing
-        SkipWindowsUpdate           = $SkipWindowsUpdate
-        WindowsUpdate               = $windowsUpdate
-        SkipPendingFileRename       = $SkipPendingFileRename
-        PendingFileRename           = $pendingFileRename
-        SkipPendingComputerRename   = $SkipPendingComputerRename
-        PendingComputerRename       = $pendingComputerRename
-        SkipCcmClientSDK            = $SkipCcmClientSDK
-        CcmClientSDK                = $sccmSDK
-    }
+    return $pendingRebootState
 }
 
 Export-ModuleMember -Function *-TargetResource
