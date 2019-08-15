@@ -153,7 +153,7 @@ try
                     } | Should -Not -Throw
                 }
 
-                It 'Should set DSCMachineStatus to 1' {
+                It 'Should have set DSCMachineStatus to 1' {
                     $global:DSCMachineStatus | Should -BeExactly 1
                 }
             }
@@ -172,7 +172,7 @@ try
                     } | Should -Not -Throw
                 }
 
-                It 'Should set DSCMachineStatus to 0' {
+                It 'Should have not set DSCMachineStatus to 1' {
                     $global:DSCMachineStatus | Should -BeExactly 0
                 }
             }

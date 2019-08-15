@@ -75,16 +75,16 @@ try
             }
             $current.Name | Should -Be $configData.AllNodes[0].RebootName
             $current.SkipComponentBasedServicing | Should -Be $configData.AllNodes[0].SkipComponentBasedServicing
-            $current.ComponentBasedServicing | Should -Be $true
+            $current.ComponentBasedServicing | Should -BeTrue
             $current.SkipWindowsUpdate | Should -Be $configData.AllNodes[0].SkipWindowsUpdate
-            $current.WindowsUpdate | Should -Be $false
+            $current.WindowsUpdate | Should -BeFalse
             $current.SkipPendingFileRename | Should -Be $configData.AllNodes[0].SkipPendingFileRename
-            $current.PendingFileRename | Should -Be $false
+            $current.PendingFileRename | Should -BeFalse
             $current.SkipPendingComputerRename | Should -Be $configData.AllNodes[0].SkipPendingComputerRename
-            $current.PendingComputerRename | Should -Be $false
+            $current.PendingComputerRename | Should -BeFalse
             $current.SkipCcmClientSDK | Should -Be $configData.AllNodes[0].SkipCcmClientSDK
-            $current.CcmClientSDK | Should -Be $false
-            $current.RebootRequired | Should -Be $true
+            $current.CcmClientSDK | Should -BeFalse
+            $current.RebootRequired | Should -BeTrue
         }
     }
 }
