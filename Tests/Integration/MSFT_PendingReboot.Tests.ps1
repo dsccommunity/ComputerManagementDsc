@@ -35,7 +35,8 @@ try
             have run we will determine if the Get-TargetResource indicates
             that a reboot would have been required.
         #>
-        if ((Get-ChildItem -Path $rebootRegistryKeys.WindowsUpdate).Name)
+        $windowsUpdateKeys = (Get-ChildItem -Path $rebootRegistryKeys.WindowsUpdate).Name
+        if ($windowsUpdateKeys)
         {
             $currentAutoUpdateRebootState = $windowsUpdateKeys.Split('\') -contains 'RebootRequired'
         }
