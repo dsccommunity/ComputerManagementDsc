@@ -74,7 +74,7 @@ try
 
         Describe 'MSFT_PendingReboot\Get-TargetResource' {
             Context 'When all reboots are required' {
-                Mock -CommandName Get-PendingRebootHashTable `
+                Mock -CommandName Get-PendingRebootState `
                     -MockWith $getPendingRebootStateAllRebootsTrue `
                     -ModuleName 'MSFT_PendingReboot' `
                     -Verifiable
@@ -106,7 +106,7 @@ try
             }
 
             Context 'When no reboots are required' {
-                Mock -CommandName Get-PendingRebootHashTable `
+                Mock -CommandName Get-PendingRebootState `
                     -MockWith $getPendingRebootStateAllRebootsFalse `
                     -ModuleName 'MSFT_PendingReboot' `
                     -Verifiable
@@ -199,7 +199,7 @@ try
             Context 'When a reboot is not required' {
                 $global:DSCMachineStatus = 0
 
-                Mock -CommandName Get-PendingRebootHashTable `
+                Mock -CommandName Get-PendingRebootState `
                     -MockWith $getPendingRebootStateAllRebootsFalse `
                     -ModuleName 'MSFT_PendingReboot' `
                     -Verifiable
@@ -326,7 +326,7 @@ try
                                 Verbose          = $true
                             }
 
-                            $script:getPendingRebootStateResult = Get-PendingRebootHashTable @getPendingRebootStateParameters
+                            $script:getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
                         } | Should -Not -Throw
                     }
 
@@ -354,7 +354,7 @@ try
                                 Verbose          = $true
                             }
 
-                            $script:getPendingRebootStateResult = Get-PendingRebootHashTable @getPendingRebootStateParameters
+                            $script:getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
                         } | Should -Not -Throw
                     }
 
@@ -425,7 +425,7 @@ try
                                 Verbose          = $true
                             }
 
-                            $script:getPendingRebootStateResult = Get-PendingRebootHashTable @getPendingRebootStateParameters
+                            $script:getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
                         } | Should -Not -Throw
                     }
 
@@ -453,7 +453,7 @@ try
                                 Verbose          = $true
                             }
 
-                            $script:getPendingRebootStateResult = Get-PendingRebootHashTable @getPendingRebootStateParameters
+                            $script:getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
                         } | Should -Not -Throw
                     }
 
@@ -504,6 +504,7 @@ try
                             Context "When $($rebootTrigger.Description) requires a reboot and is not skipped" {
                                 BeforeAll {
                                     $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
+                                    $null = $getPendingRebootStateMock.Remove('RebootRequired')
                                     $getPendingRebootStateMock.$($rebootTrigger.Name) = $true
                                     $getPendingRebootStateMock."skip$($rebootTrigger.Name)" = $false
 
@@ -536,6 +537,7 @@ try
                             Context "When $($rebootTrigger.Description) requires a reboot but is skipped" {
                                 BeforeAll {
                                     $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
+                                    $null = $getPendingRebootStateMock.Remove('RebootRequired')
                                     $getPendingRebootStateMock.$($rebootTrigger.Name) = $true
                                     $getPendingRebootStateMock."skip$($rebootTrigger.Name)" = $true
 
@@ -566,9 +568,12 @@ try
 
                     Context 'When a reboot is not required' {
                         BeforeAll {
+                            $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
+                            $null = $getPendingRebootStateMock.Remove('RebootRequired')
+
                             Mock -CommandName Get-PendingRebootHashTable `
                                 -MockWith {
-                                    $getPendingRebootStateObject
+                                    $getPendingRebootStateMock
                                 } `
                                 -ModuleName 'MSFT_PendingReboot' `
                                 -Verifiable

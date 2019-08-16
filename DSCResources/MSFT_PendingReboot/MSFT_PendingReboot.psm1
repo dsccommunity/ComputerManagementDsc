@@ -255,7 +255,11 @@ function Get-PendingRebootHashTable
     $pendingComputerName = (Get-ItemProperty -Path $rebootRegistryKeys.PendingComputerName).ComputerName
     $pendingComputerRename = $activeComputerName -ne $pendingComputerName
 
-    if (-not $SkipCcmClientSDK)
+    if ($SkipCcmClientSDK)
+    {
+        $ccmClientSDK = $false
+    }
+    else
     {
         $invokeCimMethodParameters = @{
             NameSpace   = 'ROOT\ccm\ClientSDK'
@@ -272,9 +276,9 @@ function Get-PendingRebootHashTable
         {
             Write-Warning -Message ($script:localizedData.QueryCcmClientUtilitiesFailedMessage -f $_)
         }
-    }
 
-    $ccmClientSDK = ($ccmClientSDK.ReturnValue -eq 0) -and ($ccmClientSDK.IsHardRebootPending -or $ccmClientSDK.RebootPending)
+        $ccmClientSDK = ($ccmClientSDK.ReturnValue -eq 0) -and ($ccmClientSDK.IsHardRebootPending -or $ccmClientSDK.RebootPending)
+    }
 
     return @{
         Name                        = $Name
@@ -288,7 +292,6 @@ function Get-PendingRebootHashTable
         PendingComputerRename       = $pendingComputerRename
         SkipCcmClientSDK            = $SkipCcmClientSDK
         CcmClientSDK                = $ccmClientSDK
-        RebootRequired              = $false
     }
 }
 
@@ -347,6 +350,7 @@ function Get-PendingRebootState
     )
 
     $pendingRebootState = Get-PendingRebootHashTable @PSBoundParameters
+    $rebootRequired = $false
 
     foreach ($rebootTrigger in $script:rebootTriggers)
     {
@@ -362,13 +366,17 @@ function Get-PendingRebootState
             if ($pendingRebootState.$($rebootTrigger.Name))
             {
                 Write-Verbose -Message ($script:localizedData.RebootRequiredMessage -f $rebootTrigger.Description)
-                $pendingRebootState.rebootRequired = $true
+                $rebootRequired = $true
             }
             else
             {
                 Write-Verbose -Message ($script:localizedData.RebootNotRequiredMessage -f $rebootTrigger.Description)
             }
         }
+    }
+
+    $pendingRebootState += @{
+        RebootRequired = $rebootRequired
     }
 
     return $pendingRebootState
