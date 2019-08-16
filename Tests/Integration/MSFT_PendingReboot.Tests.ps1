@@ -29,7 +29,24 @@ try
 
             There does not appear to be a method of determining if the
             reboot is in fact triggered, so this is not currently tested.
+
+            Instead, we will preserve the current state of the Auto Update
+            reboot flag and then set it to reboot required. After the tests
+            have run we will determine if the Get-TargetResource indicates
+            that a reboot would have been required.
         #>
+        if ((Get-ChildItem -Path $rebootRegistryKeys.WindowsUpdate).Name)
+        {
+            $currentAutoUpdateRebootState = $windowsUpdateKeys.Split('\') -contains 'RebootRequired'
+        }
+        else
+        {
+            $currentAutoUpdateRebootState = $false
+            $null = New-Item `
+                -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' `
+                -Name 'RebootRequired'
+        }
+
         $configData = @{
             AllNodes = @(
                 @{
@@ -75,9 +92,9 @@ try
             }
             $current.Name | Should -Be $configData.AllNodes[0].RebootName
             $current.SkipComponentBasedServicing | Should -Be $configData.AllNodes[0].SkipComponentBasedServicing
-            $current.ComponentBasedServicing | Should -BeTrue
+            $current.ComponentBasedServicing | Should -BeFalse
             $current.SkipWindowsUpdate | Should -Be $configData.AllNodes[0].SkipWindowsUpdate
-            $current.WindowsUpdate | Should -BeFalse
+            $current.WindowsUpdate | Should -BeTrue
             $current.SkipPendingFileRename | Should -Be $configData.AllNodes[0].SkipPendingFileRename
             $current.PendingFileRename | Should -BeFalse
             $current.SkipPendingComputerRename | Should -Be $configData.AllNodes[0].SkipPendingComputerRename
@@ -91,6 +108,11 @@ try
 finally
 {
     #region FOOTER
+    if (-not $currentAutoUpdateRebootState)
+    {
+        $null = Remove-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired'
+    }
+
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }
