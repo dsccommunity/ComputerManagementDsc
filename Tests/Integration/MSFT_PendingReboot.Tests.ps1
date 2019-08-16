@@ -36,13 +36,14 @@ try
             that a reboot would have been required.
         #>
         $windowsUpdateKeys = (Get-ChildItem -Path $rebootRegistryKeys.WindowsUpdate).Name
+
         if ($windowsUpdateKeys)
         {
-            $currentAutoUpdateRebootState = $windowsUpdateKeys.Split('\') -contains 'RebootRequired'
+            $script:currentAutoUpdateRebootState = $windowsUpdateKeys.Split('\') -contains 'RebootRequired'
         }
-        else
+
+        if (-not $script:currentAutoUpdateRebootState)
         {
-            $currentAutoUpdateRebootState = $false
             $null = New-Item `
                 -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' `
                 -Name 'RebootRequired'
@@ -109,9 +110,11 @@ try
 finally
 {
     #region FOOTER
-    if (-not $currentAutoUpdateRebootState)
+    if (-not $script:currentAutoUpdateRebootState)
     {
-        $null = Remove-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired'
+        $null = Remove-Item `
+            -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' `
+            -ErrorAction SilentlyContinue
     }
 
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
