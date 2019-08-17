@@ -15,6 +15,10 @@
         Optional. The root path where to expect to find the culture folder. This is only needed
         for localization in helper modules. This should not normally be used for resources.
 
+    .PARAMETER Postfix
+        Optional. The default string to postfix to the resource name to generate the name of the
+        localized file.
+
     .NOTES
         To be able to use localization in the helper function, this function must
         be first in the file, before Get-LocalizedData is used by itself to load
@@ -33,7 +37,12 @@ function Get-LocalizedData
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [System.String]
-        $ScriptRoot
+        $ScriptRoot,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Postfix = 'strings'
     )
 
     if (-not $ScriptRoot)
@@ -56,7 +65,7 @@ function Get-LocalizedData
 
     Import-LocalizedData `
         -BindingVariable 'localizedData' `
-        -FileName "$ResourceName.strings.psd1" `
+        -FileName "$ResourceName.$Postfix.psd1" `
         -BaseDirectory $localizedStringFileLocation
 
     return $localizedData
