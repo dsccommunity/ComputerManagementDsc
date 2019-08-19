@@ -2,11 +2,9 @@
 
 ## Unreleased
 
-<<<<<<< HEAD
 - Changes to ScheduledTask:
   - Delay property not handled properly on AtLogon and AtStartup trigger - Fixes
     [Issue #230](https://github.com/PowerShell/ComputerManagementDsc/issues/230)
-=======
 - PendingReboot:
   - Migrated xPendingReboot from [xPendingReboot](https://github.com/PowerShell/xPendingReboot)
     and renamed to PendingReboot.
@@ -23,7 +21,6 @@
   - Deleted the code that removes the `regRebootLocations` variable at the end of
     the resource as it appears to serve no purpose.
 - Correct all tests to meet Pester 4.0 standards.
->>>>>>> 3c0502b058f088624c5a8bc48429eda479b5a651
 
 ## 6.5.0.0
 
