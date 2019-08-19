@@ -45,25 +45,25 @@ try
                 }
 
                 It 'Should have retained parameters in the hashtable' {
-                    $script:result.Contains('Parameter1') | Should -Be $true
-                    $script:result.Contains('Parameter2') | Should -Be $true
+                    $script:result.Contains('Parameter1') | Should -BeTrue
+                    $script:result.Contains('Parameter2') | Should -BeTrue
                 }
 
                 It 'Should have removed the common parameters from the hashtable' {
-                    $script:result.Contains('Verbose') | Should -Be $false
-                    $script:result.Contains('Debug') | Should -Be $false
-                    $script:result.Contains('ErrorAction') | Should -Be $false
-                    $script:result.Contains('WarningAction') | Should -Be $false
-                    $script:result.Contains('InformationAction') | Should -Be $false
-                    $script:result.Contains('ErrorVariable') | Should -Be $false
-                    $script:result.Contains('WarningVariable') | Should -Be $false
-                    $script:result.Contains('OutVariable') | Should -Be $false
-                    $script:result.Contains('OutBuffer') | Should -Be $false
-                    $script:result.Contains('PipelineVariable') | Should -Be $false
-                    $script:result.Contains('InformationVariable') | Should -Be $false
-                    $script:result.Contains('WhatIf') | Should -Be $false
-                    $script:result.Contains('Confirm') | Should -Be $false
-                    $script:result.Contains('UseTransaction') | Should -Be $false
+                    $script:result.Contains('Verbose') | Should -BeFalse
+                    $script:result.Contains('Debug') | Should -BeFalse
+                    $script:result.Contains('ErrorAction') | Should -BeFalse
+                    $script:result.Contains('WarningAction') | Should -BeFalse
+                    $script:result.Contains('InformationAction') | Should -BeFalse
+                    $script:result.Contains('ErrorVariable') | Should -BeFalse
+                    $script:result.Contains('WarningVariable') | Should -BeFalse
+                    $script:result.Contains('OutVariable') | Should -BeFalse
+                    $script:result.Contains('OutBuffer') | Should -BeFalse
+                    $script:result.Contains('PipelineVariable') | Should -BeFalse
+                    $script:result.Contains('InformationVariable') | Should -BeFalse
+                    $script:result.Contains('WhatIf') | Should -BeFalse
+                    $script:result.Contains('Confirm') | Should -BeFalse
+                    $script:result.Contains('UseTransaction') | Should -BeFalse
                 }
             }
         }
@@ -100,7 +100,7 @@ try
                 }
 
                 It 'Should return $true' {
-                    $script:result | Should -Be $true
+                    $script:result | Should -BeTrue
                 }
             }
 
@@ -135,7 +135,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
 
@@ -170,7 +170,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
 
@@ -205,7 +205,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
 
@@ -240,7 +240,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
 
@@ -275,7 +275,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
 
@@ -310,7 +310,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
 
@@ -345,7 +345,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
 
@@ -380,7 +380,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
 
@@ -412,7 +412,7 @@ try
                 }
 
                 It 'Should return $true' {
-                    $script:result | Should -Be $true
+                    $script:result | Should -BeTrue
                 }
             }
         }
@@ -427,7 +427,7 @@ try
                 }
 
                 It 'Should return $true' {
-                    $script:result | Should -Be $true
+                    $script:result | Should -BeTrue
                 }
             }
 
@@ -437,7 +437,7 @@ try
                 }
 
                 It 'Should return $false' {
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
         }
@@ -543,13 +543,13 @@ try
 
             Context 'current timezone matches desired timezone' {
                 It 'Should return $true' {
-                    Test-TimezoneId -TimeZoneId 'Russia Time Zone 11' | Should -Be $true
+                    Test-TimezoneId -TimeZoneId 'Russia Time Zone 11' | Should -BeTrue
                 }
             }
 
             Context 'current timezone does not match desired timezone' {
                 It 'Should return $false' {
-                    Test-TimezoneId -TimeZoneId 'GMT Standard Time' | Should -Be $false
+                    Test-TimezoneId -TimeZoneId 'GMT Standard Time' | Should -BeFalse
                 }
             }
         }
@@ -1111,7 +1111,7 @@ try
                     }
                 }
 
-                Test-IsNanoServer | Should -Be $false
+                Test-IsNanoServer | Should -BeFalse
             }
 
             Context 'When the current computer is a Nano server' {
@@ -1128,7 +1128,7 @@ try
                     }
                 }
 
-                Test-IsNanoServer | Should -Be $true
+                Test-IsNanoServer | Should -BeTrue
             }
 
             Context 'When the current computer is not a Nano server' {
@@ -1145,7 +1145,7 @@ try
                     }
                 }
 
-                Test-IsNanoServer | Should -Be $false
+                Test-IsNanoServer | Should -BeFalse
             }
         }
     }

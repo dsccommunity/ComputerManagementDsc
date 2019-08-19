@@ -115,7 +115,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should create the scheduled task in the set method' {
@@ -162,7 +162,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
             }
@@ -198,12 +198,12 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
             }
 
@@ -243,12 +243,12 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should remove the scheduled task in the set method' {
@@ -275,7 +275,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -322,7 +322,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -374,7 +374,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -421,7 +421,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -473,7 +473,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -519,7 +519,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -567,7 +567,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -615,7 +615,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -671,7 +671,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -727,7 +727,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -781,7 +781,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -835,7 +835,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -892,7 +892,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -952,7 +952,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1021,7 +1021,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -1073,7 +1073,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -1125,7 +1125,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1181,7 +1181,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -1265,7 +1265,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1331,7 +1331,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1384,7 +1384,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1437,7 +1437,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1490,7 +1490,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -1526,13 +1526,13 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -BeNullOrEmpty
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
             }
 
@@ -1570,7 +1570,7 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -Be 'OnEvent'
                     $result.EventSubscription | Should -Be $testParameters.EventSubscription
@@ -1578,7 +1578,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -1602,7 +1602,7 @@ try
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should register the new scheduled task' {
@@ -1645,13 +1645,13 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -Be 'OnEvent'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should not call Register-ScheduledTask on an already registered task' {
@@ -1700,20 +1700,20 @@ try
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -Be 'OnEvent'
                     $result.RandomDelay | Should -Be '00:00:00'
                 }
 
                 It 'Should return true from the test method - ignoring the RandomDelay parameter' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
 
                 $testParameters.EventSubscription = 'InvalidXML'
 
                 It 'When an EventSubscription cannot be parsed as valid XML an error is generated when changing the task' {
-                    { Set-TargetResource @testParameters } | Should throw
+                    { Set-TargetResource @testParameters } | Should -Throw
                 }
             }
 
@@ -1776,7 +1776,7 @@ try
                 $testParameters.LogonType = 'Password'
 
                 It 'Should return true when BuiltInAccount set even if LogonType parameter different' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -1845,13 +1845,13 @@ try
                 }
 
                 It 'Should return true if the task is in desired state and given gMSA user in DOMAIN\User$ format' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
 
                 $testParameters.ExecuteAsGMSA = 'gMSA$@domain.fqdn'
 
                 It 'Should return true if the task is in desired state and given gMSA user in UPN format' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -1894,7 +1894,7 @@ try
                 }
 
                 It 'Should return false on Test-TargetResource if the task is not in desired state and given gMSA user in DOMAIN\User$ format' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should call Set-ScheduledTask using the new Group Managed Service Account' {
@@ -1948,11 +1948,11 @@ try
                 It 'Should return the time in string format and SynchronizeAcrossTimeZone with value false' {
                     $result = Get-TargetResource @testParameters
                     $result.StartTime | Should -Be $startTimeString
-                    $result.SynchronizeAcrossTimeZone | Should -Be $false
+                    $result.SynchronizeAcrossTimeZone | Should -BeFalse
                 }
 
                 It 'Should return true given that startTime is set correctly' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1976,7 +1976,7 @@ try
                 }
 
                 It 'Should return false given that the task is configured with synchronize across time zone' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 Set-TargetResource @testParameters
@@ -2024,11 +2024,11 @@ try
                 It 'Should return the time in string format and SynchronizeAcrossTimeZone with value true' {
                     $result = Get-TargetResource @testParameters
                     $result.StartTime | Should -Be $startTimeStringWithOffset
-                    $result.SynchronizeAcrossTimeZone | Should -Be $true
+                    $result.SynchronizeAcrossTimeZone | Should -BeTrue
                 }
 
                 It 'Should return true given that startTime is set correctly' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2052,7 +2052,7 @@ try
                 }
 
                 It 'Should return false given that the task is configured with synchronize across time zone disabled' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 Set-TargetResource @testParameters
@@ -2077,7 +2077,7 @@ try
                 }
 
                 It 'Should throw when Set-TargetResource is called and SynchronizeAcrossTimeZone is used in combination with an unsupported trigger type' {
-                    { Set-TargetResource @testParamers } | Should Throw
+                    { Set-TargetResource @testParamers } | Should -Throw
                 }
             }
         }

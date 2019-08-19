@@ -58,7 +58,7 @@ try
                 }
 
                 It 'Should return IsEnabled is true' {
-                    $results.IsEnabled | should -Be $true
+                    $results.IsEnabled | Should -BeTrue
                 }
 
                 It 'Should return a LogMode is Circular' {
@@ -116,11 +116,11 @@ try
                 }
 
                 It 'Should return $true if Logmode is in desired state' {
-                    Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true | Should -Be $true
+                    Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true | Should -BeTrue
                 }
 
                 It 'Should return $false if Logmode is not in desired state' {
-                    Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $false | Should -Be $false
+                    Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $false | Should -BeFalse
                 }
 
                 It 'Should throw when passed an invalid MaximumSizeInBytes below 1028kb' {
@@ -132,11 +132,11 @@ try
                 }
 
                 It 'Should return $true if MaximumSizeInBytes is in desired state' {
-                    Test-TargetResource -MaximumSizeInBytes 1028kb -LogName 'Application' -IsEnabled $true | Should -Be $true
+                    Test-TargetResource -MaximumSizeInBytes 1028kb -LogName 'Application' -IsEnabled $true | Should -BeTrue
                 }
 
                 It 'Should return $false if MaximumSizeInBytes is not in desired state' {
-                    Test-TargetResource -MaximumSizeInBytes 2048kb -LogName 'Application' -IsEnabled $true | Should -Be $false
+                    Test-TargetResource -MaximumSizeInBytes 2048kb -LogName 'Application' -IsEnabled $true | Should -BeFalse
                 }
 
                 It 'Should not throw when passed an valid MaximumSizeInBytes' {
@@ -156,7 +156,7 @@ try
                 }
 
                 It 'Should return $false if LogRetentionDays is not in desired state' {
-                    Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 13 -LogMode 'AutoBackup'  | Should -Be $false
+                    Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 13 -LogMode 'AutoBackup'  | Should -BeFalse
                 }
 
                 It 'Should return $true if LogRetentionDays is in desired state' {
@@ -174,7 +174,7 @@ try
                         return (New-Object -TypeName PSObject -Property $properties)
                     }
 
-                    Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 7 -LogMode 'AutoBackup'  | Should -Be $true
+                    Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 7 -LogMode 'AutoBackup'  | Should -BeTrue
                 }
 
                 It 'Should not throw when passed an invalid LogRetentionDays' {
@@ -190,11 +190,11 @@ try
                 }
 
                 It 'Should return $true if LogFilePath is in desired state' {
-                    Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -IsEnabled $true | Should -Be $true
+                    Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -IsEnabled $true | Should -BeTrue
                 }
 
                 It 'Should return $false if LogFilePath is not in desired state' {
-                    Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\OtherLogs\Application.evtx' -IsEnabled $true | Should -Be $false
+                    Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\OtherLogs\Application.evtx' -IsEnabled $true | Should -BeFalse
                 }
 
                 It 'Should not throw when passed an valid SecurityDescriptor' {
@@ -202,19 +202,19 @@ try
                 }
 
                 It 'Should return $true if SecurityDescriptor is in desired state' {
-                    Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestDescriptor' -IsEnabled $true | Should -Be $true
+                    Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestDescriptor' -IsEnabled $true | Should -BeTrue
                 }
 
                 It 'Should return $false if SecurityDescriptor is not in desired state' {
-                    Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestTestDescriptor' -IsEnabled $true | Should -Be $false
+                    Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestTestDescriptor' -IsEnabled $true | Should -BeFalse
                 }
 
                 It 'Should return $true if IsEnabled is in desired state' {
-                    Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $true
+                    Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -BeTrue
                 }
 
                 It 'Should return $false if IsEnabled is not in desired state' {
-                    Test-TargetResource -LogName 'Application' -IsEnabled $false | Should -Be $false
+                    Test-TargetResource -LogName 'Application' -IsEnabled $false | Should -BeFalse
                 }
 
                 It 'Should return $false if IsEnabled is not in desired state' {
@@ -228,7 +228,7 @@ try
                         return (New-Object -TypeName PSObject -Property $properties)
                     }
 
-                    Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $false
+                    Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -BeFalse
                 }
 
                 It 'Should return $true if IsEnabled is not in desired state' {
@@ -242,7 +242,7 @@ try
                         return (New-Object -TypeName PSObject -Property $properties)
                     }
 
-                    Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -Be $true
+                    Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -BeTrue
                 }
             }
 
