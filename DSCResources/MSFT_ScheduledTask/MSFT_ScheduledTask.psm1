@@ -1260,9 +1260,10 @@ function Set-TargetResource
         {
             # On W2016+ / W10+ the Delay property is supported on the AtLogon, AtStartup and OnEvent trigger types
             $triggerSupportsDelayProperty = @('AtLogon', 'AtStartup', 'OnEvent')
+
             if ($ScheduleType -in $triggerSupportsDelayProperty)
             {
-                $trigger.Delay = [System.Xml.XmlConvert]::ToString([timespan]$Delay)
+                $trigger.Delay = [System.Xml.XmlConvert]::ToString([System.TimeSpan]$Delay)
             }
         }
 
