@@ -698,7 +698,7 @@ try
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should -Be $true
+                        $result | Should -BeTrue
                     }
 
                     It 'Should call the correct mocks' {
@@ -729,7 +729,7 @@ try
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should -Be $true
+                        $result | Should -BeTrue
                     }
 
                     It 'Should call the correct mocks' {
@@ -772,7 +772,7 @@ try
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should -Be $true
+                        $result | Should -BeTrue
                     }
 
                     It 'Should call the correct mocks' {
@@ -815,7 +815,7 @@ try
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should -Be $true
+                        $result | Should -BeTrue
                     }
 
                     It 'Should call the correct mocks' {
@@ -849,7 +849,7 @@ try
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should -Be $false
+                        $result | Should -BeFalse
                     }
 
                     It 'Should call the correct mocks' {
@@ -887,7 +887,7 @@ try
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should -Be $false
+                        $result | Should -BeFalse
                     }
 
                     It 'Should call the correct mocks' {
@@ -930,7 +930,7 @@ try
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should -Be $false
+                        $result | Should -BeFalse
                     }
 
                     It 'Should call the correct mocks' {
@@ -973,7 +973,7 @@ try
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should -Be $false
+                        $result | Should -BeFalse
                     }
 
                     It 'Should call the correct mocks' {
@@ -1016,7 +1016,7 @@ try
                         }
 
                         $result = Test-TargetResource @testParameters
-                        $result | Should -Be $false
+                        $result | Should -BeFalse
                     }
 
                     It 'Should call the correct mocks' {

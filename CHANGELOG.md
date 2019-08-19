@@ -2,9 +2,28 @@
 
 ## Unreleased
 
+<<<<<<< HEAD
 - Changes to ScheduledTask:
   - Delay property not handled properly on AtLogon and AtStartup trigger - Fixes
     [Issue #230](https://github.com/PowerShell/ComputerManagementDsc/issues/230)
+=======
+- PendingReboot:
+  - Migrated xPendingReboot from [xPendingReboot](https://github.com/PowerShell/xPendingReboot)
+    and renamed to PendingReboot.
+  - Converted to meet HQRM guidelines - Fixes [Issue #12](https://github.com/PowerShell/xPendingReboot/issues/12).
+  - Changed `SkipCcmClientSDK` parameter to default to `$true` - Fixes [Issue #13](https://github.com/PowerShell/xPendingReboot/issues/13).
+  - Fixed `Test-TargetResource` so that if ConfigMgr requires a reboot then
+    the pending reboot will be set - Fixes [Issue #26](https://github.com/PowerShell/xPendingReboot/issues/26).
+  - Refactored `Test-TargetResource` to reduce code duplication and move to a
+    data driven design.
+  - Refactored `Get-TargetResource` by adding a new function `Get-PendingRebootState`
+    so that `Test-TargetResource` no longer needed to use `Get-TargetResource`. This
+    eliminated the need to include write parameters in `Get-TargetResource`.
+  - Converted the call to `Invoke-WmiMethod` to `Invoke-CimMethod`.
+  - Deleted the code that removes the `regRebootLocations` variable at the end of
+    the resource as it appears to serve no purpose.
+- Correct all tests to meet Pester 4.0 standards.
+>>>>>>> 3c0502b058f088624c5a8bc48429eda479b5a651
 
 ## 6.5.0.0
 
