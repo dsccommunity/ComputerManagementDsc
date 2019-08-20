@@ -21,6 +21,9 @@
   - Deleted the code that removes the `regRebootLocations` variable at the end of
     the resource as it appears to serve no purpose.
 - Correct all tests to meet Pester 4.0 standards.
+- RemoteDesktopAdmin:
+  - New resource for configuring Remote Desktop for Administration - fixes
+    [Issue #224](https://github.com/PowerShell/ComputerManagementDsc/issues/224).
 
 ## 6.5.0.0
 
