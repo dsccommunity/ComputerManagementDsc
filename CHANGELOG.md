@@ -51,9 +51,6 @@
     prevented it to work. Though the helper function is not used, so this
     issue was not caught until now when unit tests was added.
   - Improved code coverage.
-- RemoteDesktopAdmin:
-  - New resource for configuring Remote Desktop for Administration - fixes
-    [Issue #224](https://github.com/PowerShell/ComputerManagementDsc/issues/224).
 
 ## 6.4.0.0
 
