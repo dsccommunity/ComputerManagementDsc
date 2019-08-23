@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Changes to ScheduledTask:
+  - Delay property not handled properly on AtLogon and AtStartup trigger - Fixes
+    [Issue #230](https://github.com/PowerShell/ComputerManagementDsc/issues/230)
 - PendingReboot:
   - Migrated xPendingReboot from [xPendingReboot](https://github.com/PowerShell/xPendingReboot)
     and renamed to PendingReboot.
