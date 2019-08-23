@@ -2094,6 +2094,108 @@ try
                     { Set-TargetResource @testParamers } | Should -Throw
                 }
             }
+
+            Context 'When a scheduled task is configured with the ScheduleType AtLogon and is in desired state' {
+                $startTimeString = '2018-10-01T01:00:00'
+                $testParameters = @{
+                    TaskName          = 'Test task'
+                    TaskPath          = '\Test\'
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime         = Get-Date -Date $startTimeString
+                    ScheduleType      = 'AtLogon'
+                    Delay             = '00:01:00'
+                    Enable            = $true
+                    Verbose           = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Delay = 'PT1M'
+                                StartBoundary = $startTimeString
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskLogonTrigger'
+                                }
+                            }
+                        )
+                        Settings = [pscustomobject] @{
+                            Enabled = $testParameters.Enable
+                        }
+                    }
+                }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Enable | Should -Be $testParameters.Enable
+                    $result.Ensure | Should -Be 'Present'
+                    $result.StartTime | Should -Be $startTimeString
+                    $result.ScheduleType | Should -Be 'AtLogon'
+                    $result.Delay | Should -Be $testParameters.Delay
+                }
+
+                It 'Should return true from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+            }
+
+            Context 'When a scheduled task is configured with the ScheduleType AtStartup and is in desired state' {
+                $startTimeString = '2018-10-01T01:00:00'
+                $testParameters = @{
+                    TaskName          = 'Test task'
+                    TaskPath          = '\Test\'
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime         = Get-Date -Date $startTimeString
+                    ScheduleType      = 'AtStartup'
+                    Delay             = '00:01:00'
+                    Enable            = $true
+                    Verbose           = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Delay = 'PT1M'
+                                StartBoundary = $startTimeString
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskBootTrigger'
+                                }
+                            }
+                        )
+                        Settings = [pscustomobject] @{
+                            Enabled = $testParameters.Enable
+                        }
+                    }
+                }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @testParameters
+                    $result.Enable | Should -Be $testParameters.Enable
+                    $result.Ensure | Should -Be 'Present'
+                    $result.StartTime | Should -Be $startTimeString
+                    $result.ScheduleType | Should -Be 'AtStartup'
+                    $result.Delay | Should -Be $testParameters.Delay
+                }
+
+                It 'Should return true from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+            }
         }
     }
     #endregion
