@@ -2136,7 +2136,7 @@ try
 
             Context 'When the date string contains a date with a timezone' {
                 It 'Should return $true' {
-                    Test-DateStringContainsTimeZone -DateString '2018-10-01T01:00:00' + (Get-Date -Format 'zzz') | Should -BeTrue
+                    Test-DateStringContainsTimeZone -DateString ('2018-10-01T01:00:00' + (Get-Date -Format 'zzz')) | Should -BeTrue
                 }
             }
         }

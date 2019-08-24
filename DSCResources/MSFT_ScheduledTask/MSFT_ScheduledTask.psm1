@@ -49,6 +49,10 @@ function Get-TargetResource
         $TaskPath = '\'
     )
 
+    $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
+
+    Write-Verbose -Message ($script:localizedData.GetScheduledTaskMessage -f $TaskName, $TaskPath)
+
     return Get-CurrentResource @PSBoundParameters
 }
 
@@ -1669,7 +1673,7 @@ function Get-CurrentResource
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
-    Write-Verbose -Message ($script:localizedData.GetScheduledTaskMessage -f $TaskName, $TaskPath)
+    Write-Verbose -Message ($script:localizedData.GettingCurrentTaskValuesMessage -f $TaskName, $TaskPath)
 
     $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
 
@@ -1818,7 +1822,7 @@ function Get-CurrentResource
         }
     }
 
-    Write-Verbose -Message ($script:localizedData.GetCurrentTaskValuesMessage)
+    Write-Verbose -Message ($script:localizedData.CurrentTaskValuesRetrievedMessage -f $TaskName, $TaskPath)
 
     return $result
 }

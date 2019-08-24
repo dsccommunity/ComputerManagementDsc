@@ -27,8 +27,8 @@
 - Updated common function `Test-DscParameterState` to support ordered comparison
   of arrays by copying function and tests from `NetworkingDsc` - fixes [Issue #250](https://github.com/PowerShell/ComputerManagementDsc/issues/250).
 - BREAKING CHANGE: ScheduledTask:
-  - Correct output type of `DaysInterval` parameter from `Get-TargetResource` to
-    match MOF.
+  - Correct output type of `DaysInterval` parameter from `Get-TargetResource`
+    to match MOF.
   - Correct output type of `StartTime` parameter from `Get-TargetResource` to
     match MOF.
   - Refactored `Get-TargetResource` to remove parameters that
