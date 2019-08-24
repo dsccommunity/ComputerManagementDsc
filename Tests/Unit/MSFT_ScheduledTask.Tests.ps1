@@ -2026,9 +2026,7 @@ try
 
             Context 'When a scheduled task is configured with the ScheduleType AtLogon and is in desired state' {
                 $startTimeString = '2018-10-01T01:00:00'
-                $testParameters = @{
-                    TaskName          = 'Test task'
-                    TaskPath          = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     StartTime         = Get-Date -Date $startTimeString
                     ScheduleType      = 'AtLogon'
@@ -2062,7 +2060,7 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Enable | Should -Be $testParameters.Enable
                     $result.Ensure | Should -Be 'Present'
                     $result.StartTime | Should -Be $startTimeString
@@ -2077,9 +2075,7 @@ try
 
             Context 'When a scheduled task is configured with the ScheduleType AtStartup and is in desired state' {
                 $startTimeString = '2018-10-01T01:00:00'
-                $testParameters = @{
-                    TaskName          = 'Test task'
-                    TaskPath          = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     StartTime         = Get-Date -Date $startTimeString
                     ScheduleType      = 'AtStartup'
@@ -2113,7 +2109,7 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Enable | Should -Be $testParameters.Enable
                     $result.Ensure | Should -Be 'Present'
                     $result.StartTime | Should -Be $startTimeString
