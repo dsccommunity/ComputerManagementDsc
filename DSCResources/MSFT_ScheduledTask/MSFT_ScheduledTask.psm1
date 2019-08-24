@@ -1759,7 +1759,7 @@ function Get-CurrentResource
 
             if ($day -ne 0)
             {
-                $daysOfWeek += [ScheduledTask.DaysOfWeek] $day
+                $daysOfWeek += [System.String][ScheduledTask.DaysOfWeek] $day
             }
         }
 
