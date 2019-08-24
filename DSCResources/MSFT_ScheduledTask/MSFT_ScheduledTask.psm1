@@ -1293,24 +1293,6 @@ function Test-TargetResource
 
     $currentValues = Get-CurrentResource -TaskName $TaskName -TaskPath $TaskPath
 
-    <#
-        If the current StartTime is null then we need to set it to
-        the desired StartTime (which defaults to Today if not passed)
-        so that the test does not fail.
-    #>
-    if ($currentValues['StartTime'])
-    {
-        $currentValues['StartTime'] = Get-DateTimeString `
-            -Date $currentValues['StartTime'] `
-            -SynchronizeAcrossTimeZone $currentValues['SynchronizeAcrossTimeZone']
-    }
-    else
-    {
-        $currentValues['StartTime'] = Get-DateTimeString `
-            -Date $StartTime `
-            -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
-    }
-
     # Convert the strings containing time spans to TimeSpan Objects
     if ($PSBoundParameters.ContainsKey('RepeatInterval'))
     {
@@ -1367,6 +1349,29 @@ function Test-TargetResource
     if ($ScheduleType -in @('Once', 'Daily', 'Weekly'))
     {
         $PSBoundParameters['StartTime'] = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
+        <#
+            If the current StartTime is null then we need to set it to
+            the desired StartTime (which defaults to Today if not passed)
+            so that the test does not fail.
+        #>
+        if ($currentValues['StartTime'])
+        {
+            $currentValues['StartTime'] = Get-DateTimeString `
+                -Date $currentValues['StartTime'] `
+                -SynchronizeAcrossTimeZone $currentValues['SynchronizeAcrossTimeZone']
+        }
+        else
+        {
+            $currentValues['StartTime'] = Get-DateTimeString `
+                -Date $StartTime `
+                -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
+        }
+    }
+    else
+    {
+        # Do not compare StartTime for triggers that aren't Once, Daily or Weekly.
+        $null = $PSBoundParameters.Remove('StartTime')
+        $null = $currentValues.Remove('StartTime')
     }
 
     if ($Ensure -eq 'Absent' -and $currentValues.Ensure -eq 'Absent')

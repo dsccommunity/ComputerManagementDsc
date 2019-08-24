@@ -36,6 +36,8 @@
   - Added function `Test-DateStringContainsTimeZone` to determine if a string
     containing a date time includes a time zone.
   - Enable verbose preference to be passed through to `Test-DscParameterState`.
+  - Changed `Test-TargetResource` so that `StartTime` is only compared for
+    trigger types `Daily`,`Weekly` or `Once`.
 
 ## 6.5.0.0
 

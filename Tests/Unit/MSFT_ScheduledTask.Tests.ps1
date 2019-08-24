@@ -2074,10 +2074,8 @@ try
             }
 
             Context 'When a scheduled task is configured with the ScheduleType AtStartup and is in desired state' {
-                $startTimeString = '2018-10-01T01:00:00'
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    StartTime         = Get-Date -Date $startTimeString
                     ScheduleType      = 'AtStartup'
                     Delay             = '00:01:00'
                     Enable            = $true
@@ -2096,7 +2094,7 @@ try
                         Triggers  = @(
                             [pscustomobject] @{
                                 Delay = 'PT1M'
-                                StartBoundary = $startTimeString
+                                StartBoundary = ''
                                 CimClass      = @{
                                     CimClassName = 'MSFT_TaskBootTrigger'
                                 }
@@ -2112,7 +2110,6 @@ try
                     $result = Get-TargetResource @getTargetResourceParameters
                     $result.Enable | Should -Be $testParameters.Enable
                     $result.Ensure | Should -Be 'Present'
-                    $result.StartTime | Should -Be (Get-Date -Date $startTimeString)
                     $result.ScheduleType | Should -Be 'AtStartup'
                     $result.Delay | Should -Be $testParameters.Delay
                 }
