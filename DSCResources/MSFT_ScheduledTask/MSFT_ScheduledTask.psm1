@@ -660,7 +660,6 @@ function Set-TargetResource
                 $cimTriggerClass = Get-CimClass -ClassName MSFT_TaskEventTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskEventTrigger
                 $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
                 $trigger.Enabled = $true
-                $trigger.Delay = [System.Xml.XmlConvert]::ToString([timespan]$Delay)
                 $trigger.Subscription = $EventSubscription
             }
         }
@@ -736,6 +735,17 @@ function Set-TargetResource
                     New-InvalidOperationException `
                         -Message ($script:localizedData.TriggerUnexpectedTypeError -f $trigger.GetType().FullName)
                 }
+            }
+        }
+
+        if ($trigger.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance')
+        {
+            # On W2016+ / W10+ the Delay property is supported on the AtLogon, AtStartup and OnEvent trigger types
+            $triggerSupportsDelayProperty = @('AtLogon', 'AtStartup', 'OnEvent')
+
+            if ($ScheduleType -in $triggerSupportsDelayProperty)
+            {
+                $trigger.Delay = [System.Xml.XmlConvert]::ToString([System.TimeSpan]$Delay)
             }
         }
 
