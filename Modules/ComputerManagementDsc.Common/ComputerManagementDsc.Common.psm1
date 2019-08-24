@@ -380,7 +380,7 @@ function Test-DscParameterState
             if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
                 $desiredType.FullName -ne $currentType.FullName)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchTypeMismatchMessage -f $key, $currentType.Name, $desiredType.Name)
+                Write-Verbose -Message ($script:localizedData.NoMatchTypeMismatchMessage -f $key, $currentType.FullName, $desiredType.FullName)
                 $returnValue = $false
                 continue
             }
