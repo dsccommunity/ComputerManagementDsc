@@ -1759,7 +1759,7 @@ function Get-CurrentResource
 
             if ($day -ne 0)
             {
-                $daysOfWeek += [ScheduledTask.DaysOfWeek] $day
+                $daysOfWeek += [System.String][ScheduledTask.DaysOfWeek] $day
             }
         }
 
@@ -1795,11 +1795,11 @@ function Get-CurrentResource
             RandomDelay                     = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.RandomDelay
             RepetitionDuration              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Duration -AllowIndefinitely
             DaysOfWeek                      = $daysOfWeek
-            WeeksInterval                   = $trigger.WeeksInterval
+            WeeksInterval                   = [System.Uint32] $trigger.WeeksInterval
             User                            = $task.Principal.UserId
             DisallowDemandStart             = -not $settings.AllowDemandStart
             DisallowHardTerminate           = -not $settings.AllowHardTerminate
-            Compatibility                   = $settings.Compatibility
+            Compatibility                   = [System.String] $settings.Compatibility
             AllowStartIfOnBatteries         = -not $settings.DisallowStartIfOnBatteries
             Hidden                          = $settings.Hidden
             RunOnlyIfIdle                   = $settings.RunOnlyIfIdle
