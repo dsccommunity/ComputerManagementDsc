@@ -724,7 +724,7 @@ try
                     }
                 }
 
-                Context '!= CimInstances missing a value in the desired state (recognized using ReverseCheck)' {
+                Context 'When CimInstances missing a value in the desired state (recognized using ReverseCheck)' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -755,7 +755,7 @@ try
                     }
                 }
 
-                Context '!= CimInstances have an additional value' {
+                Context 'When CimInstances have an additional value' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -787,7 +787,7 @@ try
                     }
                 }
 
-                Context '!= CimInstances have a different value' {
+                Context 'When CimInstances have a different value' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -818,7 +818,7 @@ try
                     }
                 }
 
-                Context '!= CimInstaces have a value with a different type' {
+                Context 'When CimInstances have a value with a different type' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -849,7 +849,7 @@ try
                     }
                 }
 
-                Context '== CimInstaces have a value with a different type but TurnOffTypeChecking is used' {
+                Context 'When CimInstances have a value with a different type but TurnOffTypeChecking is used' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -895,7 +895,7 @@ try
                     }
                 }
 
-                Context '== even if missing property in the desired state' {
+                Context 'When even if missing property in the desired state' {
                     $desiredValues = [PSObject] @{
                         Array     = 'a', 'b', 'c', 1
                         Hashtable = @{
@@ -917,7 +917,7 @@ try
                     }
                 }
 
-                Context '!= missing property in the desired state' {
+                Context 'When missing property in the desired state' {
                     $currentValues = @{
                         String = 'a string'
                         Bool   = $true
@@ -942,7 +942,6 @@ try
             }
 
             Context 'When testing parameter types' {
-
                 Context 'When desired value is of the wrong type' {
                     $currentValues = @{
                         String = 'a string'
