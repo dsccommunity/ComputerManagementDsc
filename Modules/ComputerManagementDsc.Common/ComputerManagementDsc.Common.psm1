@@ -409,7 +409,7 @@ function Test-DscParameterState
 
         if ($desiredType.IsArray)
         {
-            Write-Verbose -Message ($script:localizedData.TestDscParameterCompareMessage -f $key)
+            Write-Verbose -Message ($script:localizedData.TestDscParameterCompareMessage -f $key, $desiredType.FullName)
 
             if (-not $currentValue)
             {

@@ -2063,7 +2063,7 @@ try
                     $result = Get-TargetResource @getTargetResourceParameters
                     $result.Enable | Should -Be $testParameters.Enable
                     $result.Ensure | Should -Be 'Present'
-                    $result.StartTime | Should -Be $startTimeString
+                    $result.StartTime | Should -Be (Get-Date -Date $startTimeString)
                     $result.ScheduleType | Should -Be 'AtLogon'
                     $result.Delay | Should -Be $testParameters.Delay
                 }
@@ -2112,7 +2112,7 @@ try
                     $result = Get-TargetResource @getTargetResourceParameters
                     $result.Enable | Should -Be $testParameters.Enable
                     $result.Ensure | Should -Be 'Present'
-                    $result.StartTime | Should -Be $startTimeString
+                    $result.StartTime | Should -Be (Get-Date -Date $startTimeString)
                     $result.ScheduleType | Should -Be 'AtStartup'
                     $result.Delay | Should -Be $testParameters.Delay
                 }
