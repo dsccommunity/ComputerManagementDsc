@@ -26,197 +26,13 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_ScheduledTask'
 
 <#
     .SYNOPSIS
-        Tests if the current resource state matches the desired resource state.
+        Gets the current state of the resource.
 
     .PARAMETER TaskName
         The name of the task.
 
     .PARAMETER TaskPath
         The path to the task - defaults to the root directory.
-
-    .PARAMETER Description
-        The task description. Not used in Get-TargetResource.
-
-    .PARAMETER ActionExecutable
-        The path to the .exe for this task.
-
-    .PARAMETER ActionArguments
-        The arguments to pass the executable. Not used in Get-TargetResource.
-
-    .PARAMETER ActionWorkingPath
-        The working path to specify for the executable. Not used in Get-TargetResource.
-
-    .PARAMETER ScheduleType
-        When should the task be executed.
-
-    .PARAMETER RepeatInterval
-        How many units (minutes, hours, days) between each run of this task?
-        Not used in Get-TargetResource.
-
-    .PARAMETER StartTime
-        The time of day this task should start at - defaults to 12:00 AM. Not valid for
-        AtLogon and AtStartup tasks. Not used in Get-TargetResource.
-
-    .PARAMETER SynchronizeAcrossTimeZone
-        Enable the scheduled task option to synchronize across time zones. This is enabled
-        by including the timezone offset in the scheduled task trigger. Defaults to false
-        which does not include the timezone offset.
-
-    .PARAMETER Ensure
-        Present if the task should exist, Absent if it should be removed.
-
-    .PARAMETER Enable
-        True if the task should be enabled, false if it should be disabled.
-        Not used in Get-TargetResource.
-
-    .PARAMETER BuiltInAccount
-        Run the task as one of the built in service accounts.
-        When set ExecuteAsCredential will be ignored and LogonType will be set to 'ServiceAccount'
-
-    .PARAMETER ExecuteAsCredential
-        The credential this task should execute as. If not specified defaults to running
-        as the local system account. Cannot be used in combination with ExecuteAsGMSA.
-        Not used in Get-TargetResource.
-
-    .PARAMETER ExecuteAsGMSA
-        The gMSA (Group Managed Service Account) this task should execute as. Cannot be
-        used in combination with ExecuteAsCredential.
-        Not used in Get-TargetResource.
-
-    .PARAMETER DaysInterval
-        Specifies the interval between the days in the schedule. An interval of 1 produces
-        a daily schedule. An interval of 2 produces an every-other day schedule.
-        Not used in Get-TargetResource.
-
-    .PARAMETER RandomDelay
-        Specifies a random amount of time to delay the start time of the trigger. The
-        delay time is a random time between the time the task triggers and the time that
-        you specify in this setting. Not used in Get-TargetResource.
-
-    .PARAMETER RepetitionDuration
-        Specifies how long the repetition pattern repeats after the task starts.
-        Not used in Get-TargetResource.
-
-    .PARAMETER DaysOfWeek
-        Specifies an array of the days of the week on which Task Scheduler runs the task.
-        Not used in Get-TargetResource.
-
-    .PARAMETER WeeksInterval
-        Specifies the interval between the weeks in the schedule. An interval of 1 produces
-        a weekly schedule. An interval of 2 produces an every-other week schedule.
-        Not used in Get-TargetResource.
-
-    .PARAMETER User
-        Specifies the identifier of the user for a trigger that starts a task when a
-        user logs on. Not used in Get-TargetResource.
-
-    .PARAMETER DisallowDemandStart
-        Indicates whether the task is prohibited to run on demand or not. Defaults
-        to $false. Not used in Get-TargetResource.
-
-    .PARAMETER DisallowHardTerminate
-        Indicates whether the task is prohibited to be terminated or not. Defaults
-        to $false
-
-    .PARAMETER Compatibility
-        The task compatibility level. Defaults to Vista. Not used in
-        Get-TargetResource.
-
-    .PARAMETER AllowStartIfOnBatteries
-        Indicates whether the task should start if the machine is on batteries or not.
-        Defaults to $false. Not used in Get-TargetResource.
-
-    .PARAMETER Hidden
-        Indicates that the task is hidden in the Task Scheduler UI.
-        Not used in Get-TargetResource.
-
-    .PARAMETER RunOnlyIfIdle
-        Indicates that Task Scheduler runs the task only when the computer is idle.
-        Not used in Get-TargetResource.
-
-    .PARAMETER IdleWaitTimeout
-        Specifies the amount of time that Task Scheduler waits for an idle condition to occur.
-        Not used in Get-TargetResource.
-
-    .PARAMETER NetworkName
-        Specifies the name of a network profile that Task Scheduler uses to determine
-        if the task can run.
-        The Task Scheduler UI uses this setting for display purposes. Specify a network
-        name if you specify the RunOnlyIfNetworkAvailable parameter. Not used in
-        Get-TargetResource.
-
-    .PARAMETER DisallowStartOnRemoteAppSession
-        Indicates that the task does not start if the task is triggered to run in a Remote
-        Applications Integrated Locally (RAIL) session. Not used in Get-TargetResource.
-
-    .PARAMETER StartWhenAvailable
-        Indicates that Task Scheduler can start the task at any time after its scheduled
-        time has passed. Not used in Get-TargetResource.
-
-    .PARAMETER DontStopIfGoingOnBatteries
-        Indicates that the task does not stop if the computer switches to battery power.
-        Not used in Get-TargetResource.
-
-    .PARAMETER WakeToRun
-        Indicates that Task Scheduler wakes the computer before it runs the task.
-        Not used in Get-TargetResource.
-
-    .PARAMETER IdleDuration
-        Specifies the amount of time that the computer must be in an idle state before
-        Task Scheduler runs the task. Not used in Get-TargetResource.
-
-    .PARAMETER RestartOnIdle
-        Indicates that Task Scheduler restarts the task when the computer cycles into an
-        idle condition more than once. Not used in Get-TargetResource.
-
-    .PARAMETER DontStopOnIdleEnd
-        Indicates that Task Scheduler does not terminate the task if the idle condition
-        ends before the task is completed. Not used in Get-TargetResource.
-
-    .PARAMETER ExecutionTimeLimit
-        Specifies the amount of time that Task Scheduler is allowed to complete the task.
-        Not used in Get-TargetResource.
-
-    .PARAMETER MultipleInstances
-        Specifies the policy that defines how Task Scheduler handles multiple instances
-        of the task. Not used in Get-TargetResource.
-
-    .PARAMETER Priority
-        Specifies the priority level of the task. Priority must be an integer from 0 (highest priority)
-        to 10 (lowest priority). The default value is 7. Priority levels 7 and 8 are
-        used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.
-        Not used in Get-TargetResource.
-
-    .PARAMETER RestartCount
-        Specifies the number of times that Task Scheduler attempts to restart the task.
-        Not used in Get-TargetResource.
-
-    .PARAMETER RestartInterval
-        Specifies the amount of time that Task Scheduler attempts to restart the task.
-        Not used in Get-TargetResource.
-
-    .PARAMETER RunOnlyIfNetworkAvailable
-        Indicates that Task Scheduler runs the task only when a network is available. Task
-        Scheduler uses the NetworkID parameter and NetworkName parameter that you specify
-        in this cmdlet to determine if the network is available. Not used in Get-TargetResource.
-
-    .PARAMETER RunLevel
-        Specifies the level of user rights that Task Scheduler uses to run the tasks that
-        are associated with the principal. Defaults to 'Limited'. Not used in
-        Get-TargetResource.
-
-    .PARAMETER LogonType
-        Specifies the security logon method that Task Scheduler uses to run the tasks that
-        are associated with the principal. Not used in Get-TargetResource.
-
-    .PARAMETER EventSubscription
-        The event subscription in a string that can be parsed as valid XML. This parameter is only
-        valid in combination with the OnEvent Schedule Type. For the query schema please check:
-        https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema
-
-    .PARAMETER Delay
-        The time to wait after an event based trigger was triggered. This parameter is only
-        valid in combination with the OnEvent Schedule Type.
 #>
 function Get-TargetResource
 {
@@ -230,344 +46,14 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        $TaskPath = '\',
-
-        [Parameter()]
-        [System.String]
-        $Description,
-
-        [Parameter()]
-        [System.String]
-        $ActionExecutable,
-
-        [Parameter()]
-        [System.String]
-        $ActionArguments,
-
-        [Parameter()]
-        [System.String]
-        $ActionWorkingPath,
-
-        [Parameter()]
-        [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn', 'OnEvent')]
-        $ScheduleType,
-
-        [Parameter()]
-        [System.String]
-        $RepeatInterval = '00:00:00',
-
-        [Parameter()]
-        [System.DateTime]
-        $StartTime = [System.DateTime]::Today,
-
-        [Parameter()]
-        [System.Boolean]
-        $SynchronizeAcrossTimeZone = $false,
-
-        [Parameter()]
-        [System.String]
-        [ValidateSet('Present', 'Absent')]
-        $Ensure = 'Present',
-
-        [Parameter()]
-        [System.Boolean]
-        $Enable = $true,
-
-        [Parameter()]
-        [ValidateSet('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')]
-        [System.String]
-        $BuiltInAccount,
-
-        [Parameter()]
-        [System.Management.Automation.PSCredential]
-        $ExecuteAsCredential,
-
-        [Parameter()]
-        [System.String]
-        $ExecuteAsGMSA,
-
-        [Parameter()]
-        [System.UInt32]
-        $DaysInterval = 1,
-
-        [Parameter()]
-        [System.String]
-        $RandomDelay = '00:00:00',
-
-        [Parameter()]
-        [System.String]
-        $RepetitionDuration = '00:00:00',
-
-        [Parameter()]
-        [System.String[]]
-        $DaysOfWeek,
-
-        [Parameter()]
-        [System.UInt32]
-        $WeeksInterval = 1,
-
-        [Parameter()]
-        [System.String]
-        $User,
-
-        [Parameter()]
-        [System.Boolean]
-        $DisallowDemandStart = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $DisallowHardTerminate = $false,
-
-        [Parameter()]
-        [ValidateSet('AT', 'V1', 'Vista', 'Win7', 'Win8')]
-        [System.String]
-        $Compatibility = 'Vista',
-
-        [Parameter()]
-        [System.Boolean]
-        $AllowStartIfOnBatteries = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $Hidden = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $RunOnlyIfIdle = $false,
-
-        [Parameter()]
-        [System.String]
-        $IdleWaitTimeout = '02:00:00',
-
-        [Parameter()]
-        [System.String]
-        $NetworkName,
-
-        [Parameter()]
-        [System.Boolean]
-        $DisallowStartOnRemoteAppSession = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $StartWhenAvailable = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $DontStopIfGoingOnBatteries = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $WakeToRun = $false,
-
-        [Parameter()]
-        [System.String]
-        $IdleDuration = '01:00:00',
-
-        [Parameter()]
-        [System.Boolean]
-        $RestartOnIdle = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $DontStopOnIdleEnd = $false,
-
-        [Parameter()]
-        [System.String]
-        $ExecutionTimeLimit = '08:00:00',
-
-        [Parameter()]
-        [ValidateSet('IgnoreNew', 'Parallel', 'Queue')]
-        [System.String]
-        $MultipleInstances = 'Queue',
-
-        [Parameter()]
-        [System.UInt32]
-        $Priority = 7,
-
-        [Parameter()]
-        [System.UInt32]
-        $RestartCount = 0,
-
-        [Parameter()]
-        [System.String]
-        $RestartInterval = '00:00:00',
-
-        [Parameter()]
-        [System.Boolean]
-        $RunOnlyIfNetworkAvailable = $false,
-
-        [Parameter()]
-        [ValidateSet('Limited', 'Highest')]
-        [System.String]
-        $RunLevel = 'Limited',
-
-        [Parameter()]
-        [ValidateSet('Group', 'Interactive', 'InteractiveOrPassword', 'None', 'Password', 'S4U', 'ServiceAccount')]
-        [System.String]
-        $LogonType,
-
-        [Parameter()]
-        [System.String]
-        $EventSubscription,
-
-        [Parameter()]
-        [System.String]
-        $Delay = '00:00:00'
+        $TaskPath = '\'
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
 
     Write-Verbose -Message ($script:localizedData.GetScheduledTaskMessage -f $TaskName, $TaskPath)
 
-    $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
-
-    if ($null -eq $task)
-    {
-        Write-Verbose -Message ($script:localizedData.TaskNotFoundMessage -f $TaskName, $TaskPath)
-
-        return @{
-            TaskName = $TaskName
-            TaskPath = $TaskPath
-            Ensure   = 'Absent'
-        }
-    }
-    else
-    {
-        Write-Verbose -Message ($script:localizedData.TaskFoundMessage -f $TaskName, $TaskPath)
-
-        $action = $task.Actions | Select-Object -First 1
-        $trigger = $task.Triggers | Select-Object -First 1
-        $settings = $task.Settings
-        $returnScheduleType = 'Unknown'
-
-        switch ($trigger.CimClass.CimClassName)
-        {
-            'MSFT_TaskTimeTrigger'
-            {
-                $returnScheduleType = 'Once'
-                break
-            }
-
-            'MSFT_TaskDailyTrigger'
-            {
-                $returnScheduleType = 'Daily'
-                break
-            }
-
-            'MSFT_TaskWeeklyTrigger'
-            {
-                $returnScheduleType = 'Weekly'
-                break
-            }
-
-            'MSFT_TaskBootTrigger'
-            {
-                $returnScheduleType = 'AtStartup'
-                break
-            }
-
-            'MSFT_TaskLogonTrigger'
-            {
-                $returnScheduleType = 'AtLogon'
-                break
-            }
-
-            'MSFT_TaskEventTrigger'
-            {
-                $returnScheduleType = 'OnEvent'
-                break
-            }
-
-            default
-            {
-                $returnScheduleType = ''
-                Write-Verbose -Message ($script:localizedData.TriggerTypeUnknown -f $trigger.CimClass.CimClassName)
-            }
-        }
-
-        Write-Verbose -Message ($script:localizedData.DetectedScheduleTypeMessage -f $returnScheduleType)
-
-        $daysOfWeek = @()
-
-        foreach ($binaryAdductor in 1, 2, 4, 8, 16, 32, 64)
-        {
-            $day = $trigger.DaysOfWeek -band $binaryAdductor
-
-            if ($day -ne 0)
-            {
-                $daysOfWeek += [ScheduledTask.DaysOfWeek] $day
-            }
-        }
-
-        $startAt = $trigger.StartBoundary
-
-        if ($startAt)
-        {
-            $stringSynchronizeAcrossTimeZone = Get-DateTimeString -Date $startAt -SynchronizeAcrossTimeZone $true
-            $returnSynchronizeAcrossTimeZone = $startAt -eq $stringSynchronizeAcrossTimeZone
-        }
-        else
-        {
-            $startAt = $StartTime
-            $returnSynchronizeAcrossTimeZone = $false
-        }
-
-        $result = @{
-            TaskName                        = $task.TaskName
-            TaskPath                        = $task.TaskPath
-            StartTime                       = $startAt
-            SynchronizeAcrossTimeZone       = $returnSynchronizeAcrossTimeZone
-            Ensure                          = 'Present'
-            Description                     = $task.Description
-            ActionExecutable                = $action.Execute
-            ActionArguments                 = $action.Arguments
-            ActionWorkingPath               = $action.WorkingDirectory
-            ScheduleType                    = $returnScheduleType
-            RepeatInterval                  = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Interval
-            ExecuteAsCredential             = $task.Principal.UserId
-            ExecuteAsGMSA                   = $task.Principal.UserId -replace '^.+\\|@.+', $null
-            Enable                          = $settings.Enabled
-            DaysInterval                    = $trigger.DaysInterval
-            RandomDelay                     = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.RandomDelay
-            RepetitionDuration              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Duration -AllowIndefinitely
-            DaysOfWeek                      = $daysOfWeek
-            WeeksInterval                   = $trigger.WeeksInterval
-            User                            = $task.Principal.UserId
-            DisallowDemandStart             = -not $settings.AllowDemandStart
-            DisallowHardTerminate           = -not $settings.AllowHardTerminate
-            Compatibility                   = $settings.Compatibility
-            AllowStartIfOnBatteries         = -not $settings.DisallowStartIfOnBatteries
-            Hidden                          = $settings.Hidden
-            RunOnlyIfIdle                   = $settings.RunOnlyIfIdle
-            IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.WaitTimeout
-            NetworkName                     = $settings.NetworkSettings.Name
-            DisallowStartOnRemoteAppSession = $settings.DisallowStartOnRemoteAppSession
-            StartWhenAvailable              = $settings.StartWhenAvailable
-            DontStopIfGoingOnBatteries      = -not $settings.StopIfGoingOnBatteries
-            WakeToRun                       = $settings.WakeToRun
-            IdleDuration                    = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.IdleDuration
-            RestartOnIdle                   = $settings.IdleSettings.RestartOnIdle
-            DontStopOnIdleEnd               = -not $settings.IdleSettings.StopOnIdleEnd
-            ExecutionTimeLimit              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.ExecutionTimeLimit
-            MultipleInstances               = $settings.MultipleInstances
-            Priority                        = $settings.Priority
-            RestartCount                    = $settings.RestartCount
-            RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.RestartInterval
-            RunOnlyIfNetworkAvailable       = $settings.RunOnlyIfNetworkAvailable
-            RunLevel                        = [System.String] $task.Principal.RunLevel
-            LogonType                       = [System.String] $task.Principal.LogonType
-            EventSubscription               = $trigger.Subscription
-            Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
-        }
-
-        if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
-        {
-            $result.Add('BuiltInAccount', $task.Principal.UserId)
-        }
-
-        return $result
-    }
+    return Get-CurrentResource @PSBoundParameters
 }
 
 <#
@@ -954,7 +440,7 @@ function Set-TargetResource
     [System.TimeSpan] $ExecutionTimeLimit = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $ExecutionTimeLimit
     [System.TimeSpan] $RestartInterval = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval
 
-    $currentValues = Get-TargetResource @PSBoundParameters
+    $currentValues = Get-CurrentResource -TaskName $TaskName -TaskPath $TaskPath
 
     if ($Ensure -eq 'Present')
     {
@@ -1805,6 +1291,8 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestScheduledTaskMessage -f $TaskName, $TaskPath)
 
+    $currentValues = Get-CurrentResource -TaskName $TaskName -TaskPath $TaskPath
+
     # Convert the strings containing time spans to TimeSpan Objects
     if ($PSBoundParameters.ContainsKey('RepeatInterval'))
     {
@@ -1861,11 +1349,30 @@ function Test-TargetResource
     if ($ScheduleType -in @('Once', 'Daily', 'Weekly'))
     {
         $PSBoundParameters['StartTime'] = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
+        <#
+            If the current StartTime is null then we need to set it to
+            the desired StartTime (which defaults to Today if not passed)
+            so that the test does not fail.
+        #>
+        if ($currentValues['StartTime'])
+        {
+            $currentValues['StartTime'] = Get-DateTimeString `
+                -Date $currentValues['StartTime'] `
+                -SynchronizeAcrossTimeZone $currentValues['SynchronizeAcrossTimeZone']
+        }
+        else
+        {
+            $currentValues['StartTime'] = Get-DateTimeString `
+                -Date $StartTime `
+                -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
+        }
     }
-
-    $currentValues = Get-TargetResource @PSBoundParameters
-
-    Write-Verbose -Message ($script:localizedData.GetCurrentTaskValuesMessage)
+    else
+    {
+        # Do not compare StartTime for triggers that aren't Once, Daily or Weekly.
+        $null = $PSBoundParameters.Remove('StartTime')
+        $null = $currentValues.Remove('StartTime')
+    }
 
     if ($Ensure -eq 'Absent' -and $currentValues.Ensure -eq 'Absent')
     {
@@ -1947,7 +1454,10 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingDscParameterStateMessage)
 
-    return Test-DscParameterState -CurrentValues $currentValues -DesiredValues $desiredValues
+    return Test-DscParameterState `
+        -CurrentValues $currentValues `
+        -DesiredValues $desiredValues `
+        -Verbose:$VerbosePreference
 }
 
 <#
@@ -2142,4 +1652,212 @@ Function Get-DateTimeString
     }
 
     return $returnDate
+}
+
+<#
+    .SYNOPSIS
+        Returns the current values of the resource.
+
+    .PARAMETER TaskName
+        The name of the task.
+
+    .PARAMETER TaskPath
+        The path to the task - defaults to the root directory.
+#>
+function Get-CurrentResource
+{
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $TaskName,
+
+        [Parameter()]
+        [System.String]
+        $TaskPath = '\'
+    )
+
+    $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
+
+    Write-Verbose -Message ($script:localizedData.GettingCurrentTaskValuesMessage -f $TaskName, $TaskPath)
+
+    $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
+
+    if ($null -eq $task)
+    {
+        Write-Verbose -Message ($script:localizedData.TaskNotFoundMessage -f $TaskName, $TaskPath)
+
+        $result = @{
+            TaskName = $TaskName
+            TaskPath = $TaskPath
+            Ensure   = 'Absent'
+        }
+    }
+    else
+    {
+        Write-Verbose -Message ($script:localizedData.TaskFoundMessage -f $TaskName, $TaskPath)
+
+        $action = $task.Actions | Select-Object -First 1
+        $trigger = $task.Triggers | Select-Object -First 1
+        $settings = $task.Settings
+        $returnScheduleType = 'Unknown'
+
+        switch ($trigger.CimClass.CimClassName)
+        {
+            'MSFT_TaskTimeTrigger'
+            {
+                $returnScheduleType = 'Once'
+                break
+            }
+
+            'MSFT_TaskDailyTrigger'
+            {
+                $returnScheduleType = 'Daily'
+                break
+            }
+
+            'MSFT_TaskWeeklyTrigger'
+            {
+                $returnScheduleType = 'Weekly'
+                break
+            }
+
+            'MSFT_TaskBootTrigger'
+            {
+                $returnScheduleType = 'AtStartup'
+                break
+            }
+
+            'MSFT_TaskLogonTrigger'
+            {
+                $returnScheduleType = 'AtLogon'
+                break
+            }
+
+            'MSFT_TaskEventTrigger'
+            {
+                $returnScheduleType = 'OnEvent'
+                break
+            }
+
+            default
+            {
+                $returnScheduleType = ''
+                Write-Verbose -Message ($script:localizedData.TriggerTypeUnknown -f $trigger.CimClass.CimClassName)
+            }
+        }
+
+        Write-Verbose -Message ($script:localizedData.DetectedScheduleTypeMessage -f $returnScheduleType)
+
+        $daysOfWeek = @()
+
+        foreach ($binaryAdductor in 1, 2, 4, 8, 16, 32, 64)
+        {
+            $day = $trigger.DaysOfWeek -band $binaryAdductor
+
+            if ($day -ne 0)
+            {
+                $daysOfWeek += [System.String][ScheduledTask.DaysOfWeek] $day
+            }
+        }
+
+        $startAt = $trigger.StartBoundary
+
+        if ($startAt)
+        {
+            $synchronizeAcrossTimeZone = Test-DateStringContainsTimeZone -DateString $startAt
+            $startTime = [System.DateTime] $startAt
+        }
+        else
+        {
+            $startTime = $null
+            $synchronizeAcrossTimeZone = $false
+        }
+
+        $result = @{
+            TaskName                        = $task.TaskName
+            TaskPath                        = $task.TaskPath
+            StartTime                       = $startTime
+            SynchronizeAcrossTimeZone       = $synchronizeAcrossTimeZone
+            Ensure                          = 'Present'
+            Description                     = $task.Description
+            ActionExecutable                = $action.Execute
+            ActionArguments                 = $action.Arguments
+            ActionWorkingPath               = $action.WorkingDirectory
+            ScheduleType                    = $returnScheduleType
+            RepeatInterval                  = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Interval
+            ExecuteAsCredential             = $task.Principal.UserId
+            ExecuteAsGMSA                   = $task.Principal.UserId -replace '^.+\\|@.+', $null
+            Enable                          = $settings.Enabled
+            DaysInterval                    = [System.Uint32] $trigger.DaysInterval
+            RandomDelay                     = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.RandomDelay
+            RepetitionDuration              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Duration -AllowIndefinitely
+            DaysOfWeek                      = [System.String[]] $daysOfWeek
+            WeeksInterval                   = [System.Uint32] $trigger.WeeksInterval
+            User                            = $task.Principal.UserId
+            DisallowDemandStart             = -not $settings.AllowDemandStart
+            DisallowHardTerminate           = -not $settings.AllowHardTerminate
+            Compatibility                   = [System.String] $settings.Compatibility
+            AllowStartIfOnBatteries         = -not $settings.DisallowStartIfOnBatteries
+            Hidden                          = $settings.Hidden
+            RunOnlyIfIdle                   = $settings.RunOnlyIfIdle
+            IdleWaitTimeout                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.WaitTimeout
+            NetworkName                     = $settings.NetworkSettings.Name
+            DisallowStartOnRemoteAppSession = $settings.DisallowStartOnRemoteAppSession
+            StartWhenAvailable              = $settings.StartWhenAvailable
+            DontStopIfGoingOnBatteries      = -not $settings.StopIfGoingOnBatteries
+            WakeToRun                       = $settings.WakeToRun
+            IdleDuration                    = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.IdleSettings.IdleDuration
+            RestartOnIdle                   = $settings.IdleSettings.RestartOnIdle
+            DontStopOnIdleEnd               = -not $settings.IdleSettings.StopOnIdleEnd
+            ExecutionTimeLimit              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.ExecutionTimeLimit
+            MultipleInstances               = $settings.MultipleInstances
+            Priority                        = $settings.Priority
+            RestartCount                    = $settings.RestartCount
+            RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.RestartInterval
+            RunOnlyIfNetworkAvailable       = $settings.RunOnlyIfNetworkAvailable
+            RunLevel                        = [System.String] $task.Principal.RunLevel
+            LogonType                       = [System.String] $task.Principal.LogonType
+            EventSubscription               = $trigger.Subscription
+            Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
+        }
+
+        if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
+        {
+            $result.Add('BuiltInAccount', $task.Principal.UserId)
+        }
+    }
+
+    Write-Verbose -Message ($script:localizedData.CurrentTaskValuesRetrievedMessage -f $TaskName, $TaskPath)
+
+    return $result
+}
+
+<#
+    .SYNOPSIS
+        Test if a date string contains a time zone.
+
+    .DESCRIPTION
+        This function returns true if the string contains a time
+        zone appended to it. This is used to determine if the
+        SynchronizeAcrossTimeZone parameter has been set in a
+        trigger.
+
+    .PARAMETER DateString
+        The date string to test.
+#>
+function Test-DateStringContainsTimeZone
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DateString
+    )
+
+    return $DateString.Contains('+')
 }

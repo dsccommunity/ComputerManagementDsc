@@ -24,6 +24,18 @@
 - RemoteDesktopAdmin:
   - New resource for configuring Remote Desktop for Administration - fixes
     [Issue #224](https://github.com/PowerShell/ComputerManagementDsc/issues/224).
+- Updated common function `Test-DscParameterState` to support ordered comparison
+  of arrays by copying function and tests from `NetworkingDsc` - fixes [Issue #250](https://github.com/PowerShell/ComputerManagementDsc/issues/250).
+- BREAKING CHANGE: ScheduledTask:
+  - Correct output type of `DaysInterval`,`StartTime`,`WeeksDaysOfWeek`,
+    and `WeeksInterval` parameters from `Get-TargetResource` to match MOF.
+  - Refactored `Get-TargetResource` to remove parameters that
+    are not key or required - fixes [Issue #249](https://github.com/PowerShell/ComputerManagementDsc/issues/249).
+  - Added function `Test-DateStringContainsTimeZone` to determine if a string
+    containing a date time includes a time zone.
+  - Enable verbose preference to be passed through to `Test-DscParameterState`.
+  - Changed `Test-TargetResource` so that `StartTime` is only compared for
+    trigger types `Daily`,`Weekly` or `Once`.
 
 ## 6.5.0.0
 
