@@ -35,6 +35,7 @@
     are not key or required - fixes [Issue #249](https://github.com/PowerShell/ComputerManagementDsc/issues/249).
   - Added function `Test-DateStringContainsTimeZone` to determine if a string
     containing a date time includes a time zone.
+  - Enable verbose preference to be passed through to `Test-DscParameterState`.
 
 ## 6.5.0.0
 

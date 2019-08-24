@@ -388,7 +388,7 @@ function Test-DscParameterState
 
         if ($currentValue -eq $desiredValue -and -not $desiredType.IsArray)
         {
-            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
+            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.FullName, $key, $currentValue, $desiredValue)
             continue
         }
 
@@ -403,7 +403,7 @@ function Test-DscParameterState
 
         if (-not $checkDesiredValue)
         {
-            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
+            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.FullName, $key, $currentValue, $desiredValue)
             continue
         }
 
@@ -413,13 +413,13 @@ function Test-DscParameterState
 
             if (-not $currentValue)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
+                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.FullName, $key, $currentValue, $desiredValue)
                 $returnValue = $false
                 continue
             }
             elseif ($currentValue.Count -ne $desiredValue.Count)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueDifferentCountMessage -f $desiredType.Name, $key, $currentValue.Count, $desiredValue.Count)
+                Write-Verbose -Message ($script:localizedData.NoMatchValueDifferentCountMessage -f $desiredType.FullName, $key, $currentValue.Count, $desiredValue.Count)
                 $returnValue = $false
                 continue
             }
@@ -463,7 +463,7 @@ function Test-DscParameterState
                         if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
                             $desiredType.FullName -ne $currentType.FullName)
                         {
-                            Write-Verbose -Message ($script:localizedData.NoMatchElementTypeMismatchMessage -f $key, $i, $currentType.Name, $desiredType.Name)
+                            Write-Verbose -Message ($script:localizedData.NoMatchElementTypeMismatchMessage -f $key, $i, $currentType.FullName, $desiredType.FullName)
                             $returnValue = $false
                             continue
                         }
@@ -471,13 +471,13 @@ function Test-DscParameterState
 
                     if ($desiredArrayValues[$i] -ne $currentArrayValues[$i])
                     {
-                        Write-Verbose -Message ($script:localizedData.NoMatchElementValueMismatchMessage -f $i, $desiredType.Name, $key, $currentArrayValues[$i], $desiredArrayValues[$i])
+                        Write-Verbose -Message ($script:localizedData.NoMatchElementValueMismatchMessage -f $i, $desiredType.FullName, $key, $currentArrayValues[$i], $desiredArrayValues[$i])
                         $returnValue = $false
                         continue
                     }
                     else
                     {
-                        Write-Verbose -Message ($script:localizedData.MatchElementValueMessage -f $i, $desiredType.Name, $key, $currentArrayValues[$i], $desiredArrayValues[$i])
+                        Write-Verbose -Message ($script:localizedData.MatchElementValueMessage -f $i, $desiredType.FullName, $key, $currentArrayValues[$i], $desiredArrayValues[$i])
                         continue
                     }
                 }
@@ -505,7 +505,7 @@ function Test-DscParameterState
         {
             if ($desiredValue -ne $currentValue)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
+                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.FullName, $key, $currentValue, $desiredValue)
                 $returnValue = $false
             }
         }
