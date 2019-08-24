@@ -84,7 +84,7 @@ try
                     }
                 }
 
-                Context '== All match' {
+                Context 'When all values match' {
                     $desiredValues = [PSObject] @{
                         String    = 'a string'
                         Bool      = $true
@@ -109,7 +109,7 @@ try
                     }
                 }
 
-                Context '!= string mismatch' {
+                Context 'When a string is mismatched' {
                     $desiredValues = [PSObject] @{
                         String    = 'different string'
                         Bool      = $true
@@ -134,7 +134,7 @@ try
                     }
                 }
 
-                Context '!= boolean mismatch' {
+                Context 'When a boolean is mismatched' {
                     $desiredValues = [PSObject] @{
                         String    = 'a string'
                         Bool      = $false
@@ -159,7 +159,7 @@ try
                     }
                 }
 
-                Context '!= int mismatch' {
+                Context 'When an int is mismatched' {
                     $desiredValues = [PSObject] @{
                         String    = 'a string'
                         Bool      = $true
@@ -184,7 +184,7 @@ try
                     }
                 }
 
-                Context '!= Type mismatch' {
+                Context 'When a type is mismatched' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -204,7 +204,7 @@ try
                     }
                 }
 
-                Context '!= Type mismatch but TurnOffTypeChecking is used' {
+                Context 'When a type is mismatched but TurnOffTypeChecking is used' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -225,7 +225,7 @@ try
                     }
                 }
 
-                Context '== mismatches but valuesToCheck is used to exclude them' {
+                Context 'When a value is mismatched but valuesToCheck is used to exclude them' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $false
@@ -252,19 +252,21 @@ try
             }
 
             Context 'When testing array values' {
-                $currentValues = @{
-                    String    = 'a string'
-                    Bool      = $true
-                    Int       = 99
-                    Array     = 'a', 'b', 'c', 1
-                    Hashtable = @{
-                        k1 = 'Test'
-                        k2 = 123
-                        k3 = 'v1', 'v2', 'v3'
+                BeforeAll {
+                    $currentValues = @{
+                        String    = 'a string'
+                        Bool      = $true
+                        Int       = 99
+                        Array     = 'a', 'b', 'c', 1
+                        Hashtable = @{
+                            k1 = 'Test'
+                            k2 = 123
+                            k3 = 'v1', 'v2', 'v3'
+                        }
                     }
                 }
 
-                Context '!= Array missing a value' {
+                Context 'When array is missing a value' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -289,7 +291,7 @@ try
                     }
                 }
 
-                Context '!= Array has an additional value' {
+                Context 'When array has an additional value' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -309,7 +311,7 @@ try
                     }
                 }
 
-                Context '!= Array has a different value' {
+                Context 'When array has a different value' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -329,7 +331,7 @@ try
                     }
                 }
 
-                Context '!= Array has different order' {
+                Context 'When array has different order' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -349,7 +351,7 @@ try
                     }
                 }
 
-                Context '== Array has different order but SortArrayValues is used' {
+                Context 'When array has different order but SortArrayValues is used' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -371,7 +373,7 @@ try
                 }
 
 
-                Context '!= Array has a value with a different type' {
+                Context 'When array has a value with a different type' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -391,7 +393,7 @@ try
                     }
                 }
 
-                Context '== Array has a value with a different type but TurnOffTypeChecking is used' {
+                Context 'When array has a value with a different type but TurnOffTypeChecking is used' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -404,6 +406,43 @@ try
                                 -CurrentValues $currentValues `
                                 -DesiredValues $desiredValues `
                                 -TurnOffTypeChecking `
+                                -Verbose:$verbose } | Should -Not -Throw
+                    }
+
+                    It 'Should return $true' {
+                        $script:result | Should -Be $true
+                    }
+                }
+
+                Context 'When both arrays are empty' {
+                    $currentValues = @{
+                        String    = 'a string'
+                        Bool      = $true
+                        Int       = 99
+                        Array     = @()
+                        Hashtable = @{
+                            k1 = 'Test'
+                            k2 = 123
+                            k3 = @()
+                        }
+                    }
+
+                    $desiredValues = [PSObject]@{
+                        String    = 'a string'
+                        Bool      = $true
+                        Int       = 99
+                        Array     = @()
+                        Hashtable = @{
+                            k1 = 'Test'
+                            k2 = 123
+                            k3 = @()
+                        }
+                    }
+
+                    It 'Should not throw exception' {
+                        { $script:result = Test-DscParameterState `
+                                -CurrentValues $currentValues `
+                                -DesiredValues $desiredValues `
                                 -Verbose:$verbose } | Should -Not -Throw
                     }
 
@@ -426,7 +465,7 @@ try
                     }
                 }
 
-                Context '!= Hashtable missing a value' {
+                Context 'When hashtable is missing a value' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -451,7 +490,7 @@ try
                     }
                 }
 
-                Context '!= Hashtable has an additional value' {
+                Context 'When hashtable has an additional value' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -476,7 +515,7 @@ try
                     }
                 }
 
-                Context '!= Hashtable has a different value' {
+                Context 'When hashtable has a different value' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -501,7 +540,7 @@ try
                     }
                 }
 
-                Context '!= Array in hashtable has different order' {
+                Context 'When an array in hashtable has different order' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -526,7 +565,7 @@ try
                     }
                 }
 
-                Context '== Array in hashtable has different order but SortArrayValues is used' {
+                Context 'When an array in hashtable has different order but SortArrayValues is used' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -553,7 +592,7 @@ try
                 }
 
 
-                Context '!= Hashtable has a value with a different type' {
+                Context 'When hashtable has a value with a different type' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -578,7 +617,7 @@ try
                     }
                 }
 
-                Context '== Hashtable has a value with a different type but TurnOffTypeChecking is used' {
+                Context 'When hashtable has a value with a different type but TurnOffTypeChecking is used' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -624,7 +663,7 @@ try
                         })
                 }
 
-                Context '== Everything matches' {
+                Context 'When everything matches' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -655,7 +694,7 @@ try
                     }
                 }
 
-                Context '== CimInstances missing a value in the desired state (not recognized)' {
+                Context 'When CimInstances missing a value in the desired state (not recognized)' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true

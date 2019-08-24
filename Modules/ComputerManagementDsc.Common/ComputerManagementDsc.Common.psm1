@@ -411,7 +411,12 @@ function Test-DscParameterState
         {
             Write-Verbose -Message ($script:localizedData.TestDscParameterCompareMessage -f $key, $desiredType.FullName)
 
-            if (-not $currentValue)
+            if (-not $currentValue -and -not $desiredValue)
+            {
+                Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.FullName, $key, 'empty array', 'empty array')
+                continue
+            }
+            elseif (-not $currentValue)
             {
                 Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.FullName, $key, $currentValue, $desiredValue)
                 $returnValue = $false
