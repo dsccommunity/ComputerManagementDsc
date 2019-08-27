@@ -12,6 +12,8 @@ The **ComputerManagementDsc** module contains the following resources:
   the condition.
 - **PowerPlan**: allows specifying a power plan to activate.
 - **PowerShellExecutionPolicy**: Specifies the desired PowerShell execution policy.
+- **RemoteDesktopAdmin**: This resource will manage the remote desktop administration
+  settings on a computer.
 - **ScheduledTask**: is used to define basic run once or recurring scheduled tasks
   on the local computer. It can also be used to delete or disable built-in
   scheduled tasks.
