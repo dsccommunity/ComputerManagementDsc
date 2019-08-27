@@ -835,7 +835,7 @@ function Set-TargetResource
             Write-Verbose -Message ($script:localizedData.RetrieveScheduledTaskMessage -f $TaskName, $TaskPath)
             $tempScheduledTask = New-ScheduledTask @scheduledTaskArguments -ErrorAction Stop
 
-            $scheduledTask = Get-ScheduledTask `
+            $scheduledTask = ScheduledTasks\Get-ScheduledTask `
                 -TaskName $currentValues.TaskName `
                 -TaskPath $currentValues.TaskPath `
                 -ErrorAction Stop
@@ -1610,7 +1610,7 @@ function Disable-ScheduledTask
         $TaskPath = '\'
     )
 
-    $existingTask = Get-ScheduledTask @PSBoundParameters
+    $existingTask = ScheduledTasks\Get-ScheduledTask @PSBoundParameters
     $existingTask.Settings.Enabled = $false
     $null = $existingTask | Register-ScheduledTask @PSBoundParameters -Force
 }
@@ -1683,7 +1683,7 @@ function Get-CurrentResource
 
     Write-Verbose -Message ($script:localizedData.GettingCurrentTaskValuesMessage -f $TaskName, $TaskPath)
 
-    $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
+    $task = ScheduledTasks\Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
 
     if ($null -eq $task)
     {
