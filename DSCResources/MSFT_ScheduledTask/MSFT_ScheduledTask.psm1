@@ -1813,7 +1813,7 @@ function Get-CurrentResource
             RestartOnIdle                   = $settings.IdleSettings.RestartOnIdle
             DontStopOnIdleEnd               = -not $settings.IdleSettings.StopOnIdleEnd
             ExecutionTimeLimit              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.ExecutionTimeLimit
-            MultipleInstances               = $settings.MultipleInstances
+            MultipleInstances               = [System.String] $settings.MultipleInstances
             Priority                        = $settings.Priority
             RestartCount                    = $settings.RestartCount
             RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.RestartInterval
