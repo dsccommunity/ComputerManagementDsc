@@ -7,7 +7,13 @@ The **ComputerManagementDsc** module contains the following resources:
 - **OfflineDomainJoin**: allows you to join computers to an Active Directory
   domain using an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx)
   request file.
+- **PendingReboot**: examines specific registry locations where a Windows Server
+  might indicate that a reboot is pending and allows DSC to predictably handle
+  the condition.
 - **PowerPlan**: allows specifying a power plan to activate.
+- **PowerShellExecutionPolicy**: Specifies the desired PowerShell execution policy.
+- **RemoteDesktopAdmin**: This resource will manage the remote desktop administration
+  settings on a computer.
 - **ScheduledTask**: is used to define basic run once or recurring scheduled tasks
   on the local computer. It can also be used to delete or disable built-in
   scheduled tasks.
@@ -20,7 +26,6 @@ The **ComputerManagementDsc** module contains the following resources:
 - **TimeZone**: this resource is used for setting the time zone on a machine.
 - **VirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
-- **PowerShellExecutionPolicy**: Specifies the desired PowerShell execution policy.
 - **WindowsEventLog**: This resource allows configuration of a specified
   Windows Event Log.
 

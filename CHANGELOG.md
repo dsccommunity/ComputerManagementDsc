@@ -2,6 +2,45 @@
 
 ## Unreleased
 
+- Changes to ScheduledTask:
+  - Delay property not handled properly on AtLogon and AtStartup trigger - Fixes
+    [Issue #230](https://github.com/PowerShell/ComputerManagementDsc/issues/230)
+  - Changed `Get-ScheduledTask` calls to `ScheduledTasks\Get-ScheduledTask` to
+    avoid name clash with `Carbon` module. Fixes [Issue #248](https://github.com/PowerShell/ComputerManagementDsc/issues/248)
+- PendingReboot:
+  - Migrated xPendingReboot from [xPendingReboot](https://github.com/PowerShell/xPendingReboot)
+    and renamed to PendingReboot.
+  - Converted to meet HQRM guidelines - Fixes [Issue #12](https://github.com/PowerShell/xPendingReboot/issues/12).
+  - Changed `SkipCcmClientSDK` parameter to default to `$true` - Fixes [Issue #13](https://github.com/PowerShell/xPendingReboot/issues/13).
+  - Fixed `Test-TargetResource` so that if ConfigMgr requires a reboot then
+    the pending reboot will be set - Fixes [Issue #26](https://github.com/PowerShell/xPendingReboot/issues/26).
+  - Refactored `Test-TargetResource` to reduce code duplication and move to a
+    data driven design.
+  - Refactored `Get-TargetResource` by adding a new function `Get-PendingRebootState`
+    so that `Test-TargetResource` no longer needed to use `Get-TargetResource`. This
+    eliminated the need to include write parameters in `Get-TargetResource`.
+  - Converted the call to `Invoke-WmiMethod` to `Invoke-CimMethod`.
+  - Deleted the code that removes the `regRebootLocations` variable at the end of
+    the resource as it appears to serve no purpose.
+- Correct all tests to meet Pester 4.0 standards.
+- RemoteDesktopAdmin:
+  - New resource for configuring Remote Desktop for Administration - fixes
+    [Issue #224](https://github.com/PowerShell/ComputerManagementDsc/issues/224).
+- Updated common function `Test-DscParameterState` to support ordered comparison
+  of arrays by copying function and tests from `NetworkingDsc` - fixes [Issue #250](https://github.com/PowerShell/ComputerManagementDsc/issues/250).
+- BREAKING CHANGE: ScheduledTask:
+  - Correct output type of `DaysInterval`,`StartTime`,`WeeksDaysOfWeek`,
+    and `WeeksInterval` parameters from `Get-TargetResource` to match MOF.
+  - Refactored `Get-TargetResource` to remove parameters that
+    are not key or required - fixes [Issue #249](https://github.com/PowerShell/ComputerManagementDsc/issues/249).
+  - Added function `Test-DateStringContainsTimeZone` to determine if a string
+    containing a date time includes a time zone.
+  - Enable verbose preference to be passed through to `Test-DscParameterState`.
+  - Changed `Test-TargetResource` so that `StartTime` is only compared for
+    trigger types `Daily`,`Weekly` or `Once`.
+
+## 6.5.0.0
+
 - Computer:
   - Fix for 'directory service is busy' error when joining a domain and renaming
     a computer when JoinOU is specified - Fixes [Issue #221](https://github.com/PowerShell/ComputerManagementDsc/issues/221).

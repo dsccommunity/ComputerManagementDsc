@@ -34,7 +34,7 @@ try
 
                 $timeZoneResource.Properties.Where{
                     $_.Name -eq 'IsSingleInstance'
-                }.IsMandatory | Should -Be $true
+                }.IsMandatory | Should -BeTrue
 
                 $timeZoneResource.Properties.Where{
                     $_.Name -eq 'IsSingleInstance'
@@ -53,7 +53,7 @@ try
                 -Verbose
 
             It 'Should return hashtable with Key TimeZone' {
-                $timeZone.ContainsKey('TimeZone') | Should -Be $true
+                $timeZone.ContainsKey('TimeZone') | Should -BeTrue
             }
 
             It 'Should return hashtable with Value that matches "Pacific Standard Time"' {
@@ -108,14 +108,14 @@ try
                 Test-TargetResource `
                     -TimeZone 'Pacific Standard Time' `
                     -IsSingleInstance 'Yes' `
-                    -Verbose | Should -Be $true
+                    -Verbose | Should -BeTrue
             }
 
             It 'Should return false when Test is passed Time Zone that is not set' {
                 Test-TargetResource `
                     -TimeZone 'Eastern Standard Time' `
                     -IsSingleInstance 'Yes' `
-                    -Verbose | Should -Be $false
+                    -Verbose | Should -BeFalse
             }
         }
     } #end InModuleScope $DSCResourceName
