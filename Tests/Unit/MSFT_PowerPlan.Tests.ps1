@@ -81,7 +81,7 @@ try
                 $result = Get-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose
                 $result.IsSingleInstance | Should -Be 'Yes'
                 $result.Name | Should -Be $Name
-                $result.IsActive | Should -Be $true
+                $result.IsActive | Should -BeTrue
             }
         }
 
@@ -118,7 +118,7 @@ try
                 $result = Get-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose
                 $result.IsSingleInstance | Should -Be 'Yes'
                 $result.Name | Should -Be $Name
-                $result.IsActive | Should -Be $false
+                $result.IsActive | Should -BeFalse
             }
         }
 
@@ -254,7 +254,7 @@ try
                     $Name
                 )
 
-                Test-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose | Should -Be $true
+                Test-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose | Should -BeTrue
             }
         }
 
@@ -287,7 +287,7 @@ try
                     $Name
                 )
 
-                Test-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose | Should -Be $false
+                Test-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose | Should -BeFalse
             }
         }
 

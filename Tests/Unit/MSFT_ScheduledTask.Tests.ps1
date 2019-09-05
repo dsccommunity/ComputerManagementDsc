@@ -94,12 +94,15 @@ try
                 Mock -CommandName Register-ScheduledTask
                 Mock -CommandName Set-ScheduledTask
                 Mock -CommandName Unregister-ScheduledTask
+
+                $getTargetResourceParameters = @{
+                    TaskName           = 'Test task'
+                    TaskPath           = '\Test\'
+                }
             }
 
             Context 'No scheduled task exists, but it should' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -110,12 +113,12 @@ try
                 Mock -CommandName Get-ScheduledTask -MockWith { return $null }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should create the scheduled task in the set method' {
@@ -124,9 +127,7 @@ try
             }
 
             Context 'A scheduled task exists, but it should not' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -157,12 +158,12 @@ try
                     } }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should remove the scheduled task in the set method' {
@@ -172,9 +173,7 @@ try
             }
 
             Context 'A built-in scheduled task exists and is enabled, but it should be disabled' {
-                $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     Enable   = $false
                     Verbose  = $true
                 }
@@ -201,13 +200,13 @@ try
                     } }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should remove the scheduled task in the set method' {
@@ -217,9 +216,7 @@ try
             }
 
             Context 'A built-in scheduled task exists, but it should be absent' {
-                $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     Ensure   = 'Absent'
                     Verbose  = $true
                 }
@@ -251,13 +248,13 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should remove the scheduled task in the set method' {
@@ -267,9 +264,7 @@ try
             }
 
             Context 'A scheduled task doesnt exist, and it should not' {
-                $testParameters = @{
-                    TaskName         = 'Test task'
-                    TaskPath         = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType     = 'Once'
                     Ensure           = 'Absent'
@@ -279,19 +274,17 @@ try
                 Mock -CommandName Get-ScheduledTask
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'A scheduled task with Once based repetition exists, but has the wrong settings' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -326,12 +319,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -341,9 +334,7 @@ try
             }
 
             Context 'A scheduled task with minutes based repetition exists and has the correct settings' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -378,19 +369,17 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'A scheduled task with hourly based repetition exists, but has the wrong settings' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
@@ -425,12 +414,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -440,9 +429,7 @@ try
             }
 
             Context 'A scheduled task with hourly based repetition exists and has the correct settings' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
@@ -477,19 +464,17 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'A scheduled task with daily based repetition exists, but has the wrong settings' {
-                $testParameters = @{
-                    TaskName         = 'Test task'
-                    TaskPath         = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType     = 'Daily'
                     DaysInterval     = 3
@@ -523,12 +508,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -538,9 +523,7 @@ try
             }
 
             Context 'A scheduled task with daily based repetition exists and has the correct settings' {
-                $testParameters = @{
-                    TaskName         = 'Test task'
-                    TaskPath         = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType     = 'Daily'
                     DaysInterval     = 3
@@ -571,19 +554,17 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'A scheduled task exists and is configured with the wrong execution account' {
-                $testParameters = @{
-                    TaskName            = 'Test task'
-                    TaskPath            = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType        = 'Once'
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
@@ -619,12 +600,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -634,9 +615,7 @@ try
             }
 
             Context 'A scheduled task exists and is configured with the wrong logon type' {
-                $testParameters = @{
-                    TaskName            = 'Test task'
-                    TaskPath            = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType        = 'Once'
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
@@ -674,13 +653,13 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                     $result.LogonType | Should -Be 'Password'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -690,9 +669,7 @@ try
             }
 
             Context 'A scheduled task exists and is configured with the wrong run level' {
-                $testParameters = @{
-                    TaskName            = 'Test task'
-                    TaskPath            = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType        = 'Once'
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
@@ -730,13 +707,13 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                     $result.RunLevel | Should -Be 'Limited'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -746,9 +723,7 @@ try
             }
 
             Context 'A scheduled task exists and is configured with the wrong working directory' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ActionWorkingPath  = 'C:\Example'
                     ScheduleType       = 'Once'
@@ -785,12 +760,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -800,9 +775,7 @@ try
             }
 
             Context 'A scheduled task exists and is configured with the wrong executable arguments' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ActionArguments    = '-File "C:\something\right.ps1"'
                     ScheduleType       = 'Once'
@@ -839,12 +812,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -854,9 +827,7 @@ try
             }
 
             Context 'A scheduled task is enabled and should be disabled' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -896,12 +867,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -912,9 +883,7 @@ try
             }
 
             Context 'A scheduled task is enabled without an execution time limit and but has an execution time limit set' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -956,12 +925,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -971,9 +940,7 @@ try
             }
 
             Context 'A scheduled task is enabled and has the correct settings' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -1025,19 +992,17 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'A scheduled task is disabled and has the correct settings' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -1077,19 +1042,17 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'A scheduled task is disabled but should be enabled' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -1129,12 +1092,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1144,9 +1107,7 @@ try
             }
 
             Context 'A Scheduled task exists, is disabled, and the optional parameter enable is not specified' -Fixture {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
@@ -1185,12 +1146,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -1217,9 +1178,7 @@ try
             }
 
             Context 'A scheduled task exists and is configured with the wrong interval, duration & random delay parameters' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
@@ -1269,12 +1228,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1283,9 +1242,7 @@ try
             }
 
             Context 'A scheduled task exists and is configured with the wrong idle timeout & idle duration parameters' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
@@ -1335,12 +1292,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1350,9 +1307,7 @@ try
             }
 
             Context 'A scheduled task exists and is configured with the wrong duration parameter for an indefinite trigger' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
@@ -1388,12 +1343,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1403,9 +1358,7 @@ try
             }
 
             Context 'A scheduled task exists and is configured with indefinite repetition duration for a trigger but should be fixed' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
@@ -1441,12 +1394,12 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should update the scheduled task in the set method' {
@@ -1456,9 +1409,7 @@ try
             }
 
             Context 'A scheduled task exists and is configured with correctly with an indefinite duration trigger' {
-                $testParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType       = 'Once'
                     RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
@@ -1494,19 +1445,17 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'When a built-in scheduled task exists and is enabled, but it should be disabled and the trigger type is not recognized' {
-                $testParameters = @{
-                    TaskName = 'Test task'
-                    TaskPath = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     Enable   = $false
                     Verbose  = $true
                 }
@@ -1534,14 +1483,14 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -BeNullOrEmpty
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should disable the scheduled task in the set method' {
@@ -1551,9 +1500,7 @@ try
             }
 
             Context 'When a scheduled task with an OnEvent scheduletype is in desired state' {
-                $testParameters = @{
-                    TaskName          = 'Test task'
-                    TaskPath          = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
@@ -1583,8 +1530,8 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -Be 'OnEvent'
                     $result.EventSubscription | Should -Be $testParameters.EventSubscription
@@ -1592,14 +1539,12 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'When a scheduled task with an OnEvent scheduletype needs to be created' {
-                $testParameters = @{
-                    TaskName          = 'Test task'
-                    TaskPath          = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
@@ -1611,12 +1556,12 @@ try
                 Mock -CommandName Get-ScheduledTask
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
                     $result.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should register the new scheduled task' {
@@ -1626,9 +1571,7 @@ try
             }
 
             Context 'When a scheduled task with an OnEvent scheduletype needs to be updated' {
-                $testParameters = @{
-                    TaskName          = 'Test task'
-                    TaskPath          = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
@@ -1658,14 +1601,14 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -Be 'OnEvent'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should not call Register-ScheduledTask on an already registered task' {
@@ -1680,9 +1623,7 @@ try
             }
 
             Context 'When a scheduled task with an OnEvent scheduletype is used on combination with unsupported parameters for this scheduletype' {
-                $testParameters = @{
-                    TaskName          = 'Test task'
-                    TaskPath          = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
@@ -1713,28 +1654,26 @@ try
                 }
 
                 It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @testParameters
-                    $result.Enable | Should -Be $true
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Enable | Should -BeTrue
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -Be 'OnEvent'
                     $result.RandomDelay | Should -Be '00:00:00'
                 }
 
                 It 'Should return true from the test method - ignoring the RandomDelay parameter' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
 
                 $testParameters.EventSubscription = 'InvalidXML'
 
                 It 'When an EventSubscription cannot be parsed as valid XML an error is generated when changing the task' {
-                    { Set-TargetResource @testParameters } | Should throw
+                    { Set-TargetResource @testParameters } | Should -Throw
                 }
             }
 
             Context 'When a scheduled task is created using a Built In Service Account' {
-                $testParameters = @{
-                    TaskName            = 'Test task'
-                    TaskPath            = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType        = 'Once'
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
@@ -1790,14 +1729,12 @@ try
                 $testParameters.LogonType = 'Password'
 
                 It 'Should return true when BuiltInAccount set even if LogonType parameter different' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'When a scheduled task is created using a Group Managed Service Account' {
-                $testParameters = @{
-                    TaskName            = 'Test task'
-                    TaskPath            = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType        = 'Once'
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
@@ -1859,20 +1796,18 @@ try
                 }
 
                 It 'Should return true if the task is in desired state and given gMSA user in DOMAIN\User$ format' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
 
                 $testParameters.ExecuteAsGMSA = 'gMSA$@domain.fqdn'
 
                 It 'Should return true if the task is in desired state and given gMSA user in UPN format' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
             Context 'When a scheduled task Group Managed Service Account is changed' {
-                $testParameters = @{
-                    TaskName            = 'Test task'
-                    TaskPath            = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType        = 'Once'
                     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
@@ -1908,7 +1843,7 @@ try
                 }
 
                 It 'Should return false on Test-TargetResource if the task is not in desired state and given gMSA user in DOMAIN\User$ format' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 It 'Should call Set-ScheduledTask using the new Group Managed Service Account' {
@@ -1929,9 +1864,7 @@ try
             Context 'When a scheduled task is created and synchronize across time zone is disabled' {
                 $startTimeString           = '2018-10-01T01:00:00'
                 $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
-                $testParameters = @{
-                    TaskName                  = 'Test task'
-                    TaskPath                  = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     StartTime                 = Get-Date -Date $startTimeString
                     SynchronizeAcrossTimeZone = $false
@@ -1959,14 +1892,14 @@ try
                     }
                 }
 
-                It 'Should return the time in string format and SynchronizeAcrossTimeZone with value false' {
-                    $result = Get-TargetResource @testParameters
-                    $result.StartTime | Should -Be $startTimeString
-                    $result.SynchronizeAcrossTimeZone | Should -Be $false
+                It 'Should return the start time in DateTime format and SynchronizeAcrossTimeZone with value false' {
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.StartTime | Should -Be (Get-Date -Date $startTimeString)
+                    $result.SynchronizeAcrossTimeZone | Should -BeFalse
                 }
 
                 It 'Should return true given that startTime is set correctly' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1990,7 +1923,7 @@ try
                 }
 
                 It 'Should return false given that the task is configured with synchronize across time zone' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 Set-TargetResource @testParameters
@@ -2005,9 +1938,7 @@ try
             Context 'When a scheduled task is created and synchronize across time zone is enabled' {
                 $startTimeString           = '2018-10-01T01:00:00'
                 $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
-                $testParameters = @{
-                    TaskName                  = 'Test task'
-                    TaskPath                  = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     StartTime                 = Get-Date -Date $startTimeString
                     SynchronizeAcrossTimeZone = $true
@@ -2035,14 +1966,14 @@ try
                     }
                 }
 
-                It 'Should return the time in string format and SynchronizeAcrossTimeZone with value true' {
-                    $result = Get-TargetResource @testParameters
-                    $result.StartTime | Should -Be $startTimeStringWithOffset
-                    $result.SynchronizeAcrossTimeZone | Should -Be $true
+                It 'Should return the start time in DateTime format and SynchronizeAcrossTimeZone with value true' {
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.StartTime | Should -Be (Get-Date -Date $startTimeStringWithOffset)
+                    $result.SynchronizeAcrossTimeZone | Should -BeTrue
                 }
 
                 It 'Should return true given that startTime is set correctly' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2066,7 +1997,7 @@ try
                 }
 
                 It 'Should return false given that the task is configured with synchronize across time zone disabled' {
-                    Test-TargetResource @testParameters | Should -Be $false
+                    Test-TargetResource @testParameters | Should -BeFalse
                 }
 
                 Set-TargetResource @testParameters
@@ -2080,9 +2011,7 @@ try
 
             Context 'When a scheduled task is configured to SynchronizeAcrossTimeZone and the ScheduleType is not Once, Daily or Weekly' {
                 $startTimeString              = '2018-10-01T01:00:00'
-                $testParameters = @{
-                    TaskName                  = 'Test task'
-                    TaskPath                  = '\Test\'
+                $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     StartTime                 = Get-Date -Date $startTimeString
                     SynchronizeAcrossTimeZone = $true
@@ -2091,7 +2020,116 @@ try
                 }
 
                 It 'Should throw when Set-TargetResource is called and SynchronizeAcrossTimeZone is used in combination with an unsupported trigger type' {
-                    { Set-TargetResource @testParamers } | Should Throw
+                    { Set-TargetResource @testParamers } | Should -Throw
+                }
+            }
+
+            Context 'When a scheduled task is configured with the ScheduleType AtLogon and is in desired state' {
+                $startTimeString = '2018-10-01T01:00:00'
+                $testParameters = $getTargetResourceParameters + @{
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime         = Get-Date -Date $startTimeString
+                    ScheduleType      = 'AtLogon'
+                    Delay             = '00:01:00'
+                    Enable            = $true
+                    Verbose           = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Delay = 'PT1M'
+                                StartBoundary = $startTimeString
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskLogonTrigger'
+                                }
+                            }
+                        )
+                        Settings = [pscustomobject] @{
+                            Enabled = $testParameters.Enable
+                        }
+                    }
+                }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Enable | Should -Be $testParameters.Enable
+                    $result.Ensure | Should -Be 'Present'
+                    $result.StartTime | Should -Be (Get-Date -Date $startTimeString)
+                    $result.ScheduleType | Should -Be 'AtLogon'
+                    $result.Delay | Should -Be $testParameters.Delay
+                }
+
+                It 'Should return true from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+            }
+
+            Context 'When a scheduled task is configured with the ScheduleType AtStartup and is in desired state' {
+                $testParameters = $getTargetResourceParameters + @{
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType      = 'AtStartup'
+                    Delay             = '00:01:00'
+                    Enable            = $true
+                    Verbose           = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Delay = 'PT1M'
+                                StartBoundary = ''
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskBootTrigger'
+                                }
+                            }
+                        )
+                        Settings = [pscustomobject] @{
+                            Enabled = $testParameters.Enable
+                        }
+                    }
+                }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Enable | Should -Be $testParameters.Enable
+                    $result.Ensure | Should -Be 'Present'
+                    $result.ScheduleType | Should -Be 'AtStartup'
+                    $result.Delay | Should -Be $testParameters.Delay
+                }
+
+                It 'Should return true from the test method' {
+                    Test-TargetResource @testParameters | Should -Be $true
+                }
+            }
+        }
+
+        Describe 'MSFT_ScheduledTask\Test-DateStringContainsTimeZone' {
+            Context 'When the date string contains a date without a timezone' {
+                It 'Should return $false' {
+                    Test-DateStringContainsTimeZone -DateString '2018-10-01T01:00:00' | Should -BeFalse
+                }
+            }
+
+            Context 'When the date string contains a date with a timezone' {
+                It 'Should return $true' {
+                    Test-DateStringContainsTimeZone -DateString ('2018-10-01T01:00:00' + (Get-Date -Format 'zzz')) | Should -BeTrue
                 }
             }
         }
