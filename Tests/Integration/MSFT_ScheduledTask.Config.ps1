@@ -328,7 +328,7 @@ Configuration ScheduledTaskLogonMod
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskStartupMod
+        ScheduledTask ScheduledTaskLogonMod
         {
             TaskName           = 'Test task Logon'
             TaskPath           = '\ComputerManagementDsc\'
@@ -345,7 +345,7 @@ Configuration ScheduledTaskStartupMod
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskLogonMod
+        ScheduledTask ScheduledTaskStartupMod
         {
             TaskName           = 'Test task Startup'
             TaskPath           = '\ComputerManagementDsc\'
@@ -362,7 +362,7 @@ Configuration ScheduledTaskExecuteAsMod
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskLogonMod
+        ScheduledTask ScheduledTaskExecuteAsMod
         {
             TaskName         = 'Test task Logon'
             TaskPath         = '\ComputerManagementDsc\'

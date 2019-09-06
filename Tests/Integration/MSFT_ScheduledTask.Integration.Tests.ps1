@@ -40,6 +40,7 @@ try
             AtLogon           = 'ScheduledTaskLogon'
             AtStartup         = 'ScheduledTaskStartup'
             ExecuteAs         = 'ScheduledTaskExecuteAs'
+            ExecuteAsGroup    = 'ScheduledTaskExecuteAsGroup'
             OnEvent           = 'ScheduledTaskOnEvent'
         }
 
