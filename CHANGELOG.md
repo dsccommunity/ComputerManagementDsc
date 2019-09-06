@@ -12,6 +12,8 @@
     [Issue #230](https://github.com/PowerShell/ComputerManagementDsc/issues/230)
   - Changed `Get-ScheduledTask` calls to `ScheduledTasks\Get-ScheduledTask` to
     avoid name clash with `Carbon` module. Fixes [Issue #248](https://github.com/PowerShell/ComputerManagementDsc/issues/248)
+  - Cast `MultipleInstances` value returned by `Get-TargetResource` to `string` -
+    fixes [Issue #255](https://github.com/PowerShell/ComputerManagementDsc/issues/255)
 - PendingReboot:
   - Migrated xPendingReboot from [xPendingReboot](https://github.com/PowerShell/xPendingReboot)
     and renamed to PendingReboot.
