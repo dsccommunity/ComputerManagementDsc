@@ -1788,6 +1788,15 @@ function Get-CurrentResource
             $synchronizeAcrossTimeZone = $false
         }
 
+        if($task.Principal.LogonType -ieq 'Group')
+        {
+            $PrincipalId = 'GroupId'
+        }
+        else
+        {
+            $PrincipalId = 'UserId'
+        }
+
         $result = @{
             TaskName                        = $task.TaskName
             TaskPath                        = $task.TaskPath
@@ -1800,7 +1809,7 @@ function Get-CurrentResource
             ActionWorkingPath               = $action.WorkingDirectory
             ScheduleType                    = $returnScheduleType
             RepeatInterval                  = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Interval
-            ExecuteAsCredential             = $task.Principal.UserId
+            ExecuteAsCredential             = $task.Principal.$PrincipalId
             ExecuteAsGMSA                   = $task.Principal.UserId -replace '^.+\\|@.+', $null
             Enable                          = $settings.Enabled
             DaysInterval                    = [System.Uint32] $trigger.DaysInterval
