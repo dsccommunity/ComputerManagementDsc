@@ -1788,7 +1788,7 @@ function Get-CurrentResource
             $synchronizeAcrossTimeZone = $false
         }
 
-        if($task.Principal.LogonType -ieq 'Group')
+        if ($task.Principal.LogonType -ieq 'Group')
         {
             $PrincipalId = 'GroupId'
         }
