@@ -193,7 +193,7 @@ Configuration ScheduledTaskExecuteAsAdd
             -TypeName System.Management.Automation.PSCredential `
             -ArgumentList ($ENV:USERNAME, (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
 
-        ScheduledTask ScheduledTaskOnceAdd
+        ScheduledTask ScheduledTaskExecuteAsAdd
         {
             TaskName            = 'Test task Logon'
             TaskPath            = '\ComputerManagementDsc\'
@@ -202,6 +202,28 @@ Configuration ScheduledTaskExecuteAsAdd
             ExecuteAsCredential = $executeAsCredential
             LogonType           = 'Interactive'
             RunLevel            = 'Highest'
+        }
+    }
+}
+
+Configuration ScheduledTaskExecuteAsGroupAdd
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        $executeAsCredential = New-Object `
+            -TypeName System.Management.Automation.PSCredential `
+            -ArgumentList ('Users', (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
+
+        ScheduledTask ScheduledTaskExecuteAsAdd
+        {
+            TaskName            = 'Test task Logon with BuiltIn Group'
+            TaskPath            = '\ComputerManagementDsc\'
+            ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            LogonType           = 'Group'
+            ExecuteAsCredential = $executeAsCredential
+            ScheduleType        = 'AtLogOn'
+            RunLevel            = 'Limited'
         }
     }
 }
@@ -306,7 +328,7 @@ Configuration ScheduledTaskLogonMod
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskOnceMod
+        ScheduledTask ScheduledTaskLogonMod
         {
             TaskName           = 'Test task Logon'
             TaskPath           = '\ComputerManagementDsc\'
@@ -323,7 +345,7 @@ Configuration ScheduledTaskStartupMod
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskOnceMod
+        ScheduledTask ScheduledTaskStartupMod
         {
             TaskName           = 'Test task Startup'
             TaskPath           = '\ComputerManagementDsc\'
@@ -340,9 +362,25 @@ Configuration ScheduledTaskExecuteAsMod
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskOnceMod
+        ScheduledTask ScheduledTaskExecuteAsMod
         {
             TaskName         = 'Test task Logon'
+            TaskPath         = '\ComputerManagementDsc\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType     = 'AtLogOn'
+            RunLevel         = 'Limited'
+        }
+    }
+}
+
+Configuration ScheduledTaskExecuteAsGroupMod
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskLogonMod
+        {
+            TaskName         = 'Test task Logon with BuiltIn Group'
             TaskPath         = '\ComputerManagementDsc\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType     = 'AtLogOn'
@@ -490,9 +528,25 @@ Configuration ScheduledTaskExecuteAsDel
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskOnceDel
+        ScheduledTask ScheduledTaskLogonDel
         {
             TaskName         = 'Test task Logon'
+            TaskPath         = '\ComputerManagementDsc\'
+            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType     = 'AtLogOn'
+            Ensure           = 'Absent'
+        }
+    }
+}
+
+Configuration ScheduledTaskExecuteAsGroupDel
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskLogonDel
+        {
+            TaskName         = 'Test task Logon with BuiltIn Group'
             TaskPath         = '\ComputerManagementDsc\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType     = 'AtLogOn'

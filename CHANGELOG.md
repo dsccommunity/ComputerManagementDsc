@@ -2,7 +2,12 @@
 
 ## Unreleased
 
-- Changes to ScheduledTask:
+- ScheduledTask:
+  - Better compatibility with Group LogonType
+    when passing BuiltIn groups through ExecuteAsCredential
+    - Primary use case is 'BUILTIN\Users'
+    - Use the ExecuteAsCredential property to pass the username
+      The PSCredential needs a non-null that is ignored
   - Delay property not handled properly on AtLogon and AtStartup trigger - Fixes
     [Issue #230](https://github.com/PowerShell/ComputerManagementDsc/issues/230)
   - Changed `Get-ScheduledTask` calls to `ScheduledTasks\Get-ScheduledTask` to
