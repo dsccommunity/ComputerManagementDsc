@@ -359,7 +359,7 @@ function Test-TargetResource
     .PARAMETER Log
         Gets the specified Windows Event Log properties.
 #>
-Function Get-WindowsEventLog
+function Get-WindowsEventLog
 {
     [CmdletBinding()]
     param
@@ -390,7 +390,7 @@ Function Get-WindowsEventLog
     .PARAMETER Log
         Specifies the given object of a Windows Event Log.
 #>
-Function Save-LogFile
+function Save-LogFile
 {
     [CmdletBinding()]
     param
@@ -421,7 +421,7 @@ Function Save-LogFile
     .PARAMETER Retention
         Specifies the given RetentionDays for LogMode Autobackup.
 #>
-Function Set-LogRetentionDays
+function Set-LogRetentionDays
 {
     [CmdletBinding()]
     param
