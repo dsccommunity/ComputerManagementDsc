@@ -1638,7 +1638,7 @@ function Disable-ScheduledTask
         Boolean to specifiy if the returned string is formatted in synchronize
         across time zone format.
 #>
-Function Get-DateTimeString
+function Get-DateTimeString
 {
     [CmdletBinding()]
     param
