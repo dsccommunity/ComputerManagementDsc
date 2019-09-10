@@ -679,6 +679,8 @@ function Test-TargetResource
 
     $currentSmbServerConfiguration = Get-TargetResource -IsSingleInstance Yes
 
+    Write-Verbose -Message ($script:localizedData.EvaluatingProperties)
+
     if($AnnounceComment)
     {
         if($AnnounceComment -ne $currentSmbServerConfiguration.AnnounceComment)
