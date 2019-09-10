@@ -16,6 +16,9 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_SmbServerConfigura
 <#
     .SYNOPSIS
         Returns the current state of the SMB Server.
+    
+    .PARAMETER IsSingleInstance
+    Specifies the resource is a single instance, the value must be 'Yes'.
 #>
 function Get-TargetResource
 {
@@ -23,6 +26,10 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Yes')]
+        [System.String]
+        $IsSingleInstance
     )
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceMessage -f $Name)
@@ -35,6 +42,9 @@ function Get-TargetResource
 <#
     .SYNOPSIS
         Determines if the SMB Server is in the desired state.
+
+    .PARAMETER IsSingleInstance
+    Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER AnnounceComment
         Specifies the announce comment string.
@@ -167,6 +177,11 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Yes')]
+        [System.String]
+        $IsSingleInstance,
+
         [Parameter()]
         [string]
         $AnnounceComment,
@@ -336,14 +351,21 @@ function Set-TargetResource
         $ValidateTargetName
     )
 
+    $Params = $PSBoundParameters
+
+    $Params.Remove('IsSingleInstance')
+
     Write-Verbose -Message ($script:localizedData.UpdatingProperties)
 
-    Set-SmbServerConfiguration @PSBoundParameters
+    Set-SmbServerConfiguration @Params
 }
 
 <#
     .SYNOPSIS
         Determines if the SMB Server is in the desired state.
+    
+    .PARAMETER IsSingleInstance
+    Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER AnnounceComment
         Specifies the announce comment string.
@@ -477,6 +499,11 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Yes')]
+        [System.String]
+        $IsSingleInstance,
+
         [Parameter()]
         [string]
         $AnnounceComment,
@@ -650,7 +677,7 @@ function Test-TargetResource
 
     $resourceRequiresUpdate = $false
 
-    $currentSmbServerConfiguration = Get-TargetResource
+    $currentSmbServerConfiguration = Get-TargetResource -IsSingleInstance Yes
 
     if($AnnounceComment)
     {

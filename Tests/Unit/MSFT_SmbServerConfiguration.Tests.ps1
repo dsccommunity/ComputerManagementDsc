@@ -37,6 +37,7 @@ try
     InModuleScope $script:DSCResourceName {
 
         $Params = @{
+            IsSingleInstance                = 'Yes'
             AnnounceServer                  = $False
             AsynchronousCredits             = 64
             AuditSmb1Access                 = $False
@@ -81,7 +82,7 @@ try
         Describe 'MSFT_SmbServerConfiguration\Get-TargetResource' -Tag 'Get' {
             Context 'When getting the Target Resource information' {
                 It 'Should get the current SMB server configuration state' {
-                    $SmbServerConfiguration = Get-TargetResource
+                    $SmbServerConfiguration = Get-TargetResource -IsSingleInstance Yes
 
                     $SmbServerConfiguration.AuditSmb1Access | Should -Not -BeNullOrEmpty
                     $SmbServerConfiguration.EnableSMB1Protocol | Should -Not -BeNullOrEmpty
