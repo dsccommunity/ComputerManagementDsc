@@ -104,7 +104,17 @@ try
             Context 'When the SMB Server is not in the desired state' {
                 It 'Should return True when changes are required' {
                     
-                    $Params.EnableSMB1Protocol = $true
+                    switch ($Params.EnableSMB1Protocol) 
+                    {
+                        $false 
+                        {
+                            $Params.EnableSMB1Protocol = $true
+                        }
+                        $true 
+                        {
+                            $Params.EnableSMB1Protocol = $false
+                        }
+                    }
                     
                     $TestEnvironmentResult = Test-TargetResource @Params
 
