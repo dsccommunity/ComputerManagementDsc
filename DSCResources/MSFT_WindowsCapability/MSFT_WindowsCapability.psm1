@@ -41,7 +41,7 @@ function Get-TargetResource
     $returnValue = @{
         Name        = [System.String] $Name
         LogLevel    = [system.String] $capability.LogLevel
-        LimitAccess = [System.Int64] $capability.LimitAccess
+        LimitAccess = [System.Boolean] $capability.LimitAccess
         Online      = [System.Boolean] $capability.Online
         LogPath     = [System.String] $capability.LogPath
     }
