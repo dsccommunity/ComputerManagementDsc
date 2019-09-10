@@ -11,7 +11,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_SmbShare'
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_SmbServer'
 
 <#
     .SYNOPSIS
@@ -335,6 +335,8 @@ function Set-TargetResource
         [boolean]
         $ValidateTargetName
     )
+
+    Write-Verbose -Message ($script:localizedData.UpdatingProperties)
 
     Set-SmbServerConfiguration @PSBoundParameters
 }
