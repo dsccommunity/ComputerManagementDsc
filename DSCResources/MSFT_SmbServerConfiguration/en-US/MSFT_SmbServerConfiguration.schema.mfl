@@ -1,4 +1,4 @@
-[Description("This resource is used to configure SMB Servers.")]
+[Description("This resource is used to configure SMB Server.")]
 class MSFT_SmbServer : OMI_BaseResource
 {
     [Description("Specifies the announce comment string.")] String AnnounceComment;
@@ -39,7 +39,7 @@ class MSFT_SmbServer : OMI_BaseResource
     [Description("Specifies the minimum SMB2 credits.")] UInt32 Smb2CreditsMin;
     [Description("Specifies the SMB Service name hardening level.")] UInt32 SmbServerNameHardeningLevel;
     [Description("Specifies whether the host is treated as the stable storage.")] Boolean TreatHostAsStableStorage;
-    [Description("Specifies whether the aliases that are not circular are validated.)] Boolean ValidateAliasNotCircular;
+    [Description("Specifies whether the aliases that are not circular are validated.")] Boolean ValidateAliasNotCircular;
     [Description("Specifies whether the existence of share scopes is checked during share creation.")] Boolean ValidateShareScope;
     [Description("Specifies whether the share scope being aliased is validated.")] Boolean ValidateShareScopeNotAliased;
     [Description("Specifies whether the target name is validated.")] Boolean ValidateTargetName;

@@ -36,6 +36,48 @@ try
 
     InModuleScope $script:DSCResourceName {
 
+        $Params = @{
+            AnnounceServer                  = $False
+            AsynchronousCredits             = 64
+            AuditSmb1Access                 = $False
+            AutoDisconnectTimeout           = 15
+            AutoShareServer                 = $True
+            AutoShareWorkstation            = $True
+            CachedOpenLimit                 = 10
+            DurableHandleV2TimeoutInSeconds = 180
+            EnableAuthenticateUserSharing   = $False
+            EnableDownlevelTimewarp         = $False
+            EnableForcedLogoff              = $True
+            EnableLeasing                   = $True
+            EnableMultiChannel              = $True
+            EnableOplocks                   = $True
+            EnableSecuritySignature         = $False
+            EnableSMB1Protocol              = $False
+            EnableSMB2Protocol              = $True
+            EnableStrictNameChecking        = $True
+            EncryptData                     = $False
+            IrpStackSize                    = 15
+            KeepAliveTime                   = 2
+            MaxChannelPerSession            = 32
+            MaxMpxCount                     = 50
+            MaxSessionPerConnection         = 16384
+            MaxThreadsPerQueue              = 20
+            MaxWorkItems                    = 1
+            OplockBreakWait                 = 35
+            PendingClientTimeoutInSeconds   = 120
+            RejectUnencryptedAccess         = $True
+            RequireSecuritySignature        = $False
+            ServerHidden                    = $True
+            Smb2CreditsMax                  = 2048
+            Smb2CreditsMin                  = 128
+            SmbServerNameHardeningLevel     = 0
+            TreatHostAsStableStorage        = $False
+            ValidateAliasNotCircular        = $True
+            ValidateShareScope              = $True
+            ValidateShareScopeNotAliased    = $True
+            ValidateTargetName              = $True
+        }
+
         Describe 'MSFT_SmbServerConfiguration\Get-TargetResource' -Tag 'Get' {
             Context 'When getting the Target Resource information' {
                 It 'Should get the current SMB server configuration state' {
@@ -50,48 +92,7 @@ try
         Describe 'MSFT_SmbServerConfiguration\Test-TargetResource' -Tag 'Test' {
             Context 'When the SMB Server is in the desired state' {
                 It 'Should return false' {
-                    $Params = @{
-                        AnnounceServer                  = $False
-                        AsynchronousCredits             = 64
-                        AuditSmb1Access                 = $False
-                        AutoDisconnectTimeout           = 15
-                        AutoShareServer                 = $True
-                        AutoShareWorkstation            = $True
-                        CachedOpenLimit                 = 10
-                        DurableHandleV2TimeoutInSeconds = 180
-                        EnableAuthenticateUserSharing   = $False
-                        EnableDownlevelTimewarp         = $False
-                        EnableForcedLogoff              = $True
-                        EnableLeasing                   = $True
-                        EnableMultiChannel              = $True
-                        EnableOplocks                   = $True
-                        EnableSecuritySignature         = $False
-                        EnableSMB1Protocol              = $False
-                        EnableSMB2Protocol              = $True
-                        EnableStrictNameChecking        = $True
-                        EncryptData                     = $False
-                        IrpStackSize                    = 15
-                        KeepAliveTime                   = 2
-                        MaxChannelPerSession            = 32
-                        MaxMpxCount                     = 50
-                        MaxSessionPerConnection         = 16384
-                        MaxThreadsPerQueue              = 20
-                        MaxWorkItems                    = 1
-                        OplockBreakWait                 = 35
-                        PendingClientTimeoutInSeconds   = 120
-                        RejectUnencryptedAccess         = $True
-                        RequireSecuritySignature        = $False
-                        ServerHidden                    = $True
-                        Smb2CreditsMax                  = 2048
-                        Smb2CreditsMin                  = 128
-                        SmbServerNameHardeningLevel     = 0
-                        TreatHostAsStableStorage        = $False
-                        ValidateAliasNotCircular        = $True
-                        ValidateShareScope              = $True
-                        ValidateShareScopeNotAliased    = $True
-                        ValidateTargetName              = $True
-                    }
-
+                    
                     $TestEnvironmentResult = Test-TargetResource @Params
 
                     $TestEnvironmentResult | Should -Be $false
@@ -99,47 +100,8 @@ try
             }
             Context 'When the SMB Server is not in the desired state' {
                 It 'Should return True when changes are required' {
-                    $Params = @{
-                        AnnounceServer                  = $False
-                        AsynchronousCredits             = 64
-                        AuditSmb1Access                 = $False
-                        AutoDisconnectTimeout           = 15
-                        AutoShareServer                 = $True
-                        AutoShareWorkstation            = $True
-                        CachedOpenLimit                 = 10
-                        DurableHandleV2TimeoutInSeconds = 180
-                        EnableAuthenticateUserSharing   = $False
-                        EnableDownlevelTimewarp         = $False
-                        EnableForcedLogoff              = $True
-                        EnableLeasing                   = $True
-                        EnableMultiChannel              = $True
-                        EnableOplocks                   = $True
-                        EnableSecuritySignature         = $False
-                        EnableSMB1Protocol              = $True
-                        EnableSMB2Protocol              = $True
-                        EnableStrictNameChecking        = $True
-                        EncryptData                     = $False
-                        IrpStackSize                    = 15
-                        KeepAliveTime                   = 2
-                        MaxChannelPerSession            = 32
-                        MaxMpxCount                     = 50
-                        MaxSessionPerConnection         = 16384
-                        MaxThreadsPerQueue              = 20
-                        MaxWorkItems                    = 1
-                        OplockBreakWait                 = 35
-                        PendingClientTimeoutInSeconds   = 120
-                        RejectUnencryptedAccess         = $True
-                        RequireSecuritySignature        = $False
-                        ServerHidden                    = $True
-                        Smb2CreditsMax                  = 2048
-                        Smb2CreditsMin                  = 128
-                        SmbServerNameHardeningLevel     = 0
-                        TreatHostAsStableStorage        = $False
-                        ValidateAliasNotCircular        = $True
-                        ValidateShareScope              = $True
-                        ValidateShareScopeNotAliased    = $True
-                        ValidateTargetName              = $True
-                    }
+                    
+                    $Params.EnableSMB1Protocol = $true
                     
                     $TestEnvironmentResult = Test-TargetResource @Params
 
@@ -152,48 +114,6 @@ try
             Context 'When configuration is required' {
                 It 'Runs the Set-SmbServerConfiguration cmdlet with the parameters' {
                     Mock -CommandName Set-SmbServerConfiguration
-
-                    $Params = @{
-                        AnnounceServer                  = $False
-                        AsynchronousCredits             = 64
-                        AuditSmb1Access                 = $False
-                        AutoDisconnectTimeout           = 15
-                        AutoShareServer                 = $True
-                        AutoShareWorkstation            = $True
-                        CachedOpenLimit                 = 10
-                        DurableHandleV2TimeoutInSeconds = 180
-                        EnableAuthenticateUserSharing   = $False
-                        EnableDownlevelTimewarp         = $False
-                        EnableForcedLogoff              = $True
-                        EnableLeasing                   = $True
-                        EnableMultiChannel              = $True
-                        EnableOplocks                   = $True
-                        EnableSecuritySignature         = $False
-                        EnableSMB1Protocol              = $True
-                        EnableSMB2Protocol              = $True
-                        EnableStrictNameChecking        = $True
-                        EncryptData                     = $False
-                        IrpStackSize                    = 15
-                        KeepAliveTime                   = 2
-                        MaxChannelPerSession            = 32
-                        MaxMpxCount                     = 50
-                        MaxSessionPerConnection         = 16384
-                        MaxThreadsPerQueue              = 20
-                        MaxWorkItems                    = 1
-                        OplockBreakWait                 = 35
-                        PendingClientTimeoutInSeconds   = 120
-                        RejectUnencryptedAccess         = $True
-                        RequireSecuritySignature        = $False
-                        ServerHidden                    = $True
-                        Smb2CreditsMax                  = 2048
-                        Smb2CreditsMin                  = 128
-                        SmbServerNameHardeningLevel     = 0
-                        TreatHostAsStableStorage        = $False
-                        ValidateAliasNotCircular        = $True
-                        ValidateShareScope              = $True
-                        ValidateShareScopeNotAliased    = $True
-                        ValidateTargetName              = $True
-                    }
 
                     Set-TargetResource @Params
 
