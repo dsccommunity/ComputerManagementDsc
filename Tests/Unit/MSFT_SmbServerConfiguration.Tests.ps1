@@ -114,6 +114,10 @@ try
                         {
                             $Params.EnableSMB1Protocol = $false
                         }
+                        default
+                        {
+                            $Params.EnableSMB1Protocol = $false
+                        }
                     }
                     
                     $TestEnvironmentResult = Test-TargetResource @Params
