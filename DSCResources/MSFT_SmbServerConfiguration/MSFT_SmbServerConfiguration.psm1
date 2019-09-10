@@ -11,7 +11,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_SmbServer'
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_SmbServerConfiguration'
 
 <#
     .SYNOPSIS
@@ -765,7 +765,7 @@ function Test-TargetResource
     }
     
     if($EnableOplocks)
-    
+
     {   
         if($EnableOplocks -ne $currentSmbServerConfiguration.EnableOplocks)
         {
