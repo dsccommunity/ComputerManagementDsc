@@ -104,19 +104,15 @@ try
             Context 'When the SMB Server is not in the desired state' {
                 It 'Should return True when changes are required' {
                     
-                    switch ($Params.EnableSMB1Protocol) 
+                    switch ($Params.EncryptData) 
                     {
                         $false 
                         {
-                            $Params.EnableSMB1Protocol = $true
+                            $Params.EncryptData = $true
                         }
                         $true 
                         {
-                            $Params.EnableSMB1Protocol = $false
-                        }
-                        default
-                        {
-                            $Params.EnableSMB1Protocol = $false
+                            $Params.EncryptData = $false
                         }
                     }
                     

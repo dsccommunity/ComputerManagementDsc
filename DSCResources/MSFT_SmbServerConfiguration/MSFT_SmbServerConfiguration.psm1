@@ -1020,3 +1020,5 @@ function Test-TargetResource
   
     return $resourceRequiresUpdate
 }
+
+Export-ModuleMember -Function *-TargetResource
