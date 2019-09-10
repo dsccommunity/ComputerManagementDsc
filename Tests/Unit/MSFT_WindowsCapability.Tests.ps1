@@ -29,7 +29,7 @@ try
             Describe "$($script:dscResourceName)\Get-TargetResource" -Tag 'Get' {
                 Mock -CommandName Get-WindowsCapability -MockWith {
                     $properties = @{
-                            Name        = 'Msix.PackagingTool.Driver'
+                            Name        = 'Browser.InternetExplorer~~~~0.0.11.0'
                             LogLevel    = '3'
                             LimitAccess = $true
                             Online      = $true
@@ -38,14 +38,14 @@ try
                     return (New-Object -TypeName PSObject -Property $properties)
                 }
 
-                $results = Get-TargetResource -LogName 'Application' -IsEnabled $true
+                $results = Get-TargetResource -Name 'Browser.InternetExplorer~~~~0.0.11.0' -IsEnabled $true
 
                 It 'Should return an hashtable' {
                     $results.GetType().Name | Should -Be 'Hashtable'
                 }
 
                 It 'Should return a Name of a Windows Capability' {
-                    $results.Name = 'Msix.PackagingTool.Driver'
+                    $results.Name = 'Browser.InternetExplorer~~~~0.0.11.0'
                 }
 
                 It 'Should return a LogLevel of 3' {
