@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WindowsEventLog'
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WindowsCapability'
 
 <#
     .SYNOPSIS
@@ -14,6 +14,9 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WindowsEventLog'
 
     .PARAMETER Name
         Specifies the given name of a Windows Capability.
+
+    .PARAMETER Ensure
+        Specifies whether the Windows Capability should be installed or uninstalled.
 #>
 function Get-TargetResource
 {
@@ -26,9 +29,12 @@ function Get-TargetResource
         $Name,
 
         [Parameter()]
-        [System.Boolean]
-        $IsEnabled
+        [ValidateSet('Present', 'Absent')]
+        [System.String]
+        $Ensure = 'Present'
     )
+
+    Write-Verbose -Message ($script:localizedData.GetTargetResourceStartMessage -f $Name)
 
     $capability = Get-WindowsCapability -Name $Name
 
@@ -40,7 +46,7 @@ function Get-TargetResource
         LogPath     = [System.String] $capability.LogPath
     }
 
-    Write-Verbose -Message ($script:localizedData.GettingEventlogName -f $LogName)
+    Write-Verbose -Message ($script:localizedData.GetTargetResourceEndMessage -f $Name)
     return $returnValue
 }
 
@@ -50,6 +56,9 @@ function Get-TargetResource
 
     .PARAMETER Name
         Specifies the given name of a Windows Capability.
+
+    .PARAMETER Ensure
+        Specifies whether the Windows Capability should be installed or uninstalled.
 
     .PARAMETER LogLevel
         Specifies the given LogLevel of a Windows Capability. The Default Level is 3.
@@ -80,6 +89,11 @@ function Set-TargetResource
         $Name,
 
         [Parameter()]
+        [ValidateSet('Present', 'Absent')]
+        [System.String]
+        $Ensure = 'Present',
+
+        [Parameter()]
         [ValidateRange(1, 4)]
         $LogLevel,
 
@@ -96,6 +110,35 @@ function Set-TargetResource
         $LogPath
     )
 
+    Write-Verbose -Message ($script:localizedData.SetTargetResourceStartMessage -f $Name)
+
+    if ($Ensure -eq 'Present')
+    {
+        if ($Online -eq $true)
+        {
+            Add-WindowsCapability -Online -Name $Name
+        }
+
+        if ($Online -eq $false)
+        {
+            Add-WindowsCapability -Name $Name
+        }
+    }
+
+    if ($Ensure -eq 'Absent')
+    {
+        if ($Online -eq $true)
+        {
+            Remove-WindowsCapability -Online -Name $Name
+        }
+
+        if ($Online -eq $false)
+        {
+            Remove-WindowsCapability -Name $Name
+        }
+    }
+
+    Write-Verbose -Message ($script:localizedData.SetTargetResourceEndMessage -f $Name)
 }
 
 <#
@@ -104,6 +147,9 @@ function Set-TargetResource
 
     .PARAMETER Name
         Specifies the given name of a Windows Capability.
+
+    .PARAMETER Ensure
+        Specifies whether the Windows Capability should be installed or uninstalled.
 
     .PARAMETER LogLevel
         Specifies the given LogLevel of a Windows Capability. The Default Level is 3.
@@ -135,6 +181,11 @@ function Test-TargetResource
         $Name,
 
         [Parameter()]
+        [ValidateSet('Present', 'Absent')]
+        [System.String]
+        $Ensure = 'Present',
+
+        [Parameter()]
         [ValidateRange(1, 4)]
         $LogLevel,
 
@@ -151,8 +202,20 @@ function Test-TargetResource
         $LogPath
     )
 
+    Write-Verbose -Message ($script:localizedData.TestTargetResourceStartMessage -f $Name)
+
+    $windowsCapability = Get-WindowsCapability -Name $Name
+
+    if ($null -eq $windowsCapability)
+    {
+        return
+    }
+
     $desiredState = $true
 
+    Write-Verbose -Message ($script:localizedData.SetResourceIsInDesiredState -f $Name)
+
+    Write-Verbose -Message ($script:localizedData.TestTargetResourceEndMessage -f $Name)
     return $desiredState
 }
 
