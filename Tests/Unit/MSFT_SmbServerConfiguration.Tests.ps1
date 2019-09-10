@@ -36,52 +36,54 @@ try
 
     InModuleScope $script:DSCResourceName {
 
+        $CurrSmbConfig = Get-SmbServerConfiguration
         $Params = @{
             IsSingleInstance                = 'Yes'
-            AnnounceServer                  = $False
-            AsynchronousCredits             = 64
-            AuditSmb1Access                 = $False
-            AutoDisconnectTimeout           = 15
-            AutoShareServer                 = $True
-            AutoShareWorkstation            = $True
-            CachedOpenLimit                 = 10
-            DurableHandleV2TimeoutInSeconds = 180
-            EnableAuthenticateUserSharing   = $False
-            EnableDownlevelTimewarp         = $False
-            EnableForcedLogoff              = $True
-            EnableLeasing                   = $True
-            EnableMultiChannel              = $True
-            EnableOplocks                   = $True
-            EnableSecuritySignature         = $False
-            EnableSMB1Protocol              = $False
-            EnableSMB2Protocol              = $True
-            EnableStrictNameChecking        = $True
-            EncryptData                     = $False
-            IrpStackSize                    = 15
-            KeepAliveTime                   = 2
-            MaxChannelPerSession            = 32
-            MaxMpxCount                     = 50
-            MaxSessionPerConnection         = 16384
-            MaxThreadsPerQueue              = 20
-            MaxWorkItems                    = 1
-            OplockBreakWait                 = 35
-            PendingClientTimeoutInSeconds   = 120
-            RejectUnencryptedAccess         = $True
-            RequireSecuritySignature        = $False
-            ServerHidden                    = $True
-            Smb2CreditsMax                  = 2048
-            Smb2CreditsMin                  = 128
-            SmbServerNameHardeningLevel     = 0
-            TreatHostAsStableStorage        = $False
-            ValidateAliasNotCircular        = $True
-            ValidateShareScope              = $True
-            ValidateShareScopeNotAliased    = $True
-            ValidateTargetName              = $True
+            AnnounceServer                  = $CurrSmbConfig.AnnounceServer
+            AsynchronousCredits             = $CurrSmbConfig.AsynchronousCredits
+            AuditSmb1Access                 = $CurrSmbConfig.AuditSmb1Access
+            AutoDisconnectTimeout           = $CurrSmbConfig.AutoDisconnectTimeout
+            AutoShareServer                 = $CurrSmbConfig.AutoShareServer
+            AutoShareWorkstation            = $CurrSmbConfig.AutoShareWorkstation
+            CachedOpenLimit                 = $CurrSmbConfig.CachedOpenLimit
+            DurableHandleV2TimeoutInSeconds = $CurrSmbConfig.DurableHandleV2TimeoutInSeconds
+            EnableAuthenticateUserSharing   = $CurrSmbConfig.EnableAuthenticateUserSharing
+            EnableDownlevelTimewarp         = $CurrSmbConfig.EnableDownlevelTimewarp
+            EnableForcedLogoff              = $CurrSmbConfig.EnableForcedLogoff
+            EnableLeasing                   = $CurrSmbConfig.EnableLeasing
+            EnableMultiChannel              = $CurrSmbConfig.EnableMultiChannel
+            EnableOplocks                   = $CurrSmbConfig.EnableOplocks
+            EnableSecuritySignature         = $CurrSmbConfig.EnableSecuritySignature
+            EnableSMB1Protocol              = $CurrSmbConfig.EnableSMB1Protocol
+            EnableSMB2Protocol              = $CurrSmbConfig.EnableSMB2Protocol
+            EnableStrictNameChecking        = $CurrSmbConfig.EnableStrictNameChecking
+            EncryptData                     = $CurrSmbConfig.EncryptData
+            IrpStackSize                    = $CurrSmbConfig.IrpStackSize
+            KeepAliveTime                   = $CurrSmbConfig.KeepAliveTime
+            MaxChannelPerSession            = $CurrSmbConfig.MaxChannelPerSession
+            MaxMpxCount                     = $CurrSmbConfig.MaxMpxCount
+            MaxSessionPerConnection         = $CurrSmbConfig.MaxSessionPerConnection
+            MaxThreadsPerQueue              = $CurrSmbConfig.MaxThreadsPerQueue
+            MaxWorkItems                    = $CurrSmbConfig.MaxWorkItems
+            OplockBreakWait                 = $CurrSmbConfig.OplockBreakWait
+            PendingClientTimeoutInSeconds   = $CurrSmbConfig.PendingClientTimeoutInSeconds
+            RejectUnencryptedAccess         = $CurrSmbConfig.RejectUnencryptedAccess
+            RequireSecuritySignature        = $CurrSmbConfig.RequireSecuritySignature
+            ServerHidden                    = $CurrSmbConfig.ServerHidden
+            Smb2CreditsMax                  = $CurrSmbConfig.Smb2CreditsMax
+            Smb2CreditsMin                  = $CurrSmbConfig.Smb2CreditsMin
+            SmbServerNameHardeningLevel     = $CurrSmbConfig.SmbServerNameHardeningLevel
+            TreatHostAsStableStorage        = $CurrSmbConfig.TreatHostAsStableStorage
+            ValidateAliasNotCircular        = $CurrSmbConfig.ValidateAliasNotCircular
+            ValidateShareScope              = $CurrSmbConfig.ValidateShareScope
+            ValidateShareScopeNotAliased    = $CurrSmbConfig.ValidateShareScopeNotAliased
+            ValidateTargetName              = $CurrSmbConfig.ValidateTargetName
         }
 
         Describe 'MSFT_SmbServerConfiguration\Get-TargetResource' -Tag 'Get' {
             Context 'When getting the Target Resource information' {
                 It 'Should get the current SMB server configuration state' {
+
                     $SmbServerConfiguration = Get-TargetResource -IsSingleInstance Yes
 
                     $SmbServerConfiguration.AuditSmb1Access | Should -Not -BeNullOrEmpty
