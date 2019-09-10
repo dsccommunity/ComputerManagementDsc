@@ -1,6 +1,6 @@
 
 [ClassVersion("1.0.0.0"), FriendlyName("SmbServer")]
-class MSFT_SmbServer : OMI_BaseResource
+class MSFT_SmbServerConfiguration : OMI_BaseResource
 {
     [Description("Specifies the announce comment string.")] String AnnounceComment;
     [Description("Specifies whether this server announces itself by using browser announcements.")] Boolean AnnounceServer;

@@ -765,6 +765,7 @@ function Test-TargetResource
     }
     
     if($EnableOplocks)
+    
     {   
         if($EnableOplocks -ne $currentSmbServerConfiguration.EnableOplocks)
         {
