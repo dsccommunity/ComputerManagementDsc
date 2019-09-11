@@ -95,7 +95,7 @@ function Set-TargetResource
 
         [Parameter()]
         [ValidateRange(1, 4)]
-        [System.Int32]
+        [System.Integer]
         $LogLevel,
 
         [Parameter()]
@@ -188,7 +188,7 @@ function Test-TargetResource
 
         [Parameter()]
         [ValidateRange(1, 4)]
-        [System.Int32]
+        [System.Integer]
         $LogLevel,
 
         [Parameter()]
