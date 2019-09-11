@@ -38,7 +38,7 @@ try
                     return (New-Object -TypeName PSObject -Property $properties)
                 }
 
-                $results = Get-TargetResource -Name 'Browser.InternetExplorer~~~~0.0.11.0' -IsEnabled $true
+                $results = Get-TargetResource -Name 'Browser.InternetExplorer~~~~0.0.11.0' -Ensure 'Present' -Online $true
 
                 It 'Should return an hashtable' {
                     $results.GetType().Name | Should -Be 'Hashtable'

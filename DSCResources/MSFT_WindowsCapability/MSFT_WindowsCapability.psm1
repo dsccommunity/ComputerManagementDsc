@@ -17,6 +17,14 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WindowsCapability'
 
     .PARAMETER Ensure
         Specifies whether the Windows Capability should be installed or uninstalled.
+
+    .PARAMETER Online
+        Indicates that the cmdlet operates on a running operating system on the local host.
+
+    .PARAMETER LimitAccess
+        Indicates that this cmdlet does not query Windows Update for source packages
+        when servicing a live OS.
+        Only applies when the -Online switch is specified.
 #>
 function Get-TargetResource
 {
@@ -31,12 +39,28 @@ function Get-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present'
+        $Ensure = 'Present',
+
+        [Parameter()]
+        [System.Boolean]
+        $Online,
+
+        [Parameter()]
+        [System.Boolean]
+        $LimitAccess
     )
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceStartMessage -f $Name)
 
-    $capability = Get-WindowsCapability -Name $Name
+    if ($Online -eq $true)
+    {
+        $capability = Get-WindowsCapability -Name $Name -Online
+    }
+
+    if ($LimitAccess -eq $true)
+    {
+        $capability = Get-WindowsCapability -Name $Name -LimitAccess
+    }
 
     $returnValue = @{
         Name        = [System.String] $Name

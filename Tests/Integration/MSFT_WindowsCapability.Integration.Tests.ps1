@@ -102,6 +102,32 @@ try
                 (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -BeTrue
             }
         }
+
+        Context 'Set Windows Capability to Default' {
+            $CurrentConfig = 'MSFT_WindowsCapability_Default'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -BeTrue
+            }
+        }
     }
 }
 finally
