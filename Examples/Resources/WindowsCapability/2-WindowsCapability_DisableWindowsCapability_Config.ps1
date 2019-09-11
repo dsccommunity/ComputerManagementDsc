@@ -21,3 +21,17 @@
     .DESCRIPTION
         Example script that disables the Windows Capability Browser.InternetExplorer
 #>
+Configuration WindowsCapability_EnableWindowsCapability_Config
+{
+    Import-DSCResource -ModuleName ComputerManagementDsc
+
+    Node localhost
+    {
+        WindowsCapability XPSViewer
+        {
+            Name   = 'XPS.Viewer~~~~0.0.1.0'
+            Ensure = 'Absent'
+            Online = $true
+        } # End of Windows Capability Resource
+    } # End of Node
+} # End of Configuration

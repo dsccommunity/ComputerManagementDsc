@@ -188,6 +188,7 @@ function Test-TargetResource
 
         [Parameter()]
         [ValidateRange(1, 4)]
+        [System.Int32]
         $LogLevel,
 
         [Parameter()]
@@ -214,7 +215,7 @@ function Test-TargetResource
 
     $desiredState = $true
 
-    if ($SomeThinIsWrong -eq $true)
+    if ($SomeThingIsWrong -eq $true)
     {
         Write-Verbose -Message ($script:localizedData.SetResourceIsNotInDesiredState -f $Name)
         $desiredState = $false

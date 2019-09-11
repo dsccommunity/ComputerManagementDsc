@@ -24,6 +24,84 @@ try
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile
     Describe "$($script:dscResourceName)_Integration" {
+
+        Context 'Set Windows Capability to Default' {
+            $CurrentConfig = 'MSFT_WindowsCapability_Default'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -BeTrue
+            }
+        }
+
+        Context 'Set Windows Capability XPS.Viewer to Absent' {
+            $CurrentConfig = 'MSFT_WindowsCapability_DisableCapability_XPSViewer'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -BeTrue
+            }
+        }
+
+        Context 'Set Windows Capability XPS.Viewer to Present' {
+            $CurrentConfig = 'MSFT_WindowsCapability_EnableCapability_XPSViewer'
+            $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
+            $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+
+            It 'Should compile a MOF file without error' {
+                {
+                    . $CurrentConfig -OutputPath $ConfigDir
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF correctly' {
+                {
+                    Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should return a compliant state after being applied' {
+                (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -BeTrue
+            }
+        }
     }
 }
 finally

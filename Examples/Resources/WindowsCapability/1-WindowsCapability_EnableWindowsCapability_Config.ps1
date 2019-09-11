@@ -19,19 +19,19 @@
 
 <#
     .DESCRIPTION
-        Example script that enables the Windows Capability Browser.InternetExplorer
+        Example script that enables the Windows Capability XPS.Viewer~~~~0.0.1.0
 #>
-Configuration WindowsEventlog_SetWindowsEventlogSize_Config
+Configuration WindowsCapability_EnableWindowsCapability_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsCapability BrowserInternetExplorer
+        WindowsCapability XPSViewer
         {
-            Name            = 'Application'
-            Ensure          = 'Present'
-
+            Name   = 'XPS.Viewer~~~~0.0.1.0'
+            Ensure = 'Present'
+            Online = $true
         } # End of Windows Capability Resource
     } # End of Node
 } # End of Configuration
