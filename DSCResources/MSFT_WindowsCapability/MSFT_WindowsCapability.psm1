@@ -141,12 +141,34 @@ function Set-TargetResource
     {
         if ($Online -eq $true)
         {
-            Add-WindowsCapability -Online -Name $Name
+            if ($LogPath -and $LogLevel)
+            {
+                Add-WindowsCapability -Online -Name $Name -LogPath $LogPath -LogLevel $LogLevel
+            }
+            elseif ($LogPath -and !$LogLevel)
+            {
+                Add-WindowsCapability -Online -Name $Name -LogPath $LogPath
+            }
+            elseif (!$LogPath -and $LogLevel)
+            {
+                Add-WindowsCapability -Online -Name $Name -LogLevel $LogLevel
+            }
         }
 
         if ($Online -eq $false)
         {
-            Add-WindowsCapability -Name $Name
+            if ($LogPath -and $LogLevel)
+            {
+                Add-WindowsCapability -Name $Name -LogPath $LogPath -LogLevel $LogLevel
+            }
+            elseif ($LogPath -and !$LogLevel)
+            {
+                Add-WindowsCapability -Name $Name -LogPath $LogPath
+            }
+            elseif (!$LogPath -and $LogLevel)
+            {
+                Add-WindowsCapability -Name $Name -LogLevel $LogLevel
+            }
         }
     }
 
@@ -230,16 +252,59 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestTargetResourceStartMessage -f $Name)
 
-    $windowsCapability = Get-WindowsCapability -Name $Name
+    if ($Online -eq $true)
+    {
+        $windowsCapability = Get-WindowsCapability -Name $Name -Online
+    }
 
-    if ($null -eq $windowsCapability)
+    if ($LimitAccess -eq $true)
+    {
+        $windowsCapability = Get-WindowsCapability -Name $Name -LimitAccess
+    }
+
+    if ($null -eq $windowsCapability.Name)
+    {
+        return
+    }
+
+    if (-not (Test-Path $LogPath))
     {
         return
     }
 
     $desiredState = $true
 
-    if ($SomeThingIsWrong -eq $true)
+    if ($windowsCapability.State -eq 'NotPresent')
+    {
+        $ensureResult = 'Absent'
+    }
+
+    if ($windowsCapability.State -eq 'Installed')
+    {
+        $ensureResult = 'Present'
+    }
+
+    if ($PSBoundParameters.ContainsKey('Ensure') -and $windowsCapability.State -ne $ensureResult)
+    {
+        Write-Verbose -Message ($script:localizedData.SetResourceIsNotInDesiredState -f $Name)
+        $desiredState = $false
+    }
+
+    if ($PSBoundParameters.ContainsKey('LogPath') -and $windowsCapability.LogPath -ne $LogPath)
+    {
+        Write-Verbose -Message ($script:localizedData.SetResourceIsNotInDesiredState -f $Name)
+        $desiredState = $false
+    }
+
+    switch ($windowsCapability.LogLevel)
+    {
+        'Errors' { $logLevelResult = '1' }
+        'Warnings' { $logLevelResult = '2' }
+        'WarningsInfo' { $logLevelResult = '3' }
+        'Debug' { $logLevelResult = '4' }
+    }
+
+    if ($PSBoundParameters.ContainsKey('LogLevel') -and $LogLevel -ne $logLevelResult)
     {
         Write-Verbose -Message ($script:localizedData.SetResourceIsNotInDesiredState -f $Name)
         $desiredState = $false
