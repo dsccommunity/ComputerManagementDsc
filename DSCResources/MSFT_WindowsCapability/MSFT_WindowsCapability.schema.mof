@@ -8,5 +8,4 @@ class MSFT_WindowsCapability : OMI_BaseResource
     [Write, Description("Specifies the full path and file name to log to. If not set, the default is Logs\Dism\dism.log")] String LogPath;
     [Write, Description("Indicates that this cmdlet does not query Windows Update for source packages when servicing a live OS. Only applies when the -Online switch is specified")] Boolean LimitAccess;
     [Write, Description("Indicates that the cmdlet operates on a running operating system on the local host")] Boolean Online;
-    [Write, Description("Specifies the given path of a Windows Capability source")] String LogPath;
 };
