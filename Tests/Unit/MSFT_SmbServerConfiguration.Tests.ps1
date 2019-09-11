@@ -36,49 +36,221 @@ try
 
     InModuleScope $script:DSCResourceName {
 
-        $CurrSmbConfig = Get-SmbServerConfiguration
-        $Params = @{
-            IsSingleInstance                = 'Yes'
-            AnnounceComment                 = $CurrSmbConfig.AnnounceComment
-            AnnounceServer                  = $CurrSmbConfig.AnnounceServer
-            AsynchronousCredits             = $CurrSmbConfig.AsynchronousCredits
-            AuditSmb1Access                 = $CurrSmbConfig.AuditSmb1Access
-            AutoDisconnectTimeout           = $CurrSmbConfig.AutoDisconnectTimeout
-            AutoShareServer                 = $CurrSmbConfig.AutoShareServer
-            AutoShareWorkstation            = $CurrSmbConfig.AutoShareWorkstation
-            CachedOpenLimit                 = $CurrSmbConfig.CachedOpenLimit
-            DurableHandleV2TimeoutInSeconds = $CurrSmbConfig.DurableHandleV2TimeoutInSeconds
-            EnableAuthenticateUserSharing   = $CurrSmbConfig.EnableAuthenticateUserSharing
-            EnableDownlevelTimewarp         = $CurrSmbConfig.EnableDownlevelTimewarp
-            EnableForcedLogoff              = $CurrSmbConfig.EnableForcedLogoff
-            EnableLeasing                   = $CurrSmbConfig.EnableLeasing
-            EnableMultiChannel              = $CurrSmbConfig.EnableMultiChannel
-            EnableOplocks                   = $CurrSmbConfig.EnableOplocks
-            EnableSecuritySignature         = $CurrSmbConfig.EnableSecuritySignature
-            EnableSMB1Protocol              = $CurrSmbConfig.EnableSMB1Protocol
-            EnableSMB2Protocol              = $CurrSmbConfig.EnableSMB2Protocol
-            EnableStrictNameChecking        = $CurrSmbConfig.EnableStrictNameChecking
-            EncryptData                     = $CurrSmbConfig.EncryptData
-            IrpStackSize                    = $CurrSmbConfig.IrpStackSize
-            KeepAliveTime                   = $CurrSmbConfig.KeepAliveTime
-            MaxChannelPerSession            = $CurrSmbConfig.MaxChannelPerSession
-            MaxMpxCount                     = $CurrSmbConfig.MaxMpxCount
-            MaxSessionPerConnection         = $CurrSmbConfig.MaxSessionPerConnection
-            MaxThreadsPerQueue              = $CurrSmbConfig.MaxThreadsPerQueue
-            MaxWorkItems                    = $CurrSmbConfig.MaxWorkItems
-            OplockBreakWait                 = $CurrSmbConfig.OplockBreakWait
-            PendingClientTimeoutInSeconds   = $CurrSmbConfig.PendingClientTimeoutInSeconds
-            RejectUnencryptedAccess         = $CurrSmbConfig.RejectUnencryptedAccess
-            RequireSecuritySignature        = $CurrSmbConfig.RequireSecuritySignature
-            ServerHidden                    = $CurrSmbConfig.ServerHidden
-            Smb2CreditsMax                  = $CurrSmbConfig.Smb2CreditsMax
-            Smb2CreditsMin                  = $CurrSmbConfig.Smb2CreditsMin
-            SmbServerNameHardeningLevel     = $CurrSmbConfig.SmbServerNameHardeningLevel
-            TreatHostAsStableStorage        = $CurrSmbConfig.TreatHostAsStableStorage
-            ValidateAliasNotCircular        = $CurrSmbConfig.ValidateAliasNotCircular
-            ValidateShareScope              = $CurrSmbConfig.ValidateShareScope
-            ValidateShareScopeNotAliased    = $CurrSmbConfig.ValidateShareScopeNotAliased
-            ValidateTargetName              = $CurrSmbConfig.ValidateTargetName
+        $testCases = @(
+            @{
+                smbSetting = 'AnnounceComment'
+                newValue   = 'Test String'
+            }
+            @{
+                smbSetting = 'AnnounceServer'
+                newValue   = $true
+            }
+            @{
+                smbSetting = 'AsynchronousCredits'
+                newValue   = 32
+            }
+            @{
+                smbSetting = 'AuditSmb1Access'
+                newValue   = $true
+            }
+            @{
+                smbSetting = 'AutoDisconnectTimeout'
+                newValue   = 30
+            }
+            @{
+                smbSetting = 'AutoShareServer'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'AutoShareWorkstation'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'CachedOpenLimit'
+                newValue   = 20
+            }
+            @{
+                smbSetting = 'DurableHandleV2TimeoutInSeconds'
+                newValue   = 360
+            }
+            @{
+                smbSetting = 'EnableAuthenticateUserSharing'
+                newValue   = $true
+            }
+            @{
+                smbSetting = 'EnableDownlevelTimewarp'
+                newValue   = $true
+            }
+            @{
+                smbSetting = 'EnableForcedLogoff'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'EnableLeasing'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'EnableMultiChannel'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'EnableOplocks'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'EnableSecuritySignature'
+                newValue   = $true
+            }
+            @{
+                smbSetting = 'EnableSMB1Protocol'
+                newValue   = $true
+            }
+            @{
+                smbSetting = 'EnableSMB2Protocol'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'EnableStrictNameChecking'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'EncryptData'
+                newValue   = $true
+            }
+            @{
+                smbSetting = 'IrpStackSize'
+                newValue   = 30
+            }
+            @{
+                smbSetting = 'KeepAliveTime'
+                newValue   = 4
+            }
+            @{
+                smbSetting = 'MaxChannelPerSession'
+                newValue   = 16
+            }
+            @{
+                smbSetting = 'MaxMpxCount'
+                newValue   = 25
+            }
+            @{
+                smbSetting = 'MaxSessionPerConnection'
+                newValue   = 16000
+            }
+            @{
+                smbSetting = 'MaxThreadsPerQueue'
+                newValue   = 10
+            }
+            @{
+                smbSetting = 'MaxWorkItems'
+                newValue   = 2
+            }
+            @{
+                smbSetting = 'NullSessionPipes'
+                newValue   = 'TestPipe'
+            }
+            @{
+                smbSetting = 'NullSessionShares'
+                newValue   = 'TestShare'
+            }
+            @{
+                smbSetting = 'OplockBreakWait'
+                newValue   = 60
+            }
+            @{
+                smbSetting = 'PendingClientTimeoutInSeconds'
+                newValue   = 240
+            }
+            @{
+                smbSetting = 'RejectUnencryptedAccess'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'RequireSecuritySignature'
+                newValue   = $true
+            }
+            @{
+                smbSetting = 'ServerHidden'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'Smb2CreditsMax'
+                newValue   = 1024
+            }
+            @{
+                smbSetting = 'Smb2CreditsMin'
+                newValue   = 256
+            }
+            @{
+                smbSetting = 'SmbServerNameHardeningLevel'
+                newValue   = 1
+            }
+            @{
+                smbSetting = 'TreatHostAsStableStorage'
+                newValue   = $true
+            }
+            @{
+                smbSetting = 'ValidateAliasNotCircular'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'ValidateShareScope'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'ValidateShareScopeNotAliased'
+                newValue   = $false
+            }
+            @{
+                smbSetting = 'ValidateTargetName'
+                newValue   = $false
+            }
+        )
+        $mocks = @{
+            DefaultSettings = @{
+                AnnounceComment                 = ''
+                AnnounceServer                  = $false
+                AsynchronousCredits             = 64
+                AuditSmb1Access                 = $false
+                AutoDisconnectTimeout           = 15
+                AutoShareServer                 = $true
+                AutoShareWorkstation            = $true
+                CachedOpenLimit                 = 10
+                DurableHandleV2TimeoutInSeconds = 180
+                EnableAuthenticateUserSharing   = $false
+                EnableDownlevelTimewarp         = $false
+                EnableForcedLogoff              = $true
+                EnableLeasing                   = $true
+                EnableMultiChannel              = $true
+                EnableOplocks                   = $true
+                EnableSecuritySignature         = $false
+                EnableSMB1Protocol              = $false
+                EnableSMB2Protocol              = $true
+                EnableStrictNameChecking        = $true
+                EncryptData                     = $false
+                IrpStackSize                    = 15
+                KeepAliveTime                   = 2
+                MaxChannelPerSession            = 32
+                MaxMpxCount                     = 50
+                MaxSessionPerConnection         = 16384
+                MaxThreadsPerQueue              = 20
+                MaxWorkItems                    = 1
+                NullSessionPipes                = ''
+                NullSessionShares               = ''
+                OplockBreakWait                 = 35
+                PendingClientTimeoutInSeconds   = 120
+                RejectUnencryptedAccess         = $true
+                RequireSecuritySignature        = $false
+                ServerHidden                    = $true
+                Smb2CreditsMax                  = 2048
+                Smb2CreditsMin                  = 128
+                SmbServerNameHardeningLevel     = 0
+                TreatHostAsStableStorage        = $false
+                ValidateAliasNotCircular        = $true
+                ValidateShareScope              = $true
+                ValidateShareScopeNotAliased    = $true
+                ValidateTargetName              = $true
+            }
         }
 
         Describe 'MSFT_SmbServerConfiguration\Get-TargetResource' -Tag 'Get' {
@@ -95,187 +267,45 @@ try
 
         Describe 'MSFT_SmbServerConfiguration\Test-TargetResource' -Tag 'Test' {
             Context 'When the SMB Server is in the desired state' {
-                It 'Should return false' {
+                It 'Test-TargetResource should return false' {
+                    Mock -CommandName Get-SmbServerConfiguration { return $mocks.DefaultSettings }
+
                     $TestEnvironmentResult = Test-TargetResource @Params
-                    $TestEnvironmentResult | Should -Be $false
+                    $TestEnvironmentResult | Should -BeFalse
                 }
             }
+
             Context 'When the SMB Server is not in the desired state' {
-                It 'Should return True when AnnouncementComment setting changes are required' {
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -AnnounceComment "Test Comment"
-                    $TestEnvironmentResult | Should -Be $true
-                }
+                It 'Should return True when <smbSetting> setting changes are required' -TestCases $testCases {
+                    Param($smbSetting, $newValue)
 
-                It 'Should return True when AnnounceServer setting changes are required' {
-                    $Param = !$Params.AnnounceServer
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -AnnounceServer $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
+                    Mock -CommandName Get-SmbServerConfiguration { return $mocks.DefaultSettings }
 
-                It 'Should return True when AsynchronousCredits setting changes are required' {
-                    $Param = $Params.AsynchronousCredits - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -AsynchronousCredits $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
+                    $caseParams = @{
+                        IsSingleInstance = 'Yes'
+                        $smbSetting      = $newValue
+                    }
 
-                It 'Should return True when AuditSmb1Access setting changes are required' {
-                    $Param = !$Params.AuditSmb1Access
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -AuditSmb1Access $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when AutoDisconnectTimeout setting changes are required' {
-                    $Param = $Params.AutoDisconnectTimeout - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -AutoDisconnectTimeout $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when AutoShareServer setting changes are required' {
-                    $Param = !$Params.AutoShareServer
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -AutoShareServer $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when AutoShareWorkstation setting changes are required' {
-                    $Param = !$Params.AutoShareWorkstation
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -AutoShareWorkstation $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when CachedOpenLimit setting changes are required' {
-                    $Param = $Params.CachedOpenLimit - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -CachedOpenLimit $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when DurableHandleV2TimeoutInSeconds setting changes are required' {
-                    $Param = $Params.DurableHandleV2TimeoutInSeconds - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -DurableHandleV2TimeoutInSeconds $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableAuthenticateUserSharing setting changes are required' {
-                    $Param = !$Params.EnableAuthenticateUserSharing
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableAuthenticateUserSharing $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableForcedLogoff setting changes are required' {
-                    $Param = !$Params.EnableForcedLogoff
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableForcedLogoff $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableLeasing setting changes are required' {
-                    $Param = !$Params.EnableLeasing
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableLeasing $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableMultiChannel setting changes are required' {
-                    $Param = !$Params.EnableMultiChannel
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableMultiChannel $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableOplocks setting changes are required' {
-                    $Param = !$Params.EnableOplocks
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableOplocks $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableOplocks setting changes are required' {
-                    $Param = !$Params.EnableOplocks
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableOplocks $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableSMB1Protocol setting changes are required' {
-                    $Param = !$Params.EnableSMB1Protocol
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableSMB1Protocol $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableSMB2Protocol setting changes are required' {
-                    $Param = !$Params.EnableSMB2Protocol
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableSMB2Protocol $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableSMB2Protocol setting changes are required' {
-                    $Param = !$Params.EnableSMB2Protocol
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableSMB2Protocol $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableSecuritySignature setting changes are required' {
-                    $Param = !$Params.EnableSecuritySignature
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableSecuritySignature $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EnableStrictNameChecking setting changes are required' {
-                    $Param = !$Params.EnableStrictNameChecking
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EnableStrictNameChecking $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when EncryptData setting changes are required' {
-                    $Param = !$Params.EncryptData
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -EncryptData $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when IrpStackSize setting changes are required' {
-                    $Param = $Params.IrpStackSize - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -IrpStackSize $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when KeepAliveTime setting changes are required' {
-                    $Param = $Params.KeepAliveTime - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -KeepAliveTime $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when MaxChannelPerSession setting changes are required' {
-                    $Param = $Params.MaxChannelPerSession - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -MaxChannelPerSession $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when MaxMpxCount setting changes are required' {
-                    $Param = $Params.MaxMpxCount - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -MaxMpxCount $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when MaxSessionPerConnection setting changes are required' {
-                    $Param = $Params.MaxSessionPerConnection - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -MaxSessionPerConnection $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when MaxThreadsPerQueue setting changes are required' {
-                    $Param = $Params.MaxThreadsPerQueue - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -MaxThreadsPerQueue $Param
-                    $TestEnvironmentResult | Should -Be $true
-                }
-
-                It 'Should return True when MaxWorkItems setting changes are required' {
-                    $Param = $Params.MaxWorkItems - 1
-                    $TestEnvironmentResult = Test-TargetResource -IsSingleInstance Yes -MaxWorkItems $Param
-                    $TestEnvironmentResult | Should -Be $true
+                    $TestEnvironmentResult = Test-TargetResource @caseParams
+                    $TestEnvironmentResult | Should -BeTrue
                 }
             }
         }
 
         Describe 'MSFT_SmbServerConfiguration\Set-TargetResource' -Tag 'Set' {
             Context 'When configuration is required' {
-                It 'Runs the Set-SmbServerConfiguration cmdlet with the parameters' {
+                It 'Runs the Set-SmbServerConfiguration cmdlet when the <smbSetting> needs to be changed' -TestCases $testCases {
+                    Param($smbSetting, $newValue)
+
+                    Mock -CommandName Get-SmbServerConfiguration { return $mocks.DefaultSettings }
                     Mock -CommandName Set-SmbServerConfiguration
 
-                    Set-TargetResource @Params
+                    $caseParams = @{
+                        IsSingleInstance = 'Yes'
+                        $smbSetting      = $newValue
+                    }
+
+                    Set-TargetResource @caseParams
 
                     Assert-MockCalled -CommandName Set-SmbServerConfiguration -Times 1
                 }

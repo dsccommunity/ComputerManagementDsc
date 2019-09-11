@@ -27,6 +27,8 @@
         'MaxSessionPerConnection'
         'MaxThreadsPerQueue'
         'MaxWorkItems'
+        'NullSessionPipes'
+        'NullSessionShares'
         'OplockBreakWait'
         'PendingClientTimeoutInSeconds'
         'RejectUnencryptedAccess'
