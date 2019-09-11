@@ -19,9 +19,9 @@
 
 <#
     .DESCRIPTION
-        Example script that disables the Windows Capability Browser.InternetExplorer
+        Example script that disables the Windows Capability XPS.Viewer~~~~0.0.1.0
 #>
-Configuration WindowsCapability_EnableWindowsCapability_Config
+Configuration WindowsCapability_DisableWindowsCapability_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
