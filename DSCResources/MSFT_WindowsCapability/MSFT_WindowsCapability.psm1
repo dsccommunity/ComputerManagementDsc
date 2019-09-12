@@ -90,10 +90,6 @@ function Set-TargetResource
         $LogLevel,
 
         [Parameter()]
-        [System.Boolean]
-        $Online,
-
-        [Parameter()]
         [System.String]
         $LogPath
     )

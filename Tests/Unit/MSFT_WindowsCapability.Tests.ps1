@@ -30,8 +30,6 @@ try
             Mock -CommandName Get-WindowsCapability -MockWith {
                 $properties = @{
                     Name     = 'Browser.InternetExplorer~~~~0.0.11.0'
-                    LogLevel = '3'
-                    LogPath  = '%WINDIR%\Logs\Dism\dism.log'
                     State    = 'Installed'
                 }
                 return (New-Object -TypeName PSObject -Property $properties)
@@ -47,10 +45,6 @@ try
                 $results.Name = 'Browser.InternetExplorer~~~~0.0.11.0'
             }
 
-            It 'Should return a LogLevel of 3' {
-                $results.LogLevel | Should -Be 3
-            }
-
             It 'Should return a State of Installed' {
                 $results.State | Should -Be 'Installed'
             }
@@ -60,9 +54,6 @@ try
             Mock -CommandName Get-WindowsCapability -MockWith {
                 $properties = @{
                     Name     = 'XPS.Viewer~~~~0.0.1.0'
-                    LogLevel = '2'
-                    Online   = $true
-                    LogPath  = '%WINDIR%\Logs\Dism\dism.log'
                     State    = 'Installed'
                 }
                 return (New-Object -TypeName PSObject -Property $properties)
@@ -76,30 +67,6 @@ try
                 { Test-TargetResource -Name 'XPS.BadViewer~~~~0.0.1.0' -Ensure 'Present' -ErrorAction Stop } | Should -Throw
             }
 
-            It 'Should throw when passed an invalid LogLevel' {
-                { Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present' -LogLevel 5 -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should throw when passed an invalid LogPath' {
-                { Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present' -LogPath 'E:\BadLogPath' -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should return $true if LogLevel is in desired state' {
-                Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -LogLevel '2' -Ensure 'Present' | Should -BeTrue
-            }
-
-            It 'Should return $false if LogLevel is not in desired state' {
-                Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -LogLevel '1' -Ensure 'Present' | Should -BeFalse
-            }
-
-            It 'Should return $true if LogPath is in desired state' {
-                Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -LogPath '%WINDIR%\Logs\Dism\dism.log' -Ensure 'Present' | Should -BeTrue
-            }
-
-            It 'Should return $false if LogPath is not in desired state' {
-                Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -LogPath '%WINDIR%\Logs\Dism\dism2.log' -Ensure 'Present' | Should -BeFalse
-            }
-
             It 'Should return $true if Windows Capability is in desired state' {
                 Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present' | Should -BeTrue
             }
@@ -110,41 +77,36 @@ try
         }
 
         Describe "$($script:dscResourceName)\Set-TargetResource" -Tag 'Set' {
-            Mock -CommandName Get-WindowsCapability -MockWith {
+            Mock -CommandName Add-WindowsCapability -MockWith {
                 $properties = @{
                     Name     = 'XPS.Viewer~~~~0.0.1.0'
                     LogLevel = '2'
-                    Online   = $true
                     LogPath  = '%WINDIR%\Logs\Dism\dism.log'
                     State    = 'Installed'
                 }
                 return (New-Object -TypeName PSObject -Property $properties)
             }
 
-            $results = Set-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present' -Online $true
-
-            It 'Should return an hashtable' {
-                $results.GetType().Name | Should -Be 'Hashtable'
+            Mock -CommandName Remove-WindowsCapability -MockWith {
+                $properties = @{
+                    Name     = 'XPS.Viewer~~~~0.0.1.0'
+                    LogLevel = '2'
+                    LogPath  = '%WINDIR%\Logs\Dism\dism.log'
+                    State    = 'NotPresent'
+                }
+                return (New-Object -TypeName PSObject -Property $properties)
             }
 
-            It 'Should return a Name of a Windows Capability' {
-                $results.Name = 'XPS.Viewer~~~~0.0.1.0'
+            $results = Set-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present'
+
+            It "Windows Capability 'XPS.Viewer~~~~0.0.1.0' is in desired state" {
+                Set-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present'
+                Assert-MockCalled -CommandName Add-WindowsCapability -Exactly -Times 0 -Scope It
             }
 
-            It 'Should return a LogLevel of 2' {
-                $results.LogLevel | Should -Be 2
-            }
-
-            It 'Should return a Online of $true' {
-                $results.Online | Should -Be $true
-            }
-
-            It 'Should return a LogPath %WINDIR%\Logs\Dism\dism.log' {
-                $results.LogPath | Should -Be '%WINDIR%\Logs\Dism\dism.log'
-            }
-
-            It 'Should return a State of Installed' {
-                $results.State | Should -Be 'Installed'
+            It "Windows Capability 'XPS.Viewer~~~~0.0.1.0' is not in desired state" {
+                Set-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Absent'
+                Assert-MockCalled -CommandName Remove-WindowsCapability -Exactly -Times 1 -Scope It
             }
         }
     }
