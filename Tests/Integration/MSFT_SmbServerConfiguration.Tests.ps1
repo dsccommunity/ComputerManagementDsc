@@ -47,7 +47,7 @@ try
                     EnableMultiChannel              = $false
                     EnableOplocks                   = $false
                     EnableSecuritySignature         = $true
-                    EnableSMB1Protocol              = $true
+                    EnableSMB1Protocol              = $false
                     EnableSMB2Protocol              = $false
                     EnableStrictNameChecking        = $false
                     EncryptData                     = $true

@@ -364,6 +364,7 @@ function Set-TargetResource
     )
 
     $null = $PSBoundParameters.Remove('IsSingleInstance')
+    $PSBoundParameters.Add('Confirm', $false)
 
     Write-Verbose -Message ($script:localizedData.UpdatingProperties)
 
@@ -685,7 +686,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestTargetResourceMessage)
 
-    $resourceRequiresUpdate = $false
+    $resourceCompliant = $true
 
     $currentSmbServerConfiguration = Get-TargetResource -IsSingleInstance Yes
 
@@ -697,12 +698,12 @@ function Test-TargetResource
 
             if ($PSBoundParameters.$smbParameter -ne $currentSmbServerConfiguration.$smbParameter)
             {
-                $resourceRequiresUpdate = $true
+                $resourceCompliant = $false
             }
         }
     }
 
-    return $resourceRequiresUpdate
+    return $resourceCompliant
 }
 
 Export-ModuleMember -Function *-TargetResource

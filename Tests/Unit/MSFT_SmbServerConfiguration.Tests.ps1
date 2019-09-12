@@ -352,16 +352,16 @@ try
 
         Describe 'MSFT_SmbServerConfiguration\Test-TargetResource' -Tag 'Test' {
             Context 'When the SMB Server is in the desired state' {
-                It 'Test-TargetResource should return false' {
+                It 'Test-TargetResource should return true' {
                     Mock -CommandName Get-SmbServerConfiguration { return $mocks.DefaultSettings }
 
                     $TestEnvironmentResult = Test-TargetResource @FullParams
-                    $TestEnvironmentResult | Should -BeFalse
+                    $TestEnvironmentResult | Should -BeTrue
                 }
             }
 
             Context 'When the SMB Server is not in the desired state' {
-                It 'Should return True when <smbSetting> setting changes are required' -TestCases $testCases {
+                It 'Should return false when <smbSetting> setting changes are required' -TestCases $testCases {
                     Param($smbSetting, $newValue)
 
                     Mock -CommandName Get-SmbServerConfiguration { return $mocks.DefaultSettings }
@@ -372,7 +372,7 @@ try
                     }
 
                     $TestEnvironmentResult = Test-TargetResource @caseParams
-                    $TestEnvironmentResult | Should -BeTrue
+                    $TestEnvironmentResult | Should -BeFalse
                 }
             }
         }
