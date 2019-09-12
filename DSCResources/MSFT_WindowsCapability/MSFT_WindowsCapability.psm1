@@ -15,16 +15,8 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WindowsCapability'
     .PARAMETER Name
         Specifies the given name of a Windows Capability.
 
-    .PARAMETER Ensure
-        Specifies whether the Windows Capability should be installed or uninstalled.
-
-    .PARAMETER Online
-        Indicates that the cmdlet operates on a running operating system on the local host.
-
-    .PARAMETER LimitAccess
-        Indicates that this cmdlet does not query Windows Update for source packages
-        when servicing a live OS.
-        Only applies when the -Online switch is specified.
+    .PARAMETER Name
+        Specifies the given name of a Windows Capability.
 #>
 function Get-TargetResource
 {
@@ -39,35 +31,18 @@ function Get-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present',
-
-        [Parameter()]
-        [System.Boolean]
-        $Online,
-
-        [Parameter()]
-        [System.Boolean]
-        $LimitAccess
+        $Ensure = 'Present'
     )
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceStartMessage -f $Name)
 
-    if ($Online -eq $true)
-    {
-        $capability = Get-WindowsCapability -Name $Name -Online
-    }
-
-    if ($LimitAccess -eq $true)
-    {
-        $capability = Get-WindowsCapability -Name $Name -LimitAccess
-    }
+    $capability = Get-WindowsCapability -Name $Name -Online
 
     $returnValue = @{
-        Name        = [System.String] $Name
-        LogLevel    = [system.String] $capability.LogLevel
-        LimitAccess = [System.Boolean] $capability.LimitAccess
-        Online      = [System.Boolean] $capability.Online
-        LogPath     = [System.String] $capability.LogPath
+        Name     = $Name
+        LogLevel = $capability.LogLevel
+        State    = $capability.State
+        Ensure   = $Ensure
     }
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceEndMessage -f $Name)
@@ -85,19 +60,11 @@ function Get-TargetResource
         Specifies whether the Windows Capability should be installed or uninstalled.
 
     .PARAMETER LogLevel
-        Specifies the given LogLevel of a Windows Capability. The Default Level is 3.
+        Specifies the given LogLevel of a Windows Capability. The Default Level is 'Errors', 'Warnings', 'WarningsInfo'.
         1 = Errors only
         2 = Errors and warnings
         3 = Errors, warnings, and information
         4 = All of the information listed previously, plus debug output.
-
-    .PARAMETER LimitAccess
-        Indicates that this cmdlet does not query Windows Update for source packages
-        when servicing a live OS.
-        Only applies when the -Online switch is specified.
-
-    .PARAMETER Online
-        Indicates that the cmdlet operates on a running operating system on the local host.
 
     .PARAMETER LogPath
         Specifies the full path and file name to log to.
@@ -118,13 +85,9 @@ function Set-TargetResource
         $Ensure = 'Present',
 
         [Parameter()]
-        [ValidateRange(1, 4)]
-        [System.UInt32]
+        [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
+        [System.String]
         $LogLevel,
-
-        [Parameter()]
-        [System.Boolean]
-        $LimitAccess,
 
         [Parameter()]
         [System.Boolean]
@@ -139,50 +102,23 @@ function Set-TargetResource
 
     if ($Ensure -eq 'Present')
     {
-        if ($Online -eq $true)
+        if ($LogPath -and $LogLevel)
         {
-            if ($LogPath -and $LogLevel)
-            {
-                Add-WindowsCapability -Online -Name $Name -LogPath $LogPath -LogLevel $LogLevel
-            }
-            elseif ($LogPath -and !$LogLevel)
-            {
-                Add-WindowsCapability -Online -Name $Name -LogPath $LogPath
-            }
-            elseif (!$LogPath -and $LogLevel)
-            {
-                Add-WindowsCapability -Online -Name $Name -LogLevel $LogLevel
-            }
+            Add-WindowsCapability -Online -Name $Name -LogPath $LogPath -LogLevel $LogLevel
         }
-
-        if ($Online -eq $false)
+        elseif ($LogPath -and !$LogLevel)
         {
-            if ($LogPath -and $LogLevel)
-            {
-                Add-WindowsCapability -Name $Name -LogPath $LogPath -LogLevel $LogLevel
-            }
-            elseif ($LogPath -and !$LogLevel)
-            {
-                Add-WindowsCapability -Name $Name -LogPath $LogPath
-            }
-            elseif (!$LogPath -and $LogLevel)
-            {
-                Add-WindowsCapability -Name $Name -LogLevel $LogLevel
-            }
+            Add-WindowsCapability -Online -Name $Name -LogPath $LogPath
+        }
+        elseif (!$LogPath -and $LogLevel)
+        {
+            Add-WindowsCapability -Online -Name $Name -LogLevel $LogLevel
         }
     }
 
     if ($Ensure -eq 'Absent')
     {
-        if ($Online -eq $true)
-        {
-            Remove-WindowsCapability -Online -Name $Name
-        }
-
-        if ($Online -eq $false)
-        {
-            Remove-WindowsCapability -Name $Name
-        }
+        Remove-WindowsCapability -Online -Name $Name
     }
 
     Write-Verbose -Message ($script:localizedData.SetTargetResourceEndMessage -f $Name)
@@ -197,25 +133,6 @@ function Set-TargetResource
 
     .PARAMETER Ensure
         Specifies whether the Windows Capability should be installed or uninstalled.
-
-    .PARAMETER LogLevel
-        Specifies the given LogLevel of a Windows Capability. The Default Level is 3.
-        1 = Errors only
-        2 = Errors and warnings
-        3 = Errors, warnings, and information
-        4 = All of the information listed previously, plus debug output.
-
-    .PARAMETER LimitAccess
-        Indicates that this cmdlet does not query Windows Update for source packages
-        when servicing a live OS.
-        Only applies when the -Online switch is specified.
-
-    .PARAMETER Online
-        Indicates that the cmdlet operates on a running operating system on the local host.
-
-    .PARAMETER LogPath
-        Specifies the full path and file name to log to.
-        If not set, the default is %WINDIR%\Logs\Dism\dism.log
 #>
 function Test-TargetResource
 {
@@ -230,37 +147,10 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present',
-
-        [Parameter()]
-        [ValidateRange(1, 4)]
-        [System.UInt32]
-        $LogLevel,
-
-        [Parameter()]
-        [System.Boolean]
-        $LimitAccess,
-
-        [Parameter()]
-        [System.Boolean]
-        $Online,
-
-        [Parameter()]
-        [System.String]
-        $LogPath
+        $Ensure = 'Present'
     )
 
     Write-Verbose -Message ($script:localizedData.TestTargetResourceStartMessage -f $Name)
-
-    if ($Online -eq $true)
-    {
-        $windowsCapability = Get-WindowsCapability -Name $Name -Online
-    }
-
-    if ($LimitAccess -eq $true)
-    {
-        $windowsCapability = Get-WindowsCapability -Name $Name -LimitAccess
-    }
 
     if ($null -eq $windowsCapability.Name)
     {
@@ -274,14 +164,13 @@ function Test-TargetResource
 
     $desiredState = $true
 
-    if ($windowsCapability.State -eq 'NotPresent')
-    {
-        $ensureResult = 'Absent'
-    }
-
     if ($windowsCapability.State -eq 'Installed')
     {
         $ensureResult = 'Present'
+    }
+    else
+    {
+        $ensureResult = 'Absent'
     }
 
     if ($PSBoundParameters.ContainsKey('Ensure') -and $windowsCapability.State -ne $ensureResult)
@@ -290,29 +179,8 @@ function Test-TargetResource
         $desiredState = $false
     }
 
-    if ($PSBoundParameters.ContainsKey('LogPath') -and $windowsCapability.LogPath -ne $LogPath)
-    {
-        Write-Verbose -Message ($script:localizedData.SetResourceIsNotInDesiredState -f $Name)
-        $desiredState = $false
-    }
-
-    switch ($windowsCapability.LogLevel)
-    {
-        'Errors' { $logLevelResult = '1' }
-        'Warnings' { $logLevelResult = '2' }
-        'WarningsInfo' { $logLevelResult = '3' }
-        'Debug' { $logLevelResult = '4' }
-    }
-
-    if ($PSBoundParameters.ContainsKey('LogLevel') -and $LogLevel -ne $logLevelResult)
-    {
-        Write-Verbose -Message ($script:localizedData.SetResourceIsNotInDesiredState -f $Name)
-        $desiredState = $false
-    }
-
     Write-Verbose -Message ($script:localizedData.SetResourceIsInDesiredState -f $Name)
 
-    Write-Verbose -Message ($script:localizedData.TestTargetResourceEndMessage -f $Name)
     return $desiredState
 }
 
