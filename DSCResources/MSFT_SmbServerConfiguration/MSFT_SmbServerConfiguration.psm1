@@ -40,9 +40,15 @@ function Get-TargetResource
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceMessage -f $Name)
 
+    $smbReturn = @{}
     $smbServer = Get-SmbServerConfiguration -ErrorAction 'SilentlyContinue'
+    $smbReturn.Add('IsSingleInstance', $IsSingleInstance)
+    foreach ($smbServerSetting in $script:smbServerSettings)
+    {
+        $smbReturn.Add($smbServerSetting, $smbServer.$smbServerSetting)
+    }
 
-    return $smbServer
+    return $smbReturn
 }
 
 <#
