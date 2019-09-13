@@ -28,6 +28,8 @@ The **ComputerManagementDsc** module contains the following resources:
   the local computer.
 - **WindowsEventLog**: This resource allows configuration of a specified
   Windows Event Log.
+- **WindowsCapability**: Provides a mechanism to enable or disable
+  Windows Capabilities on a target node.
 
 This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
