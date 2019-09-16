@@ -176,7 +176,7 @@ function Test-TargetResource
 function Join-Domain
 {
     [CmdletBinding()]
-    param(
+    param (
         [Parameter(Mandatory = $true)]
         [System.String]
         $RequestFile
@@ -223,7 +223,7 @@ function Get-DomainName
 {
     [CmdletBinding()]
     [OutputType([System.String])]
-    param()
+    param ()
 
     # Use CIM to detect the domain name so that this will work on Nano Server.
     $computerSystem = Get-CimInstance -ClassName 'Win32_ComputerSystem' -Namespace root\cimv2
