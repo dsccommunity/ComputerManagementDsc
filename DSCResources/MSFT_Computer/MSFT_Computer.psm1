@@ -639,7 +639,7 @@ function Get-LogonServer
 {
     [CmdletBinding()]
     [OutputType([System.String])]
-    param()
+    param ()
 
     $logonserver = $env:LOGONSERVER -replace "\\",""
     return $logonserver
