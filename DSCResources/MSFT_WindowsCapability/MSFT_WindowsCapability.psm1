@@ -15,8 +15,8 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WindowsCapability'
     .PARAMETER Name
         Specifies the given name of a Windows Capability.
 
-    .PARAMETER Name
-        Specifies the given name of a Windows Capability.
+    .PARAMETER Ensure
+        Specifies whether the Windows Capability should be installed or uninstalled.
 #>
 function Get-TargetResource
 {
@@ -31,18 +31,24 @@ function Get-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present'
+        $Ensure = 'Absent'
     )
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceStartMessage -f $Name)
 
     $capability = Get-WindowsCapability -Name $Name -Online
 
-    $returnValue = @{
-        Name     = $Name
-        LogLevel = $capability.LogLevel
-        State    = $capability.State
-        Ensure   = $Ensure
+    if ($capability.State -eq 'Installed')
+    {
+        $Ensure = 'Present'
+    }
+
+    return @{
+        IsSingleInstance = 'Yes'
+        Name             = $Name
+        LogLevel         = $capability.LogLevel
+        LogPath          = $capability.LogPath
+        Ensure           = $Ensure
     }
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceEndMessage -f $Name)
@@ -60,11 +66,7 @@ function Get-TargetResource
         Specifies whether the Windows Capability should be installed or uninstalled.
 
     .PARAMETER LogLevel
-        Specifies the given LogLevel of a Windows Capability. The Default Level is 'Errors', 'Warnings', 'WarningsInfo'.
-        1 = Errors only
-        2 = Errors and warnings
-        3 = Errors, warnings, and information
-        4 = All of the information listed previously, plus debug output.
+        Specifies the given LogLevel of a Windows Capability. The Default Level is 'WarningsInfo'.
 
     .PARAMETER LogPath
         Specifies the full path and file name to log to.
@@ -82,7 +84,7 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present',
+        $Ensure = 'Absent',
 
         [Parameter()]
         [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
@@ -96,25 +98,12 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SetTargetResourceStartMessage -f $Name)
 
-    if ($Ensure -eq 'Present')
-    {
-        if ($LogPath -and $LogLevel)
-        {
-            Add-WindowsCapability -Online -Name $Name -LogPath $LogPath -LogLevel $LogLevel
-        }
-        elseif ($LogPath -and !$LogLevel)
-        {
-            Add-WindowsCapability -Online -Name $Name -LogPath $LogPath
-        }
-        elseif (!$LogPath -and $LogLevel)
-        {
-            Add-WindowsCapability -Online -Name $Name -LogLevel $LogLevel
-        }
-    }
+    $null = $PSBoundParameters.Remove('Ensure')
+    $null = Add-WindowsCapability -Online @PSBoundParameters
 
     if ($Ensure -eq 'Absent')
     {
-        Remove-WindowsCapability -Online -Name $Name
+        $null = Remove-WindowsCapability -Online @PSBoundParameters
     }
 
     Write-Verbose -Message ($script:localizedData.SetTargetResourceEndMessage -f $Name)
@@ -143,7 +132,16 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present'
+        $Ensure = 'Absent',
+
+        [Parameter()]
+        [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
+        [System.String]
+        $LogLevel,
+
+        [Parameter()]
+        [System.String]
+        $LogPath
     )
 
     Write-Verbose -Message ($script:localizedData.TestTargetResourceStartMessage -f $Name)

@@ -19,7 +19,7 @@
 
 <#
     .DESCRIPTION
-        Example script that enables the Windows Capability XPS.Viewer~~~~0.0.1.0
+        Example script that add the Windows Capability XPS.Viewer~~~~0.0.1.0
 #>
 Configuration WindowsCapability_EnableWindowsCapability_Config
 {
@@ -31,7 +31,6 @@ Configuration WindowsCapability_EnableWindowsCapability_Config
         {
             Name   = 'XPS.Viewer~~~~0.0.1.0'
             Ensure = 'Present'
-            Online = $true
         } # End of Windows Capability Resource
     } # End of Node
 } # End of Configuration
