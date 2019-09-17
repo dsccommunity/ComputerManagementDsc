@@ -55,6 +55,8 @@ try
                 $properties = @{
                     Name     = 'XPS.Viewer~~~~0.0.1.0'
                     State    = 'Installed'
+                    LogPath  = 'C:\Logs\Logfile.log'
+                    LogLevel = 'Errors'
                 }
                 return (New-Object -TypeName PSObject -Property $properties)
             }
@@ -63,16 +65,40 @@ try
                 { Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present' -ErrorAction Stop } | Should -Not -Throw
             }
 
-            It 'Should throw when passed an invalid Windows Capability' {
+            It 'Should throw when passed an invalid Windows Capability Name' {
                 { Test-TargetResource -Name 'XPS.BadViewer~~~~0.0.1.0' -Ensure 'Present' -ErrorAction Stop } | Should -Throw
             }
 
+            It 'Should not throw when passed an valid Windows Capability LogLevel' {
+                { Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present' -LogLevel 'Errors' -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should throw when passed an invalid Windows Capability LogLevel' {
+                { Test-TargetResource -Name 'XPS.BadViewer~~~~0.0.1.0' -Ensure 'Present' -LogLevel 'Debug' -ErrorAction Stop } | Should -Throw
+            }
+
+            Mock -CommandName 'Test-Path' –MockWith {
+                return $true
+            }
+
+            It 'Should not throw when passed an valid Windows Capability LogPath' {
+                { Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present' -LogPath 'C:\Logs\Logfile.log' -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            Mock -CommandName 'Test-Path' –MockWith {
+                return $false
+            }
+
+            It 'Should throw when passed an invalid Windows Capability LogPath' {
+                { Test-TargetResource -Name 'XPS.BadViewer~~~~0.0.1.0' -Ensure 'Present' -LogPath 'C:\Logs\BadLogfile.log' -ErrorAction Stop } | Should Throw
+            }
+
             It 'Should return $true if Windows Capability is in desired state' {
-                Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present' | Should -BeTrue
+                { Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present' } | Should -BeTrue
             }
 
             It 'Should return $false if Windows Capability is not in desired state' {
-                Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Absent' | Should -BeFalse
+                { Test-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Absent' } | Should -BeFalse
             }
         }
 
@@ -101,7 +127,7 @@ try
 
             It "Windows Capability 'XPS.Viewer~~~~0.0.1.0' is in desired state" {
                 Set-TargetResource -Name 'XPS.Viewer~~~~0.0.1.0' -Ensure 'Present'
-                Assert-MockCalled -CommandName Add-WindowsCapability -Exactly -Times 0 -Scope It
+                Assert-MockCalled -CommandName Add-WindowsCapability -Exactly -Times 1 -Scope It
             }
 
             It "Windows Capability 'XPS.Viewer~~~~0.0.1.0' is not in desired state" {

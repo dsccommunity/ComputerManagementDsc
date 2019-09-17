@@ -8,7 +8,6 @@ configuration MSFT_WindowsCapability_Default
         {
             Name   = 'XPS.Viewer~~~~0.0.1.0'
             Ensure = 'Absent'
-            Online = $true
         }
     }
 }
@@ -22,7 +21,21 @@ configuration MSFT_WindowsCapability_EnableCapability_XPSViewer
         {
             Name   = 'XPS.Viewer~~~~0.0.1.0'
             Ensure = 'Present'
-            Online = $true
+        }
+    }
+}
+
+configuration MSFT_WindowsCapability_EnableCapabilitywithLogPathandLogLevel_OpenSSHClient
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    node 'localhost'
+    {
+        WindowsCapability Integration_Test
+        {
+            Name     = 'OpenSSH.Client~~~~0.0.1.0'
+            Ensure   = 'Present'
+            LogPath  = 'C:\'
+            LogLevel = 'Errors'
         }
     }
 }
@@ -36,7 +49,6 @@ configuration MSFT_WindowsCapability_DisableCapability_XPSViewer
         {
             Name   = 'XPS.Viewer~~~~0.0.1.0'
             Ensure = 'Absent'
-            Online = $true
         }
     }
 }

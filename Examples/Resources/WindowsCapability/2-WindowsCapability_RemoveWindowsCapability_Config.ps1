@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID f8fb71fd-9f4a-4ae5-93b8-53362752e37d
+.GUID 87cc15cc-113a-410a-acad-7333768d648b
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT (c) Microsoft Corporation. All rights reserved.
@@ -19,7 +19,7 @@
 
 <#
     .DESCRIPTION
-        Example script that removes the Windows Capability XPS.Viewer~~~~0.0.1.0
+        Example script that disables the Windows Capability XPS.Viewer~~~~0.0.1.0
 #>
 Configuration WindowsCapability_DisableWindowsCapability_Config
 {
@@ -31,6 +31,6 @@ Configuration WindowsCapability_DisableWindowsCapability_Config
         {
             Name   = 'XPS.Viewer~~~~0.0.1.0'
             Ensure = 'Absent'
-        } # End of Windows Capability Resource
-    } # End of Node
-} # End of Configuration
+        }
+    }
+}

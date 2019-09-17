@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID adade795-9143-4f4a-ae2d-4e31e81029a2
+.GUID c966b525-2764-461e-b48e-b9f479c86a64
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT (c) Microsoft Corporation. All rights reserved.
@@ -19,18 +19,21 @@
 
 <#
     .DESCRIPTION
-        Example script that enables the Windows Capability XPS.Viewer~~~~0.0.1.0
+        Example script that enables the Windows Capability OpenSSH.Client~~~~0.0.1.0
+        and set the LogLevel to log Errors only and write the Logfile to Path C:\Temp
 #>
-Configuration WindowsCapability_EnableWindowsCapability_Config
+Configuration WindowsCapability_EnableWindowsCapabilitywithLogLevelandLogPath_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsCapability XPSViewer
+        WindowsCapability OpenSSHClient
         {
-            Name   = 'XPS.Viewer~~~~0.0.1.0'
-            Ensure = 'Present'
+            Name     = 'OpenSSH.Client~~~~0.0.1.0'
+            Ensure   = 'Present'
+            LogLevel = 'Errors'
+            LogPath  = 'C:\Temp\Logfile.log'
         }
     }
 }
