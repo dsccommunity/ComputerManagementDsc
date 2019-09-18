@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.0.0.0
+
 - ScheduledTask:
   - Better compatibility with Group LogonType
     when passing BuiltIn groups through ExecuteAsCredential
