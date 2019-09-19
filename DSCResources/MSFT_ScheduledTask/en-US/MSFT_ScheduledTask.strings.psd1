@@ -29,7 +29,8 @@ ConvertFrom-StringData @'
     RemoveScheduledTaskMessage = Removing scheduled task '{0}' from '{1}'.
     UpdateScheduledTaskMessage = Updating scheduled task '{0}' in '{1}'.
     TestScheduledTaskMessage = Testing scheduled task '{0}' in '{1}'.
-    GetCurrentTaskValuesMessage = Current scheduled task values retrieved.
+    GettingCurrentTaskValuesMessage = Getting current scheduled task values for task '{0}' in '{1}'.
+    CurrentTaskValuesRetrievedMessage = Current scheduled task values for task '{0}' in '{1}' retrieved.
     CurrentTaskValuesNullMessage = Current scheduled values were null.
     TestingDscParameterStateMessage = Testing DSC parameter state.
 '@

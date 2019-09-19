@@ -40,6 +40,7 @@ try
             AtLogon           = 'ScheduledTaskLogon'
             AtStartup         = 'ScheduledTaskStartup'
             ExecuteAs         = 'ScheduledTaskExecuteAs'
+            ExecuteAsGroup    = 'ScheduledTaskExecuteAsGroup'
             OnEvent           = 'ScheduledTaskOnEvent'
         }
 
@@ -79,7 +80,7 @@ try
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
                 }
             }
 
@@ -108,7 +109,7 @@ try
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
                 }
             }
 
@@ -137,7 +138,7 @@ try
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
                 }
             }
         }
@@ -173,7 +174,7 @@ try
             }
 
             It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
             }
 
             It 'Should have set the resource and all the parameters should match' {
@@ -185,10 +186,10 @@ try
                 $current.RepeatInterval        | Should -Be '00:15:00'
                 $current.RepetitionDuration    | Should -Be '23:00:00'
                 $current.ActionWorkingPath     | Should -Be (Get-Location).Path
-                $current.Enable                | Should -Be $true
+                $current.Enable                | Should -BeTrue
                 $current.RandomDelay           | Should -Be '01:00:00'
-                $current.DisallowHardTerminate | Should -Be $true
-                $current.RunOnlyIfIdle         | Should -Be $false
+                $current.DisallowHardTerminate | Should -BeTrue
+                $current.RunOnlyIfIdle         | Should -BeFalse
                 $current.Priority              | Should -Be 9
                 $current.RunLevel              | Should -Be 'Limited'
                 $current.ExecutionTimeLimit    | Should -Be '00:00:00'
@@ -223,7 +224,7 @@ try
             }
 
             It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
             }
 
             $expectedStartTime = '2018-10-01T01:00:00'
@@ -235,9 +236,9 @@ try
                 $current.ActionExecutable          | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 $current.ScheduleType              | Should -Be 'Once'
                 $current.StartTime                 | Should -Be (Get-Date -Date $expectedStartTime)
-                $current.SynchronizeAcrossTimeZone | Should -Be $false
+                $current.SynchronizeAcrossTimeZone | Should -BeFalse
                 $current.ActionWorkingPath         | Should -Be (Get-Location).Path
-                $current.Enable                    | Should -Be $true
+                $current.Enable                    | Should -BeTrue
             }
 
             It "Should have the trigger startBoundary set to $expectedStartTime" {
@@ -270,7 +271,7 @@ try
             }
 
             It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
             }
 
             $expectedStartTime = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
@@ -282,9 +283,9 @@ try
                 $current.ActionExecutable          | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 $current.ScheduleType              | Should -Be 'Once'
                 $current.StartTime                 | Should -Be (Get-Date -Date $expectedStartTime)
-                $current.SynchronizeAcrossTimeZone | Should -Be $true
+                $current.SynchronizeAcrossTimeZone | Should -BeTrue
                 $current.ActionWorkingPath         | Should -Be (Get-Location).Path
-                $current.Enable                    | Should -Be $true
+                $current.Enable                    | Should -BeTrue
             }
 
             It "Should have the trigger startBoundary set to $expectedStartTime" {
@@ -324,7 +325,7 @@ try
             }
 
             It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
             }
 
             It 'Should have set the resource and all the parameters should match' {
@@ -333,7 +334,7 @@ try
                 }
                 $current.TaskName              | Should -Be 'Test task builtin'
                 $current.TaskPath              | Should -Be '\ComputerManagementDsc\'
-                $current.Enable                | Should -Be $false
+                $current.Enable                | Should -BeFalse
             }
         }
 
@@ -363,7 +364,7 @@ try
             }
 
             It 'Should return a compliant state after being applied' {
-                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -Be $true
+                (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
             }
 
             It 'Should have set the resource and all the parameters should match' {
