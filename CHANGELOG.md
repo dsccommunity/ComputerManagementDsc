@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- ComputerManagementDsc:
+  - Update psd1 description
+
 ## 7.0.0.0
 
 - ScheduledTask:
