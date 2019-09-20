@@ -4,6 +4,7 @@
 
 - ComputerManagementDsc:
   - Update psd1 description - Fixes [Issue #269](https://github.com/PowerShell/ComputerManagementDsc/issues/269)
+- Fix minor style issues with missing spaces between `param` statements and '('.
 
 ## 7.0.0.0
 
@@ -51,7 +52,6 @@
   - Changed `Test-TargetResource` so that `StartTime` is only compared for
     trigger types `Daily`,`Weekly` or `Once`.
 - Fix minor style issues in statement case.
-- Fix minor style issues with missing spaces between `param` statements and '('.
 
 ## 6.5.0.0
 
