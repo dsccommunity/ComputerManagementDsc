@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- ComputerManagementDsc:
+  - Update psd1 description - Fixes [Issue #269](https://github.com/PowerShell/ComputerManagementDsc/issues/269)
+
 ## 7.0.0.0
 
 - ScheduledTask:
