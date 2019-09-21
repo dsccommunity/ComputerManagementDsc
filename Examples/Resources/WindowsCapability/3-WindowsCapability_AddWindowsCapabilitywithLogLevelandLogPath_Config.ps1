@@ -20,7 +20,7 @@
 <#
     .DESCRIPTION
         Example script that adds the Windows Capability OpenSSH.Client~~~~0.0.1.0
-        and set the LogLevel to log Errors only and write the Logfile to Path C:\Temp
+        and set the LogLevel to log Errors only and write the Logfile to Path C:\Temp.
 #>
 Configuration WindowsCapability_AddWindowsCapabilitywithLogLevelandLogPath_Config
 {
