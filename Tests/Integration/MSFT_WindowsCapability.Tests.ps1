@@ -19,9 +19,9 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 function Invoke-TestSetup
 {
-    if (-not (Get-Module DnsServer -ListAvailable))
+    if (-not (Get-Module dism -ListAvailable))
     {
-        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Stubs\DnsServer.psm1') -Force
+        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Stubs\dism.psm1') -Force
     }
 }
 
@@ -95,18 +95,11 @@ try
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
-            $current.Name | Should -Be $configData.AllNodes[0].RebootName
-            $current.SkipComponentBasedServicing | Should -Be $configData.AllNodes[0].SkipComponentBasedServicing
-            $current.ComponentBasedServicing | Should -BeFalse
-            $current.SkipWindowsUpdate | Should -Be $configData.AllNodes[0].SkipWindowsUpdate
-            $current.WindowsUpdate | Should -BeTrue
-            $current.SkipPendingFileRename | Should -Be $configData.AllNodes[0].SkipPendingFileRename
-            $current.PendingFileRename | Should -BeFalse
-            $current.SkipPendingComputerRename | Should -Be $configData.AllNodes[0].SkipPendingComputerRename
-            $current.PendingComputerRename | Should -BeFalse
-            $current.SkipCcmClientSDK | Should -Be $configData.AllNodes[0].SkipCcmClientSDK
-            $current.CcmClientSDK | Should -BeFalse
-            $current.RebootRequired | Should -BeTrue
+            $current.Name | Should -Be $configData.AllNodes[0].Name
+            $current.LogLevel | Should -Be $configData.AllNodes[0].LogLevel
+            $current.LogPath | Should -Be $configData.AllNodes[0].LogPath
+            $current.Ensure | Should -Be $configData.AllNodes[0].Ensure
+            $current.IsSingleInstance | Should -Be 'Yes'
         }
     }
 }
