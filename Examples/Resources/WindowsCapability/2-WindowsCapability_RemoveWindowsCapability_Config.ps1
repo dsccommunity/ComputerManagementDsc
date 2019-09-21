@@ -21,7 +21,7 @@
     .DESCRIPTION
         Example script that removes the Windows Capability XPS.Viewer~~~~0.0.1.0
 #>
-Configuration WindowsCapability_DisableWindowsCapability_Config
+Configuration WindowsCapability_RemoveWindowsCapability_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 

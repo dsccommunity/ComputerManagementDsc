@@ -21,7 +21,7 @@
     .DESCRIPTION
         Example script that adds the Windows Capability XPS.Viewer~~~~0.0.1.0
 #>
-Configuration WindowsCapability_EnableWindowsCapability_Config
+Configuration WindowsCapability_AddWindowsCapability_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
