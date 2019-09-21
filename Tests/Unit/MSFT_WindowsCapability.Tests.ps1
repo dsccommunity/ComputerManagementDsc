@@ -24,6 +24,21 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
+    # Ensure that the tests can be performed on this computer
+    $productType = (Get-CimInstance Win32_OperatingSystem).ProductType
+    Describe 'Environment' {
+        Context 'Operating System' {
+            It 'Should be a Server OS' {
+                $productType | Should -Be 3
+            }
+        }
+    }
+
+    if ($productType -ne 1)
+    {
+        break
+    }
+
     InModuleScope $script:dscResourceName {
         $script:dscResourceName = 'MSFT_WindowsCapability'
         Describe "$($script:dscResourceName)\Get-TargetResource" -Tag 'Get' {
