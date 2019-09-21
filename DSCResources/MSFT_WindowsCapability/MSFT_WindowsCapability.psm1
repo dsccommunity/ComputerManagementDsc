@@ -48,10 +48,11 @@ function Get-TargetResource
     }
 
     $returnValue = @{
-        Name     = $Name
-        LogLevel = $windowsCapability.LogLevel
-        State    = $windowsCapability.State
-        Ensure   = $Ensure
+        Name             = $Name
+        LogLevel         = $windowsCapability.LogLevel
+        State            = $windowsCapability.State
+        Ensure           = $Ensure
+        IsSingleInstance = 'Yes'
     }
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceEndMessage -f $Name)
@@ -104,12 +105,12 @@ function Set-TargetResource
     if ($Ensure -eq 'Present')
     {
         Write-Verbose -Message ($script:localizedData.SetTargetAddMessage -f $Name)
-        $null = Add-WindowsCapability -Online -Name $Name
+        $null = Add-WindowsCapability -Online @PSBoundParameters
     }
     else
     {
         Write-Verbose -Message ($script:localizedData.SetTargetRemoveMessage -f $Name)
-        $null = Remove-WindowsCapability -Online -Name $Name
+        $null = Remove-WindowsCapability -Online @PSBoundParameters
     }
 }
 

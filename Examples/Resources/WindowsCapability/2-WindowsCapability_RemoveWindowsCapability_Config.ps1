@@ -19,7 +19,7 @@
 
 <#
     .DESCRIPTION
-        Example script that disables the Windows Capability XPS.Viewer~~~~0.0.1.0
+        Example script that removes the Windows Capability XPS.Viewer~~~~0.0.1.0
 #>
 Configuration WindowsCapability_DisableWindowsCapability_Config
 {

@@ -19,7 +19,7 @@
 
 <#
     .DESCRIPTION
-        Example script that enables the Windows Capability XPS.Viewer~~~~0.0.1.0
+        Example script that adds the Windows Capability XPS.Viewer~~~~0.0.1.0
 #>
 Configuration WindowsCapability_EnableWindowsCapability_Config
 {
