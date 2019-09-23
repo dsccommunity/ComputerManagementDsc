@@ -43,6 +43,7 @@ function Get-TargetResource
     $smbReturn = @{}
     $smbServer = Get-SmbServerConfiguration -ErrorAction 'SilentlyContinue'
     $smbReturn.Add('IsSingleInstance', $IsSingleInstance)
+
     foreach ($smbServerSetting in $script:smbServerSettings)
     {
         $smbReturn.Add($smbServerSetting, $smbServer.$smbServerSetting)
@@ -364,7 +365,7 @@ function Set-TargetResource
     )
 
     $null = $PSBoundParameters.Remove('IsSingleInstance')
-    $PSBoundParameters.Add('Confirm', $false)
+    $null = $PSBoundParameters.Add('Confirm', $false)
 
     Write-Verbose -Message ($script:localizedData.UpdatingProperties)
 
@@ -690,11 +691,12 @@ function Test-TargetResource
 
     $currentSmbServerConfiguration = Get-TargetResource -IsSingleInstance Yes
 
-    foreach ($smbParameter in $smbServerSettings)
+    foreach ($smbParameter in $script:smbServerSettings)
     {
         if ($PSBoundParameters.ContainsKey($smbParameter))
         {
-            Write-Verbose -Message ($script:localizedData.EvaluatingProperties -f $smbParameter, $currentSmbServerConfiguration.$smbParameter, $PSBoundParameters.$smbParameter)
+            Write-Verbose -Message ($script:localizedData.EvaluatingProperties `
+                -f $smbParameter, $currentSmbServerConfiguration.$smbParameter, $PSBoundParameters.$smbParameter)
 
             if ($PSBoundParameters.$smbParameter -ne $currentSmbServerConfiguration.$smbParameter)
             {

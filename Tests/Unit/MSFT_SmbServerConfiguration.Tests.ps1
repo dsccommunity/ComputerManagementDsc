@@ -206,6 +206,7 @@ try
                 newValue   = $false
             }
         )
+
         $mocks = @{
             DefaultSettings = @{
                 AnnounceComment                 = ''
@@ -252,7 +253,8 @@ try
                 ValidateTargetName              = $true
             }
         }
-        $FullParams = @{
+
+        $fullParams = @{
             IsSingleInstance                = 'Yes'
             AnnounceComment                 = ''
             AnnounceServer                  = $false
@@ -301,7 +303,6 @@ try
         Describe 'MSFT_SmbServerConfiguration\Get-TargetResource' -Tag 'Get' {
             Context 'When getting the Target Resource information' {
                 It 'Should get the current SMB server configuration state' {
-
                     $SmbServerConfiguration = Get-TargetResource -IsSingleInstance Yes
 
                     $SmbServerConfiguration.EnableSMB1Protocol | Should -Not -BeNullOrEmpty
@@ -355,14 +356,14 @@ try
                 It 'Test-TargetResource should return true' {
                     Mock -CommandName Get-SmbServerConfiguration { return $mocks.DefaultSettings }
 
-                    $TestEnvironmentResult = Test-TargetResource @FullParams
+                    $TestEnvironmentResult = Test-TargetResource @fullParams
                     $TestEnvironmentResult | Should -BeTrue
                 }
             }
 
             Context 'When the SMB Server is not in the desired state' {
                 It 'Should return false when <smbSetting> setting changes are required' -TestCases $testCases {
-                    Param($smbSetting, $newValue)
+                    param ($smbSetting, $newValue)
 
                     Mock -CommandName Get-SmbServerConfiguration { return $mocks.DefaultSettings }
 
@@ -380,7 +381,7 @@ try
         Describe 'MSFT_SmbServerConfiguration\Set-TargetResource' -Tag 'Set' {
             Context 'When configuration is required' {
                 It 'Runs the Set-SmbServerConfiguration cmdlet when the <smbSetting> needs to be changed' -TestCases $testCases {
-                    Param($smbSetting, $newValue)
+                    param ($smbSetting, $newValue)
 
                     Mock -CommandName Get-SmbServerConfiguration { return $mocks.DefaultSettings }
                     Mock -CommandName Set-SmbServerConfiguration
