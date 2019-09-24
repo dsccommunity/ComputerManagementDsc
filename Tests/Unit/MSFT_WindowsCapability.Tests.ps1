@@ -27,6 +27,10 @@ try
     InModuleScope $script:dscResourceName {
         $script:dscResourceName = 'MSFT_WindowsCapability'
         Describe "$($script:dscResourceName)\Get-TargetResource" -Tag 'Get' {
+
+            Mock -CommandName Remove-WindowsCapability
+            Mock -CommandName Get-WindowsCapability
+
             Context 'When a Windows Capability is installed' {
                 Mock -CommandName Get-WindowsCapability -MockWith {
                     $properties = @{
@@ -53,6 +57,9 @@ try
         }
 
         Describe "$($script:dscResourceName)\Test-TargetResource" -Tag 'Test' {
+
+            Mock -CommandName Remove-WindowsCapability
+            Mock -CommandName Set-WindowsCapability
 
             Context 'When valid Windows Capability parameters are passed' {
                 Mock -CommandName Get-WindowsCapability -MockWith {
@@ -120,6 +127,7 @@ try
         }
 
         Describe "$($script:dscResourceName)\Set-TargetResource" -Tag 'Set' {
+            Mock -CommandName Get-WindowsCapability
 
             Context 'When a Windows Capability is installed' {
                 Mock -CommandName Add-WindowsCapability -MockWith {
