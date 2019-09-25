@@ -31,12 +31,12 @@ function Get-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present'
+        $Ensure
     )
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceStartMessage -f $Name)
 
-    $windowsCapability = Get-WindowsCapability -Name $Name -Online
+    $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
 
     if ($windowsCapability.State -eq 'Installed')
     {
@@ -89,7 +89,7 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present',
+        $Ensure,
 
         [Parameter()]
         [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
@@ -146,7 +146,7 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present',
+        $Ensure,
 
         [Parameter()]
         [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
@@ -162,7 +162,7 @@ function Test-TargetResource
 
     $desiredState = $true
 
-    $windowsCapability = Get-WindowsCapability -Name $Name -Online
+    $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
 
     if ($null -eq $windowsCapability.Name)
     {

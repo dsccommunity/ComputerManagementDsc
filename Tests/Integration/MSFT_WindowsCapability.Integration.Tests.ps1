@@ -34,20 +34,20 @@ try
 {
     Invoke-TestSetup
 
-    # Ensure that the tests can be performed on this computer
-    $productType = (Get-CimInstance Win32_OperatingSystem).ProductType
-    Describe 'Environment' {
-        Context 'Operating System' {
-            It 'Should be a Server OS' {
-                $productType | Should -Be 3
-            }
-        }
-    }
+    # # Ensure that the tests can be performed on this computer
+    # $productType = (Get-CimInstance Win32_OperatingSystem).ProductType
+    # Describe 'Environment' {
+    #     Context 'Operating System' {
+    #         It 'Should be a Desktop OS' {
+    #             $productType | Should -Be 1
+    #         }
+    #     }
+    # }
 
-    if ($productType -ne 3)
-    {
-        break
-    }
+    # if ($productType -ne 1)
+    # {
+    #     break
+    # }
 
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).Config.ps1"
     . $configFile
