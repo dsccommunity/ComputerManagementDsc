@@ -70,7 +70,8 @@ function Get-TargetResource
         Specifies whether the Windows Capability should be installed or uninstalled.
 
     .PARAMETER LogLevel
-        Specifies the given LogLevel of a Windows Capability. The Default Level is 'Errors', 'Warnings', 'WarningsInfo'.
+        Specifies the given LogLevel of a Windows Capability. The different Levels are 'Errors', 'Warnings', 'WarningsInfo'.
+        Default LogLevel is: 'WarningsInfo'
 
     .PARAMETER LogPath
         Specifies the full path and file name to log to.
@@ -125,7 +126,8 @@ function Set-TargetResource
         Specifies whether the Windows Capability should be installed or uninstalled.
 
     .PARAMETER LogLevel
-        Specifies the given LogLevel of a Windows Capability. The Default Level is 'Errors', 'Warnings', 'WarningsInfo'.
+        Specifies the given LogLevel of a Windows Capability. The different Levels are 'Errors', 'Warnings', 'WarningsInfo'.
+        Default LogLevel is: 'WarningsInfo'
 
     .PARAMETER LogPath
         Specifies the full path and file name to log to.
