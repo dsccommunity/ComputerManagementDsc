@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- ComputerManagementDsc:
+  - Update psd1 description - Fixes [Issue #269](https://github.com/PowerShell/ComputerManagementDsc/issues/269)
+- Fix minor style issues with missing spaces between `param` statements and '('.
+
 ## 7.0.0.0
 
 - ScheduledTask:
