@@ -52,6 +52,8 @@
   - Changed `Test-TargetResource` so that `StartTime` is only compared for
     trigger types `Daily`,`Weekly` or `Once`.
 - Fix minor style issues in statement case.
+- SmbServer:
+  - New resource for configuring the SMB Server settings.
 
 ## 6.5.0.0
 
