@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- ComputerManagementDsc:
+  - Update psd1 description - Fixes [Issue #269](https://github.com/PowerShell/ComputerManagementDsc/issues/269)
+- Fix minor style issues with missing spaces between `param` statements and '('.
+
+## 7.0.0.0
+
 - ScheduledTask:
   - Better compatibility with Group LogonType
     when passing BuiltIn groups through ExecuteAsCredential
@@ -46,6 +52,8 @@
   - Changed `Test-TargetResource` so that `StartTime` is only compared for
     trigger types `Daily`,`Weekly` or `Once`.
 - Fix minor style issues in statement case.
+- SmbServer:
+  - New resource for configuring the SMB Server settings.
 
 ## 6.5.0.0
 
