@@ -21,7 +21,7 @@
     .DESCRIPTION
         This example configures the SMB Server to disable SMB1.
 #>
-Configuration SmbShareConfiguration_DisableSmb1_Config
+Configuration SmbServerConfiguration_DisableSmb1_Config
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 

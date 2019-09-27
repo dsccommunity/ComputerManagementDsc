@@ -22,7 +22,7 @@
         This example configures all supported SMB Server settings for a node
         to ensure they are set to known values.
 #>
-Configuration SmbShareConfiguration_AllProperties_Config
+Configuration SmbServerConfiguration_AllProperties_Config
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
