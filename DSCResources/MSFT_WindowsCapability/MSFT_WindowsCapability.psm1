@@ -31,7 +31,7 @@ function Get-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceStartMessage -f $Name)
@@ -70,7 +70,7 @@ function Get-TargetResource
         Specifies whether the Windows Capability should be installed or uninstalled.
 
     .PARAMETER LogLevel
-        Specifies the given LogLevel of a Windows Capability. The different Levels are 'Errors', 'Warnings', 'WarningsInfo'.
+        Specifies the given LogLevel of a Windows Capability.
         Default LogLevel is: 'WarningsInfo'
 
     .PARAMETER LogPath
@@ -89,7 +89,7 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure,
+        $Ensure = 'Present',
 
         [Parameter()]
         [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
@@ -126,7 +126,7 @@ function Set-TargetResource
         Specifies whether the Windows Capability should be installed or uninstalled.
 
     .PARAMETER LogLevel
-        Specifies the given LogLevel of a Windows Capability. The different Levels are 'Errors', 'Warnings', 'WarningsInfo'.
+        Specifies the given LogLevel of a Windows Capability.
         Default LogLevel is: 'WarningsInfo'
 
     .PARAMETER LogPath

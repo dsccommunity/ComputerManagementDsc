@@ -30,7 +30,7 @@ try
         $script:testAndSetTargetResourceParameters = @{
             Name     = $script:testResourceName
             LogLevel = 'WarningsInfo'
-            LogPath  = "$ENV:Temp/Logfile.log"
+            LogPath  = Join-Path -Path $ENV:Temp -ChildPath 'Logfile.log'
         }
 
         $getWindowsCapabilityIsInstalled = {
@@ -47,8 +47,53 @@ try
             }
         }
 
+        function Get-WindowsCapability
+        {
+            [CmdletBinding()]
+            param
+            (
+                [Parameter()]
+                [System.String]
+                $Name,
+
+                [Parameter()]
+                [Switch]
+                $Online = $true
+            )
+        }
+
+        function Add-WindowsCapability
+        {
+            [CmdletBinding()]
+            param
+            (
+                [Parameter()]
+                [System.String]
+                $Name,
+
+                [Parameter()]
+                [Switch]
+                $Online = $true
+            )
+        }
+
+        function Remove-WindowsCapability
+        {
+            [CmdletBinding()]
+            param
+            (
+                [Parameter()]
+                [System.String]
+                $Name,
+
+                [Parameter()]
+                [Switch]
+                $Online = $true
+            )
+        }
+
         Describe "MSFT_WindowsCapability\Get-TargetResource" {
-            Context 'When a Windows Capability is installed' {
+            Context 'When a Windows Capability is enabled' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsInstalled `
                     -ModuleName 'MSFT_WindowsCapability' `
@@ -70,7 +115,7 @@ try
                 }
             }
 
-            Context 'When a Windows Capability is not installed' {
+            Context 'When a Windows Capability is not enabled' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsNotInstalled `
                     -ModuleName 'MSFT_WindowsCapability' `
@@ -94,7 +139,7 @@ try
         }
 
         Describe "MSFT_WindowsCapability\Test-TargetResource" {
-            Context 'When a Windows Capability is installed' {
+            Context 'When a Windows Capability is enabled' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsInstalled `
                     -ModuleName 'MSFT_WindowsCapability' `
@@ -109,9 +154,13 @@ try
                 It 'Should return true' {
                     $script:testTargetResourceResult | Should -BeTrue
                 }
+
+                It 'Should call all verifiable mocks' {
+                    Assert-VerifiableMock
+                }
             }
 
-            Context 'When a Windows Capability is not installed' {
+            Context 'When a Windows Capability is not enabled' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsNotInstalled `
                     -ModuleName 'MSFT_WindowsCapability' `
@@ -126,6 +175,10 @@ try
                 It 'Should return true' {
                     $script:testTargetResourceResult | Should -BeTrue
                 }
+
+                It 'Should call all verifiable mocks' {
+                    Assert-VerifiableMock
+                }
             }
         }
 
@@ -139,7 +192,11 @@ try
 
                 It 'Should call Add-WindowsCapability when Ensure set to Present' {
                     { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Add-WindowsCapability -Times 0 -Exactly -Scope It
+                    Assert-MockCalled -CommandName Add-WindowsCapability -Times 1 -Exactly -Scope It
+                }
+
+                It 'Should call all verifiable mocks' {
+                    Assert-VerifiableMock
                 }
             }
 
@@ -153,6 +210,26 @@ try
                     { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
                     Assert-MockCalled -CommandName Add-WindowsCapability -Times 0 -Exactly -Scope It
                 }
+
+                It 'Should call all verifiable mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+
+            Context 'When a Windows Capability is already disabled' {
+                Mock -CommandName Add-WindowsCapability `
+                -MockWith $getWindowsCapabilityIsNotInstalled `
+                -ModuleName 'MSFT_WindowsCapability' `
+                -Verifiable
+
+                It 'Should not call Remove-WindowsCapability when Windows Capability is already disabled' {
+                    { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
+                    Assert-MockCalled -CommandName Remove-WindowsCapability -Times 0 -Exactly -Scope It
+                }
+
+                It 'Should call all verifiable mocks' {
+                    Assert-VerifiableMock
+                }
             }
 
             Context 'When a Windows Capability is enabled and should not' {
@@ -164,6 +241,10 @@ try
                 It 'Should call Remove-WindowsCapability when Windows Capability is enabled' {
                     { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
                     Assert-MockCalled -CommandName Remove-WindowsCapability -Times 1 -Exactly -Scope It
+                }
+
+                It 'Should call all verifiable mocks' {
+                    Assert-VerifiableMock
                 }
             }
         }

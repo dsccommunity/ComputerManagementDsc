@@ -34,20 +34,20 @@ try
 {
     Invoke-TestSetup
 
-    # # Ensure that the tests can be performed on this computer
-    # $productType = (Get-CimInstance Win32_OperatingSystem).ProductType
-    # Describe 'Environment' {
-    #     Context 'Operating System' {
-    #         It 'Should be a Desktop OS' {
-    #             $productType | Should -Be 1
-    #         }
-    #     }
-    # }
+    # Ensure that the tests can be performed on this computer
+    $productType = (Get-CimInstance Win32_OperatingSystem).ProductType
+    Describe 'Environment' {
+        Context 'Operating System' {
+            It 'Should be a Desktop OS' {
+                $productType | Should -Be 1
+            }
+        }
+    }
 
-    # if ($productType -ne 1)
-    # {
-    #     break
-    # }
+    if ($productType -ne 1)
+    {
+        break
+    }
 
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).Config.ps1"
     . $configFile
@@ -60,7 +60,7 @@ try
                         NodeName = 'localhost'
                         Name     = 'XPS.Viewer~~~~0.0.1.0'
                         LogLevel = 'Errors'
-                        LogPath  = '$ENV:Temp\Logfile.log'
+                        LogPath  = Join-Path -Path $ENV:Temp -ChildPath 'Logfile.log'
                         Ensure   = 'Present'
                     }
                 )
@@ -110,7 +110,7 @@ try
                         NodeName = 'localhost'
                         Name     = 'XPS.Viewer~~~~0.0.1.0'
                         LogLevel = 'Errors'
-                        LogPath  = '$ENV:Temp\Logfile.log'
+                        LogPath  = Join-Path -Path $ENV:Temp -ChildPath 'Logfile.log'
                         Ensure   = 'Absent'
                     }
                 )
