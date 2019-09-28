@@ -89,7 +89,7 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present',
+        $Ensure,
 
         [Parameter()]
         [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
@@ -103,12 +103,15 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SetTargetResourceStartMessage -f $Name)
 
-    if ($Ensure -eq 'Present')
+    $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
+
+    if ($PSBoundParameters.ContainsKey('Ensure') -and $Ensure -ne $ensureResult)
     {
         Write-Verbose -Message ($script:localizedData.SetTargetAddMessage -f $Name)
         $null = Add-WindowsCapability -Online @PSBoundParameters
     }
-    else
+
+    if ($PSBoundParameters.ContainsKey('Absent') -and $Ensure -ne $ensureResult)
     {
         Write-Verbose -Message ($script:localizedData.SetTargetRemoveMessage -f $Name)
         $null = Remove-WindowsCapability -Online @PSBoundParameters
