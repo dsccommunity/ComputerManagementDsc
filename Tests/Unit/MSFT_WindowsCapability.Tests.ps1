@@ -192,11 +192,7 @@ try
 
                 It 'Should call Add-WindowsCapability when Ensure set to Present' {
                     { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Add-WindowsCapability -Times 1 -Exactly -Scope It
-                }
-
-                It 'Should call all verifiable mocks' {
-                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Add-WindowsCapability -Times 0 -Exactly -Scope It
                 }
             }
 
@@ -232,11 +228,7 @@ try
 
                 It 'Should call Remove-WindowsCapability when Ensure set to Absent' {
                     { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Remove-WindowsCapability -Times 1 -Exactly -Scope It
-                }
-
-                It 'Should call all verifiable mocks' {
-                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Remove-WindowsCapability -Times 0 -Exactly -Scope It
                 }
             }
         }
