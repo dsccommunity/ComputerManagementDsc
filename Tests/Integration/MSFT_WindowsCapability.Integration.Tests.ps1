@@ -39,7 +39,10 @@ try
     Describe 'Environment' {
         Context 'Operating System' {
             It 'Should be a Desktop OS' {
-                $productType | Should -Be 1
+                if ($productType -ne 1)
+                {
+                    Set-ItResult -Inconclusive -Because 'Operating System is not a Desktop OS'
+                }
             }
         }
     }
