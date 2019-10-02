@@ -30,6 +30,8 @@ settings on the local machine.
   the local computer.
 - **WindowsEventLog**: This resource allows configuration of a specified
   Windows Event Log.
+- **WindowsCapability**: Provides a mechanism to enable or disable
+  Windows Capabilities on a target node.
 
 This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
