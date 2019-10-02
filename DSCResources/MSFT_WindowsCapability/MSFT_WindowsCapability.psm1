@@ -102,19 +102,36 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ($script:localizedData.SetTargetResourceStartMessage -f $Name)
-
+    $PSBoundParameters.Remove('Ensure')
     $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
 
-    if ($PSBoundParameters.ContainsKey('Ensure') -and $Ensure -ne $ensureResult)
+    if ($windowsCapability.State -eq 'Installed')
     {
-        Write-Verbose -Message ($script:localizedData.SetTargetAddMessage -f $Name)
-        $null = Add-WindowsCapability -Online @PSBoundParameters
+        $ensureResult = 'Present'
+    }
+    else
+    {
+        $ensureResult = 'Absent'
     }
 
-    if ($PSBoundParameters.ContainsKey('Absent') -and $Ensure -ne $ensureResult)
+    switch ($Ensure)
     {
-        Write-Verbose -Message ($script:localizedData.SetTargetRemoveMessage -f $Name)
-        $null = Remove-WindowsCapability -Online @PSBoundParameters
+        'Present'
+        {
+            if ($Ensure -ne $ensureResult)
+            {
+                Write-Verbose -Message ($script:localizedData.SetTargetAddMessage -f $Name)
+                $null = Add-WindowsCapability -Online @PSBoundParameters
+            }
+        }
+        'Absent'
+        {
+            if ($Ensure -ne $ensureResult)
+            {
+                Write-Verbose -Message ($script:localizedData.SetTargetRemoveMessage -f $Name)
+                $null = Remove-WindowsCapability -Online @PSBoundParameters
+            }
+        }
     }
 }
 
