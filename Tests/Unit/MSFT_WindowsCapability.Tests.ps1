@@ -196,9 +196,9 @@ try
 
             Context 'When a Windows Capability is not enabled' {
                 Mock -CommandName Get-WindowsCapability `
-                -MockWith $getWindowsCapabilityIsNotInstalled `
-                -ModuleName 'MSFT_WindowsCapability' `
-                -Verifiable
+                    -MockWith $getWindowsCapabilityIsNotInstalled `
+                    -ModuleName 'MSFT_WindowsCapability' `
+                    -Verifiable
 
                 Mock -CommandName Add-WindowsCapability -MockWith {}
 
@@ -209,7 +209,9 @@ try
                 }
 
                 It 'Should call Add-WindowsCapability when Ensure set to Present' {
-                    { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
+                    {
+                        Set-TargetResource -Name $testResourceName
+                    } | Should -Not -Throw
                     Assert-MockCalled -CommandName Add-WindowsCapability -Times 1 -Exactly -Scope It
                 }
 
@@ -221,15 +223,15 @@ try
 
             Context 'When a Windows Capability is already enabled' {
                 Mock -CommandName Get-WindowsCapability `
-                -MockWith $getWindowsCapabilityIsInstalled `
-                -ModuleName 'MSFT_WindowsCapability' `
-                -Verifiable
+                    -MockWith $getWindowsCapabilityIsInstalled `
+                    -ModuleName 'MSFT_WindowsCapability' `
+                    -Verifiable
 
                 Mock -CommandName Add-WindowsCapability -MockWith {}
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Set-TargetResource $script:testAndSetTargetResourceParametersPresent
+                        Set-TargetResource $script:testAndSetTargetResourceParametersPresent
                     } | Should -Not -Throw
                 }
 
@@ -246,20 +248,22 @@ try
 
             Context 'When a Windows Capability is already disabled' {
                 Mock -CommandName Get-WindowsCapability `
-                -MockWith $getWindowsCapabilityIsNotInstalled `
-                -ModuleName 'MSFT_WindowsCapability' `
-                -Verifiable
+                    -MockWith $getWindowsCapabilityIsNotInstalled `
+                    -ModuleName 'MSFT_WindowsCapability' `
+                    -Verifiable
 
                 Mock -CommandName Remove-WindowsCapability -MockWith {}
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Set-TargetResource $script:testAndSetTargetResourceParametersPresent
+                        Set-TargetResource $script:testAndSetTargetResourceParametersPresent
                     } | Should -Not -Throw
                 }
 
                 It 'Should not call Remove-WindowsCapability when Windows Capability is already disabled' {
-                    { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
+                    {
+                        Set-TargetResource -Name $testResourceName
+                    } | Should -Not -Throw
                     Assert-MockCalled -CommandName Remove-WindowsCapability -Times 0 -Exactly -Scope It
                 }
 
@@ -269,17 +273,17 @@ try
                 }
             }
 
-            Context 'When a Windows Capability is enabled and should not' {
+            Context 'When a Windows Capability is enabled and should not be' {
                 Mock -CommandName Get-WindowsCapability `
-                -MockWith $getWindowsCapabilityIsInstalled `
-                -ModuleName 'MSFT_WindowsCapability' `
-                -Verifiable
+                    -MockWith $getWindowsCapabilityIsInstalled `
+                    -ModuleName 'MSFT_WindowsCapability' `
+                    -Verifiable
 
                 Mock -CommandName Remove-WindowsCapability -MockWith {}
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Set-TargetResource $script:testAndSetTargetResourceParametersAbsent
+                        Set-TargetResource $script:testAndSetTargetResourceParametersAbsent
                     } | Should -Not -Throw
                 }
 

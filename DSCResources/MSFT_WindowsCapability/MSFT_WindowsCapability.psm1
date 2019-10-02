@@ -102,7 +102,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ($script:localizedData.SetTargetResourceStartMessage -f $Name)
-    $PSBoundParameters.Remove('Ensure')
+    $null = $PSBoundParameters.Remove('Ensure')
     $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
 
     if ($windowsCapability.State -eq 'Installed')
@@ -124,6 +124,7 @@ function Set-TargetResource
                 $null = Add-WindowsCapability -Online @PSBoundParameters
             }
         }
+
         'Absent'
         {
             if ($Ensure -ne $ensureResult)
