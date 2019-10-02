@@ -89,7 +89,7 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure,
+        $Ensure = 'Present',
 
         [Parameter()]
         [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
