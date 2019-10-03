@@ -29,15 +29,11 @@ try
 
         $script:testAndSetTargetResourceParametersPresent = @{
             Name     = $script:testResourceName
-            LogLevel = 'WarningsInfo'
-            LogPath  = Join-Path -Path $ENV:Temp -ChildPath 'Logfile.log'
             Ensure   = 'Present'
         }
 
         $script:testAndSetTargetResourceParametersAbsent = @{
             Name     = $script:testResourceName
-            LogLevel = 'WarningsInfo'
-            LogPath  = Join-Path -Path $ENV:Temp -ChildPath 'Logfile.log'
             Ensure   = 'Absent'
         }
 
@@ -204,7 +200,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Set-TargetResource $script:testAndSetTargetResourceParametersAbsent
+                        Set-TargetResource @script:testAndSetTargetResourceParametersAbsent
                     } | Should -Not -Throw
                 }
 
@@ -231,7 +227,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource $script:testAndSetTargetResourceParametersPresent
+                        Set-TargetResource @script:testAndSetTargetResourceParametersPresent
                     } | Should -Not -Throw
                 }
 
@@ -256,7 +252,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource $script:testAndSetTargetResourceParametersPresent
+                        Set-TargetResource @script:testAndSetTargetResourceParametersPresent
                     } | Should -Not -Throw
                 }
 
@@ -283,7 +279,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource $script:testAndSetTargetResourceParametersAbsent
+                        Set-TargetResource @script:testAndSetTargetResourceParametersAbsent
                     } | Should -Not -Throw
                 }
 
