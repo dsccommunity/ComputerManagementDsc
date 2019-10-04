@@ -1238,7 +1238,8 @@ try
 
                 It 'Should update the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1                }
+                    Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1
+                }
             }
 
             Context 'A scheduled task exists and is configured with the wrong idle timeout & idle duration parameters' {
@@ -2069,7 +2070,7 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
 
@@ -2115,7 +2116,60 @@ try
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParameters | Should -Be $true
+                    Test-TargetResource @testParameters | Should -BeTrue
+                }
+            }
+
+            Context 'When a scheduled task is configured with a description that contains various forms of whitespace but is in the desired state' {
+                <#
+                    This test verifies issue #258:
+                    https://github.com/PowerShell/ComputerManagementDsc/issues/258
+                #>
+                $testParameters = $getTargetResourceParameters + @{
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    Description       = "`t`n`r    test description    `t`n`r"
+                    ScheduleType      = 'AtStartup'
+                    Delay             = '00:01:00'
+                    Enable            = $true
+                    Verbose           = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName    = $testParameters.TaskName
+                        TaskPath    = $testParameters.TaskPath
+                        Description = 'test description'
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Delay = 'PT1M'
+                                StartBoundary = ''
+                                CimClass      = @{
+                                    CimClassName = 'MSFT_TaskBootTrigger'
+                                }
+                            }
+                        )
+                        Settings = [pscustomobject] @{
+                            Enabled = $testParameters.Enable
+                        }
+                    }
+                }
+
+                It 'Should return the correct values from Get-TargetResource' {
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Description | Should -Be 'test description'
+                    $result.Enable | Should -Be $testParameters.Enable
+                    $result.Ensure | Should -Be 'Present'
+                    $result.ScheduleType | Should -Be 'AtStartup'
+                    $result.Delay | Should -Be $testParameters.Delay
+                }
+
+                It 'Should return true from the test method' {
+                    Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
         }
