@@ -4,6 +4,7 @@
 
 - ComputerManagementDsc:
   - Update psd1 description - Fixes [Issue #269](https://github.com/PowerShell/ComputerManagementDsc/issues/269)
+  - WindowsEventLog - log differ - Fixes [Issue #229](https://github.com/PowerShell/ComputerManagementDsc/issues/229)
 - Fix minor style issues with missing spaces between `param` statements and '('.
 - SmbServerConfiguration:
   - New resource for configuring the SMB Server settings.
