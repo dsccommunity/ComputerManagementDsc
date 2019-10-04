@@ -170,15 +170,11 @@ function Set-TargetResource
 
     if ($PSBoundParameters.ContainsKey('LogRetentionDays'))
     {
-        if ($LogMode -eq 'AutoBackup' -and (Get-EventLog -List | Where-Object -FilterScript {$_.Log -like $LogName}))
+        if ($LogMode -eq 'AutoBackup')
         {
-            $matchingEventLog = Get-EventLog -List | Where-Object -FilterScript {
-                $_.Log -eq $LogName
-            }
+            $minimumRetentionDays = Get-EventLog -List | Where-Object -FilterScript { $_.Log -eq $LogName }
 
-            $minimumRetentionDaysForLog = $matchingEventLog.minimumRetentionDays
-
-            if ($LogRetentionDays -ne $minimumRetentionDaysForLog)
+            if ($LogRetentionDays -ne $minimumRetentionDays.minimumRetentionDays)
             {
                 Set-LogRetentionDays -LogName $LogName -LogRetentionDays $LogRetentionDays
             }
