@@ -33,7 +33,7 @@ Configuration WindowsEventlog_EnableWindowsEventLog_Config
             LogName             = 'Microsoft-Windows-Dsc/Analytic'
             IsEnabled           = $True
             LogMode             = 'Retain'
-            MaximumSizeInBytes  = 4096kb
+            MaximumSizeInBytes  = 4194304
             LogFilePath         = "%SystemRoot%\System32\Winevt\Logs\Microsoft-Windows-DSC%4Analytic.evtx"
         } # End of Windows Event Log Resource
     } # End of Node
