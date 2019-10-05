@@ -35,10 +35,10 @@ try
             $systemLocaleResource = Get-DscResource -Name SystemLocale
             $systemLocaleResource.Properties.Where{
                 $_.Name -eq 'IsSingleInstance'
-            }.IsMandatory | Should Be $true
+            }.IsMandatory | Should -BeTrue
             $systemLocaleResource.Properties.Where{
                 $_.Name -eq 'IsSingleInstance'
-            }.Values | Should Be 'Yes'
+            }.Values | Should -Be 'Yes'
         }
     }
 
@@ -57,7 +57,7 @@ try
                 -IsSingleInstance 'Yes'
 
             It 'Should return hashtable with Key SystemLocale' {
-                $systemLocale.ContainsKey('SystemLocale') | Should Be $true
+                $systemLocale.ContainsKey('SystemLocale') | Should -BeTrue
             }
 
             It "Should return hashtable with Value that matches '$testSystemLocale'" {
@@ -84,7 +84,7 @@ try
                     Set-TargetResource `
                         -SystemLocale $testSystemLocale `
                         -IsSingleInstance 'Yes'
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should not call Set-WinSystemLocale' {
@@ -101,7 +101,7 @@ try
                     Set-TargetResource `
                         -SystemLocale $testAltSystemLocale `
                         -IsSingleInstance 'Yes'
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should call Set-WinSystemLocale' {
@@ -129,19 +129,19 @@ try
 
             { Test-TargetResource `
                     -SystemLocale $badSystemLocale `
-                    -IsSingleInstance 'Yes' } | Should Throw $errorRecord
+                    -IsSingleInstance 'Yes' } | Should -Throw $errorRecord
         }
 
         It 'Should return true when Test is passed System Locale that is already set' {
             Test-TargetResource `
                 -SystemLocale $testSystemLocale `
-                -IsSingleInstance 'Yes' | Should Be $true
+                -IsSingleInstance 'Yes' | Should -BeTrue
         }
 
         It 'Should return false when Test is passed System Locale that is not set' {
             Test-TargetResource `
                 -SystemLocale $testAltSystemLocale `
-                -IsSingleInstance 'Yes' | Should Be $false
+                -IsSingleInstance 'Yes' | Should -BeFalse
         }
     }
 
@@ -154,12 +154,12 @@ try
         Describe "$($script:DSCResourceName)\Test-SystemLocaleValue" {
             It 'Should return true when a valid System Locale is passed' {
                 Test-SystemLocaleValue `
-                    -SystemLocale $testSystemLocale | Should Be $true
+                    -SystemLocale $testSystemLocale | Should -BeTrue
             }
 
             It 'Should return false when an invalid System Locale is passed' {
                 Test-SystemLocaleValue `
-                    -SystemLocale $badSystemLocale | Should Be $false
+                    -SystemLocale $badSystemLocale | Should -BeFalse
             }
         }
     } #end InModuleScope $DSCResourceName
