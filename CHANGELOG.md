@@ -9,6 +9,8 @@
   - New resource for configuring the SMB Server settings.
   - Added examples for SMB Server Configuration.
 - Minor corrections to CHANGELOG.MD.
+- SystemLocale:
+  - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
 
 ## 7.0.0.0
 
