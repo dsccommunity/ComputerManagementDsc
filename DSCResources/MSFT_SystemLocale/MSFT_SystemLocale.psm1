@@ -1,14 +1,17 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-# Import the Networking Resource Helper Module
+# Import the ComputerManagementDsc Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'ComputerManagementDsc.ResourceHelper' `
-            -ChildPath 'ComputerManagementDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
+            -ChildPath 'ComputerManagementDsc.Common.psm1')) -Force
+
+# Import the ComputerManagementDsc Resource Helper Module
+Import-Module -Name (Join-Path -Path $modulePath `
+        -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
+            -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
 # Import Localization Strings
-$LocalizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_SystemLocale' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_SystemLocale'
 
 <#
     .SYNOPSIS
@@ -38,7 +41,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingSystemLocaleMessage)
+            $($script:localizedData.GettingSystemLocaleMessage)
         ) -join '' )
 
     # Get the current System Locale
@@ -83,7 +86,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.SettingSystemLocaleMessage)
+            $($script:localizedData.SettingSystemLocaleMessage)
         ) -join '' )
 
     # Get the current System Locale
@@ -98,14 +101,14 @@ function Set-TargetResource
 
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.SystemLocaleUpdatedMessage)
+            $($script:localizedData.SystemLocaleUpdatedMessage)
             ) -join '' )
 
         $global:DSCMachineStatus = 1
 
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.RestartRequiredMessage)
+            $($script:localizedData.RestartRequiredMessage)
             ) -join '' )
     }
 } # Set-TargetResource
@@ -141,13 +144,13 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.TestingSystemLocaleMessage)
+            $($script:localizedData.TestingSystemLocaleMessage)
         ) -join '' )
 
     if (-not (Test-SystemLocaleValue -SystemLocale $SystemLocale))
     {
         New-InvalidArgumentException `
-            -Message ($LocalizedData.InvalidSystemLocaleError -f $SystemLocale) `
+            -Message ($script:localizedData.InvalidSystemLocaleError -f $SystemLocale) `
             -ArgumentName 'SystemLocale'
     } # if
 
@@ -159,7 +162,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.SystemLocaleParameterNeedsUpdateMessage -f `
+            $($script:localizedData.SystemLocaleParameterNeedsUpdateMessage -f `
                 $currentSystemLocale.Name,$SystemLocale)
         ) -join '' )
 
