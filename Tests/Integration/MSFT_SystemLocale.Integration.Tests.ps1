@@ -52,11 +52,11 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should have set the resource and all the parameters should match' {
@@ -67,7 +67,7 @@ try
                 A reboot would need to occur before this node can be bought into alignment.
                 Therefore a test for the new SystemLocale can not be automated.
             #>
-            $current.IsSingleInstance | Should Be $configData.AllNodes[0].IsSingleInstance
+            $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance
         }
     }
 }
