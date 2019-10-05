@@ -15,6 +15,8 @@
 - SmbShare:
   - Removal of duplicate code in Add-SmbShareAccessPermission helper function
     fixes [Issue #226](https://github.com/PowerShell/ComputerManagementDsc/issues/226).
+- SystemLocale:
+  - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
 
 ## 7.0.0.0
 
