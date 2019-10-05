@@ -23,8 +23,10 @@ The **ComputerManagementDsc** module contains the following resources:
   containing this resource may be compiled on Windows Server 2008 R2/Windows 7 but
   can not be applied._
 - **SmbServerConfiguration**: this resource is used to configure the SMB Server
-settings on the local machine.
+  settings on the local machine.
 - **SmbShare**: this resource is used to manage SMB shares on a machine.
+- **SystemLocale**: this resource is used to set the system locale on a
+  Windows machine
 - **TimeZone**: this resource is used for setting the time zone on a machine.
 - **VirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
