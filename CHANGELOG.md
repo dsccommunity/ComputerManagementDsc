@@ -4,13 +4,15 @@
 
 - ComputerManagementDsc:
   - Update psd1 description - Fixes [Issue #269](https://github.com/PowerShell/ComputerManagementDsc/issues/269).
-  - WindowsEventLog - log differ - Fixes
-  [Issue #229](https://github.com/PowerShell/ComputerManagementDsc/issues/229).
+  - WindowsEventLog - log differ - Fixes [Issue #229](https://github.com/PowerShell/ComputerManagementDsc/issues/229).
 - Fix minor style issues with missing spaces between `param` statements and '('.
 - SmbServerConfiguration:
   - New resource for configuring the SMB Server settings.
   - Added examples for SMB Server Configuration.
 - Minor corrections to CHANGELOG.MD.
+- ScheduledTask:
+  - Fixed bug when description has any form of whitespace at beginning or
+    end the resource would not go into state - Fixes [Issue #258](https://github.com/PowerShell/ComputerManagementDsc/issues/258).
 
 ## 7.0.0.0
 
@@ -21,11 +23,11 @@
     - Use the ExecuteAsCredential property to pass the username
       The PSCredential needs a non-null that is ignored
   - Delay property not handled properly on AtLogon and AtStartup trigger - Fixes
-    [Issue #230](https://github.com/PowerShell/ComputerManagementDsc/issues/230)
+    [Issue #230](https://github.com/PowerShell/ComputerManagementDsc/issues/230).
   - Changed `Get-ScheduledTask` calls to `ScheduledTasks\Get-ScheduledTask` to
-    avoid name clash with `Carbon` module. Fixes [Issue #248](https://github.com/PowerShell/ComputerManagementDsc/issues/248)
+    avoid name clash with `Carbon` module. Fixes [Issue #248](https://github.com/PowerShell/ComputerManagementDsc/issues/248).
   - Cast `MultipleInstances` value returned by `Get-TargetResource` to `string` -
-    fixes [Issue #255](https://github.com/PowerShell/ComputerManagementDsc/issues/255)
+    fixes [Issue #255](https://github.com/PowerShell/ComputerManagementDsc/issues/255).
 - PendingReboot:
   - Migrated xPendingReboot from [xPendingReboot](https://github.com/PowerShell/xPendingReboot)
     and renamed to PendingReboot.
