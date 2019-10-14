@@ -675,7 +675,7 @@ function Add-SmbShareAccessPermission
                 $_ -notin $accessAccountNames
             }
 
-            # Add new accounts that should have change permission.
+            # Add new accounts that should have permission.
             $newAccountsToHaveAccess | ForEach-Object -Process {
                 Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight.Value, $_, $Name)
 
