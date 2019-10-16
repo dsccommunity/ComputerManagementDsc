@@ -63,7 +63,7 @@ try
             (
                 New-Object -TypeName Object |
                 Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
-                Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
+                Add-Member -MemberType NoteProperty -Name 'ScopeName' -Value '*' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockFullPermissionUserName[0] -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Allow' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Full' -PassThru -Force
@@ -71,7 +71,7 @@ try
             (
                 New-Object -TypeName Object |
                 Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
-                Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
+                Add-Member -MemberType NoteProperty -Name 'ScopeName' -Value '*' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockFullPermissionUserName[1] -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Allow' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Full' -PassThru -Force
@@ -79,7 +79,7 @@ try
             (
                 New-Object -TypeName Object |
                 Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
-                Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
+                Add-Member -MemberType NoteProperty -Name 'ScopeName' -Value '*' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockChangePermissionUserName[0] -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Allow' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Change' -PassThru -Force
@@ -87,7 +87,7 @@ try
             (
                 New-Object -TypeName Object |
                 Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
-                Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
+                Add-Member -MemberType NoteProperty -Name 'ScopeName' -Value '*' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockReadPermissionUserName[0] -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Allow' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Read' -PassThru -Force
@@ -95,7 +95,7 @@ try
             (
                 New-Object -TypeName Object |
                 Add-Member -MemberType NoteProperty -Name 'Name' -Value $mockShareName -PassThru |
-                Add-Member -MemberType NoteProperty -Name 'ScopName' -Value '*' -PassThru |
+                Add-Member -MemberType NoteProperty -Name 'ScopeName' -Value '*' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccountName' -Value $mockNoPermissionUserName[0] -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessControlType' -Value 'Deny' -PassThru |
                 Add-Member -MemberType NoteProperty -Name 'AccessRight' -Value 'Full' -PassThru -Force
@@ -339,6 +339,51 @@ try
                         Assert-MockCalled Add-SmbShareAccessPermission -Exactly -Times 1 -Scope It
                         Assert-MockCalled New-SmbShare -Exactly -Times 0 -Scope It
                         Assert-MockCalled Remove-SmbShare -Exactly -Times 0 -Scope It
+                    }
+                }
+
+                Context 'When the share exists, but on the wrong path and recreate is allowed' {
+                    Mock -CommandName Get-TargetResource -MockWith {
+                        return @{
+                            Name = $mockSmbShare.Name
+                            Path = $mockSmbShare.Path
+                            Ensure = 'Present'
+                        }
+                    }
+
+                    $setTargetResourceParameters = @{
+                        Name  = $mockSmbShare.Name
+                        Path  = 'TestDrive:\Temp'
+                        Force = $true
+                    }
+
+                    It 'Should drop and recreate the share' {
+                        Set-TargetResource @setTargetResourceParameters
+                        Assert-MockCalled -CommandName Remove-SmbShare -Times 1
+                        Assert-MockCalled -CommandName New-SmbShare -Times 1
+                    }
+                }
+
+                Context 'When the share exists, but on the wrong path and recreate is not allowed' {
+                    Mock -CommandName Get-TargetResource -MockWith {
+                        return @{
+                            Name = $mockSmbShare.Name
+                            Path = $mockSmbShare.Path
+                            Ensure = 'Present'
+                        }
+                    }
+
+                    $setTargetResourceParameters = @{
+                        Name  = $mockSmbShare.Name
+                        Path  = 'TestDrive:\Temp'
+                        Force = $false
+                    }
+
+                    It 'Should display a warning with the message the share cannot be updated' {
+                        $message = Set-TargetResource @setTargetResourceParameters 3>&1
+                        $message | Should -Be ($script:localizedData.NoRecreateShare -f
+                            $setTargetResourceParameters['Name'], $mockSmbShare.Path, $setTargetResourceParameters['Path']
+                        )
                     }
                 }
             }

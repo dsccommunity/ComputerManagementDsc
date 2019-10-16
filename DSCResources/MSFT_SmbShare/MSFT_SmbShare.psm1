@@ -183,6 +183,10 @@ function Get-TargetResource
 
     .PARAMETER Ensure
         Specifies if the SMB share should be added or removed.
+
+    .PARAMETER Force
+        Specifies if the SMB share is allowed to be dropped and recreated (required
+        when the path changes).
 #>
 function Set-TargetResource
 {
@@ -242,7 +246,11 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present'
+        $Ensure = 'Present',
+
+        [Parameter()]
+        [System.Boolean]
+        $Force
     )
 
     Assert-AccessPermissionParameters @PSBoundParameters
@@ -261,11 +269,32 @@ function Set-TargetResource
 
         if ($Ensure -eq 'Present')
         {
+            if ($currentSmbShareConfiguration.Path -ne $Path -and $Force)
+            {
+                Write-Verbose -Message ($script:localizedData.RecreateShare -f $Name)
+
+                try
+                {
+                    Remove-SmbShare -Name $Name -Force -ErrorAction Stop
+                    New-SmbShare -Name $Name -Path $Path -ErrorAction Stop
+                }
+                catch
+                {
+                    Write-Error -Message ($script:localizedData.RecreateShareError -f $Name, $_)
+                }
+            }
+            else
+            {
+                Write-Warning -Message (
+                    $script:localizedData.NoRecreateShare -f $Name, $currentSmbShareConfiguration.Path, $Path
+                )
+            }
+
             Write-Verbose -Message $script:localizedData.UpdatingProperties
 
             $parametersToRemove = $smbShareParameters.Keys |
                 Where-Object -FilterScript {
-                    $_ -in ('ChangeAccess','ReadAccess','FullAccess','NoAccess','Ensure','Path')
+                    $_ -in ('ChangeAccess','ReadAccess','FullAccess','NoAccess','Ensure','Path','Force')
                 }
 
             $parametersToRemove | ForEach-Object -Process {
@@ -316,6 +345,7 @@ function Set-TargetResource
         if ($Ensure -eq 'Present')
         {
             $smbShareParameters.Remove('Ensure')
+            $smbShareParameters.Remove('Force')
 
             Write-Verbose -Message ($script:localizedData.CreateShare -f $Name)
 
@@ -385,6 +415,10 @@ function Set-TargetResource
 
     .PARAMETER Ensure
         Specifies if the SMB share should be added or removed.
+
+    .PARAMETER Force
+        Specifies if the SMB share is allowed to be dropped and recreated (required
+        when the path changes).
 #>
 function Test-TargetResource
 {
@@ -445,7 +479,11 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = 'Present'
+        $Ensure = 'Present',
+
+        [Parameter()]
+        [System.Boolean]
+        $Force
     )
 
     Assert-AccessPermissionParameters @PSBoundParameters
