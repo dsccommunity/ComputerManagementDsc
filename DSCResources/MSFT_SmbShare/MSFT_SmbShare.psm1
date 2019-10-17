@@ -486,6 +486,8 @@ function Test-TargetResource
         $Force
     )
 
+    $null = $PSBoundParameters.Remove('Force')
+
     Assert-AccessPermissionParameters @PSBoundParameters
 
     Write-Verbose -Message ($script:localizedData.TestTargetResourceMessage -f $Name)
