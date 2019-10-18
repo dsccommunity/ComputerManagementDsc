@@ -1448,8 +1448,17 @@ function Test-TargetResource
             format, or we need to remove everything after @ in case
             when the UPN format (User@domain.fqdn) is used.
         #>
-
         $PSBoundParameters['ExecuteAsGMSA'] = $PSBoundParameters.ExecuteAsGMSA -replace '^.+\\|@.+', $null
+    }
+
+    if ($PSBoundParameters.ContainsKey('Description'))
+    {
+        <#
+            All forms of whitespace is automatically trimmed from the description
+            when it is set, so we must not compare it here. See issue #258:
+            https://github.com/PowerShell/ComputerManagementDsc/issues/258
+        #>
+        $PSBoundParameters['Description'] = $PSBoundParameters.Description.Trim()
     }
 
     $desiredValues = $PSBoundParameters
