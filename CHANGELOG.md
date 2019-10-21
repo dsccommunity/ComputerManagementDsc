@@ -12,6 +12,7 @@
 - ScheduledTask:
   - Fixed bug when description has any form of whitespace at beginning or
     end the resource would not go into state - Fixes [Issue #258](https://github.com/PowerShell/ComputerManagementDsc/issues/258).
+- WindowsEventLog: Updated example 3-WindowsEventlog_EnableWindowsEventLog_Config.ps1 with a number in bytes, because other units are not recognized.
 
 ## 7.0.0.0
 
