@@ -16,6 +16,8 @@
   - Fixed bug where the resource would not update the path of a share if the
     share exists on a different path. Adds a parameter Force to the SmbShare
     resource to allow updating of the path - Fixes [Issue #215](https://github.com/PowerShell/ComputerManagementDsc/issues/215)
+  - Removal of duplicate code in Add-SmbShareAccessPermission helper function
+    fixes [Issue #226](https://github.com/PowerShell/ComputerManagementDsc/issues/226).
 
 ## 7.0.0.0
 
