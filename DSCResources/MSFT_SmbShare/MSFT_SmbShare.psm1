@@ -56,6 +56,7 @@ function Get-TargetResource
         ShareType             = [System.String] $null
         ShadowCopy            = $false
         Special               = $false
+        ScopeName             = [System.String] $null
     }
 
     $accountsFullAccess   = [system.string[]] @()
@@ -80,6 +81,7 @@ function Get-TargetResource
         $returnValue['ShareType'] = $smbShare.ShareType.ToString()
         $returnValue['ShadowCopy'] = $smbShare.ShadowCopy
         $returnValue['Special'] = $smbShare.Special
+        $returnValue['ScopeName'] = $smbShare.ScopeName
 
         $currentSmbShareAccessPermissions = Get-SmbShareAccess -Name $Name
 
@@ -249,6 +251,10 @@ function Set-TargetResource
         $Ensure = 'Present',
 
         [Parameter()]
+        [System.String]
+        $ScopeName = '*',
+
+        [Parameter()]
         [System.Boolean]
         $Force
     )
@@ -269,7 +275,11 @@ function Set-TargetResource
 
         if ($Ensure -eq 'Present')
         {
-            if ($currentSmbShareConfiguration.Path -ne $Path -and $Force)
+            if (
+                ($currentSmbShareConfiguration.Path -ne $Path -or
+                $currentSmbShareConfiguration.ScopeName -ne $ScopeName) -and
+                $Force
+            )
             {
                 Write-Verbose -Message ($script:localizedData.RecreateShare -f $Name)
 
@@ -480,6 +490,10 @@ function Test-TargetResource
         [ValidateSet('Present', 'Absent')]
         [System.String]
         $Ensure = 'Present',
+
+        [Parameter()]
+        [System.String]
+        $ScopeName = '*',
 
         [Parameter()]
         [System.Boolean]
