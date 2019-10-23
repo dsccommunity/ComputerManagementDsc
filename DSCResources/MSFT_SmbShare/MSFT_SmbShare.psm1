@@ -186,6 +186,9 @@ function Get-TargetResource
     .PARAMETER Ensure
         Specifies if the SMB share should be added or removed.
 
+    .PARAMETER ScopeName
+        Specifies the scope in which the share should be created.
+
     .PARAMETER Force
         Specifies if the SMB share is allowed to be dropped and recreated (required
         when the path changes).
@@ -425,6 +428,9 @@ function Set-TargetResource
 
     .PARAMETER Ensure
         Specifies if the SMB share should be added or removed.
+
+    .PARAMETER ScopeName
+        Specifies the scope in which the share should be created.
 
     .PARAMETER Force
         Specifies if the SMB share is allowed to be dropped and recreated (required
