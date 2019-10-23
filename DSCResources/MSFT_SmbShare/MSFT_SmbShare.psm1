@@ -671,7 +671,7 @@ function Add-SmbShareAccessPermission
             # Get a collection of just the account names.
             $accessAccountNames = @($smbShareAccessObjects.AccountName)
 
-            $newAccountsToHaveAccess = (Get-Variable -Name $accessRight.Key -ValueOnly) | Where-Object -FilterScript {
+            $newAccountsToHaveAccess = $PSBoundParameters[$accessRight.Key] | Where-Object -FilterScript {
                 $_ -notin $accessAccountNames
             }
 
