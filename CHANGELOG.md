@@ -13,6 +13,9 @@
 - ScheduledTask:
   - Fixed bug when description has any form of whitespace at beginning or
     end the resource would not go into state - Fixes [Issue #258](https://github.com/PowerShell/ComputerManagementDsc/issues/258).
+- SmbShare:
+  - Removal of duplicate code in Add-SmbShareAccessPermission helper function
+    fixes [Issue #226](https://github.com/PowerShell/ComputerManagementDsc/issues/226).
 
 ## 7.0.0.0
 
