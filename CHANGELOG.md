@@ -32,6 +32,8 @@
     fixes [Issue #226](https://github.com/PowerShell/ComputerManagementDsc/issues/226).
 - SystemLocale:
   - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
+- RemoveDesktopAdmin:
+  - Correct Context messages in integration tests by adding 'When'.
 
 ## 7.0.0.0
 
