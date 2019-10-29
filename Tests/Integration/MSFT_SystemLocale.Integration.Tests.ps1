@@ -30,44 +30,46 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        $configData = @{
-            AllNodes = @(
-                @{
-                    NodeName         = 'localhost'
-                    SystemLocale     = 'fr-FR'
-                    IsSingleInstance = 'Yes'
-                }
-            )
-        }
-
-        It 'Should compile and apply the MOF without throwing' {
-            {
-                & "$($script:DSCResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configData
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -ComputerName localhost `
-                    -Wait `
-                    -Verbose `
-                    -Force `
-                    -ErrorAction Stop
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+        Context 'When settting System Locale to fr-FR' {
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName         = 'localhost'
+                        SystemLocale     = 'fr-FR'
+                        IsSingleInstance = 'Yes'
+                    }
+                )
             }
-            <#
-                A reboot would need to occur before this node can be bought into alignment.
-                Therefore a test for the new SystemLocale can not be automated.
-            #>
-            $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance
+
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                <#
+                    A reboot would need to occur before this node can be bought into alignment.
+                    Therefore a test for the new SystemLocale can not be automated.
+                #>
+                $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance
+            }
         }
     }
 }

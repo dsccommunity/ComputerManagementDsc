@@ -51,7 +51,7 @@ try
                 DisplayName = 'English (United States)'
             } }
 
-        Context 'System Locale is the desired state' {
+        Context 'When System Locale is the desired state' {
             $systemLocale = Get-TargetResource `
                 -SystemLocale $testSystemLocale `
                 -IsSingleInstance 'Yes'
@@ -78,7 +78,7 @@ try
         Mock -CommandName Set-WinSystemLocale `
             -ModuleName $($script:DSCResourceName)
 
-        Context 'System Locale is the desired state' {
+        Context 'When System Locale is the desired state' {
             It 'Should not throw exception' {
                 {
                     Set-TargetResource `
@@ -95,7 +95,7 @@ try
             }
         }
 
-        Context 'System Locale is not in the desired state' {
+        Context 'When System Locale is not in the desired state' {
             It 'Should not throw exception' {
                 {
                     Set-TargetResource `
