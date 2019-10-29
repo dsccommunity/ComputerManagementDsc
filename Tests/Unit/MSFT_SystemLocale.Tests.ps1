@@ -29,7 +29,6 @@ try
 
         Describe 'MSFT_SystemLocale\Get-TargetResource' {
             Mock -CommandName Get-WinSystemLocale `
-                -ModuleName 'MSFT_SystemLocale' `
                 -MockWith { @{
                     LCID        = '1033'
                     Name        = 'en-US'
@@ -53,15 +52,13 @@ try
 
         Describe 'MSFT_SystemLocale\Set-TargetResource' {
             Mock -CommandName Get-WinSystemLocale `
-                -ModuleName 'MSFT_SystemLocale' `
                 -MockWith { @{
                     LCID        = '1033'
                     Name        = 'en-US'
                     DisplayName = 'English (United States)'
                 } }
 
-            Mock -CommandName Set-WinSystemLocale `
-                -ModuleName 'MSFT_SystemLocale'
+            Mock -CommandName Set-WinSystemLocale
 
             Context 'When System Locale is the desired state' {
                 It 'Should not throw exception' {
@@ -75,7 +72,6 @@ try
                 It 'Should not call Set-WinSystemLocale' {
                     Assert-MockCalled `
                         -CommandName Set-WinSystemLocale `
-                        -ModuleName 'MSFT_SystemLocale' `
                         -Exactly 0
                 }
             }
@@ -92,7 +88,6 @@ try
                 It 'Should call Set-WinSystemLocale' {
                     Assert-MockCalled `
                         -CommandName Set-WinSystemLocale `
-                        -ModuleName 'MSFT_SystemLocale' `
                         -Exactly 1
                 }
             }
@@ -100,7 +95,6 @@ try
 
         Describe 'MSFT_SystemLocale\Test-TargetResource' {
             Mock -CommandName Get-WinSystemLocale `
-                -ModuleName 'MSFT_SystemLocale' `
                 -MockWith { @{
                     LCID        = '1033'
                     Name        = 'en-US'
