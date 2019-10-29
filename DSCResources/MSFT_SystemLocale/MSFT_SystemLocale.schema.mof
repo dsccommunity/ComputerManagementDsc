@@ -1,0 +1,6 @@
+[ClassVersion("1.0.0.0"), FriendlyName("SystemLocale")]
+class MSFT_SystemLocale : OMI_BaseResource
+{
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'"), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Required, Description("Specifies the System Locale.")] String SystemLocale;
+};
