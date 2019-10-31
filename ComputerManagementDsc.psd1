@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-moduleVersion = '7.0.0.0'
+moduleVersion = '7.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
@@ -49,50 +49,19 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- ScheduledTask:
-  - Better compatibility with Group LogonType
-    when passing BuiltIn groups through ExecuteAsCredential
-    - Primary use case is "BUILTIN\Users"
-    - Use the ExecuteAsCredential property to pass the username
-      The PSCredential needs a non-null that is ignored
-  - Delay property not handled properly on AtLogon and AtStartup trigger - Fixes
-    [Issue 230](https://github.com/PowerShell/ComputerManagementDsc/issues/230)
-  - Changed `Get-ScheduledTask` calls to `ScheduledTasks\Get-ScheduledTask` to
-    avoid name clash with `Carbon` module. Fixes [Issue 248](https://github.com/PowerShell/ComputerManagementDsc/issues/248)
-  - Cast `MultipleInstances` value returned by `Get-TargetResource` to `string` -
-    fixes [Issue 255](https://github.com/PowerShell/ComputerManagementDsc/issues/255)
-- PendingReboot:
-  - Migrated xPendingReboot from [xPendingReboot](https://github.com/PowerShell/xPendingReboot)
-    and renamed to PendingReboot.
-  - Converted to meet HQRM guidelines - Fixes [Issue 12](https://github.com/PowerShell/xPendingReboot/issues/12).
-  - Changed `SkipCcmClientSDK` parameter to default to `$true` - Fixes [Issue 13](https://github.com/PowerShell/xPendingReboot/issues/13).
-  - Fixed `Test-TargetResource` so that if ConfigMgr requires a reboot then
-    the pending reboot will be set - Fixes [Issue 26](https://github.com/PowerShell/xPendingReboot/issues/26).
-  - Refactored `Test-TargetResource` to reduce code duplication and move to a
-    data driven design.
-  - Refactored `Get-TargetResource` by adding a new function `Get-PendingRebootState`
-    so that `Test-TargetResource` no longer needed to use `Get-TargetResource`. This
-    eliminated the need to include write parameters in `Get-TargetResource`.
-  - Converted the call to `Invoke-WmiMethod` to `Invoke-CimMethod`.
-  - Deleted the code that removes the `regRebootLocations` variable at the end of
-    the resource as it appears to serve no purpose.
-- Correct all tests to meet Pester 4.0 standards.
-- RemoteDesktopAdmin:
-  - New resource for configuring Remote Desktop for Administration - fixes
-    [Issue 224](https://github.com/PowerShell/ComputerManagementDsc/issues/224).
-- Updated common function `Test-DscParameterState` to support ordered comparison
-  of arrays by copying function and tests from `NetworkingDsc` - fixes [Issue 250](https://github.com/PowerShell/ComputerManagementDsc/issues/250).
-- BREAKING CHANGE: ScheduledTask:
-  - Correct output type of `DaysInterval`,`StartTime`,`WeeksDaysOfWeek`,
-    and `WeeksInterval` parameters from `Get-TargetResource` to match MOF.
-  - Refactored `Get-TargetResource` to remove parameters that
-    are not key or required - fixes [Issue 249](https://github.com/PowerShell/ComputerManagementDsc/issues/249).
-  - Added function `Test-DateStringContainsTimeZone` to determine if a string
-    containing a date time includes a time zone.
-  - Enable verbose preference to be passed through to `Test-DscParameterState`.
-  - Changed `Test-TargetResource` so that `StartTime` is only compared for
-    trigger types `Daily`,`Weekly` or `Once`.
-- Fix minor style issues in statement case.
+        ReleaseNotes = '- ComputerManagementDsc:
+  - Update psd1 description - Fixes [Issue 269](https://github.com/PowerShell/ComputerManagementDsc/issues/269).
+- Fix minor style issues with missing spaces between `param` statements and "(".
+- SmbServerConfiguration:
+  - New resource for configuring the SMB Server settings.
+  - Added examples for SMB Server Configuration.
+- Minor corrections to CHANGELOG.MD.
+- ScheduledTask:
+  - Fixed bug when description has any form of whitespace at beginning or
+    end the resource would not go into state - Fixes [Issue 258](https://github.com/PowerShell/ComputerManagementDsc/issues/258).
+- SmbShare:
+  - Removal of duplicate code in Add-SmbShareAccessPermission helper function
+    fixes [Issue 226](https://github.com/PowerShell/ComputerManagementDsc/issues/226).
 
 '
 
@@ -100,6 +69,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 

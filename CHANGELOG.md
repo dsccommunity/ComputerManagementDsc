@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.1.0.0
+
 - ComputerManagementDsc:
   - Update psd1 description - Fixes [Issue #269](https://github.com/PowerShell/ComputerManagementDsc/issues/269).
   - WindowsEventLog - log differ - Fixes [Issue #229](https://github.com/PowerShell/ComputerManagementDsc/issues/229).
