@@ -99,16 +99,11 @@ function Set-TargetResource
             -SystemLocale $SystemLocale `
             -ErrorAction Stop
 
-        Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.SystemLocaleUpdatedMessage)
-            ) -join '' )
-
         $global:DSCMachineStatus = 1
 
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($script:localizedData.RestartRequiredMessage)
+            $($script:localizedData.SystemLocaleUpdatedMessage -f $SystemLocale)
             ) -join '' )
     }
 } # Set-TargetResource
