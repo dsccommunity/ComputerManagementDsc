@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- Added `.gitattributes` to ensure CRLF is used when pulling repository.
+- Added `.gitattributes` to ensure CRLF is used when pulling repository - Fixes
+  [Issue #290](https://github.com/PowerShell/ComputerManagementDsc/issues/290).
 - SystemLocale:
   - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
 
