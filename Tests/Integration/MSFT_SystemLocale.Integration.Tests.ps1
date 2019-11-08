@@ -46,6 +46,7 @@ try
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
+
                     Start-DscConfiguration `
                         -Path $TestDrive `
                         -ComputerName localhost `
