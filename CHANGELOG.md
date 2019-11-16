@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- SmbShare:
+  - Add parameter ScopeName to support creating shares in a different
+    scope. Fixes [Issue #284](https://github.com/PowerShell/ComputerManagementDsc/issues/284)
+
 ## 7.1.0.0
 
 - ComputerManagementDsc:
