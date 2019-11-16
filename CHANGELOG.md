@@ -27,8 +27,6 @@
     resource to allow updating of the path - Fixes [Issue #215](https://github.com/PowerShell/ComputerManagementDsc/issues/215)
   - Removal of duplicate code in Add-SmbShareAccessPermission helper function
     fixes [Issue #226](https://github.com/PowerShell/ComputerManagementDsc/issues/226).
-- RemoveDesktopAdmin:
-  - Correct Context messages in integration tests by adding 'When'.
 
 ## 7.0.0.0
 
