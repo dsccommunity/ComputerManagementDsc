@@ -692,78 +692,35 @@ function Add-SmbShareAccessPermission
 
     $currentSmbShareAccessPermissions = Get-SmbShareAccess -Name $Name
 
-    if ($PSBoundParameters.ContainsKey('ChangeAccess'))
-    {
-        # Get already added account names.
-        $smbShareChangeAccessObjects = $currentSmbShareAccessPermissions | Where-Object -FilterScript {
-            $_.AccessControlType -eq 'Allow' `
-            -and $_.AccessRight -eq 'Change'
-        }
-
-        # Get a collection of just the account names.
-        $changeAccessAccountNames = @($smbShareChangeAccessObjects.AccountName)
-
-        $newAccountsToHaveChangeAccess = $ChangeAccess | Where-Object -FilterScript {
-            $_ -notin $changeAccessAccountNames
-        }
-
-        $accessRight = 'Change'
-
-        # Add new accounts that should have change permission.
-        $newAccountsToHaveChangeAccess | ForEach-Object -Process {
-            Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight, $_, $Name)
-
-            Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight -Force -ErrorAction 'Stop'
-        }
+    $accessRights = @{
+        ReadAccess = 'Read'
+        ChangeAccess = 'Change'
+        FullAccess = 'Full'
     }
 
-    if ($PSBoundParameters.ContainsKey('ReadAccess'))
+    foreach ($accessRight in $accessRights.GetEnumerator())
     {
-        # Get already added account names.
-        $smbShareReadAccessObjects = $currentSmbShareAccessPermissions | Where-Object -FilterScript {
-            $_.AccessControlType -eq 'Allow' `
-            -and $_.AccessRight -eq 'Read'
-        }
+        if ($PSBoundParameters.ContainsKey($accessRight.Key))
+        {
+            # Get already added account names.
+            $smbShareAccessObjects = $currentSmbShareAccessPermissions | Where-Object -FilterScript {
+                $_.AccessControlType -eq 'Allow' -and
+                $_.AccessRight -eq $accessRight.Value
+            }
 
-        # Get a collection of just the account names.
-        $readAccessAccountNames = @($smbShareReadAccessObjects.AccountName)
+            # Get a collection of just the account names.
+            $accessAccountNames = @($smbShareAccessObjects.AccountName)
 
-        $newAccountsToHaveReadAccess = $ReadAccess | Where-Object -FilterScript {
-            $_ -notin $readAccessAccountNames
-        }
+            $newAccountsToHaveAccess = $PSBoundParameters[$accessRight.Key] | Where-Object -FilterScript {
+                $_ -notin $accessAccountNames
+            }
 
-        $accessRight = 'Read'
+            # Add new accounts that should have permission.
+            $newAccountsToHaveAccess | ForEach-Object -Process {
+                Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight.Value, $_, $Name)
 
-        # Add new accounts that should have read permission.
-        $newAccountsToHaveReadAccess | ForEach-Object -Process {
-            Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight, $_, $Name)
-
-            Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight -Force -ErrorAction 'Stop'
-        }
-    }
-
-    if ($PSBoundParameters.ContainsKey('FullAccess'))
-    {
-        # Get already added account names.
-        $smbShareFullAccessObjects = $currentSmbShareAccessPermissions | Where-Object -FilterScript {
-            $_.AccessControlType -eq 'Allow' `
-            -and $_.AccessRight -eq 'Full'
-        }
-
-        # Get a collection of just the account names.
-        $fullAccessAccountNames = @($smbShareFullAccessObjects.AccountName)
-
-        $newAccountsToHaveFullAccess = $FullAccess | Where-Object -FilterScript {
-            $_ -notin $fullAccessAccountNames
-        }
-
-        $accessRight = 'Full'
-
-        # Add new accounts that should have full permission.
-        $newAccountsToHaveFullAccess | ForEach-Object -Process {
-            Write-Verbose -Message ($script:localizedData.GrantAccess -f $accessRight, $_, $Name)
-
-            Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight -Force -ErrorAction 'Stop'
+                Grant-SmbShareAccess -Name $Name -AccountName $_ -AccessRight $accessRight.Value -Force -ErrorAction 'Stop'
+            }
         }
     }
 
@@ -771,8 +728,8 @@ function Add-SmbShareAccessPermission
     {
         # Get already added account names.
         $smbShareNoAccessObjects = $currentSmbShareAccessPermissions | Where-Object -FilterScript {
-            $_.AccessControlType -eq 'Deny' `
-            -and $_.AccessRight -eq 'Full'
+            $_.AccessControlType -eq 'Deny' -and
+            $_.AccessRight -eq 'Full'
         }
 
         # Get a collection of just the account names.
