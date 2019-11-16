@@ -9,8 +9,6 @@
   [Issue #290](https://github.com/PowerShell/ComputerManagementDsc/issues/290).
 - SystemLocale:
   - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
-- RemoteDesktopAdmin:
-  - Correct Context messages in integration tests by adding 'When'.
 
 ## 7.1.0.0
 
@@ -30,18 +28,8 @@
     resource to allow updating of the path - Fixes [Issue #215](https://github.com/PowerShell/ComputerManagementDsc/issues/215)
   - Removal of duplicate code in Add-SmbShareAccessPermission helper function
     fixes [Issue #226](https://github.com/PowerShell/ComputerManagementDsc/issues/226).
-- SystemLocale:
-  - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
-<<<<<<< HEAD
-<<<<<<< HEAD
 - RemoveDesktopAdmin:
   - Correct Context messages in integration tests by adding 'When'.
-=======
->>>>>>> Add SystemLocale Resource
-=======
-- RemoveDesktopAdmin:
-  - Correct Context messages in integration tests by adding 'When'.
->>>>>>> Fix context messages
 
 ## 7.0.0.0
 
