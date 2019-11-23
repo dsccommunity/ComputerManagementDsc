@@ -56,6 +56,7 @@ function Get-TargetResource
         ShareType             = [System.String] $null
         ShadowCopy            = $false
         Special               = $false
+        ScopeName             = [System.String] $null
     }
 
     $accountsFullAccess   = [system.string[]] @()
@@ -80,6 +81,7 @@ function Get-TargetResource
         $returnValue['ShareType'] = $smbShare.ShareType.ToString()
         $returnValue['ShadowCopy'] = $smbShare.ShadowCopy
         $returnValue['Special'] = $smbShare.Special
+        $returnValue['ScopeName'] = $smbShare.ScopeName
 
         $currentSmbShareAccessPermissions = Get-SmbShareAccess -Name $Name
 
@@ -184,6 +186,9 @@ function Get-TargetResource
     .PARAMETER Ensure
         Specifies if the SMB share should be added or removed.
 
+    .PARAMETER ScopeName
+        Specifies the scope in which the share should be created.
+
     .PARAMETER Force
         Specifies if the SMB share is allowed to be dropped and recreated (required
         when the path changes).
@@ -249,6 +254,10 @@ function Set-TargetResource
         $Ensure = 'Present',
 
         [Parameter()]
+        [System.String]
+        $ScopeName = '*',
+
+        [Parameter()]
         [System.Boolean]
         $Force
     )
@@ -269,7 +278,11 @@ function Set-TargetResource
 
         if ($Ensure -eq 'Present')
         {
-            if ($currentSmbShareConfiguration.Path -ne $Path -and $Force)
+            if (
+                ($currentSmbShareConfiguration.Path -ne $Path -or
+                $currentSmbShareConfiguration.ScopeName -ne $ScopeName) -and
+                $Force
+            )
             {
                 Write-Verbose -Message ($script:localizedData.RecreateShare -f $Name)
 
@@ -416,6 +429,9 @@ function Set-TargetResource
     .PARAMETER Ensure
         Specifies if the SMB share should be added or removed.
 
+    .PARAMETER ScopeName
+        Specifies the scope in which the share should be created.
+
     .PARAMETER Force
         Specifies if the SMB share is allowed to be dropped and recreated (required
         when the path changes).
@@ -480,6 +496,10 @@ function Test-TargetResource
         [ValidateSet('Present', 'Absent')]
         [System.String]
         $Ensure = 'Present',
+
+        [Parameter()]
+        [System.String]
+        $ScopeName = '*',
 
         [Parameter()]
         [System.Boolean]
