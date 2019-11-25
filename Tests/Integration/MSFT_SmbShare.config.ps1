@@ -212,6 +212,26 @@ Configuration MSFT_SmbShare_RemovePermission_Config
     }
 }
 
+<#
+    .SYNOPSIS
+        Drop and recreate share 1 on a new path.
+#>
+Configuration MSFT_SmbShare_RecreateShare1_Config
+{
+    Import-DscResource -ModuleName 'ComputerManagementDsc'
+
+    node $AllNodes.NodeName
+    {
+        SmbShare 'Integration_Test'
+        {
+            Ensure = 'Present'
+            Name   = $Node.ShareName1
+            Path   = $Node.SharePath2
+            Force  = $true
+        }
+    }
+}
+
 
 <#
     .SYNOPSIS

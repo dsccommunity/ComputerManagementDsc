@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- SmbShare:
+  - Add parameter ScopeName to support creating shares in a different
+    scope. Fixes [Issue #284](https://github.com/PowerShell/ComputerManagementDsc/issues/284)
+- Added `.gitattributes` to ensure CRLF is used when pulling repository - Fixes
+  [Issue #290](https://github.com/PowerShell/ComputerManagementDsc/issues/290).
+- SystemLocale:
+  - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
+- RemoteDesktopAdmin:
+  - Correct Context messages in integration tests by adding 'When'.
+
 ## 7.1.0.0
 
 - ComputerManagementDsc:
@@ -16,6 +26,9 @@
   - Fixed bug when description has any form of whitespace at beginning or
     end the resource would not go into state - Fixes [Issue #258](https://github.com/PowerShell/ComputerManagementDsc/issues/258).
 - SmbShare:
+  - Fixed bug where the resource would not update the path of a share if the
+    share exists on a different path. Adds a parameter Force to the SmbShare
+    resource to allow updating of the path - Fixes [Issue #215](https://github.com/PowerShell/ComputerManagementDsc/issues/215)
   - Removal of duplicate code in Add-SmbShareAccessPermission helper function
     fixes [Issue #226](https://github.com/PowerShell/ComputerManagementDsc/issues/226).
 

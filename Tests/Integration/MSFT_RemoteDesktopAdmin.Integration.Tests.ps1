@@ -28,8 +28,7 @@ try
     $script:winStationsRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp'
 
     Describe "$($script:dscResourceName)_Integration" {
-
-        Context 'Set Remote Desktop for Administration to Denied' {
+        Context 'When setting Remote Desktop for Administration to Denied' {
             $CurrentConfig = 'setToDenied'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
@@ -61,7 +60,7 @@ try
             }
         }
 
-        Context 'Set Remote Desktop for Administration to Allowed' {
+        Context 'When setting Remote Desktop for Administration to Allowed' {
             $CurrentConfig = 'setToAllowed'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
@@ -93,7 +92,7 @@ try
             }
         }
 
-        Context 'Set Remote Desktop for Administration to Allowed with Secure Authentication' {
+        Context 'When settting Remote Desktop for Administration to Allowed with Secure Authentication' {
             $CurrentConfig = 'setToAllowedSecure'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
@@ -127,7 +126,7 @@ try
             }
         }
 
-        Context 'Set Remote Desktop for Administration to Allowed with NonSecure Authentication' {
+        Context 'When settting Remote Desktop for Administration to Allowed with NonSecure Authentication' {
             $CurrentConfig = 'setToAllowedNonSecure'
             $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
             $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')

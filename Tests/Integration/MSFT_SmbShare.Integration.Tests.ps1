@@ -315,6 +315,54 @@ Describe "$($script:dcsResourceName)_Integration" {
         }
     }
 
+    $configurationName = "$($script:dcsResourceName)_RecreateShare1_Config"
+
+    Context ('When using configuration {0}' -f $configurationName) {
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                $configurationParameters = @{
+                    OutputPath        = $TestDrive
+                    ConfigurationData = $ConfigurationData
+                }
+
+                & $configurationName @configurationParameters
+
+                $startDscConfigurationParameters = @{
+                    Path         = $TestDrive
+                    ComputerName = 'localhost'
+                    Wait         = $true
+                    Verbose      = $true
+                    Force        = $true
+                    ErrorAction  = 'Stop'
+                }
+
+                Start-DscConfiguration @startDscConfigurationParameters
+            } | Should -Not -Throw
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            {
+                $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+            } | Should -Not -Throw
+        }
+
+        It 'Should have set the resource and all the parameters should match' {
+            $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq $configurationName `
+                    -and $_.ResourceId -eq "[$($script:dscResourceFriendlyName)]Integration_Test"
+            }
+
+            $resourceCurrentState.Ensure | Should -Be 'Present'
+            $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName1
+            $resourceCurrentState.Path | Should -Be $ConfigurationData.AllNodes.SharePath2
+        }
+
+        It 'Should return $true when Test-DscConfiguration is run' {
+            Test-DscConfiguration -Verbose | Should -BeTrue
+        }
+    }
+
+
     $configurationName = "$($script:dcsResourceName)_RemoveShare1_Config"
 
     Context ('When using configuration {0}' -f $configurationName) {

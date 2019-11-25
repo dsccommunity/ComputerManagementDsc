@@ -15,6 +15,8 @@ class MSFT_SmbShare : OMI_BaseResource
     [Write, Description("Specifies which accounts are denied access to the SMB share.")] String NoAccess[];
     [Write, Description("Specifies which accounts is granted read permission to access the SMB share.")] String ReadAccess[];
     [Write, Description("Specifies if the SMB share should be added or removed."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Write, Description("Specifies if the SMB share is allowed to be dropped and recreated (required when the path changes).")] Boolean Force;
+    [Write, Description("Specifies the scope in which the share should be created.")] String ScopeName;
     [Read, Description("Specifies the state of the SMB share.")] String ShareState;
     [Read, Description("Specifies the type of the SMB share.")] String ShareType;
     [Read, Description("Specifies if this SMB share is a ShadowCopy.")] Boolean ShadowCopy;
