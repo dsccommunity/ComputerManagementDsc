@@ -5,6 +5,12 @@
 - SmbShare:
   - Add parameter ScopeName to support creating shares in a different
     scope. Fixes [Issue #284](https://github.com/PowerShell/ComputerManagementDsc/issues/284)
+- Added `.gitattributes` to ensure CRLF is used when pulling repository - Fixes
+  [Issue #290](https://github.com/PowerShell/ComputerManagementDsc/issues/290).
+- SystemLocale:
+  - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
+- RemoteDesktopAdmin:
+  - Correct Context messages in integration tests by adding 'When'.
 
 ## 7.1.0.0
 
