@@ -1,301 +1,68 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xcomputermanagement/branch/master)
+# ComputerManagementDsc
 
-# xComputerManagement
+The **ComputerManagementDsc** module contains the following resources:
 
-The xComputerManagement module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources produced by the PowerShell Team.
-This module contains the xComputer resource.
-This DSC Resource allows you to rename a computer and add it to a domain or workgroup.
+- **Computer**: allows you to configure a computer by changing its name and
+  description and modifying its Active Directory domain or workgroup membership.
+- **OfflineDomainJoin**: allows you to join computers to an Active Directory
+  domain using an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx)
+  request file.
+- **PendingReboot**: examines specific registry locations where a Windows Server
+  might indicate that a reboot is pending and allows DSC to predictably handle
+  the condition.
+- **PowerPlan**: allows specifying a power plan to activate.
+- **PowerShellExecutionPolicy**: Specifies the desired PowerShell execution policy.
+- **RemoteDesktopAdmin**: This resource will manage the remote desktop administration
+  settings on a computer.
+- **ScheduledTask**: is used to define basic run once or recurring scheduled tasks
+  on the local computer. It can also be used to delete or disable built-in
+  scheduled tasks.
 
-All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service.
-The ""x" in xComputerManagement stands for experimental, which means that these resources will be fix forward and monitored by the module owner(s).
+  _The **ScheduledTask** resource requires the `ScheduledTasks` PowerShell module
+  which is only available on Windows Server 2012/Windows 8 and above. DSC configurations
+  containing this resource may be compiled on Windows Server 2008 R2/Windows 7 but
+  can not be applied._
+- **SmbServerConfiguration**: this resource is used to configure the SMB Server
+settings on the local machine.
+- **SmbShare**: this resource is used to manage SMB shares on a machine.
+- **TimeZone**: this resource is used for setting the time zone on a machine.
+- **VirtualMemory**: allows configuration of properties of the paging file on
+  the local computer.
+- **WindowsEventLog**: This resource allows configuration of a specified
+  Windows Event Log.
+- **WindowsCapability**: Provides a mechanism to enable or disable
+  Windows Capabilities on a target node.
 
-Please leave comments, feature requests, and bug reports in the Q & A tab for this module.
+This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
-If you would like to modify xComputerManagement module, feel free.
-When modifying, please update the module name, resource friendly name, and MOF class name (instructions below).
-As specified in the license, you may copy or modify this resource as long as they are used on the Windows Platform.
+## Documentation and Examples
 
-PowerShell Blog (this is a good starting point).
-There are also great community resources, such as PowerShell.org, or PowerShell Magazine.
-For more information on the DSC Resource Kit, check out this blog post.
+For a full list of resources in ComputerManagementDsc and examples on their use,
+check out the [ComputerManagementDsc wiki](https://github.com/PowerShell/ComputerManagementDsc/wiki).
 
-## Installation
-To install xComputerManagement module
+## Branches
 
-Unzip the content under $env:ProgramFiles\WindowsPowerShell\Modules folder
-To confirm installation:
+### master
 
-Run Get-DSCResource to see that xComputer is among the DSC Resources listed
-Requirements
-This module requires the latest version of PowerShell (v4.0, which ships in Windows 8.1 or Windows Server 2012R2).
-To easily use PowerShell 4.0 on older operating systems, install WMF 4.0.
-Please read the installation instructions that are present on both the download page and the release notes for WMF 4.0
+[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/ComputerManagementDsc/branch/master)
+[![codecov](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/master)
 
-## Description
-The xComputerManagement module contains the xComputer DSC Resource.
-This DSC Resource allows you to configure a computer by changing its name and modifying its domain or workgroup.
+This is the branch containing the latest release - no contributions should be made
+directly to this branch.
 
-## Details
-xComputer resource has following properties:
+### dev
 
-* Name: The desired computer name
-* DomainName: The name of the domain to join
-* JoinOU: The distinguished name of the organizational unit that the computer account will be created in
-* WorkGroupName: The name of the workgroup
-* Credential: Credential to be used to join or leave domain
-* CurrentOU: A read-only property that specifies the organizational unit that the computer account is currently in
+[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/ComputerManagementDsc/branch/dev)
+[![codecov](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/dev)
 
-## Versions
-
-### Unreleased
-
-### 1.5.0.0
-* Update Unit tests to use the standard folder structure and test templates.
-* Added .gitignore to prevent commit of DSCResource.Tests.
-
-### 1.4.0.0
-* Added validation to the Name parameter
-* Added the JoinOU parameter which allows you to specify the organizational unit that the computer account will be created in
-* Added the CurrentOU read-only property that shows the organizational unit that the computer account is currently in
-
-### 1.3.0
-
-* xComputer
-    * Fixed issue with Test-TargetResource when not specifying Domain or Workgroup name
-    * Added tests
-
-### 1.2.2
-
-Added types to Get/Set/Test definitions to allow xResourceDesigner validation to succeed
-
-### 1.2
-
-Added functionality to enable moving computer from one domain to another
-Modified Test-DscConfiguration logics when testing domain join
-
-### 1.0.0.0
-
-Initial release with the following resources
-* xComputer
-
-
-## Examples
-### Change the Name and the Workgroup Name
-
-This configuration will set a machine name and changes the workgroup it is in.
-
-```powershell
-configuration Sample_xComputer_ChangeNameAndWorkGroup 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName ='localhost', 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName, 
-         
-        [Parameter(Mandatory)] 
-        [string]$WorkGroupName 
-    ) 
-      
-    #Import the required DSC Resources  
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer NewNameAndWorkgroup 
-        { 
-            Name          = $MachineName 
-            WorkGroupName = $WorkGroupName 
-        } 
-    } 
-}  
-```
-
-### Switch from a Workgroup to a Domain
-This configuration sets the machine name and joins a domain.
-Note: this requires a credential.
-
-```powershell
-configuration Sample_xComputer_WorkgroupToDomain 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName="localhost", 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName, 
- 
-        [Parameter(Mandatory)] 
-        [string]$Domain, 
- 
-        [Parameter(Mandatory)] 
-        [pscredential]$Credential 
-    ) 
- 
-    #Import the required DSC Resources 
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer JoinDomain 
-        { 
-            Name          = $MachineName  
-            DomainName    = $Domain 
-            Credential    = $Credential  # Credential to join to domain 
-        } 
-    } 
-} 
- 
-<#**************************** 
-To save the credential in plain-text in the mof file, use the following configuration data 
- 
-$ConfigData = @{   
-                 AllNodes = @(        
-                              @{     
-                                 NodeName = "localhost" 
-                                 # Allows credential to be saved in plain-text in the the *.mof instance document.
-                            
-                                 PSDscAllowPlainTextPassword = $true 
-                              } 
-                            )  
-              } 
- 
-Sample_xComputer_WorkgroupToDomain -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -Domain <domainName> 
-****************************#> 
-```
-
-### Change the Name while staying on the Domain
-
-This example will change the machines name while remaining on the domain.
-Note: this requires a credential.
-
-```powershell
-function Sample_xComputer_ChangeNameInDomain 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName="localhost", 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName, 
- 
-        [Parameter(Mandatory)] 
-        [pscredential]$Credential 
-    ) 
- 
-    #Import the required DSC Resources  
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer NewName 
-        { 
-            Name          = $MachineName 
-            Credential    = $Credential # Domain credential 
-        } 
-    } 
-} 
- 
-<#**************************** 
-To save the credential in plain-text in the mof file, use the following configuration data 
- 
-$ConfigData = @{   
-                AllNodes = @(        
-                             @{     
-                                NodeName = "localhost"; 
- 
-                                # Allows credential to be saved in plain-text in the the *.mof instance document.
-                            
-                                PSDscAllowPlainTextPassword = $true; 
-                          } 
-                 )       
-            }     
- 
-Sample_xComputer_ChangeNameInDomain -ConfigurationData $ConfigData -MachineName <machineName>  -Credential (Get-Credential) 
- 
-*****************************#> 
-```
-
-### Change the Name while staying on the Workgroup
-This example will change the machines name while remaining on the workgroup.
-
-```powershell
-function Sample_xComputer_ChangeNameInWorkgroup 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName="localhost", 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName 
-    ) 
- 
-    #Import the required DSC Resources      
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer NewName 
-        { 
-            Name = $MachineName 
-        } 
-    } 
-}  
-```
-
-### Switch from a Domain to a Workgroup
-This example switches the computer from a domain to a workgroup.
-Note: this requires a credential.
-
-```powershell
-function  Sample_xComputer_DomainToWorkgroup 
-{ 
-    param 
-    ( 
-        [string[]]$NodeName="localhost", 
- 
-        [Parameter(Mandatory)] 
-        [string]$MachineName, 
- 
-        [Parameter(Mandatory)] 
-        [string]$WorkGroup, 
- 
-        [Parameter(Mandatory)] 
-        [pscredential]$Credential 
-    ) 
- 
-    #Import the required DSC Resources      
-    Import-DscResource -Module xComputerManagement 
- 
-    Node $NodeName 
-    { 
-        xComputer JoinWorkgroup 
-        { 
-            Name          = $MachineName 
-            WorkGroupName = $WorkGroup 
-            Credential    = $Credential # Credential to unjoin from domain 
-        } 
-    } 
-} 
- 
-<#**************************** 
-To save the credential in plain-text in the mof file, use the following configuration data 
- 
-$ConfigData = @{   
-                AllNodes = @(        
-                             @{     
-                                NodeName = "localhost"; 
-                                # Allows credential to be saved in plain-text in the the *.mof instance document.
-                            
-                                PSDscAllowPlainTextPassword = $true; 
-                              } 
-                           )       
-                } 
- 
-Sample_xComputer_DomainToWorkgroup -ConfigurationData $ConfigData -MachineName <machineName> -credential (Get-Credential) -WorkGroup <workgroupName> 
-****************************#> 
-```
+This is the development branch to which contributions should be proposed by contributors
+as pull requests. This development branch will periodically be merged to the master
+branch, and be released to [PowerShell Gallery](https://www.powershellgallery.com/).
 
 ## Contributing
+
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
+
+## Change log
+
+A full list of changes in each version can be found in the [change log](CHANGELOG.md).

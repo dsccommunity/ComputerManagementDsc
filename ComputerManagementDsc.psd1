@@ -1,0 +1,82 @@
+@{
+# Version number of this module.
+moduleVersion = '7.1.0.0'
+
+# ID used to uniquely identify this module
+GUID = 'B5004952-489E-43EA-999C-F16A25355B89'
+
+# Author of this module
+Author = 'Microsoft Corporation'
+
+# Company or vendor of this module
+CompanyName = 'Microsoft Corporation'
+
+# Copyright statement for this module
+Copyright = '(c) Microsoft Corporation. All rights reserved.'
+
+# Description of the functionality provided by this module
+Description = 'The ComputerManagementDsc module contains DSC resources for configuration of a Windows computer. These DSC resources allow you to perform computer management tasks, such as renaming the computer, joining a domain and scheduling tasks as well as configuring items such as virtual memory, event logs, time zones and power settings.
+
+All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service.'
+
+# Minimum version of the Windows PowerShell engine required by this module
+PowerShellVersion = '4.0'
+
+# Minimum version of the common language runtime (CLR) required by this module
+CLRVersion = '4.0'
+
+# Functions to export from this module
+FunctionsToExport = '*'
+
+# Cmdlets to export from this module
+CmdletsToExport = '*'
+
+# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
+PrivateData = @{
+
+    PSData = @{
+
+        # Tags applied to this module. These help with module discovery in online galleries.
+        Tags = @('DesiredStateConfiguration', 'DSC', 'DSCResourceKit', 'DSCResource')
+
+        # A URL to the license for this module.
+        LicenseUri = 'https://github.com/PowerShell/ComputerManagementDsc/blob/master/LICENSE'
+
+        # A URL to the main website for this project.
+        ProjectUri = 'https://github.com/PowerShell/ComputerManagementDsc'
+
+        # A URL to an icon representing this module.
+        # IconUri = ''
+
+        # ReleaseNotes of this module
+        ReleaseNotes = '- ComputerManagementDsc:
+  - Update psd1 description - Fixes [Issue 269](https://github.com/PowerShell/ComputerManagementDsc/issues/269).
+- Fix minor style issues with missing spaces between `param` statements and "(".
+- SmbServerConfiguration:
+  - New resource for configuring the SMB Server settings.
+  - Added examples for SMB Server Configuration.
+- Minor corrections to CHANGELOG.MD.
+- ScheduledTask:
+  - Fixed bug when description has any form of whitespace at beginning or
+    end the resource would not go into state - Fixes [Issue 258](https://github.com/PowerShell/ComputerManagementDsc/issues/258).
+- SmbShare:
+  - Removal of duplicate code in Add-SmbShareAccessPermission helper function
+    fixes [Issue 226](https://github.com/PowerShell/ComputerManagementDsc/issues/226).
+
+'
+
+    } # End of PSData hashtable
+
+} # End of PrivateData hashtable
+}
+
+
+
+
+
+
+
+
+
+
+
