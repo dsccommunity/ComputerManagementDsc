@@ -6,9 +6,9 @@
     .PARAMETER ResourceName
         The name of the resource as it appears before '.strings.psd1' of the localized string file.
         For example:
-            For WindowsOptionalFeature: MSFT_WindowsOptionalFeature
-            For Service: MSFT_ServiceResource
-            For Registry: MSFT_RegistryResource
+            For WindowsOptionalFeature: DSC_WindowsOptionalFeature
+            For Service: DSC_ServiceResource
+            For Registry: DSC_RegistryResource
             For Helper: SqlServerDscHelper
 
     .PARAMETER ScriptRoot

@@ -1,0 +1,7 @@
+[ClassVersion("1.0.0.0"), FriendlyName("PowerPlan")]
+class DSC_PowerPlan : OMI_BaseResource
+{
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'."), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Required, Description("The name or GUID of the power plan to activate.")] String Name;
+    [Read, Description("Determines if the power plan is active.")] Boolean IsActive;
+};

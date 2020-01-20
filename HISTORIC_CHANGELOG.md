@@ -189,7 +189,7 @@ change log short.
   - Migrated the xPowershellExecutionPolicy from [xPowershellExecutionPolicy](https://github.com/PowerShell/xPowerShellExecutionPolicy)
     and renamed to PowershellExecutionPolicy.
   - Moved strings to localization file.
-- Changed the scope from Global to Script in MSFT_ScheduledTask.Integration.Tests.ps1
+- Changed the scope from Global to Script in DSC_ScheduledTask.Integration.Tests.ps1
 - Changed the scope from Global to Script ComputerManagementDsc.Common.Tests.ps1
 - ScheduledTask:
   - Added support for event based triggers, implemented using the ScheduleType OnEvent
@@ -395,10 +395,10 @@ change log short.
 ### Changed
 
 - Added the following resources:
-  - MSFT_xOfflineDomainJoin resource to join computers to an AD Domain using an
+  - DSC_xOfflineDomainJoin resource to join computers to an AD Domain using an
     Offline Domain Join request file.
-  - MSFT_xScheduledTask resource to control scheduled tasks on the local server
-- MSFT_xOfflineDomainJoin: Corrected localizedData.DomainAlreadyJoinedhMessage name.
+  - DSC_xScheduledTask resource to control scheduled tasks on the local server
+- DSC_xOfflineDomainJoin: Corrected localizedData.DomainAlreadyJoinedhMessage name.
 - xComputer: Changed credential generation code in tests to avoid triggering
   PSSA rule PSAvoidUsingConvertToSecureStringWithPlainText.
   Renamed unit test file to match the name of Resource file.

@@ -1,0 +1,21 @@
+[Description("This resource is used to configure SMB shares.") : Amended,AMENDMENT, LOCALE("MS_409")]
+class DSC_SmbShare : OMI_BaseResource
+{
+    [Key, Description("Specifies the name of the SMB share.") : Amended] String Name;
+    [Description("Specifies the path of the SMB share.") : Amended] String Path;
+    [Description("Specifies the description of the SMB share.") : Amended] String Description;
+    [Description("Specifies which accounts will be granted modify permission to access the SMB share.") : Amended] String ChangeAccess[];
+    [Description("Specifies the maximum number of concurrently connected users that the new SMB share may accommodate. If this parameter is set to zero (0), then the number of users is unlimited. The default value is zero (0).") : Amended] Uint32 ConcurrentUserLimit;
+    [Description("Indicates that the SMB share is encrypted.") : Amended] Boolean EncryptData;
+    [Description("Specifies which files and folders in the new SMB share are visible to users.") : Amended] String FolderEnumerationMode;
+    [Description("Specifies the caching mode of the offline files for the SMB share.") : Amended] String CachingMode;
+    [Description("Specifies whether the SMB share should be continuously available.") : Amended] Boolean ContinuouslyAvailable;
+    [Description("Specifies which accounts are granted full permission to access the SMB share.") : Amended] String FullAccess[];
+    [Description("Specifies which accounts are denied access to the SMB share.") : Amended] String NoAccess[];
+    [Description("Specifies which accounts is granted read permission to access the SMB share.") : Amended] String ReadAccess[];
+    [Description("Specifies if the SMB share should be added or removed.") : Amended] String Ensure;
+    [Description("Specifies the state of the SMB share.") : Amended] String ShareState;
+    [Description("Specifies the type of the SMB share.") : Amended] String ShareType;
+    [Description("Specifies if this SMB share is a ShadowCopy.") : Amended] String ShadowCopy;
+    [Description("Specifies if this SMB share is a special share. E.g. an admin share, default shares, or IPC$ share.") : Amended] String Special;
+};

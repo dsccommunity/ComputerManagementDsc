@@ -1,0 +1,12 @@
+
+[ClassVersion("1.0.0.1"), FriendlyName("WindowsEventLog")]
+class DSC_WindowsEventLog : OMI_BaseResource
+{
+    [Key, Description("Specifies the given name of a Windows Event Log")] String LogName;
+    [Write, Description("Specifies the given state of a Windows Event Log")] Boolean IsEnabled;
+    [Write, Description("Specifies the given maximum size in bytes for a specified Windows Event Log")] Sint64 MaximumSizeInBytes;
+    [Write, Description("Specifies the given LogMode for a specified Windows Event Log"), ValueMap{"AutoBackup","Circular","Retain"}, Values{"AutoBackup","Circular","Retain"}] String LogMode;
+    [Write, Description("Specifies the given SecurityDescriptor for a specified Windows Event Log")] String SecurityDescriptor;
+    [Write, Description("Specifies the given LogFile path of a Windows Event Log")] String LogFilePath;
+    [Write, Description("Specifies the given LogRetentionDays for the Logmode 'AutoBackup'")] Sint32 LogRetentionDays;
+};

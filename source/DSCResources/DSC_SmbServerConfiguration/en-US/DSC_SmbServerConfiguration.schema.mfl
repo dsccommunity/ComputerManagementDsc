@@ -1,0 +1,47 @@
+[Write, Description("This resource is used to configure SMB Server.")]
+class DSC_SmbServerConfiguration : OMI_BaseResource
+{
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'"), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Write, Description("Specifies the announce comment string.")] String AnnounceComment;
+    [Write, Description("Specifies whether this server announces itself by using browser announcements.")] Boolean AnnounceServer;
+    [Write, Description("Specifies the asynchronous credits.")] UInt32 AsynchronousCredits;
+    [Write, Description("Enables auditing of SMB version 1 protocol in Windows Event Log.")] Boolean AuditSmb1Access;
+    [Write, Description("Specifies the auto disconnect time-out.")] UInt32 AutoDisconnectTimeout;
+    [Write, Description("Specifies that the default server shares are shared out.")] Boolean AutoShareServer;
+    [Write, Description("Specifies whether the default workstation shares are shared out.")] Boolean AutoShareWorkstation;
+    [Write, Description("Specifies the maximum number of cached open files.")] UInt32 CachedOpenLimit;
+    [Write, Description("Specifies the durable handle v2 time-out period, in seconds.")] UInt32 DurableHandleV2TimeoutInSeconds;
+    [Write, Description("Specifies whether authenticate user sharing is enabled.")] Boolean EnableAuthenticateUserSharing;
+    [Write, Description("Specifies whether down-level timewarp support is disabled.")] Boolean EnableDownlevelTimewarp;
+    [Write, Description("Specifies whether forced logoff is enabled.")] Boolean EnableForcedLogoff;
+    [Write, Description("Specifies whether leasing is disabled.")] Boolean EnableLeasing;
+    [Write, Description("Specifies whether multi-channel is disabled.")] Boolean EnableMultiChannel;
+    [Write, Description("Specifies whether the opportunistic locks are enabled.")] Boolean EnableOplocks;
+    [Write, Description("Specifies whether the SMB1 protocol is enabled.")] Boolean EnableSMB1Protocol;
+    [Write, Description("Specifies whether the SMB2 protocol is enabled.")] Boolean EnableSMB2Protocol;
+    [Write, Description("Specifies whether the security signature is enabled.")] Boolean EnableSecuritySignature;
+    [Write, Description("Specifies whether the server should perform strict name checking on incoming connects.")] Boolean EnableStrictNameChecking;
+    [Write, Description("Specifies whether the sessions established on this server are encrypted.")] Boolean EncryptData;
+    [Write, Description("Specifies the default IRP stack size.")] UInt32 IrpStackSize;
+    [Write, Description("Specifies the keep alive time.")] UInt32 KeepAliveTime;
+    [Write, Description("Specifies the maximum channels per session.")] UInt32 MaxChannelPerSession;
+    [Write, Description("Specifies the maximum MPX count for SMB1.")] UInt32 MaxMpxCount;
+    [Write, Description("Specifies the maximum sessions per connection.")] UInt32 MaxSessionPerConnection;
+    [Write, Description("Specifies the maximum threads per queue.")] UInt32 MaxThreadsPerQueue;
+    [Write, Description("Specifies the maximum SMB1 work items.")] UInt32 MaxWorkItems;
+    [Write, Description("Specifies the null session pipes.")] String NullSessionPipes;
+    [Write, Description("Specifies the null session shares.")] String NullSessionShares;
+    [Write, Description("Specifies how long the create caller waits for an opportunistic lock break.")] UInt32 OplockBreakWait;
+    [Write, Description("Specifies the pending client time-out period, in seconds.")] UInt32 PendingClientTimeoutInSeconds;
+    [Write, Description("Specifies whether the client that does not support encryption is denied access if it attempts to connect to an encrypted share.")] Boolean RejectUnencryptedAccess;
+    [Write, Description("Specifies whether the security signature is required.")] Boolean RequireSecuritySignature;
+    [Write, Description("Specifies whether the server announces itself.")] Boolean ServerHidden;
+    [Write, Description("Specifies the maximum SMB2 credits.")] UInt32 Smb2CreditsMax;
+    [Write, Description("Specifies the minimum SMB2 credits.")] UInt32 Smb2CreditsMin;
+    [Write, Description("Specifies the SMB Service name hardening level.")] UInt32 SmbServerNameHardeningLevel;
+    [Write, Description("Specifies whether the host is treated as the stable storage.")] Boolean TreatHostAsStableStorage;
+    [Write, Description("Specifies whether the aliases that are not circular are validated.")] Boolean ValidateAliasNotCircular;
+    [Write, Description("Specifies whether the existence of share scopes is checked during share creation.")] Boolean ValidateShareScope;
+    [Write, Description("Specifies whether the share scope being aliased is validated.")] Boolean ValidateShareScopeNotAliased;
+    [Write, Description("Specifies whether the target name is validated.")] Boolean ValidateTargetName;
+};
