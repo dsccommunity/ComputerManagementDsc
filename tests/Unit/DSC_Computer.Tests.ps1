@@ -1,35 +1,38 @@
-#region HEADER
 $script:dscModuleName = 'ComputerManagementDsc'
 $script:dscResourceName = 'DSC_Computer'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-# Unit Test Template Version: 1.2.4
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
 
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:dscModuleName `
-    -DSCResourceName $script:dscResourceName `
-    -ResourceType 'Mof' `
-    -TestType Unit
-#endregion HEADER
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    #region Pester Tests
-
     InModuleScope $script:dscResourceName {
-        $script:dscResourceName = 'DSC_Computer'
-
-        Describe $script:dscResourceName {
+        Describe 'DSC_Computer' {
             # A real password isn't needed here - use this next line to avoid triggering PSSA rule
             $securePassword = New-Object -Type SecureString
             $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
@@ -42,7 +45,7 @@ try
                 'name'
             }
 
-            Context "$($script:dscResourceName)\Test-TargetResource" {
+            Context 'DSC_Computer\Test-TargetResource' {
                 Mock -CommandName Get-WMIObject -MockWith {
                     [PSCustomObject] @{
                         DomainName = 'ContosoLtd'
@@ -444,7 +447,7 @@ try
                 }
             }
 
-            Context "$($script:dscResourceName)\Get-TargetResource" {
+            Context 'DSC_Computer\Get-TargetResource' {
                 It 'should not throw' {
                     {
                         Get-TargetResource `
@@ -479,7 +482,7 @@ try
                 }
             }
 
-            Context "$($script:dscResourceName)\Set-TargetResource" {
+            Context 'DSC_Computer\Set-TargetResource' {
                 Mock -CommandName Rename-Computer
                 Mock -CommandName Set-CimInstance
 
@@ -1089,7 +1092,7 @@ try
                 }
             }
 
-            Context "$($script:dscResourceName)\Get-ComputerDomain" {
+            Context 'DSC_Computer\Get-ComputerDomain' {
                 It 'Returns domain netbios or DNS name if domain member' {
                     Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
                         [PSCustomObject] @{
@@ -1171,18 +1174,15 @@ try
                 }
             }
 
-            Context "$($script:dscResourceName)\Get-LogonServer" {
+            Context 'DSC_Computer\Get-LogonServer' {
                 It 'Should return a non-empty string' {
                     Get-LogonServer | Should -Not -BeNullOrEmpty
                 }
             }
         }
-    } #end InModuleScope $DSCResourceName
-    #endregion
+    }
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

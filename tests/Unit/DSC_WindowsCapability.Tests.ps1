@@ -1,25 +1,32 @@
-#region HEADER
 $script:dscModuleName = 'ComputerManagementDsc'
 $script:dscResourceName = 'DSC_WindowsCapability'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-# Unit Test Template Version: 1.2.4
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
 
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:dscModuleName `
-    -DSCResourceName $script:dscResourceName `
-    -ResourceType 'Mof' `
-    -TestType Unit
-#endregion HEADER
+Invoke-TestSetup
 
 # Begin Testing
 try
@@ -28,28 +35,28 @@ try
         $script:testResourceName = 'Test'
 
         $script:testAndSetTargetResourceParametersPresent = @{
-            Name     = $script:testResourceName
-            Ensure   = 'Present'
+            Name   = $script:testResourceName
+            Ensure = 'Present'
         }
 
         $script:testAndSetTargetResourceParametersAbsent = @{
-            Name     = $script:testResourceName
-            Ensure   = 'Absent'
+            Name   = $script:testResourceName
+            Ensure = 'Absent'
         }
 
         $getWindowsCapabilityIsInstalled = {
             @{
-                Name     = 'Test'
-                State    = 'Installed'
-                Ensure   = 'Present'
+                Name   = 'Test'
+                State  = 'Installed'
+                Ensure = 'Present'
             }
         }
 
         $getWindowsCapabilityIsNotInstalled = {
             @{
-                Name     = 'Test'
-                State    = 'NotPresent'
-                Ensure   = 'Absent'
+                Name   = 'Test'
+                State  = 'NotPresent'
+                Ensure = 'Absent'
             }
         }
 
@@ -98,7 +105,7 @@ try
             )
         }
 
-        Describe "DSC_WindowsCapability\Get-TargetResource" {
+        Describe 'DSC_WindowsCapability\Get-TargetResource' {
             Context 'When a Windows Capability is enabled and it should' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsInstalled `
@@ -144,7 +151,7 @@ try
             }
         }
 
-        Describe "DSC_WindowsCapability\Test-TargetResource" {
+        Describe 'DSC_WindowsCapability\Test-TargetResource' {
             Context 'When a Windows Capability is enabled' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsInstalled `
@@ -188,15 +195,14 @@ try
             }
         }
 
-        Describe "DSC_WindowsCapability\Set-TargetResource" {
-
+        Describe 'DSC_WindowsCapability\Set-TargetResource' {
             Context 'When a Windows Capability is not enabled' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsNotInstalled `
                     -ModuleName 'DSC_WindowsCapability' `
                     -Verifiable
 
-                Mock -CommandName Add-WindowsCapability -MockWith {}
+                Mock -CommandName Add-WindowsCapability -MockWith { }
 
                 It 'Should not throw an exception' {
                     {
@@ -223,7 +229,7 @@ try
                     -ModuleName 'DSC_WindowsCapability' `
                     -Verifiable
 
-                Mock -CommandName Add-WindowsCapability -MockWith {}
+                Mock -CommandName Add-WindowsCapability -MockWith { }
 
                 It 'Should not throw an exception' {
                     {
@@ -248,7 +254,7 @@ try
                     -ModuleName 'DSC_WindowsCapability' `
                     -Verifiable
 
-                Mock -CommandName Remove-WindowsCapability -MockWith {}
+                Mock -CommandName Remove-WindowsCapability -MockWith { }
 
                 It 'Should not throw an exception' {
                     {
@@ -275,7 +281,7 @@ try
                     -ModuleName 'DSC_WindowsCapability' `
                     -Verifiable
 
-                Mock -CommandName Remove-WindowsCapability -MockWith {}
+                Mock -CommandName Remove-WindowsCapability -MockWith { }
 
                 It 'Should not throw an exception' {
                     {
@@ -298,5 +304,5 @@ try
 }
 finally
 {
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
+    Invoke-TestCleanup
 }

@@ -1,40 +1,44 @@
-#region HEADER
 $script:dscModuleName = 'ComputerManagementDsc'
 $script:dscResourceName = 'DSC_OfflineDomainJoin'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-# Unit Test Template Version: 1.2.4
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
 
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:dscModuleName `
-    -DSCResourceName $script:dscResourceName `
-    -ResourceType 'Mof' `
-    -TestType Unit
-#endregion HEADER
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:dscResourceName {
-        $script:dscResourceName = 'DSC_OfflineDomainJoin'
-
         $testOfflineDomainJoin = @{
             IsSingleInstance = 'Yes'
             RequestFile      = 'C:\ODJRequest.txt'
             Verbose          = $true
         }
 
-        Describe "$($script:dscResourceName)\Get-TargetResource" {
+        Describe 'DSC_OfflineDomainJoin\Get-TargetResource' {
             It 'Should return the correct values' {
                 $result = Get-TargetResource `
                     @TestOfflineDomainJoin
@@ -44,7 +48,7 @@ try
             }
         }
 
-        Describe "$($script:dscResourceName)\Set-TargetResource" {
+        Describe 'DSC_OfflineDomainJoin\Set-TargetResource' {
             Context 'Domain is not joined' {
                 Mock -CommandName Test-Path -MockWith {
                     return $true
@@ -84,7 +88,7 @@ try
             }
         }
 
-        Describe "$($script:dscResourceName)\Test-TargetResource" {
+        Describe 'DSC_OfflineDomainJoin\Test-TargetResource' {
             Context 'Domain is not joined' {
                 Mock -CommandName Test-Path -MockWith {
                     return $true
@@ -147,7 +151,7 @@ try
             }
         }
 
-        Describe "$($script:dscResourceName)\Join-Domain" {
+        Describe 'DSC_OfflineDomainJoin\Join-Domain' {
             Context 'Domain Join successful' {
                 Mock -CommandName djoin.exe -MockWith {
                     $script:LASTEXITCODE = 0
@@ -181,12 +185,9 @@ try
                 }
             }
         }
-    } #end InModuleScope $DSCResourceName
-    #endregion
+    }
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

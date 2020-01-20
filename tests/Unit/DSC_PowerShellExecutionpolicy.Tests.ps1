@@ -1,53 +1,52 @@
-#region HEADER
 $script:dscModuleName = 'ComputerManagementDsc'
 $script:dscResourceName = 'DSC_PowershellExecutionPolicy'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-# Unit Test Template Version: 1.2.4
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
 
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:dscModuleName `
-    -DSCResourceName $script:dscResourceName `
-    -ResourceType 'Mof' `
-    -TestType Unit
-#endregion HEADER
+Invoke-TestSetup
 
-$Script:invalidPolicyThrowMessage = @"
+# Begin Testing
+try
+{
+    InModuleScope $script:dscResourceName {
+        $Script:invalidPolicyThrowMessage = @"
 Cannot validate argument on parameter 'ExecutionPolicy'. The argument `"badParam`" does
 not belong to the set `"Bypass,Restricted,AllSigned,RemoteSigned,Unrestricted`"
 specified by the ValidateSet attribute. Supply an argument that is in the set and then
 try the command again.
 "@
 
-$Script:invalidPolicyExecutionPolicyScopeThrowMessage = @"
+        $Script:invalidPolicyExecutionPolicyScopeThrowMessage = @"
 Cannot validate argument on parameter 'ExecutionPolicyScope'. The argument `"badParam`"
 does not belong to the set `"CurrentUser,LocalMachine,MachinePolicy,Process,UserPolicy`"
 specified by the ValidateSet attribute. Supply an argument that is in the set and then
 try the command again.
 "@
 
-# Begin Testing
-try
-{
-    <#
-        The InModuleScope command allows you to perform white-box unit testing on the internal
-        (non-exported) code of a Script Module.
-    #>
-    InModuleScope $script:dscResourceName {
-        $script:dscResourceName = 'DSC_PowershellExecutionPolicy'
-
-        #region Function Get-TargetResource
-        Describe "$($script:dscResourceName)\Get-TargetResource" {
-
+        Describe 'DSC_PowershellExecutionPolicy\Get-TargetResource' {
             It 'Throws when passed an invalid execution policy' {
                 { Get-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | Should -Throw $Script:invalidPolicyThrowMessage
             }
@@ -68,11 +67,8 @@ try
                 $result.ExecutionPolicyScope | Should -Be 'LocalMachine'
             }
         }
-        #endregion
 
-        #region Function Test-TargetResource
-        Describe "$($script:dscResourceName)\Test-TargetResource" {
-
+        Describe 'DSC_PowershellExecutionPolicy\Test-TargetResource' {
             It 'Throws when passed an invalid execution policy' {
                 { Test-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | Should -Throw $Script:invalidPolicyThrowMessage
             }
@@ -100,11 +96,8 @@ try
                 Test-TargetResource -ExecutionPolicy 'Bypass' -ExecutionPolicyScope 'LocalMachine' | Should -BeFalse
             }
         }
-        #endregion
 
-        #region Function Set-TargetResource
-        Describe "$script:dscResourceName\Set-TargetResource" {
-
+        Describe 'DSC_PowershellExecutionPolicy\Set-TargetResource' {
             It 'Throws when passed an invalid execution policy' {
                 { Set-TargetResource -ExecutionPolicy 'badParam' -Scope 'LocalMachine' } | Should -Throw $Script:invalidPolicyThrowMessage
             }
@@ -136,10 +129,9 @@ try
                 Assert-MockCalled -CommandName Set-ExecutionPolicy -Exactly 1 -Scope It
             }
         }
-        #endregion
     }
 }
 finally
 {
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
+    Invoke-TestCleanup
 }
