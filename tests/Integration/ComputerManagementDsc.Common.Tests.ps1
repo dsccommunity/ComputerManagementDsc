@@ -1,18 +1,23 @@
 #region HEADER
-$script:ModuleName = 'ComputerManagementDsc.Common'
+$script:projectPath = "$PSScriptRoot\..\.." | Convert-Path
+$script:projectName = (Get-ChildItem -Path "$script:projectPath\*\*.psd1" | Where-Object -FilterScript {
+        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
+        $(try
+            { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop
+            }
+            catch
+            { $false
+            })
+    }).BaseName
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+$script:parentModule = Get-Module -Name $script:projectName -ListAvailable | Select-Object -First 1
+$script:subModulesFolder = Join-Path -Path $script:parentModule.ModuleBase -ChildPath 'Modules'
+Remove-Module -Name $script:parentModule -Force -ErrorAction 'SilentlyContinue'
 
-# Unit Test Template Version: 1.2.4
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
-{
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
-}
+$script:subModuleName = (Split-Path -Path $PSCommandPath -Leaf) -replace '\.Tests.ps1'
+$script:subModuleFile = Join-Path -Path $script:subModulesFolder -ChildPath "$($script:subModuleName)/$($script:subModuleName).psm1"
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
-Import-Module (Join-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'Modules' -ChildPath $script:ModuleName)) -ChildPath "$script:ModuleName.psm1") -Force
+Import-Module $script:subModuleFile -Force -ErrorAction Stop
 #endregion HEADER
 
 # Store the test machine timezone
@@ -24,8 +29,7 @@ tzutil.exe /s 'Eastern Standard Time'
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    InModuleScope $script:ModuleName {
-
+    InModuleScope $script:subModuleName {
         Describe 'ComputerManagementDsc.Common\Set-TimeZoneId' {
             <#
                 The purpose of this test is to ensure the C# .NET code
@@ -42,16 +46,16 @@ try
                 Mock `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Add-Type'
-                    } -MockWith {
-                        'Add-Type'
-                    }
+                    $Name -eq 'Add-Type'
+                } -MockWith {
+                    'Add-Type'
+                }
 
                 Mock `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Set-TimeZone'
-                    }
+                    $Name -eq 'Set-TimeZone'
+                }
 
                 Mock -CommandName 'TzUtil.exe' -MockWith {
                     $Script:LASTEXITCODE = 0
@@ -70,14 +74,14 @@ try
                     Assert-MockCalled `
                         -CommandName Get-Command `
                         -ParameterFilter {
-                            $Name -eq 'Add-Type'
-                        } -Exactly -Times 1
+                        $Name -eq 'Add-Type'
+                    } -Exactly -Times 1
 
                     Assert-MockCalled `
                         -CommandName Get-Command `
                         -ParameterFilter {
-                            $Name -eq 'Set-TimeZone'
-                        } -Exactly -Times 1
+                        $Name -eq 'Set-TimeZone'
+                    } -Exactly -Times 1
 
                     Assert-MockCalled -CommandName TzUtil.exe -Exactly -Times 0
                 }

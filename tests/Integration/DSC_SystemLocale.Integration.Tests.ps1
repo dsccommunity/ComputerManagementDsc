@@ -1,21 +1,22 @@
-$script:DSCModuleName      = 'ComputerManagementDsc'
-$script:DSCResourceName    = 'DSC_SystemLocale'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'DSC_SystemLocale'
 
-#region HEADER
-# Integration Test Template Version: 1.1.1
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+try
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+}
+catch [System.IO.FileNotFoundException]
+{
+    throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Script:DSCModuleName `
-    -DSCResourceName $Script:DSCResourceName `
-    -TestType Integration
-#endregion
+$script:testEnvironment = Initialize-TestEnvironment `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
+    -ResourceType 'Mof' `
+    -TestType 'Integration'
+
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
 # Store the test machine system locale
 $currentSystemLocale = (Get-WinSystemLocale).Name
@@ -23,53 +24,55 @@ $currentSystemLocale = (Get-WinSystemLocale).Name
 # Change the current system locale so that a complete test occurs.
 Set-WinSystemLocale -SystemLocale 'kl-GL'
 
-# Using try/finally to always cleanup even if something awful happens.
+# Begin Testing
 try
 {
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    Describe 'SystemLocale Integration Tests' {
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_Integration" {
-        Context 'When settting System Locale to fr-FR' {
-            $configData = @{
-                AllNodes = @(
-                    @{
-                        NodeName         = 'localhost'
-                        SystemLocale     = 'fr-FR'
-                        IsSingleInstance = 'Yes'
-                    }
-                )
-            }
-
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-
-                    Start-DscConfiguration `
-                        -Path $TestDrive `
-                        -ComputerName localhost `
-                        -Wait `
-                        -Verbose `
-                        -Force `
-                        -ErrorAction Stop
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+        Describe "$($script:DSCResourceName)_Integration" {
+            Context 'When settting System Locale to fr-FR' {
+                $configData = @{
+                    AllNodes = @(
+                        @{
+                            NodeName         = 'localhost'
+                            SystemLocale     = 'fr-FR'
+                            IsSingleInstance = 'Yes'
+                        }
+                    )
                 }
-                <#
-                    A reboot would need to occur before this node can be bought into alignment.
-                    Therefore a test for the new SystemLocale can not be automated.
-                #>
-                $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance
+
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    <#
+                        A reboot would need to occur before this node can be bought into alignment.
+                        Therefore a test for the new SystemLocale can not be automated.
+                    #>
+                    $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance
+                }
             }
         }
     }
@@ -79,7 +82,5 @@ finally
     # Restore the test machine system locale
     Set-WinSystemLocale -SystemLocale $currentSystemLocale
 
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

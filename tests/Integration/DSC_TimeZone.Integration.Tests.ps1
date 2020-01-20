@@ -1,21 +1,22 @@
-#region HEADER
-$script:dscModuleName      = 'ComputerManagementDsc'
-$script:dscResourceName    = 'DSC_TimeZone'
+$script:dscModuleName = 'ComputerManagementDsc'
+$script:dscResourceName = 'DSC_TimeZone'
 
-# Integration Test Template Version: 1.3.3
-$script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+try
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath 'DscResource.Tests'))
+    Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+}
+catch [System.IO.FileNotFoundException]
+{
+    throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'DSCResource.Tests' -ChildPath 'TestHelper.psm1')) -Force
-$TestEnvironment = Initialize-TestEnvironment `
+$script:testEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:dscModuleName `
     -DSCResourceName $script:dscResourceName `
-    -TestType Integration
-#endregion
+    -ResourceType 'Mof' `
+    -TestType 'Integration'
+
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
 # Store the test machine timezone
 $currentTimeZone = & tzutil.exe /g
@@ -23,60 +24,59 @@ $currentTimeZone = & tzutil.exe /g
 # Change the current timezone so that a complete test occurs.
 tzutil.exe /s 'Eastern Standard Time'
 
-# Using try/finally to always cleanup even if something awful happens.
+# Begin Testing
 try
 {
-    #region Integration Tests
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-    . $configFile -Verbose -ErrorAction Stop
+    Describe 'TimeZone Integration Tests' {
+        #region Integration Tests
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:dscResourceName)_Integration" {
-        $configData = @{
-            AllNodes = @(
-                @{
-                    NodeName         = 'localhost'
-                    TimeZone         = 'Pacific Standard Time'
-                    IsSingleInstance = 'Yes'
-                }
-            )
-        }
-
-        It 'Should compile and apply the MOF without throwing' {
-            {
-                & "$($script:dscResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configData
-
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -ComputerName localhost `
-                    -Wait `
-                    -Verbose `
-                    -Force `
-                    -ErrorAction Stop
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-
-        It 'Should have set the configuration and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+        Describe "$($script:dscResourceName)_Integration" {
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName         = 'localhost'
+                        TimeZone         = 'Pacific Standard Time'
+                        IsSingleInstance = 'Yes'
+                    }
+                )
             }
-            $current.TimeZone         | Should -Be $configData.AllNodes[0].TimeZone
-            $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance
+
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:dscResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the configuration and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                }
+                $current.TimeZone         | Should -Be $configData.AllNodes[0].TimeZone
+                $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance
+            }
         }
     }
-    #endregion
 }
 finally
 {
     # Restore the test machine timezone
     & tzutil.exe /s $CurrentTimeZone
 
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

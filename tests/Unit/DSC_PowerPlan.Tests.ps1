@@ -52,20 +52,18 @@ try
                     Mock `
                         -CommandName Get-PowerPlan `
                         -MockWith {
-                        return @{
-                            FriendlyName = 'High performance'
-                            Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                        }
-                    } `
-                        -ModuleName $script:dscResourceName `
+                            return @{
+                                FriendlyName = 'High performance'
+                                Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                            }
+                        } `
                         -Verifiable
 
                     Mock `
                         -CommandName Get-ActivePowerPlan `
                         -MockWith {
-                        return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                    } `
-                        -ModuleName $script:dscResourceName `
+                            return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                        } `
                         -Verifiable
                 }
 
@@ -88,20 +86,18 @@ try
                     Mock `
                         -CommandName Get-PowerPlan `
                         -MockWith {
-                        return @{
-                            FriendlyName = 'High performance'
-                            Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                        }
-                    } `
-                        -ModuleName $script:dscResourceName `
+                            return @{
+                                FriendlyName = 'High performance'
+                                Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                            }
+                        } `
                         -Verifiable
 
                     Mock `
                         -CommandName Get-ActivePowerPlan `
                         -MockWith {
-                        return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
-                    } `
-                        -ModuleName $script:dscResourceName `
+                            return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                        } `
                         -Verifiable
                 }
 
@@ -124,7 +120,6 @@ try
                 BeforeEach {
                     Mock `
                         -CommandName Get-PowerPlan `
-                        -ModuleName $script:dscResourceName `
                         -Verifiable
                 }
 
@@ -156,12 +151,10 @@ try
                                 Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                             }
                     } `
-                    -ModuleName $script:dscResourceName `
                     -Verifiable
 
                 Mock `
                     -CommandName Set-ActivePowerPlan `
-                    -ModuleName $script:dscResourceName `
                     -Verifiable
             }
 
@@ -175,7 +168,7 @@ try
 
                     Set-TargetResource -Name $Name -IsSingleInstance 'Yes' -Verbose
 
-                    Assert-MockCalled -CommandName Get-PowerPlan -Exactly -Times 1 -Scope It -ModuleName $script:dscResourceName
+                    Assert-MockCalled -CommandName Get-PowerPlan -Exactly -Times 1 -Scope It
                 }
 
                 It 'Should call Set-ActivePowerPlan once (power plan specified as <Type>)' -TestCases $testCases {
@@ -192,7 +185,6 @@ try
                         -Exactly `
                         -Times 1 `
                         -Scope It `
-                        -ModuleName $script:dscResourceName `
                         -ParameterFilter {$PowerPlanGuid -eq '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'}
                 }
             }
@@ -201,7 +193,6 @@ try
                 BeforeEach {
                     Mock `
                     -CommandName Get-PowerPlan `
-                    -ModuleName $script:dscResourceName `
                     -Verifiable
                 }
 
@@ -233,7 +224,6 @@ try
                                     Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                                 }
                         } `
-                        -ModuleName $script:dscResourceName `
                         -Verifiable
 
                     Mock `
@@ -241,7 +231,6 @@ try
                         -MockWith {
                             return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                         } `
-                        -ModuleName $script:dscResourceName `
                         -Verifiable
                 }
 
@@ -267,7 +256,6 @@ try
                                     Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
                                 }
                         } `
-                        -ModuleName $script:dscResourceName `
                         -Verifiable
 
                     Mock `
@@ -275,7 +263,6 @@ try
                         -MockWith {
                             return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
                         } `
-                        -ModuleName $script:dscResourceName `
                         -Verifiable
                 }
 
