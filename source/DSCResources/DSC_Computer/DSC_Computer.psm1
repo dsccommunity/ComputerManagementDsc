@@ -90,18 +90,18 @@ function Get-TargetResource
     $convertToCimCredential = New-CimInstance `
         -ClassName DSC_Credential `
         -Property @{
-        Username = [System.String] $Credential.UserName
-        Password = [System.String] $null
-    } `
+            Username = [System.String] $Credential.UserName
+            Password = [System.String] $null
+        } `
         -Namespace root/microsoft/windows/desiredstateconfiguration `
         -ClientOnly
 
     $convertToCimUnjoinCredential = New-CimInstance `
         -ClassName DSC_Credential `
         -Property @{
-        Username = [System.String] $UnjoinCredential.UserName
-        Password = [System.String] $null
-    } `
+            Username = [System.String] $UnjoinCredential.UserName
+            Password = [System.String] $null
+        } `
         -Namespace root/microsoft/windows/desiredstateconfiguration `
         -ClientOnly
 
