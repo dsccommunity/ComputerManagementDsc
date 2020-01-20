@@ -1,4 +1,4 @@
-$script:dscModuleName = 'NetworkingDsc'
+$script:dscModuleName = 'ComputerManagementDsc'
 $script:dscResourceName = 'DSC_PendingReboot'
 
 try
