@@ -1,5 +1,32 @@
 # ComputerManagementDsc
 
+[![Build Status](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_apis/build/status/dsccommunity.ComputerManagementDsc?branchName=master)](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_build/latest?definitionId=16&branchName=master)
+![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/ComputerManagementDsc/16/master)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/ComputerManagementDsc/16/master)](https://dsccommunity.visualstudio.com/ComputerManagementDsc/_test/analytics?definitionId=16&contextType=build)
+[![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/ComputerManagementDsc?label=ComputerManagementDsc%20Preview)](https://www.powershellgallery.com/packages/ComputerManagementDsc/)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/ComputerManagementDsc?label=ComputerManagementDsc)](https://www.powershellgallery.com/packages/ComputerManagementDsc/)
+
+## Code of Conduct
+
+This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
+
+## Releases
+
+For each merge to the branch `master` a preview release will be
+deployed to [PowerShell Gallery](https://www.powershellgallery.com/).
+Periodically a release version tag will be pushed which will deploy a
+full release to [PowerShell Gallery](https://www.powershellgallery.com/).
+
+## Contributing
+
+Please check out common DSC Community [contributing guidelines](https://dsccommunity.org/guidelines/contributing).
+
+## Change log
+
+A full list of changes in each version can be found in the [change log](CHANGELOG.md).
+
+## Resources
+
 The **ComputerManagementDsc** module contains the following resources:
 
 - **Computer**: allows you to configure a computer by changing its name and
@@ -40,31 +67,4 @@ This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 ## Documentation and Examples
 
 For a full list of resources in ComputerManagementDsc and examples on their use,
-check out the [ComputerManagementDsc wiki](https://github.com/PowerShell/ComputerManagementDsc/wiki).
-
-## Branches
-
-### master
-
-[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/ComputerManagementDsc/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/master)
-
-This is the branch containing the latest release - no contributions should be made
-directly to this branch.
-
-### dev
-
-[![Build status](https://ci.appveyor.com/api/projects/status/cg28qxeco39wgo9l/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/ComputerManagementDsc/branch/dev)
-[![codecov](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/ComputerManagementDsc/branch/dev)
-
-This is the development branch to which contributions should be proposed by contributors
-as pull requests. This development branch will periodically be merged to the master
-branch, and be released to [PowerShell Gallery](https://www.powershellgallery.com/).
-
-## Contributing
-
-Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
-
-## Change log
-
-A full list of changes in each version can be found in the [change log](CHANGELOG.md).
+check out the [ComputerManagementDsc wiki](https://github.com/dsccommunity/ComputerManagementDsc/wiki).

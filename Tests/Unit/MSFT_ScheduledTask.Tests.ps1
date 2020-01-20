@@ -2123,7 +2123,7 @@ try
             Context 'When a scheduled task is configured with a description that contains various forms of whitespace but is in the desired state' {
                 <#
                     This test verifies issue #258:
-                    https://github.com/PowerShell/ComputerManagementDsc/issues/258
+                    https://github.com/dsccommunity/ComputerManagementDsc/issues/258
                 #>
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
