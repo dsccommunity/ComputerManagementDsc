@@ -32,19 +32,9 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
-        $Script:invalidPolicyThrowMessage = @"
-Cannot validate argument on parameter 'ExecutionPolicy'. The argument `"badParam`" does
-not belong to the set `"Bypass,Restricted,AllSigned,RemoteSigned,Unrestricted`"
-specified by the ValidateSet attribute. Supply an argument that is in the set and then
-try the command again.
-"@
+        $Script:invalidPolicyThrowMessage = "Cannot validate argument on parameter 'ExecutionPolicy'. The argument `"badParam`" does not belong to the set `"Bypass,Restricted,AllSigned,RemoteSigned,Unrestricted`" specified by the ValidateSet attribute. Supply an argument that is in the set and then try the command again."
 
-        $Script:invalidPolicyExecutionPolicyScopeThrowMessage = @"
-Cannot validate argument on parameter 'ExecutionPolicyScope'. The argument `"badParam`"
-does not belong to the set `"CurrentUser,LocalMachine,MachinePolicy,Process,UserPolicy`"
-specified by the ValidateSet attribute. Supply an argument that is in the set and then
-try the command again.
-"@
+        $Script:invalidPolicyExecutionPolicyScopeThrowMessage = "Cannot validate argument on parameter 'ExecutionPolicyScope'. The argument `"badParam`" does not belong to the set `"CurrentUser,LocalMachine,MachinePolicy,Process,UserPolicy`" specified by the ValidateSet attribute. Supply an argument that is in the set and then try the command again."
 
         Describe 'DSC_PowershellExecutionPolicy\Get-TargetResource' {
             It 'Throws when passed an invalid execution policy' {
@@ -53,7 +43,7 @@ try the command again.
 
             It 'Returns correct execution policy' {
                 Mock Get-ExecutionPolicy { 'Unrestricted' }
-                $result = Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy ) -ExecutionPolicyScope 'LocalMachine'
+                $result = Get-TargetResource -ExecutionPolicy $(Get-ExecutionPolicy) -ExecutionPolicyScope 'LocalMachine'
                 $result.ExecutionPolicy | Should -Be $(Get-ExecutionPolicy)
             }
 
