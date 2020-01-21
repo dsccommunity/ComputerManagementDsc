@@ -143,6 +143,10 @@ stages:
               script: 'winrm quickconfig -quiet'
               pwsh: false
 
+          - powershell: |
+              Set-Service -Name wuauserv -StartupType Manual -Verbose
+              Start-Service -name wuauserv -Verbose
+
           - task: PowerShell@2
             name: test
             displayName: 'Run Integration Test'
