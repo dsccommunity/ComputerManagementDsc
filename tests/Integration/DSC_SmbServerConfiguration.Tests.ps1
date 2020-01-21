@@ -18,6 +18,8 @@ $script:testEnvironment = Initialize-TestEnvironment `
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
+$script:CurrentSmbServerConfigBackup = Get-SmbServerConfiguration
+
 # Begin Testing
 try
 {

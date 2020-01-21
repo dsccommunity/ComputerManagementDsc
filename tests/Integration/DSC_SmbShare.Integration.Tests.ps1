@@ -22,10 +22,10 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     Describe 'SmbShare Integration Tests' {
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dcsResourceName).config.ps1"
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile
 
-        $configurationName = "$($script:dcsResourceName)_Prerequisites_Config"
+        $configurationName = "$($script:dscResourceName)_Prerequisites_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
@@ -51,7 +51,7 @@ try
             }
         }
 
-        $configurationName = "$($script:dcsResourceName)_CreateShare1_Config"
+        $configurationName = "$($script:dscResourceName)_CreateShare1_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
@@ -119,7 +119,7 @@ try
             }
         }
 
-        $configurationName = "$($script:dcsResourceName)_CreateShare2_Config"
+        $configurationName = "$($script:dscResourceName)_CreateShare2_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
@@ -186,7 +186,7 @@ try
             }
         }
 
-        $configurationName = "$($script:dcsResourceName)_UpdateProperties_Config"
+        $configurationName = "$($script:dscResourceName)_UpdateProperties_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
@@ -255,7 +255,7 @@ try
             }
         }
 
-        $configurationName = "$($script:dcsResourceName)_RemovePermission_Config"
+        $configurationName = "$($script:dscResourceName)_RemovePermission_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
@@ -307,7 +307,7 @@ try
             }
         }
 
-        $configurationName = "$($script:dcsResourceName)_RecreateShare1_Config"
+        $configurationName = "$($script:dscResourceName)_RecreateShare1_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
@@ -355,7 +355,7 @@ try
         }
 
 
-        $configurationName = "$($script:dcsResourceName)_RemoveShare1_Config"
+        $configurationName = "$($script:dscResourceName)_RemoveShare1_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
@@ -401,7 +401,7 @@ try
             }
         }
 
-        $configurationName = "$($script:dcsResourceName)_RemoveShare2_Config"
+        $configurationName = "$($script:dscResourceName)_RemoveShare2_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
@@ -447,7 +447,7 @@ try
             }
         }
 
-        $configurationName = "$($script:dcsResourceName)_Cleanup_Config"
+        $configurationName = "$($script:dscResourceName)_Cleanup_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
             It 'Should compile and apply the MOF without throwing' {
