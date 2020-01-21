@@ -81,6 +81,34 @@ function Get-InvalidOperationRecord
     return New-Object @newObjectParams
 }
 
+<#
+    .SYNOPSIS
+        Test if the source files are available for Windows Capability.
+        If the source files are not available Get-WindowsCapability
+        will throw an exception.
+#>
+function Test-WindowsCapabilitySourceAvailable
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param ()
+
+    $sourceAvailable = $true
+
+    try
+    {
+        Get-WindowsCapability -Online -ErrorAction
+    }
+    catch
+    {
+        $sourceAvailable = $false
+        Write-Verbose -Message ($_ | Format-List * | Out-String)
+    }
+
+    return $sourceAvailable
+}
+
 Export-ModuleMember -Function `
     Get-InvalidArgumentRecord, `
-    Get-InvalidOperationRecord
+    Get-InvalidOperationRecord, `
+    Test-WindowsCapabilitySourceAvailable

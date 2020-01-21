@@ -18,12 +18,27 @@ $script:testEnvironment = Initialize-TestEnvironment `
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-Write-Verbose -Message (Get-WindowsCapability -Online | Format-List -Property * | Out-String) -Verbose
-
 # Begin Testing
 try
 {
     Describe 'WindowsCapability Integration Tests' {
+        # Ensure that the tests can be performed on this computer
+        $sourceAvailable = Test-WindowsCapabilitySourceAvailable -Verbose
+
+        Describe 'Windows capability source files' {
+            It 'Should be available' {
+                if (-not $sourceAvailable)
+                {
+                    Set-ItResult -Inconclusive -Because 'Windows capability source files are not available'
+                }
+            }
+        }
+
+        if (-not $sourceAvailable)
+        {
+            break
+        }
+
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).Config.ps1"
         . $configFile
 
