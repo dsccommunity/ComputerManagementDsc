@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - SmbShare:
   - Add parameter ScopeName to support creating shares in a different
-    scope. Fixes [Issue #284](https://github.com/dsccommunity/ComputerManagementDsc/issues/284)
+    scope - Fixes [Issue #284](https://github.com/dsccommunity/ComputerManagementDsc/issues/284).
 - Added `.gitattributes` to ensure CRLF is used when pulling repository - Fixes
   [Issue #290](https://github.com/dsccommunity/ComputerManagementDsc/issues/290).
 - SystemLocale:
@@ -31,7 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- None
+- WindowsCapability:
+  - Fix `A parameter cannot be found that matches parameter name 'Ensure'.`
+    error in `Test-TargetResource` - Fixes [Issue #297](https://github.com/dsccommunity/ComputerManagementDsc/issues/297).
 
 ### Security
 

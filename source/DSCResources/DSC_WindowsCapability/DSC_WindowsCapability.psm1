@@ -167,7 +167,7 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure,
+        $Ensure = 'Present',
 
         [Parameter()]
         [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
@@ -179,13 +179,13 @@ function Test-TargetResource
         $LogPath
     )
 
+    $inDesiredState = $true
+
     Write-Verbose -Message ($script:localizedData.TestTargetResourceStartMessage -f $Name)
-
-    $desiredState = $true
-
+    $null = $PSBoundParameters.Remove('Ensure')
     $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
 
-    if ($null -eq $windowsCapability.Name)
+    if ([System.String]::IsNullOrEmpty($windowsCapability.Name))
     {
         New-InvalidArgumentException -Message ($script:localizedData.CapabilityNameNotFound -f $Name)
     }
@@ -196,7 +196,7 @@ function Test-TargetResource
 
     if ($LogPath)
     {
-        if (-not (Test-Path $LogPath))
+        if (-not (Test-Path -Path $LogPath))
         {
             New-InvalidArgumentException -Message ($script:localizedData.LogPathFailedMessage -f $LogPath)
         }
@@ -218,14 +218,15 @@ function Test-TargetResource
     if ($PSBoundParameters.ContainsKey('Ensure') -and $Ensure -ne $ensureResult)
     {
         Write-Verbose -Message ($script:localizedData.SetResourceIsNotInDesiredState -f $Name)
-        $desiredState = $false
+        $inDesiredState = $false
     }
     else
     {
         Write-Verbose -Message ($script:localizedData.SetResourceIsInDesiredState -f $Name)
-        $desiredState = $true
+        $inDesiredState = $true
     }
-    return $desiredState
+
+    return $inDesiredState
 }
 
 Export-ModuleMember -Function *-TargetResource
