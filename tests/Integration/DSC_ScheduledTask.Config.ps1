@@ -191,7 +191,7 @@ Configuration ScheduledTaskExecuteAsAdd
     {
         $executeAsCredential = New-Object `
             -TypeName System.Management.Automation.PSCredential `
-            -ArgumentList ($ENV:USERNAME, (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
+            -ArgumentList ("$ENV:COMPUTERNAME\$ENV:USERNAME", (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
 
         ScheduledTask ScheduledTaskExecuteAsAdd
         {
@@ -213,7 +213,7 @@ Configuration ScheduledTaskExecuteAsGroupAdd
     {
         $executeAsCredential = New-Object `
             -TypeName System.Management.Automation.PSCredential `
-            -ArgumentList ('Users', (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
+            -ArgumentList ('BUILTIN\Users', (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
 
         ScheduledTask ScheduledTaskExecuteAsAdd
         {
