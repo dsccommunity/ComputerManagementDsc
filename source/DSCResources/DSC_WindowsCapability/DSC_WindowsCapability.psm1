@@ -35,7 +35,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceStartMessage -f $Name)
-
+    $null = $PSBoundParameters.Remove('Ensure')
     $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
 
     if ($windowsCapability.State -eq 'Installed')
