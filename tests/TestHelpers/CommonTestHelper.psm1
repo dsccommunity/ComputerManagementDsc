@@ -97,7 +97,7 @@ function Test-WindowsCapabilitySourceAvailable
 
     try
     {
-        Get-WindowsCapability -Online -ErrorAction
+        Get-WindowsCapability -Online -ErrorAction Stop
     }
     catch
     {
