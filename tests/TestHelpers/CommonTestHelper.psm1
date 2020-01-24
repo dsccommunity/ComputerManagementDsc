@@ -102,7 +102,6 @@ function Test-WindowsCapabilitySourceAvailable
     catch
     {
         $sourceAvailable = $false
-        Write-Verbose -Message ($_ | Format-List * | Out-String)
     }
 
     return $sourceAvailable
