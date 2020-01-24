@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
 - RemoteDesktopAdmin:
   - Correct Context messages in integration tests by adding 'When'.
+- WindowsCapability:
+  - Change `Test-TargetResource` to remove test for valid LogPath.
 
 ### Deprecated
 

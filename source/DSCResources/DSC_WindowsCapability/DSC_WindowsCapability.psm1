@@ -49,8 +49,8 @@ function Get-TargetResource
 
     $returnValue = @{
         Name     = $Name
-        LogLevel = $null
-        LogPath  = $null
+        LogLevel = $windowsCapability.LogLevel
+        LogPath  = $windowsCapability.LogPath
         Ensure   = $Ensure
     }
 
@@ -77,7 +77,7 @@ function Get-TargetResource
     .PARAMETER LogPath
         Specifies the full path and file name to log to. This is a write
         only parameter that is used when updating the status of a Windows
-        Capability. If not specified, the default is '$ENV:windir\Logs\Dism\dism.log'.
+        Capability. If not specified, the default is '%WINDIR%\Logs\Dism\dism.log'.
 #>
 function Set-TargetResource
 {
@@ -148,7 +148,15 @@ function Set-TargetResource
     .PARAMETER LogPath
         Specifies the full path and file name to log to. This is a write
         only parameter that is used when updating the status of a Windows
-        Capability. If not specified, the default is '$ENV:windir\Logs\Dism\dism.log'.
+        Capability. If not specified, the default is '%WINDIR%\Logs\Dism\dism.log'.
+
+    .NOTES
+        Get-WindowsCapability will return the LogLevel and LogPath
+        properties, but these values don't reflect the values set
+        when calling Add-WindowsCapability or Remove-WindowsCapability.
+
+        Therefore, these values can not be used to determine if the
+        resource is in state.
 #>
 function Test-TargetResource
 {

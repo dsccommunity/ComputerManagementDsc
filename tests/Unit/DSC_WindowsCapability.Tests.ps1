@@ -44,19 +44,21 @@ try
             Ensure = 'Absent'
         }
 
-        $getWindowsCapabilityIsInstalled = {
+        $script:getWindowsCapabilityIsInstalled = {
             @{
                 Name     = $script:testCapabilityName
                 State    = 'Installed'
                 LogLevel = 'Errors'
+                LogPath  = 'LogPath'
             }
         }
 
-        $getWindowsCapabilityIsNotInstalled = {
+        $script:getWindowsCapabilityIsNotInstalled = {
             @{
                 Name     = $script:testCapabilityName
                 State    = 'NotPresent'
                 LogLevel = 'Errors'
+                LogPath  = 'LogPath'
             }
         }
 
@@ -108,7 +110,7 @@ try
         Describe 'DSC_WindowsCapability\Get-TargetResource' {
             Context 'When a Windows Capability is installed' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsInstalled
+                    -MockWith $script:getWindowsCapabilityIsInstalled
 
                 It 'Should not throw an exception' {
                     {
@@ -119,6 +121,8 @@ try
                 It 'Should return expected result' {
                     $script:getTargetResourceResult.Name | Should -Be $script:testCapabilityName
                     $script:getTargetResourceResult.Ensure | Should -Be 'Present'
+                    $script:getTargetResourceResult.LogLevel | Should -Be 'Errors'
+                    $script:getTargetResourceResult.LogPath | Should -Be 'LogPath'
                 }
 
                 It 'Should call expected mocks' {
@@ -135,7 +139,7 @@ try
 
             Context 'When a Windows Capability is not installed' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsNotInstalled `
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -147,6 +151,8 @@ try
                 It 'Should return expected result' {
                     $script:getTargetResourceResult.Name | Should -Be $script:testCapabilityName
                     $script:getTargetResourceResult.Ensure | Should -Be 'Absent'
+                    $script:getTargetResourceResult.LogLevel | Should -Be 'Errors'
+                    $script:getTargetResourceResult.LogPath | Should -Be 'LogPath'
                 }
 
                 It 'Should call expected mocks' {
@@ -163,7 +169,7 @@ try
 
             Context 'When a Windows Capability does not exist' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsNotInstalled `
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled `
                     -Verifiable
 
                 $errorRecord = Get-InvalidArgumentRecord -Message ($script:localizedData.CapabilityNameNotFound -f $Name)
@@ -190,7 +196,7 @@ try
         Describe 'DSC_WindowsCapability\Test-TargetResource' {
             Context 'When a Windows Capability is installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsInstalled `
+                    -MockWith $script:getWindowsCapabilityIsInstalled `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -217,7 +223,7 @@ try
 
             Context 'When a Windows Capability is not installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsNotInstalled `
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -244,7 +250,7 @@ try
 
             Context 'When a Windows Capability is installed and should not be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsInstalled `
+                    -MockWith $script:getWindowsCapabilityIsInstalled `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -271,7 +277,7 @@ try
 
             Context 'When a Windows Capability is not installed and should not be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsNotInstalled
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -305,7 +311,7 @@ try
 
             Context 'When a Windows Capability is installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsNotInstalled
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -338,7 +344,7 @@ try
 
             Context 'When a Windows Capability is not installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsNotInstalled
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -375,7 +381,7 @@ try
 
             Context 'When a Windows Capability is installed and should not be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsInstalled
+                    -MockWith $script:getWindowsCapabilityIsInstalled
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -412,7 +418,7 @@ try
 
             Context 'When a Windows Capability is not installed and should not be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsNotInstalled
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled
                     -Verifiable
 
                 It 'Should not throw an exception' {
