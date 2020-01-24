@@ -52,7 +52,6 @@ function Get-TargetResource
         LogLevel         = $windowsCapability.LogLevel
         State            = $windowsCapability.State
         Ensure           = $Ensure
-        IsSingleInstance = 'Yes'
     }
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceEndMessage -f $Name)
