@@ -86,7 +86,6 @@ try
                         $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                     }
                     $current.Name | Should -Be $configData.AllNodes[0].Name
-                    $current.LogLevel | Should -Be $configData.AllNodes[0].LogLevel
                     $current.Ensure | Should -Be $configData.AllNodes[0].Ensure
                 }
             }
@@ -134,7 +133,6 @@ try
                         $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                     }
                     $current.Name | Should -Be $configData.AllNodes[0].Name
-                    $current.LogLevel | Should -Be $configData.AllNodes[0].LogLevel
                     $current.Ensure | Should -Be $configData.AllNodes[0].Ensure
                 }
             }

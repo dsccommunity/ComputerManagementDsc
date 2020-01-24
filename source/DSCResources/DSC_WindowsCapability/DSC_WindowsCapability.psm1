@@ -13,10 +13,7 @@ $script:localizedData = Get-LocalizedData -ResourceName 'DSC_WindowsCapability'
         Gets the current state of the Windows Capability.
 
     .PARAMETER Name
-        Specifies the given name of a Windows Capability.
-
-    .PARAMETER Name
-        Specifies the given name of a Windows Capability.
+        Specifies the name of the Windows Capability.
 #>
 function Get-TargetResource
 {
@@ -26,17 +23,20 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $Name,
-
-        [Parameter()]
-        [ValidateSet('Present', 'Absent')]
-        [System.String]
-        $Ensure = 'Present'
+        $Name
     )
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceStartMessage -f $Name)
-    $null = $PSBoundParameters.Remove('Ensure')
     $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
+
+    if ([System.String]::IsNullOrEmpty($windowsCapability.Name))
+    {
+        New-InvalidArgumentException -Message ($script:localizedData.CapabilityNameNotFound -f $Name)
+    }
+    else
+    {
+        Write-Verbose -Message ($script:localizedData.CapabilityNameFound -f $Name)
+    }
 
     if ($windowsCapability.State -eq 'Installed')
     {
@@ -48,10 +48,10 @@ function Get-TargetResource
     }
 
     $returnValue = @{
-        Name             = $Name
-        LogLevel         = $windowsCapability.LogLevel
-        LogPath          = $null
-        Ensure           = $Ensure
+        Name     = $Name
+        LogLevel = $null
+        LogPath  = $null
+        Ensure   = $Ensure
     }
 
     Write-Verbose -Message ($script:localizedData.GetTargetResourceEndMessage -f $Name)
@@ -63,18 +63,21 @@ function Get-TargetResource
         Sets if the the current state of the Windows Capability is in the desired state.
 
     .PARAMETER Name
-        Specifies the given name of a Windows Capability.
+        Specifies the name of the Windows Capability.
 
     .PARAMETER Ensure
-        Specifies whether the Windows Capability should be installed or uninstalled.
+        Specifies whether the Windows Capability should be installed
+        or uninstalled.
 
     .PARAMETER LogLevel
-        Specifies the given LogLevel of a Windows Capability.
-        Default LogLevel is: 'WarningsInfo'
+        Specifies the given Log Level of a Windows Capability. This is a write
+        only parameter that is used when updating the status of a Windows
+        Capability. If not specified, the default is 'WarningsInfo'.
 
     .PARAMETER LogPath
-        Specifies the full path and file name to log to.
-        If not set, the default is %WINDIR%\Logs\Dism\dism.log
+        Specifies the full path and file name to log to. This is a write
+        only parameter that is used when updating the status of a Windows
+        Capability. If not specified, the default is '$ENV:windir\Logs\Dism\dism.log'.
 #>
 function Set-TargetResource
 {
@@ -102,22 +105,13 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SetTargetResourceStartMessage -f $Name)
     $null = $PSBoundParameters.Remove('Ensure')
-    $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
-
-    if ($windowsCapability.State -eq 'Installed')
-    {
-        $ensureResult = 'Present'
-    }
-    else
-    {
-        $ensureResult = 'Absent'
-    }
+    $currentState = Get-TargetResource -Name $Name
 
     switch ($Ensure)
     {
         'Present'
         {
-            if ($Ensure -ne $ensureResult)
+            if ($Ensure -ne $currentState.Ensure)
             {
                 Write-Verbose -Message ($script:localizedData.SetTargetAddMessage -f $Name)
                 $null = Add-WindowsCapability -Online @PSBoundParameters
@@ -126,7 +120,7 @@ function Set-TargetResource
 
         'Absent'
         {
-            if ($Ensure -ne $ensureResult)
+            if ($Ensure -ne $currentState.Ensure)
             {
                 Write-Verbose -Message ($script:localizedData.SetTargetRemoveMessage -f $Name)
                 $null = Remove-WindowsCapability -Online @PSBoundParameters
@@ -140,18 +134,21 @@ function Set-TargetResource
         Tests if the the current state of the Windows Capability is in the desired state.
 
     .PARAMETER Name
-        Specifies the given name of a Windows Capability.
+        Specifies the name of the Windows Capability.
 
     .PARAMETER Ensure
-        Specifies whether the Windows Capability should be installed or uninstalled.
+        Specifies whether the Windows Capability should be installed
+        or uninstalled.
 
     .PARAMETER LogLevel
-        Specifies the given LogLevel of a Windows Capability.
-        Default LogLevel is: 'WarningsInfo'
+        Specifies the given Log Level of a Windows Capability. This is a write
+        only parameter that is used when updating the status of a Windows
+        Capability. If not specified, the default is 'WarningsInfo'.
 
     .PARAMETER LogPath
-        Specifies the full path and file name to log to.
-        If not set, the default is %WINDIR%\Logs\Dism\dism.log
+        Specifies the full path and file name to log to. This is a write
+        only parameter that is used when updating the status of a Windows
+        Capability. If not specified, the default is '$ENV:windir\Logs\Dism\dism.log'.
 #>
 function Test-TargetResource
 {
@@ -181,40 +178,9 @@ function Test-TargetResource
     $inDesiredState = $true
 
     Write-Verbose -Message ($script:localizedData.TestTargetResourceStartMessage -f $Name)
-    $null = $PSBoundParameters.Remove('Ensure')
-    $windowsCapability = Get-WindowsCapability -Online @PSBoundParameters
+    $currentState = Get-TargetResource -Name $Name
 
-    if ([System.String]::IsNullOrEmpty($windowsCapability.Name))
-    {
-        New-InvalidArgumentException -Message ($script:localizedData.CapabilityNameNotFound -f $Name)
-    }
-    else
-    {
-        Write-Verbose -Message ($script:localizedData.CapabilityNameFound -f $Name)
-    }
-
-    if ($LogPath)
-    {
-        if (-not (Test-Path -Path $LogPath))
-        {
-            New-InvalidArgumentException -Message ($script:localizedData.LogPathFailedMessage -f $LogPath)
-        }
-        else
-        {
-            Write-Verbose -Message ($script:localizedData.LogPathFoundMessage -f $LogPath)
-        }
-    }
-
-    if ($windowsCapability.State -eq 'Installed')
-    {
-        $ensureResult = 'Present'
-    }
-    else
-    {
-        $ensureResult = 'Absent'
-    }
-
-    if ($PSBoundParameters.ContainsKey('Ensure') -and $Ensure -ne $ensureResult)
+    if ($Ensure -ne $currentState.Ensure)
     {
         Write-Verbose -Message ($script:localizedData.SetResourceIsNotInDesiredState -f $Name)
         $inDesiredState = $false

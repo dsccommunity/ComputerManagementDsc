@@ -106,11 +106,9 @@ try
         }
 
         Describe 'DSC_WindowsCapability\Get-TargetResource' {
-            Context 'When a Windows Capability is enabled and it should' {
+            Context 'When a Windows Capability is installed' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsInstalled `
-                    -ModuleName 'DSC_WindowsCapability' `
-                    -Verifiable
+                    -MockWith $getWindowsCapabilityIsInstalled
 
                 It 'Should not throw an exception' {
                     {
@@ -121,18 +119,23 @@ try
                 It 'Should return expected result' {
                     $script:getTargetResourceResult.Name | Should -Be $script:testCapabilityName
                     $script:getTargetResourceResult.Ensure | Should -Be 'Present'
-                    $script:getTargetResourceResult.LogLevel | Should -Be 'Errors'
                 }
 
-                It 'Should call all verifiable mocks' {
-                    Assert-VerifiableMock
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
                 }
             }
 
-            Context 'When a Windows Capability is not enabled' {
+            Context 'When a Windows Capability is not installed' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsNotInstalled `
-                    -ModuleName 'DSC_WindowsCapability' `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -144,25 +147,55 @@ try
                 It 'Should return expected result' {
                     $script:getTargetResourceResult.Name | Should -Be $script:testCapabilityName
                     $script:getTargetResourceResult.Ensure | Should -Be 'Absent'
-                    $script:getTargetResourceResult.LogLevel | Should -Be 'Errors'
                 }
 
-                It 'Should call all verifiable mocks' {
-                    Assert-VerifiableMock
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
+                }
+            }
+
+            Context 'When a Windows Capability does not exist' {
+                Mock -CommandName Get-WindowsCapability `
+                    -MockWith $getWindowsCapabilityIsNotInstalled `
+                    -Verifiable
+
+                $errorRecord = Get-InvalidArgumentRecord -Message ($script:localizedData.CapabilityNameNotFound -f $Name)
+
+                It 'Should throw expected exception' {
+                    {
+                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testCapabilityName -Verbose
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
                 }
             }
         }
 
         Describe 'DSC_WindowsCapability\Test-TargetResource' {
-            Context 'When a Windows Capability is enabled' {
+            Context 'When a Windows Capability is installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsInstalled `
-                    -ModuleName 'DSC_WindowsCapability' `
                     -Verifiable
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource $script:testAndSetTargetResourceParametersPresent
+                        $script:testTargetResourceResult = Test-TargetResource @script:testAndSetTargetResourceParametersPresent
                     } | Should -Not -Throw
                 }
 
@@ -170,20 +203,53 @@ try
                     $script:testTargetResourceResult | Should -BeTrue
                 }
 
-                It 'Should call all verifiable mocks' {
-                    Assert-VerifiableMock
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
                 }
             }
 
-            Context 'When a Windows Capability is not enabled' {
+            Context 'When a Windows Capability is not installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $getWindowsCapabilityIsNotInstalled `
-                    -ModuleName 'DSC_WindowsCapability' `
                     -Verifiable
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource $script:testAndSetTargetResourceParametersAbsent
+                        $script:testTargetResourceResult = Test-TargetResource @script:testAndSetTargetResourceParametersAbsent
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return false' {
+                    $script:testTargetResourceResult | Should -BeFalse
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
+                }
+            }
+
+            Context 'When a Windows Capability is installed and should not be' {
+                Mock -CommandName Get-WindowsCapability `
+                    -MockWith $getWindowsCapabilityIsInstalled `
+                    -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource @script:testAndSetTargetResourceParametersAbsent
                     } | Should -Not -Throw
                 }
 
@@ -191,20 +257,56 @@ try
                     $script:testTargetResourceResult | Should -BeTrue
                 }
 
-                It 'Should call all verifiable mocks' {
-                    Assert-VerifiableMock
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
+                }
+            }
+
+            Context 'When a Windows Capability is not installed and should not be' {
+                Mock -CommandName Get-WindowsCapability `
+                    -MockWith $getWindowsCapabilityIsNotInstalled
+                    -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource @script:testAndSetTargetResourceParametersAbsent
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return false' {
+                    $script:testTargetResourceResult | Should -BeFalse
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
                 }
             }
         }
 
         Describe 'DSC_WindowsCapability\Set-TargetResource' {
-            Context 'When a Windows Capability is not enabled' {
-                Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsNotInstalled `
-                    -ModuleName 'DSC_WindowsCapability' `
-                    -Verifiable
+            BeforeAll {
+                Mock -CommandName Add-WindowsCapability
+                Mock -CommandName Remove-WindowsCapability
+            }
 
-                Mock -CommandName Add-WindowsCapability -MockWith { }
+            Context 'When a Windows Capability is installed and should be' {
+                Mock -CommandName Get-WindowsCapability `
+                    -MockWith $getWindowsCapabilityIsNotInstalled
+                    -Verifiable
 
                 It 'Should not throw an exception' {
                     {
@@ -212,26 +314,32 @@ try
                     } | Should -Not -Throw
                 }
 
-                It 'Should call Add-WindowsCapability when Ensure set to Present' {
-                    {
-                        Set-TargetResource -Name $testResourceName
-                    } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Add-WindowsCapability -Times 1 -Exactly -Scope It
-                }
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
 
-                It 'Should call Get-WindowsCapability when Ensure set to Present' {
-                    { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Get-WindowsCapability -Times 1 -Exactly -Scope It
+                    Assert-MockCalled `
+                        -CommandName Add-WindowsCapability `
+                        -Exactly `
+                        -Times 0
+
+                    Assert-MockCalled `
+                        -CommandName Remove-WindowsCapability `
+                        -Exactly `
+                        -Times 0
                 }
             }
 
-            Context 'When a Windows Capability is already enabled' {
+            Context 'When a Windows Capability is not installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsInstalled `
-                    -ModuleName 'DSC_WindowsCapability' `
+                    -MockWith $getWindowsCapabilityIsNotInstalled
                     -Verifiable
-
-                Mock -CommandName Add-WindowsCapability -MockWith { }
 
                 It 'Should not throw an exception' {
                     {
@@ -239,51 +347,36 @@ try
                     } | Should -Not -Throw
                 }
 
-                It 'Should not call Add-WindowsCapability when Windows Capability is already enabled' {
-                    { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Add-WindowsCapability -Times 0 -Exactly -Scope It
-                }
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
 
-                It 'Should call Get-WindowsCapability when when Windows Capability is already enabled' {
-                    { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Get-WindowsCapability -Times 1 -Exactly -Scope It
-                }
-            }
+                    Assert-MockCalled `
+                        -CommandName Add-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
 
-            Context 'When a Windows Capability is already disabled' {
-                Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsNotInstalled `
-                    -ModuleName 'DSC_WindowsCapability' `
-                    -Verifiable
-
-                Mock -CommandName Remove-WindowsCapability -MockWith { }
-
-                It 'Should not throw an exception' {
-                    {
-                        Set-TargetResource @script:testAndSetTargetResourceParametersPresent
-                    } | Should -Not -Throw
-                }
-
-                It 'Should not call Remove-WindowsCapability when Windows Capability is already disabled' {
-                    {
-                        Set-TargetResource -Name $testResourceName
-                    } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Remove-WindowsCapability -Times 0 -Exactly -Scope It
-                }
-
-                It 'Should call Get-WindowsCapability when when Windows Capability is already enabled' {
-                    { Set-TargetResource -Name $testResourceName } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Get-WindowsCapability -Times 1 -Exactly -Scope It
+                    Assert-MockCalled `
+                        -CommandName Remove-WindowsCapability `
+                        -Exactly `
+                        -Times 0
                 }
             }
 
-            Context 'When a Windows Capability is enabled and should not be' {
+            Context 'When a Windows Capability is installed and should not be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $getWindowsCapabilityIsInstalled `
-                    -ModuleName 'DSC_WindowsCapability' `
+                    -MockWith $getWindowsCapabilityIsInstalled
                     -Verifiable
-
-                Mock -CommandName Remove-WindowsCapability -MockWith { }
 
                 It 'Should not throw an exception' {
                     {
@@ -291,14 +384,62 @@ try
                     } | Should -Not -Throw
                 }
 
-                It 'Should call Remove-WindowsCapability when Ensure set to Absent' {
-                    { Set-TargetResource -Name $testResourceName -Ensure 'Absent' } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Remove-WindowsCapability -Times 1 -Exactly -Scope It
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Add-WindowsCapability `
+                        -Exactly `
+                        -Times 0
+
+                    Assert-MockCalled `
+                        -CommandName Remove-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 0
+                }
+            }
+
+            Context 'When a Windows Capability is not installed and should not be' {
+                Mock -CommandName Get-WindowsCapability `
+                    -MockWith $getWindowsCapabilityIsNotInstalled
+                    -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        Set-TargetResource @script:testAndSetTargetResourceParametersAbsent
+                    } | Should -Not -Throw
                 }
 
-                It 'Should call Get-WindowsCapability when Windows Capability is set to Absent' {
-                    { Set-TargetResource -Name $testResourceName -Ensure 'Absent' } | Should -Not -Throw
-                    Assert-MockCalled -CommandName Get-WindowsCapability -Times 1 -Exactly -Scope It
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                            $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                        } `
+                        -Exactly `
+                        -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Add-WindowsCapability `
+                        -Exactly `
+                        -Times 0
+
+                    Assert-MockCalled `
+                        -CommandName Remove-WindowsCapability `
+                        -Exactly `
+                        -Times 0
                 }
             }
         }

@@ -8,8 +8,6 @@ ConvertFrom-StringData -StringData @'
     SetTargetRemoveMessage         = Executing Remove functionality on Windows Capability '{0}'.
     SetTargetAddMessage            = Executing Add functionality on Windows Capability '{0}'.
     TestTargetResourceStartMessage = Begin executing Test functionality on Windows Capability '{0}'.
-    LogPathFailedMessage           = LogPath '{0}' not found.
-    LogPathFoundMessage            = LogPath '{0}' found.
     CapabilityNameFound            = Specified Windows Capability '{0}' found.
     CapabilityNameNotFound         = Specified Windows Capability '{0}' not found.
 '@
