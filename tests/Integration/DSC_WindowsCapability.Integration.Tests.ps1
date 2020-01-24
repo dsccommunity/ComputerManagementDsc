@@ -89,7 +89,6 @@ try
                     $current.LogLevel | Should -Be $configData.AllNodes[0].LogLevel
                     $current.LogPath | Should -Be $configData.AllNodes[0].LogPath
                     $current.Ensure | Should -Be $configData.AllNodes[0].Ensure
-                    $current.IsSingleInstance | Should -Be 'Yes'
                 }
             }
 
@@ -139,7 +138,6 @@ try
                     $current.LogLevel | Should -Be $configData.AllNodes[0].LogLevel
                     $current.LogPath | Should -Be $configData.AllNodes[0].LogPath
                     $current.Ensure | Should -Be $configData.AllNodes[0].Ensure
-                    $current.IsSingleInstance | Should -Be 'Yes'
                 }
             }
         }
