@@ -50,7 +50,7 @@ function Get-TargetResource
     $returnValue = @{
         Name             = $Name
         LogLevel         = $windowsCapability.LogLevel
-        State            = $windowsCapability.State
+        LogPath          = $null
         Ensure           = $Ensure
     }
 
