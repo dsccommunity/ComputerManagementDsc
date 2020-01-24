@@ -87,7 +87,6 @@ try
                     }
                     $current.Name | Should -Be $configData.AllNodes[0].Name
                     $current.LogLevel | Should -Be $configData.AllNodes[0].LogLevel
-                    $current.LogPath | Should -Be $configData.AllNodes[0].LogPath
                     $current.Ensure | Should -Be $configData.AllNodes[0].Ensure
                 }
             }
@@ -136,7 +135,6 @@ try
                     }
                     $current.Name | Should -Be $configData.AllNodes[0].Name
                     $current.LogLevel | Should -Be $configData.AllNodes[0].LogLevel
-                    $current.LogPath | Should -Be $configData.AllNodes[0].LogPath
                     $current.Ensure | Should -Be $configData.AllNodes[0].Ensure
                 }
             }

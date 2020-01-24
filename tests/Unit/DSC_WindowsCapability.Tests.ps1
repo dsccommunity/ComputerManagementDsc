@@ -32,31 +32,31 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
-        $script:testResourceName = 'Test'
+        $script:testCapabilityName = 'Test'
 
         $script:testAndSetTargetResourceParametersPresent = @{
-            Name   = $script:testResourceName
+            Name   = $script:testCapabilityName
             Ensure = 'Present'
         }
 
         $script:testAndSetTargetResourceParametersAbsent = @{
-            Name   = $script:testResourceName
+            Name   = $script:testCapabilityName
             Ensure = 'Absent'
         }
 
         $getWindowsCapabilityIsInstalled = {
             @{
-                Name   = 'Test'
-                State  = 'Installed'
-                Ensure = 'Present'
+                Name     = $script:testCapabilityName
+                State    = 'Installed'
+                LogLevel = 'Errors'
             }
         }
 
         $getWindowsCapabilityIsNotInstalled = {
             @{
-                Name   = 'Test'
-                State  = 'NotPresent'
-                Ensure = 'Absent'
+                Name     = $script:testCapabilityName
+                State    = 'NotPresent'
+                LogLevel = 'Errors'
             }
         }
 
@@ -114,13 +114,14 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testResourceName -Verbose
+                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testCapabilityName -Verbose
                     } | Should -Not -Throw
                 }
 
                 It 'Should return expected result' {
-                    $script:getTargetResourceResult.Name | Should -Be $script:testResourceName
-                    $script:getTargetResourceResult.State | Should -Be 'Installed'
+                    $script:getTargetResourceResult.Name | Should -Be $script:testCapabilityName
+                    $script:getTargetResourceResult.Ensure | Should -Be 'Present'
+                    $script:getTargetResourceResult.LogLevel | Should -Be 'Errors'
                 }
 
                 It 'Should call all verifiable mocks' {
@@ -136,13 +137,14 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testResourceName -Verbose
+                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testCapabilityName -Verbose
                     } | Should -Not -Throw
                 }
 
                 It 'Should return expected result' {
-                    $script:getTargetResourceResult.Name | Should -Be $script:testResourceName
-                    $script:getTargetResourceResult.State | Should -Be 'NotPresent'
+                    $script:getTargetResourceResult.Name | Should -Be $script:testCapabilityName
+                    $script:getTargetResourceResult.Ensure | Should -Be 'Absent'
+                    $script:getTargetResourceResult.LogLevel | Should -Be 'Errors'
                 }
 
                 It 'Should call all verifiable mocks' {
