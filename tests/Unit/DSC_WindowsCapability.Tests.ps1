@@ -35,13 +35,24 @@ try
         $script:testCapabilityName = 'Test'
 
         $script:testAndSetTargetResourceParametersPresent = @{
-            Name   = $script:testCapabilityName
-            Ensure = 'Present'
+            Name    = $script:testCapabilityName
+            Ensure  = 'Present'
+            Verbose = $true
         }
 
         $script:testAndSetTargetResourceParametersAbsent = @{
-            Name   = $script:testCapabilityName
-            Ensure = 'Absent'
+            Name    = $script:testCapabilityName
+            Ensure  = 'Absent'
+            Verbose = $true
+        }
+
+        $script:getWindowsCapabilityDoesNotExist = {
+            @{
+                Name     = ''
+                State    = ''
+                LogLevel = 'Errors'
+                LogPath  = 'LogPath'
+            }
         }
 
         $script:getWindowsCapabilityIsInstalled = {
@@ -114,7 +125,8 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testCapabilityName -Verbose
+                        $script:getTargetResourceResult = Get-TargetResource `
+                            -Name $script:testCapabilityName -Verbose
                     } | Should -Not -Throw
                 }
 
@@ -129,9 +141,9 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
                 }
@@ -139,12 +151,12 @@ try
 
             Context 'When a Windows Capability is not installed' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $script:getWindowsCapabilityIsNotInstalled `
-                    -Verifiable
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled
 
                 It 'Should not throw an exception' {
                     {
-                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testCapabilityName -Verbose
+                        $script:getTargetResourceResult = Get-TargetResource `
+                            -Name $script:testCapabilityName -Verbose
                     } | Should -Not -Throw
                 }
 
@@ -159,9 +171,9 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
                 }
@@ -169,14 +181,16 @@ try
 
             Context 'When a Windows Capability does not exist' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $script:getWindowsCapabilityIsNotInstalled `
-                    -Verifiable
+                    -MockWith $script:getWindowsCapabilityDoesNotExist
 
-                $errorRecord = Get-InvalidArgumentRecord -Message ($script:localizedData.CapabilityNameNotFound -f $Name)
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($script:localizedData.CapabilityNameNotFound -f $script:testCapabilityName) `
+                    -ArgumentName 'Name'
 
                 It 'Should throw expected exception' {
                     {
-                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testCapabilityName -Verbose
+                        $script:getTargetResourceResult = Get-TargetResource `
+                            -Name $script:testCapabilityName -Verbose
                     } | Should -Throw $errorRecord
                 }
 
@@ -184,9 +198,9 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
                 }
@@ -196,8 +210,7 @@ try
         Describe 'DSC_WindowsCapability\Test-TargetResource' {
             Context 'When a Windows Capability is installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $script:getWindowsCapabilityIsInstalled `
-                    -Verifiable
+                    -MockWith $script:getWindowsCapabilityIsInstalled
 
                 It 'Should not throw an exception' {
                     {
@@ -213,9 +226,9 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
                 }
@@ -223,8 +236,33 @@ try
 
             Context 'When a Windows Capability is not installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $script:getWindowsCapabilityIsNotInstalled `
-                    -Verifiable
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource @script:testAndSetTargetResourceParametersPresent
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return false' {
+                    $script:testTargetResourceResult | Should -BeFalse
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-WindowsCapability `
+                        -ParameterFilter {
+                        $Name -eq $script:testCapabilityName -and `
+                            $Online -eq $true
+                    } `
+                        -Exactly `
+                        -Times 1
+                }
+            }
+
+            Context 'When a Windows Capability is installed and should not be' {
+                Mock -CommandName Get-WindowsCapability `
+                    -MockWith $script:getWindowsCapabilityIsInstalled
 
                 It 'Should not throw an exception' {
                     {
@@ -240,18 +278,17 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
                 }
             }
 
-            Context 'When a Windows Capability is installed and should not be' {
+            Context 'When a Windows Capability is not installed and should not be' {
                 Mock -CommandName Get-WindowsCapability `
-                    -MockWith $script:getWindowsCapabilityIsInstalled `
-                    -Verifiable
+                    -MockWith $script:getWindowsCapabilityIsNotInstalled
 
                 It 'Should not throw an exception' {
                     {
@@ -267,36 +304,9 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
-                        -Exactly `
-                        -Times 1
-                }
-            }
-
-            Context 'When a Windows Capability is not installed and should not be' {
-                Mock -CommandName Get-WindowsCapability `
-                    -MockWith $script:getWindowsCapabilityIsNotInstalled
-                    -Verifiable
-
-                It 'Should not throw an exception' {
-                    {
-                        $script:testTargetResourceResult = Test-TargetResource @script:testAndSetTargetResourceParametersAbsent
-                    } | Should -Not -Throw
-                }
-
-                It 'Should return false' {
-                    $script:testTargetResourceResult | Should -BeFalse
-                }
-
-                It 'Should call expected mocks' {
-                    Assert-MockCalled `
-                        -CommandName Get-WindowsCapability `
-                        -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
-                            $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
                 }
@@ -312,7 +322,6 @@ try
             Context 'When a Windows Capability is installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $script:getWindowsCapabilityIsNotInstalled
-                    -Verifiable
 
                 It 'Should not throw an exception' {
                     {
@@ -324,9 +333,9 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
 
@@ -345,7 +354,6 @@ try
             Context 'When a Windows Capability is not installed and should be' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $script:getWindowsCapabilityIsNotInstalled
-                    -Verifiable
 
                 It 'Should not throw an exception' {
                     {
@@ -357,18 +365,18 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
 
                     Assert-MockCalled `
                         -CommandName Add-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
 
@@ -382,7 +390,6 @@ try
             Context 'When a Windows Capability is installed and should not be' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $script:getWindowsCapabilityIsInstalled
-                    -Verifiable
 
                 It 'Should not throw an exception' {
                     {
@@ -394,9 +401,9 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
 
@@ -408,18 +415,17 @@ try
                     Assert-MockCalled `
                         -CommandName Remove-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
-                        -Times 0
+                        -Times 1
                 }
             }
 
             Context 'When a Windows Capability is not installed and should not be' {
                 Mock -CommandName Get-WindowsCapability `
                     -MockWith $script:getWindowsCapabilityIsNotInstalled
-                    -Verifiable
 
                 It 'Should not throw an exception' {
                     {
@@ -431,9 +437,9 @@ try
                     Assert-MockCalled `
                         -CommandName Get-WindowsCapability `
                         -ParameterFilter {
-                            $Name -eq $script:testCapabilityName -and `
+                        $Name -eq $script:testCapabilityName -and `
                             $Online -eq $true
-                        } `
+                    } `
                         -Exactly `
                         -Times 1
 

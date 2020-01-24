@@ -31,7 +31,9 @@ function Get-TargetResource
 
     if ([System.String]::IsNullOrEmpty($windowsCapability.Name))
     {
-        New-InvalidArgumentException -Message ($script:localizedData.CapabilityNameNotFound -f $Name)
+        New-InvalidArgumentException `
+            -Message ($script:localizedData.CapabilityNameNotFound -f $Name) `
+            -ArgumentName 'Name'
     }
     else
     {
