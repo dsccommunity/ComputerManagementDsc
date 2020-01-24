@@ -72,12 +72,12 @@ function Get-TargetResource
     .PARAMETER LogLevel
         Specifies the given Log Level of a Windows Capability. This is a write
         only parameter that is used when updating the status of a Windows
-        Capability. If not specified, the default is 'WarningsInfo'.
+        Capability. If not specified, the default is WarningsInfo.
 
     .PARAMETER LogPath
         Specifies the full path and file name to log to. This is a write
         only parameter that is used when updating the status of a Windows
-        Capability. If not specified, the default is '%WINDIR%\Logs\Dism\dism.log'.
+        Capability. If not specified, the default is %WINDIR%\Logs\Dism\dism.log.
 #>
 function Set-TargetResource
 {
@@ -143,12 +143,12 @@ function Set-TargetResource
     .PARAMETER LogLevel
         Specifies the given Log Level of a Windows Capability. This is a write
         only parameter that is used when updating the status of a Windows
-        Capability. If not specified, the default is 'WarningsInfo'.
+        Capability. If not specified, the default is WarningsInfo.
 
     .PARAMETER LogPath
         Specifies the full path and file name to log to. This is a write
         only parameter that is used when updating the status of a Windows
-        Capability. If not specified, the default is '%WINDIR%\Logs\Dism\dism.log'.
+        Capability. If not specified, the default is %WINDIR%\Logs\Dism\dism.log.
 
     .NOTES
         Get-WindowsCapability will return the LogLevel and LogPath
