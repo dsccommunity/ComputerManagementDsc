@@ -4,6 +4,9 @@ The **ComputerManagementDsc** module contains the following resources:
 
 - **Computer**: allows you to configure a computer by changing its name and
   description and modifying its Active Directory domain or workgroup membership.
+- **IEEnhancedSecurityConfiguration**: The resource allows you to configure
+  the IE Enhanced Security Configuration for both the role administrators and
+  users.
 - **OfflineDomainJoin**: allows you to join computers to an Active Directory
   domain using an [Offline Domain Join](https://technet.microsoft.com/en-us/library/offline-domain-join-djoin-step-by-step(v=ws.10).aspx)
   request file.
