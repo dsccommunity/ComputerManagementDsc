@@ -11,6 +11,8 @@
   - Migrated SystemLocale from [SystemLocaleDsc](https://github.com/PowerShell/SystemLocaleDsc).
 - RemoteDesktopAdmin:
   - Correct Context messages in integration tests by adding 'When'.
+- Added new resource IEEnhancedSecurityConfiguration (moved from module
+  xSystemSecurity).
 
 ## 7.1.0.0
 
