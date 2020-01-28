@@ -81,6 +81,7 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope = 'Function')]
     [CmdletBinding()]
     param
     (
