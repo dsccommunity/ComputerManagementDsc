@@ -78,6 +78,9 @@ function Get-TargetResource
         will make Windows automatically start a new process. But, stopping a
         process feels wrong so the resource instead restarts the node when the
         value is changed.
+        Also, the issue https://github.com/dsccommunity/xSystemSecurity/issues/1
+        is referring to an API that could be used to handle this better, but there
+        are no mention of what API call to make.
 #>
 function Set-TargetResource
 {
