@@ -13,6 +13,12 @@ The possible values of the parameter `NotificationLevel`:
   because other programs can't run while it's dimmed. This is the most secure
   setting. When you are notified, you should carefully read the contents of each
   dialog box before allowing changes to be made to your computer.
+- **AlwaysNotifyAndAskForCredentials**: You will be notified before programs
+  make changes to your computer or to Windows settings that require the permissions
+  of an administrator. When you're notified, your desktop will be dimmed, and you
+  must enter valid credentials to approve the request in the UAC dialog box.
+  This notification level is the same as **AlwaysNotify** but you are always
+  asked for valid credentials on the secure desktop.
 - **NotifyChanges**: You will be notified before programs make changes to your
   computer that require the permissions of an administrator. You will not be notified
   if you try to make changes to Windows settings that require the permissions of

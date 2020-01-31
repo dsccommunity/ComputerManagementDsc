@@ -97,7 +97,7 @@ function Set-TargetResource
         $IsSingleInstance,
 
         [Parameter()]
-        [ValidateSet('AlwaysNotify', 'NotifyChanges', 'NotifyChangesWithoutDimming', 'NeverNotify', 'NeverNotifyAndDisableAll')]
+        [ValidateSet('AlwaysNotify', 'AlwaysNotifyAndAskForCredentials', 'NotifyChanges', 'NotifyChangesWithoutDimming', 'NeverNotify', 'NeverNotifyAndDisableAll')]
         [System.String]
         $NotificationLevel,
 
@@ -238,7 +238,7 @@ function Test-TargetResource
         $IsSingleInstance,
 
         [Parameter()]
-        [ValidateSet('AlwaysNotify', 'NotifyChanges', 'NotifyChangesWithoutDimming', 'NeverNotify', 'NeverNotifyAndDisableAll')]
+        [ValidateSet('AlwaysNotify', 'AlwaysNotifyAndAskForCredentials', 'NotifyChanges', 'NotifyChangesWithoutDimming', 'NeverNotify', 'NeverNotifyAndDisableAll')]
         [System.String]
         $NotificationLevel,
 
@@ -391,6 +391,14 @@ function Get-NotificationLevel
         $stringValue = 'AlwaysNotify'
     }
 
+    if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 1 `
+        -and $userAccountControlValues.EnableLua -eq 1 `
+        -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
+    )
+    {
+        $stringValue = 'AlwaysNotifyAndAskForCredentials'
+    }
+
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 5 `
         -and $userAccountControlValues.EnableLua -eq 1 `
         -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
@@ -440,7 +448,7 @@ function Set-UserAccountControlToNotificationLevel
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AlwaysNotify', 'NotifyChanges', 'NotifyChangesWithoutDimming', 'NeverNotify', 'NeverNotifyAndDisableAll')]
+        [ValidateSet('AlwaysNotify', 'AlwaysNotifyAndAskForCredentials', 'NotifyChanges', 'NotifyChangesWithoutDimming', 'NeverNotify', 'NeverNotifyAndDisableAll')]
         [System.String]
         $NotificationLevel
     )
@@ -453,6 +461,14 @@ function Set-UserAccountControlToNotificationLevel
             Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
             Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
         }
+
+        'AlwaysNotifyAndAskForCredentials'
+        {
+            Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 1
+            Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
+            Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
+        }
+
 
         'NotifyChanges'
         {
