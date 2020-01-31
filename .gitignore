@@ -1,1 +1,9 @@
-﻿DSCResource.Tests
+*.suo
+*.user
+*.coverage
+.vs
+.psproj
+.sln
+markdownissues.txt
+TestResults.xml
+output/

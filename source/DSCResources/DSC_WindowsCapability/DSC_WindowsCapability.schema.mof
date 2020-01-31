@@ -1,0 +1,9 @@
+
+[ClassVersion("1.0.0.1"), FriendlyName("WindowsCapability")]
+class DSC_WindowsCapability : OMI_BaseResource
+{
+    [Key, Description("Specifies the name of the Windows Capability.")] String Name;
+    [Write, Description("Specifies whether the Windows Capability should be installed or uninstalled. To install the Windows Capability, set this property to Present. To uninstall the Windows Capability, set the property to Absent."), ValueMap{"Present", "Absent"}, Values{"Present", "Absent"}] String Ensure;
+    [Write, Description("Specifies the given Log Level of a Windows Capability. This is a write only parameter that is used when updating the status of a Windows Capability. If not specified, the default is 'WarningsInfo'."), ValueMap{"Errors", "Warnings", "WarningsInfo"}, Values{"Errors", "Warnings", "WarningsInfo"}] String LogLevel;
+    [Write, Description("Specifies the full path and file name to log to. This is a write only parameter that is used when updating the status of a Windows Capability. If not specified, the default is '%WINDIR%\\Logs\\Dism\\dism.log'.")] String LogPath;
+};
