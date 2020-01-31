@@ -27,4 +27,5 @@ ConvertFrom-StringData @'
     PowerPlanFound                     = Found power scheme '{0}'. Getting friendly name.
     PowerPlanFriendlyNameFound         = Friendly name is '{0}'.
     AllPowerPlansFound                 = Enumerating of available power schemes done.
+    ParameterUsageWrong                = Any of the parameters '{0}' cannot be used at the same time as any of the parameters '{1}'.
 '@
