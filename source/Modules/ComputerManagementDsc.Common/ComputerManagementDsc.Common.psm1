@@ -1230,6 +1230,96 @@ function Set-ActivePowerPlan
     }
 }
 
+<#
+    .SYNOPSIS
+        Returns the value of the provided in the Name parameter, at the registry
+        location provided in the Path parameter.
+
+    .PARAMETER Path
+        String containing the path in the registry to the property name.
+
+    .PARAMETER PropertyName
+        String containing the name of the property for which the value is returned.
+#>
+function Get-RegistryPropertyValue
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Path,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name
+    )
+
+    $getItemPropertyParameters = @{
+        Path = $Path
+        Name = $Name
+    }
+
+    <#
+        Using a try/catch block instead of 'SilentlyContinue' to be
+        able to unit test a failing registry path.
+    #>
+    try
+    {
+        $getItemPropertyResult = (Get-ItemProperty @getItemPropertyParameters -ErrorAction Stop).$Name
+    }
+    catch
+    {
+         $getItemPropertyResult = $null
+    }
+
+    return $getItemPropertyResult
+}
+
+<#
+    .SYNOPSIS
+        Throws an error of one parameter from both mutual exclusive list are
+        found in the bound parameters.
+
+    .PARAMETER MutualExclusiveList1
+        An array of parameter names that are not allowed to be bound at the
+        same time and those in MutualExclusiveList2.
+
+    .PARAMETER MutualExclusiveList2
+        An array of parameter names that are not allowed to be bound at the
+        same time and those in MutualExclusiveList1.
+#>
+function Assert-BoundParameter
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [System.Collections.Hashtable]
+        $BoundParameterList,
+
+        [Parameter(Mandatory = $true)]
+        [System.String[]]
+        $MutualExclusiveList1,
+
+        [Parameter(Mandatory = $true)]
+        [System.String[]]
+        $MutualExclusiveList2
+    )
+
+    if ($BoundParameterList.Keys -in $MutualExclusiveList1 `
+    -and $BoundParameterList.Keys -in $MutualExclusiveList2)
+    {
+        $errorMessage = `
+            $script:localizedData.ParameterUsageWrong `
+                -f ($MutualExclusiveList1 -join "','"), ($MutualExclusiveList2 -join "','")
+
+        New-InvalidArgumentException -ArgumentName 'Parameters' -Message $errorMessage
+    }
+}
+
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
     -ResourceName 'ComputerManagementDsc.Common' `
@@ -1250,4 +1340,5 @@ Export-ModuleMember -Function @(
     'New-InvalidArgumentException'
     'New-InvalidOperationException'
     'Get-LocalizedData'
+    'Get-RegistryPropertyValue'
 )

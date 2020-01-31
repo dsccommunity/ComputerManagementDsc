@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - BREAKING CHANGE: Changed resource prefix from MSFT to DSC.
 - Updated to use continuous delivery pattern using Azure DevOps - Fixes
   [Issue #295](https://github.com/dsccommunity/ComputerManagementDsc/issues/295).
+- Added new resource UserAccountControl (moved from module
+  xSystemSecurity).
 
 ### Deprecated
 
