@@ -1,9 +1,10 @@
 # Integration Test Config Template Version: 1.0.0
-configuration DSC_WindowsCapability_Config
+Configuration DSC_WindowsCapability_Config
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
-    node $AllNodes.NodeName {
+    node $AllNodes.NodeName
+    {
         WindowsCapability TestInstallation
         {
             Name     = $Node.Name

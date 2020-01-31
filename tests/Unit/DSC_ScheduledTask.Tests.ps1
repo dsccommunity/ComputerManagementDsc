@@ -98,8 +98,8 @@ try
                 Mock -CommandName Unregister-ScheduledTask
 
                 $getTargetResourceParameters = @{
-                    TaskName           = 'Test task'
-                    TaskPath           = '\Test\'
+                    TaskName = 'Test task'
+                    TaskPath = '\Test\'
                 }
             }
 
@@ -176,8 +176,8 @@ try
 
             Context 'A built-in scheduled task exists and is enabled, but it should be disabled' {
                 $testParameters = $getTargetResourceParameters + @{
-                    Enable   = $false
-                    Verbose  = $true
+                    Enable  = $false
+                    Verbose = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -219,8 +219,8 @@ try
 
             Context 'A built-in scheduled task exists, but it should be absent' {
                 $testParameters = $getTargetResourceParameters + @{
-                    Ensure   = 'Absent'
-                    Verbose  = $true
+                    Ensure  = 'Absent'
+                    Verbose = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -981,8 +981,8 @@ try
                         Settings  = [pscustomobject] @{
                             Enabled            = $true
                             IdleSettings       = @{
-                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
-                                IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
+                                WaitTimeout  = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
+                                IdleDuration = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
                             RestartInterval    = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
@@ -1159,23 +1159,23 @@ try
 
             Context 'A scheduled task path is root or custom' -Fixture {
                 It 'Should return backslash' {
-                    ConvertTo-NormalizedTaskPath -TaskPath '\'| Should -Be '\'
+                    ConvertTo-NormalizedTaskPath -TaskPath '\' | Should -Be '\'
                 }
 
                 It 'Should add backslash at the end' {
-                    ConvertTo-NormalizedTaskPath -TaskPath '\Test'| Should -Be '\Test\'
+                    ConvertTo-NormalizedTaskPath -TaskPath '\Test' | Should -Be '\Test\'
                 }
 
                 It 'Should add backslash at the beginning' {
-                    ConvertTo-NormalizedTaskPath -TaskPath 'Test\'| Should -Be '\Test\'
+                    ConvertTo-NormalizedTaskPath -TaskPath 'Test\' | Should -Be '\Test\'
                 }
 
                 It 'Should add backslash at the beginning and at the end' {
-                    ConvertTo-NormalizedTaskPath -TaskPath 'Test'| Should -Be '\Test\'
+                    ConvertTo-NormalizedTaskPath -TaskPath 'Test' | Should -Be '\Test\'
                 }
 
                 It 'Should not add backslash' {
-                    ConvertTo-NormalizedTaskPath -TaskPath '\Test\'| Should -Be '\Test\'
+                    ConvertTo-NormalizedTaskPath -TaskPath '\Test\' | Should -Be '\Test\'
                 }
             }
 
@@ -1217,8 +1217,8 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             IdleSettings       = @{
-                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
-                                IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
+                                WaitTimeout  = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes)M"
+                                IdleDuration = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
                             RestartInterval    = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
@@ -1282,8 +1282,8 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             IdleSettings       = @{
-                                WaitTimeout = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes + 1)M"
-                                IdleDuration    = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes + 1)M"
+                                WaitTimeout  = "PT$([System.TimeSpan]::Parse($testParameters.IdleWaitTimeout).TotalMinutes + 1)M"
+                                IdleDuration = "PT$([System.TimeSpan]::Parse($testParameters.IdleDuration).TotalMinutes + 1)M"
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
                             RestartInterval    = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
@@ -1459,8 +1459,8 @@ try
 
             Context 'When a built-in scheduled task exists and is enabled, but it should be disabled and the trigger type is not recognized' {
                 $testParameters = $getTargetResourceParameters + @{
-                    Enable   = $false
-                    Verbose  = $true
+                    Enable  = $false
+                    Verbose = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1520,9 +1520,9 @@ try
                             Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                         }
                         Triggers = [pscustomobject] @{
-                            Delay = 'PT1M'
+                            Delay        = 'PT1M'
                             Subscription = $testParameters.EventSubscription
-                            CimClass   = @{
+                            CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
                             }
                         }
@@ -1591,9 +1591,9 @@ try
                             Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                         }
                         Triggers = [pscustomobject] @{
-                            Delay = 'PT1M'
+                            Delay        = 'PT1M'
                             Subscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1601]]</Select></Query></QueryList>'
-                            CimClass   = @{
+                            CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
                             }
                         }
@@ -1644,9 +1644,9 @@ try
                             Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                         }
                         Triggers = [pscustomobject] @{
-                            Delay = 'PT1M'
+                            Delay        = 'PT1M'
                             Subscription = $testParameters.EventSubscription
-                            CimClass   = @{
+                            CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
                             }
                         }
@@ -1723,7 +1723,7 @@ try
                             }
                         )
                         Principal = [pscustomobject] @{
-                            UserId = $testParameters.BuiltInAccount
+                            UserId    = $testParameters.BuiltInAccount
                             LogonType = 'ServiceAccount'
                         }
                     }
@@ -1761,7 +1761,7 @@ try
                 It 'Should call Register-ScheduledTask with the name of the Group Managed Service Account' {
                     Set-TargetResource @testParameters
                     Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
-                        $User -eq $null -and  $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
+                        $User -eq $null -and $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
                     }
                 }
 
@@ -1811,12 +1811,12 @@ try
 
             Context 'When a scheduled task Group Managed Service Account is changed' {
                 $testParameters = $getTargetResourceParameters + @{
-                    ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType        = 'Once'
-                    RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
-                    RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
-                    ExecuteAsGMSA       = 'DOMAIN\gMSA$'
-                    Verbose             = $true
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                    ExecuteAsGMSA      = 'DOMAIN\gMSA$'
+                    Verbose            = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1865,7 +1865,7 @@ try
             }
 
             Context 'When a scheduled task is created and synchronize across time zone is disabled' {
-                $startTimeString           = '2018-10-01T01:00:00'
+                $startTimeString = '2018-10-01T01:00:00'
                 $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
@@ -1877,14 +1877,14 @@ try
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        Triggers = @(
                             [pscustomobject] @{
                                 StartBoundary = $startTimeString
                                 CimClass      = @{
@@ -1907,14 +1907,14 @@ try
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        Triggers = @(
                             [pscustomobject] @{
                                 StartBoundary = $startTimeStringWithOffset
                                 CimClass      = @{
@@ -1939,7 +1939,7 @@ try
             }
 
             Context 'When a scheduled task is created and synchronize across time zone is enabled' {
-                $startTimeString           = '2018-10-01T01:00:00'
+                $startTimeString = '2018-10-01T01:00:00'
                 $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
@@ -1951,14 +1951,14 @@ try
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        Triggers = @(
                             [pscustomobject] @{
                                 StartBoundary = $startTimeStringWithOffset
                                 CimClass      = @{
@@ -1981,14 +1981,14 @@ try
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        Triggers = @(
                             [pscustomobject] @{
                                 StartBoundary = $startTimeString
                                 CimClass      = @{
@@ -2013,7 +2013,7 @@ try
             }
 
             Context 'When a scheduled task is configured to SynchronizeAcrossTimeZone and the ScheduleType is not Once, Daily or Weekly' {
-                $startTimeString              = '2018-10-01T01:00:00'
+                $startTimeString = '2018-10-01T01:00:00'
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     StartTime                 = Get-Date -Date $startTimeString
@@ -2030,26 +2030,26 @@ try
             Context 'When a scheduled task is configured with the ScheduleType AtLogon and is in desired state' {
                 $startTimeString = '2018-10-01T01:00:00'
                 $testParameters = $getTargetResourceParameters + @{
-                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    StartTime         = Get-Date -Date $startTimeString
-                    ScheduleType      = 'AtLogon'
-                    Delay             = '00:01:00'
-                    Enable            = $true
-                    Verbose           = $true
+                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime        = Get-Date -Date $startTimeString
+                    ScheduleType     = 'AtLogon'
+                    Delay            = '00:01:00'
+                    Enable           = $true
+                    Verbose          = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        Triggers = @(
                             [pscustomobject] @{
-                                Delay = 'PT1M'
+                                Delay         = 'PT1M'
                                 StartBoundary = $startTimeString
                                 CimClass      = @{
                                     CimClassName = 'MSFT_TaskLogonTrigger'
@@ -2078,25 +2078,25 @@ try
 
             Context 'When a scheduled task is configured with the ScheduleType AtStartup and is in desired state' {
                 $testParameters = $getTargetResourceParameters + @{
-                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    ScheduleType      = 'AtStartup'
-                    Delay             = '00:01:00'
-                    Enable            = $true
-                    Verbose           = $true
+                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType     = 'AtStartup'
+                    Delay            = '00:01:00'
+                    Enable           = $true
+                    Verbose          = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
+                        TaskName = $testParameters.TaskName
+                        TaskPath = $testParameters.TaskPath
+                        Actions  = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        Triggers = @(
                             [pscustomobject] @{
-                                Delay = 'PT1M'
+                                Delay         = 'PT1M'
                                 StartBoundary = ''
                                 CimClass      = @{
                                     CimClassName = 'MSFT_TaskBootTrigger'
@@ -2128,12 +2128,12 @@ try
                     https://github.com/dsccommunity/ComputerManagementDsc/issues/258
                 #>
                 $testParameters = $getTargetResourceParameters + @{
-                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    Description       = "`t`n`r    test description    `t`n`r"
-                    ScheduleType      = 'AtStartup'
-                    Delay             = '00:01:00'
-                    Enable            = $true
-                    Verbose           = $true
+                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    Description      = "`t`n`r    test description    `t`n`r"
+                    ScheduleType     = 'AtStartup'
+                    Delay            = '00:01:00'
+                    Enable           = $true
+                    Verbose          = $true
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2141,21 +2141,21 @@ try
                         TaskName    = $testParameters.TaskName
                         TaskPath    = $testParameters.TaskPath
                         Description = 'test description'
-                        Actions   = @(
+                        Actions     = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        Triggers    = @(
                             [pscustomobject] @{
-                                Delay = 'PT1M'
+                                Delay         = 'PT1M'
                                 StartBoundary = ''
                                 CimClass      = @{
                                     CimClassName = 'MSFT_TaskBootTrigger'
                                 }
                             }
                         )
-                        Settings = [pscustomobject] @{
+                        Settings    = [pscustomobject] @{
                             Enabled = $testParameters.Enable
                         }
                     }

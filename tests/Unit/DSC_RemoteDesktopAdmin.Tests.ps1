@@ -55,11 +55,11 @@ try
                 It 'Should return the correct values when Ensure is Present' {
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { @{fDenyTSConnections = 0} }
+                        -MockWith { @{fDenyTSConnections = 0 } }
 
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'UserAuthentication' } `
-                        -MockWith { @{UserAuthentication = 0} }
+                        -MockWith { @{UserAuthentication = 0 } }
 
                     $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
                     $targetResource.Ensure | Should -Be 'Present'
@@ -68,11 +68,11 @@ try
                 It 'Should return the correct values when Ensure is Absent' {
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { @{fDenyTSConnections = 1} }
+                        -MockWith { @{fDenyTSConnections = 1 } }
 
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'UserAuthentication' } `
-                        -MockWith { @{UserAuthentication = 0} }
+                        -MockWith { @{UserAuthentication = 0 } }
 
                     $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
                     $targetResource.Ensure | Should -Be 'Absent'
@@ -81,11 +81,11 @@ try
                 It 'Should return the correct values when UserAuthentication is NonSecure' {
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { @{fDenyTSConnections = 0} }
+                        -MockWith { @{fDenyTSConnections = 0 } }
 
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'UserAuthentication' } `
-                        -MockWith { @{UserAuthentication = 0} } `
+                        -MockWith { @{UserAuthentication = 0 } } `
 
                     $result = Get-TargetResource -IsSingleInstance 'Yes'
                     $result.UserAuthentication | Should -Be 'NonSecure'
@@ -94,11 +94,11 @@ try
                 It 'Should return the correct values when UserAuthentication is Secure' {
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { @{fDenyTSConnections = 0} }
+                        -MockWith { @{fDenyTSConnections = 0 } }
 
                     Mock -CommandName Get-ItemProperty `
                         -ParameterFilter { $Name -eq 'UserAuthentication' } `
-                        -MockWith { @{UserAuthentication = 1} } `
+                        -MockWith { @{UserAuthentication = 1 } } `
 
                     $result = Get-TargetResource -IsSingleInstance 'Yes'
                     $result.UserAuthentication | Should -Be 'Secure'

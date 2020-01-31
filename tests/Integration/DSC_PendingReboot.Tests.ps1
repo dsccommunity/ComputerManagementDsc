@@ -55,8 +55,8 @@ try
             $configData = @{
                 AllNodes = @(
                     @{
-                        NodeName   = 'localhost'
-                        RebootName = 'TestReboot'
+                        NodeName                    = 'localhost'
+                        RebootName                  = 'TestReboot'
                         SkipComponentBasedServicing = $false
                         SkipWindowsUpdate           = $false
                         SkipPendingFileRename       = $false

@@ -516,8 +516,8 @@ try
 
                                     Mock -CommandName Get-PendingRebootHashTable `
                                         -MockWith {
-                                            $getPendingRebootStateMock
-                                        } `
+                                        $getPendingRebootStateMock
+                                    } `
                                         -ModuleName 'DSC_PendingReboot' `
                                         -Verifiable
                                 }
@@ -549,8 +549,8 @@ try
 
                                     Mock -CommandName Get-PendingRebootHashTable `
                                         -MockWith {
-                                            $getPendingRebootStateMock
-                                        } `
+                                        $getPendingRebootStateMock
+                                    } `
                                         -ModuleName 'DSC_PendingReboot' `
                                         -Verifiable
                                 }
@@ -579,8 +579,8 @@ try
 
                             Mock -CommandName Get-PendingRebootHashTable `
                                 -MockWith {
-                                    $getPendingRebootStateMock
-                                } `
+                                $getPendingRebootStateMock
+                            } `
                                 -ModuleName 'DSC_PendingReboot' `
                                 -Verifiable
                         }

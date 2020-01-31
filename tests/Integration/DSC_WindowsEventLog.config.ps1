@@ -1,5 +1,5 @@
 # Integration Test Config Template Version: 1.0.0
-configuration DSC_WindowsEventLog_Default
+Configuration DSC_WindowsEventLog_Default
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
@@ -16,7 +16,7 @@ configuration DSC_WindowsEventLog_Default
     }
 }
 
-configuration DSC_WindowsEventLog_RetainSize
+Configuration DSC_WindowsEventLog_RetainSize
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
@@ -31,22 +31,22 @@ configuration DSC_WindowsEventLog_RetainSize
     }
 }
 
-configuration DSC_WindowsEventLog_AutobackupLogRetention
+Configuration DSC_WindowsEventLog_AutobackupLogRetention
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
-            LogName            = 'Application'
-            IsEnabled          = $true
-            LogMode            = 'AutoBackup'
-            LogRetentionDays   = '30'
+            LogName          = 'Application'
+            IsEnabled        = $true
+            LogMode          = 'AutoBackup'
+            LogRetentionDays = '30'
         }
     }
 }
 
-configuration DSC_WindowsEventLog_CircularLogPath
+Configuration DSC_WindowsEventLog_CircularLogPath
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
@@ -62,7 +62,7 @@ configuration DSC_WindowsEventLog_CircularLogPath
     }
 }
 
-configuration DSC_WindowsEventLog_EnableLog
+Configuration DSC_WindowsEventLog_EnableLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
@@ -77,20 +77,20 @@ configuration DSC_WindowsEventLog_EnableLog
     }
 }
 
-configuration DSC_WindowsEventLog_DisableLog
+Configuration DSC_WindowsEventLog_DisableLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
-            LogName            = 'Microsoft-Windows-CAPI2/Operational'
-            IsEnabled          = $false
+            LogName   = 'Microsoft-Windows-CAPI2/Operational'
+            IsEnabled = $false
         }
     }
 }
 
-configuration DSC_WindowsEventLog_CircularSecurityDescriptor
+Configuration DSC_WindowsEventLog_CircularSecurityDescriptor
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
@@ -106,30 +106,30 @@ configuration DSC_WindowsEventLog_CircularSecurityDescriptor
     }
 }
 
-configuration DSC_WindowsEventLog_EnableBackupLog
+Configuration DSC_WindowsEventLog_EnableBackupLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
-            LogName            = 'Microsoft-Windows-Backup'
-            IsEnabled          = $true
-            LogMode            = 'AutoBackup'
-            LogRetentionDays   = '30'
+            LogName          = 'Microsoft-Windows-Backup'
+            IsEnabled        = $true
+            LogMode          = 'AutoBackup'
+            LogRetentionDays = '30'
         }
     }
 }
 
-configuration DSC_WindowsEventLog_DisableBackupLog
+Configuration DSC_WindowsEventLog_DisableBackupLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
     node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
-            LogName            = 'Microsoft-Windows-Backup'
-            IsEnabled          = $false
+            LogName   = 'Microsoft-Windows-Backup'
+            IsEnabled = $false
         }
     }
 }

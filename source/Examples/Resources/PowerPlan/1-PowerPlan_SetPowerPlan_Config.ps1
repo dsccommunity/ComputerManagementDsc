@@ -29,8 +29,8 @@ Configuration PowerPlan_SetPowerPlan_Config
     {
         PowerPlan SetPlanHighPerformance
         {
-          IsSingleInstance = 'Yes'
-          Name             = 'High performance'
+            IsSingleInstance = 'Yes'
+            Name             = 'High performance'
         }
     }
 }

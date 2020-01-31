@@ -6,7 +6,7 @@ $configFile = [System.IO.Path]::ChangeExtension($MyInvocation.MyCommand.Path, 'j
 if (Test-Path -Path $configFile)
 {
     <#
-        Allows reading the configuration data from a JSON file
+        Allows reading the Configuration data from a JSON file
         for real testing scenarios outside of the CI.
     #>
     $ConfigurationData = Get-Content -Path $configFile | ConvertFrom-Json

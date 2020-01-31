@@ -67,7 +67,7 @@ try
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
-                $current.TimeZone         | Should -Be $configData.AllNodes[0].TimeZone
+                $current.TimeZone | Should -Be $configData.AllNodes[0].TimeZone
                 $current.IsSingleInstance | Should -Be $configData.AllNodes[0].IsSingleInstance
             }
         }

@@ -1,4 +1,4 @@
-configuration DSC_SystemLocale_Config {
+Configuration DSC_SystemLocale_Config {
     Import-DscResource -ModuleName ComputerManagementDsc
 
     node localhost {

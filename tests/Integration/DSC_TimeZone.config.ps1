@@ -1,8 +1,10 @@
-configuration DSC_TimeZone_Config {
+Configuration DSC_TimeZone_Config {
     Import-DscResource -ModuleName ComputerManagementDsc
 
-    node localhost {
-        TimeZone Integration_Test {
+    node localhost
+    {
+        TimeZone Integration_Test
+        {
             TimeZone         = $Node.TimeZone
             IsSingleInstance = $Node.IsSingleInstance
         }

@@ -51,9 +51,9 @@ try
                 }
 
                 It 'Should return the correct values from Get-DscConfiguration' {
-                    $Current = Get-DscConfiguration   | Where-Object -FilterScript {$_.ConfigurationName -eq $CurrentConfig}
-                    $Current.IsSingleInstance   | Should -Be 'Yes'
-                    $Current.Ensure             | Should -Be 'Absent'
+                    $Current = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq $CurrentConfig }
+                    $Current.IsSingleInstance | Should -Be 'Yes'
+                    $Current.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should have set the correct registry values' {
@@ -83,9 +83,9 @@ try
                 }
 
                 It 'Should return the correct values from Get-DscConfiguration' {
-                    $Current = Get-DscConfiguration   | Where-Object -FilterScript {$_.ConfigurationName -eq $CurrentConfig}
-                    $Current.IsSingleInstance   | Should -Be 'Yes'
-                    $Current.Ensure             | Should -Be 'Present'
+                    $Current = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq $CurrentConfig }
+                    $Current.IsSingleInstance | Should -Be 'Yes'
+                    $Current.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should have set the correct registry values' {
@@ -115,9 +115,9 @@ try
                 }
 
                 It 'Should return the correct values from Get-DscConfiguration' {
-                    $Current = Get-DscConfiguration   | Where-Object -FilterScript {$_.ConfigurationName -eq $CurrentConfig}
-                    $Current.IsSingleInstance   | Should -Be 'Yes'
-                    $Current.Ensure             | Should -Be 'Present'
+                    $Current = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq $CurrentConfig }
+                    $Current.IsSingleInstance | Should -Be 'Yes'
+                    $Current.Ensure | Should -Be 'Present'
                     $Current.UserAuthentication | Should -Be 'Secure'
                 }
 
@@ -149,9 +149,9 @@ try
                 }
 
                 It 'Should return the correct values from Get-DscConfiguration' {
-                    $Current = Get-DscConfiguration   | Where-Object -FilterScript {$_.ConfigurationName -eq $CurrentConfig}
-                    $Current.IsSingleInstance   | Should -Be 'Yes'
-                    $Current.Ensure             | Should -Be 'Present'
+                    $Current = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq $CurrentConfig }
+                    $Current.IsSingleInstance | Should -Be 'Yes'
+                    $Current.Ensure | Should -Be 'Present'
                     $Current.UserAuthentication | Should -Be 'NonSecure'
                 }
 

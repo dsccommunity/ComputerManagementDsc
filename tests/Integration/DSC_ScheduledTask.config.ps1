@@ -1,6 +1,7 @@
 Configuration ScheduledTaskOnceCrossTimezone
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnceAdd
@@ -25,6 +26,7 @@ Configuration ScheduledTaskOnceCrossTimezone
 Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneDisabled
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnceSynchronizeAcrossTimeZoneDisabled
@@ -44,6 +46,7 @@ Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneDisabled
 Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled
@@ -63,6 +66,7 @@ Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled
 Configuration ScheduledTaskOnceAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnceAdd
@@ -87,6 +91,7 @@ Configuration ScheduledTaskOnceAdd
 Configuration ScheduledTaskDailyAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskDailyAdd
@@ -109,6 +114,7 @@ Configuration ScheduledTaskDailyAdd
 Configuration ScheduledTaskDailyIndefinitelyAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskDailyAdd
@@ -131,6 +137,7 @@ Configuration ScheduledTaskDailyIndefinitelyAdd
 Configuration ScheduledTaskWeeklyAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskWeeklyAdd
@@ -153,6 +160,7 @@ Configuration ScheduledTaskWeeklyAdd
 Configuration ScheduledTaskLogonAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnceAdd
@@ -170,6 +178,7 @@ Configuration ScheduledTaskLogonAdd
 Configuration ScheduledTaskStartupAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnceAdd
@@ -187,6 +196,7 @@ Configuration ScheduledTaskStartupAdd
 Configuration ScheduledTaskExecuteAsAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         $executeAsCredential = New-Object `
@@ -209,6 +219,7 @@ Configuration ScheduledTaskExecuteAsAdd
 Configuration ScheduledTaskExecuteAsGroupAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         $executeAsCredential = New-Object `
@@ -231,6 +242,7 @@ Configuration ScheduledTaskExecuteAsGroupAdd
 Configuration ScheduledTaskOnEventAdd
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnEventAdd
@@ -250,6 +262,7 @@ Configuration ScheduledTaskOnEventAdd
 Configuration ScheduledTaskOnceMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnceMod
@@ -269,6 +282,7 @@ Configuration ScheduledTaskOnceMod
 Configuration ScheduledTaskDailyMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskDailyMod
@@ -288,6 +302,7 @@ Configuration ScheduledTaskDailyMod
 Configuration ScheduledTaskDailyIndefinitelyMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskDailyMod
@@ -307,6 +322,7 @@ Configuration ScheduledTaskDailyIndefinitelyMod
 Configuration ScheduledTaskWeeklyMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskWeeklyMod
@@ -326,6 +342,7 @@ Configuration ScheduledTaskWeeklyMod
 Configuration ScheduledTaskLogonMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskLogonMod
@@ -343,6 +360,7 @@ Configuration ScheduledTaskLogonMod
 Configuration ScheduledTaskStartupMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskStartupMod
@@ -360,6 +378,7 @@ Configuration ScheduledTaskStartupMod
 Configuration ScheduledTaskExecuteAsMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskExecuteAsMod
@@ -376,6 +395,7 @@ Configuration ScheduledTaskExecuteAsMod
 Configuration ScheduledTaskExecuteAsGroupMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskLogonMod
@@ -392,6 +412,7 @@ Configuration ScheduledTaskExecuteAsGroupMod
 Configuration ScheduledTaskOnEventMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnEventMod
@@ -411,6 +432,7 @@ Configuration ScheduledTaskOnEventMod
 Configuration ScheduledTaskOnceDel
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnceDel
@@ -430,6 +452,7 @@ Configuration ScheduledTaskOnceDel
 Configuration ScheduledTaskDailyDel
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskDailyDel
@@ -450,6 +473,7 @@ Configuration ScheduledTaskDailyDel
 Configuration ScheduledTaskDailyIndefinitelyDel
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskDailyDel
@@ -470,6 +494,7 @@ Configuration ScheduledTaskDailyIndefinitelyDel
 Configuration ScheduledTaskWeeklyDel
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskWeeklyDel
@@ -490,6 +515,7 @@ Configuration ScheduledTaskWeeklyDel
 Configuration ScheduledTaskLogonDel
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskLogonDel
@@ -508,6 +534,7 @@ Configuration ScheduledTaskLogonDel
 Configuration ScheduledTaskStartupDel
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskStartupDel
@@ -526,6 +553,7 @@ Configuration ScheduledTaskStartupDel
 Configuration ScheduledTaskExecuteAsDel
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskLogonDel
@@ -542,6 +570,7 @@ Configuration ScheduledTaskExecuteAsDel
 Configuration ScheduledTaskExecuteAsGroupDel
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskLogonDel
@@ -558,6 +587,7 @@ Configuration ScheduledTaskExecuteAsGroupDel
 Configuration ScheduledTaskOnEventDel
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskOnEventDel
@@ -577,6 +607,7 @@ Configuration ScheduledTaskOnEventDel
 Configuration ScheduledTaskDisableBuiltIn
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskDisableBuiltIn
@@ -591,6 +622,7 @@ Configuration ScheduledTaskDisableBuiltIn
 Configuration ScheduledTaskRemoveBuiltIn
 {
     Import-DscResource -ModuleName ComputerManagementDsc
+
     node 'localhost'
     {
         ScheduledTask ScheduledTaskRemoveBuiltIn

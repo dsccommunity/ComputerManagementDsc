@@ -175,21 +175,21 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration   | Where-Object -FilterScript {$_.ConfigurationName -eq $currentConfig}
-                    $current.TaskName              | Should -Be 'Test task once cross timezone'
-                    $current.TaskPath              | Should -Be '\ComputerManagementDsc\'
-                    $current.ActionExecutable      | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    $current.ScheduleType          | Should -Be 'Once'
-                    $current.RepeatInterval        | Should -Be '00:15:00'
-                    $current.RepetitionDuration    | Should -Be '23:00:00'
-                    $current.ActionWorkingPath     | Should -Be (Get-Location).Path
-                    $current.Enable                | Should -BeTrue
-                    $current.RandomDelay           | Should -Be '01:00:00'
+                    $current = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq $currentConfig }
+                    $current.TaskName | Should -Be 'Test task once cross timezone'
+                    $current.TaskPath | Should -Be '\ComputerManagementDsc\'
+                    $current.ActionExecutable | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    $current.ScheduleType | Should -Be 'Once'
+                    $current.RepeatInterval | Should -Be '00:15:00'
+                    $current.RepetitionDuration | Should -Be '23:00:00'
+                    $current.ActionWorkingPath | Should -Be (Get-Location).Path
+                    $current.Enable | Should -BeTrue
+                    $current.RandomDelay | Should -Be '01:00:00'
                     $current.DisallowHardTerminate | Should -BeTrue
-                    $current.RunOnlyIfIdle         | Should -BeFalse
-                    $current.Priority              | Should -Be 9
-                    $current.RunLevel              | Should -Be 'Limited'
-                    $current.ExecutionTimeLimit    | Should -Be '00:00:00'
+                    $current.RunOnlyIfIdle | Should -BeFalse
+                    $current.Priority | Should -Be 9
+                    $current.RunLevel | Should -Be 'Limited'
+                    $current.ExecutionTimeLimit | Should -Be '00:00:00'
                 }
 
                 AfterAll {
@@ -227,15 +227,15 @@ try
                 $expectedStartTime = '2018-10-01T01:00:00'
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration    | Where-Object -FilterScript {$_.ConfigurationName -eq $currentConfig}
-                    $current.TaskName                  | Should -Be 'Test task sync across time zone disabled'
-                    $current.TaskPath                  | Should -Be '\ComputerManagementDsc\'
-                    $current.ActionExecutable          | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    $current.ScheduleType              | Should -Be 'Once'
-                    $current.StartTime                 | Should -Be (Get-Date -Date $expectedStartTime)
+                    $current = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq $currentConfig }
+                    $current.TaskName | Should -Be 'Test task sync across time zone disabled'
+                    $current.TaskPath | Should -Be '\ComputerManagementDsc\'
+                    $current.ActionExecutable | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    $current.ScheduleType | Should -Be 'Once'
+                    $current.StartTime | Should -Be (Get-Date -Date $expectedStartTime)
                     $current.SynchronizeAcrossTimeZone | Should -BeFalse
-                    $current.ActionWorkingPath         | Should -Be (Get-Location).Path
-                    $current.Enable                    | Should -BeTrue
+                    $current.ActionWorkingPath | Should -Be (Get-Location).Path
+                    $current.Enable | Should -BeTrue
                 }
 
                 It "Should have the trigger startBoundary set to $expectedStartTime" {
@@ -274,15 +274,15 @@ try
                 $expectedStartTime = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration    | Where-Object -FilterScript {$_.ConfigurationName -eq $currentConfig}
-                    $current.TaskName                  | Should -Be 'Test task sync across time zone enabled'
-                    $current.TaskPath                  | Should -Be '\ComputerManagementDsc\'
-                    $current.ActionExecutable          | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    $current.ScheduleType              | Should -Be 'Once'
-                    $current.StartTime                 | Should -Be (Get-Date -Date $expectedStartTime)
+                    $current = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq $currentConfig }
+                    $current.TaskName | Should -Be 'Test task sync across time zone enabled'
+                    $current.TaskPath | Should -Be '\ComputerManagementDsc\'
+                    $current.ActionExecutable | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    $current.ScheduleType | Should -Be 'Once'
+                    $current.StartTime | Should -Be (Get-Date -Date $expectedStartTime)
                     $current.SynchronizeAcrossTimeZone | Should -BeTrue
-                    $current.ActionWorkingPath         | Should -Be (Get-Location).Path
-                    $current.Enable                    | Should -BeTrue
+                    $current.ActionWorkingPath | Should -Be (Get-Location).Path
+                    $current.Enable | Should -BeTrue
                 }
 
                 It "Should have the trigger startBoundary set to $expectedStartTime" {
@@ -326,12 +326,12 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration   | Where-Object -FilterScript {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq $currentConfig
                     }
-                    $current.TaskName              | Should -Be 'Test task builtin'
-                    $current.TaskPath              | Should -Be '\ComputerManagementDsc\'
-                    $current.Enable                | Should -BeFalse
+                    $current.TaskName | Should -Be 'Test task builtin'
+                    $current.TaskPath | Should -Be '\ComputerManagementDsc\'
+                    $current.Enable | Should -BeFalse
                 }
             }
 
@@ -365,12 +365,12 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration   | Where-Object -FilterScript {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq $currentConfig
                     }
-                    $current.TaskName              | Should -Be 'Test task builtin'
-                    $current.TaskPath              | Should -Be '\ComputerManagementDsc\'
-                    $current.Ensure                | Should -Be 'Absent'
+                    $current.TaskName | Should -Be 'Test task builtin'
+                    $current.TaskPath | Should -Be '\ComputerManagementDsc\'
+                    $current.Ensure | Should -Be 'Absent'
                 }
             }
         }

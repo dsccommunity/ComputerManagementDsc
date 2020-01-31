@@ -43,8 +43,8 @@ try
                 $result = Get-TargetResource `
                     @TestOfflineDomainJoin
 
-                $result.IsSingleInstance       | Should -Be $testOfflineDomainJoin.IsSingleInstance
-                $result.RequestFile            | Should -Be ''
+                $result.IsSingleInstance | Should -Be $testOfflineDomainJoin.IsSingleInstance
+                $result.RequestFile | Should -Be ''
             }
         }
 

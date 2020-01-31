@@ -1,10 +1,11 @@
 Configuration setToAuto
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node "localhost" {
+    node 'localhost'
+    {
         VirtualMemory vMem
         {
-            Type = 'AutoManagePagingFile'
+            Type  = 'AutoManagePagingFile'
             Drive = 'C'
         }
     }
@@ -13,11 +14,13 @@ Configuration setToAuto
 Configuration setToCustom
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node "localhost" {
+
+    node 'localhost'
+    {
         VirtualMemory vMem
         {
-            Type = 'CustomSize'
-            Drive = 'C'
+            Type        = 'CustomSize'
+            Drive       = 'C'
             InitialSize = 128
             MaximumSize = 1024
         }
@@ -27,10 +30,12 @@ Configuration setToCustom
 Configuration setToSystemManaged
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node "localhost" {
+
+    node 'localhost'
+    {
         VirtualMemory vMem
         {
-            Type = 'SystemManagedSize'
+            Type  = 'SystemManagedSize'
             Drive = 'C'
         }
     }
@@ -39,10 +44,12 @@ Configuration setToSystemManaged
 Configuration setToNone
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node "localhost" {
+
+    node 'localhost'
+    {
         VirtualMemory vMem
         {
-            Type = 'NoPagingFile'
+            Type  = 'NoPagingFile'
             Drive = 'C'
         }
     }

@@ -53,7 +53,7 @@ try
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
-                $current.ExecutionPolicy      | Should -Be 'RemoteSigned'
+                $current.ExecutionPolicy | Should -Be 'RemoteSigned'
                 $current.ExecutionPolicyScope | Should -Be 'LocalMachine'
             }
         }

@@ -3,10 +3,12 @@ $script:projectPath = "$PSScriptRoot\..\.." | Convert-Path
 $script:projectName = (Get-ChildItem -Path "$script:projectPath\*\*.psd1" | Where-Object -FilterScript {
         ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
         $(try
-            { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop
+            {
+                Test-ModuleManifest -Path $_.FullName -ErrorAction Stop
             }
             catch
-            { $false
+            {
+                $false
             })
     }).BaseName
 
@@ -1074,8 +1076,8 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-Command `
                 -ParameterFilter {
-                    $Name -eq 'Get-TimeZone'
-                }
+                $Name -eq 'Get-TimeZone'
+            }
 
             Mock -CommandName Get-CimInstance -MockWith {
                 @{
@@ -1091,8 +1093,8 @@ InModuleScope $script:subModuleName {
                 Assert-MockCalled `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Get-TimeZone'
-                    } -Exactly -Times 1
+                    $Name -eq 'Get-TimeZone'
+                } -Exactly -Times 1
 
                 Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
             }
@@ -1102,8 +1104,8 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-Command `
                 -ParameterFilter {
-                    $Name -eq 'Get-TimeZone'
-                }
+                $Name -eq 'Get-TimeZone'
+            }
 
             Mock -CommandName Get-CimInstance -MockWith {
                 @{
@@ -1119,8 +1121,8 @@ InModuleScope $script:subModuleName {
                 Assert-MockCalled `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Get-TimeZone'
-                    } -Exactly -Times 1
+                    $Name -eq 'Get-TimeZone'
+                } -Exactly -Times 1
 
                 Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
             }
@@ -1134,18 +1136,18 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-Command `
                 -ParameterFilter {
-                    $Name -eq 'Get-TimeZone'
-                } -MockWith {
-                    'Get-TimeZone'
-                }
+                $Name -eq 'Get-TimeZone'
+            } -MockWith {
+                'Get-TimeZone'
+            }
 
             Mock `
                 -CommandName Get-TimeZone `
                 -MockWith {
-                    @{
-                        StandardName = 'Pacific Standard Time'
-                    }
+                @{
+                    StandardName = 'Pacific Standard Time'
                 }
+            }
 
             It 'Returns "Pacific Standard Time"' {
                 Get-TimeZoneId | Should -Be 'Pacific Standard Time'
@@ -1155,8 +1157,8 @@ InModuleScope $script:subModuleName {
                 Assert-MockCalled `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Get-TimeZone'
-                    } -Exactly -Times 1
+                    $Name -eq 'Get-TimeZone'
+                } -Exactly -Times 1
 
                 Assert-MockCalled -CommandName Get-TimeZone -Exactly -Times 1
             }
@@ -1186,14 +1188,14 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-Command `
                 -ParameterFilter {
-                    $Name -eq 'Add-Type'
-                }
+                $Name -eq 'Add-Type'
+            }
 
             Mock `
                 -CommandName Get-Command `
                 -ParameterFilter {
-                    $Name -eq 'Set-TimeZone'
-                }
+                $Name -eq 'Set-TimeZone'
+            }
 
             Mock -CommandName 'TzUtil.exe' -MockWith {
                 $global:LASTEXITCODE = 0
@@ -1210,14 +1212,14 @@ InModuleScope $script:subModuleName {
                 Assert-MockCalled `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Add-Type'
-                    } -Exactly -Times 1
+                    $Name -eq 'Add-Type'
+                } -Exactly -Times 1
 
                 Assert-MockCalled `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Set-TimeZone'
-                    } -Exactly -Times 1
+                    $Name -eq 'Set-TimeZone'
+                } -Exactly -Times 1
 
                 Assert-MockCalled -CommandName TzUtil.exe -Exactly -Times 1
                 Assert-MockCalled -CommandName Add-Type -Exactly -Times 0
@@ -1228,16 +1230,16 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-Command `
                 -ParameterFilter {
-                    $Name -eq 'Add-Type'
-                } -MockWith {
-                    'Add-Type'
-                }
+                $Name -eq 'Add-Type'
+            } -MockWith {
+                'Add-Type'
+            }
 
             Mock `
                 -CommandName Get-Command `
                 -ParameterFilter {
-                    $Name -eq 'Set-TimeZone'
-                }
+                $Name -eq 'Set-TimeZone'
+            }
 
             Mock -CommandName 'TzUtil.exe' -MockWith {
                 $global:LASTEXITCODE = 0
@@ -1255,14 +1257,14 @@ InModuleScope $script:subModuleName {
                 Assert-MockCalled `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Add-Type'
-                    } -Exactly -Times 1
+                    $Name -eq 'Add-Type'
+                } -Exactly -Times 1
 
                 Assert-MockCalled `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Set-TimeZone'
-                    } -Exactly -Times 1
+                    $Name -eq 'Set-TimeZone'
+                } -Exactly -Times 1
 
                 Assert-MockCalled -CommandName TzUtil.exe -Exactly -Times 0
                 Assert-MockCalled -CommandName Add-Type -Exactly -Times 0
@@ -1283,16 +1285,16 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-Command `
                 -ParameterFilter {
-                    $Name -eq 'Add-Type'
-                }
+                $Name -eq 'Add-Type'
+            }
 
             Mock `
                 -CommandName Get-Command `
                 -ParameterFilter {
-                    $Name -eq 'Set-TimeZone'
-                } -MockWith {
-                    'Set-TimeZone'
-                }
+                $Name -eq 'Set-TimeZone'
+            } -MockWith {
+                'Set-TimeZone'
+            }
 
             Mock -CommandName Set-TimeZone
 
@@ -1304,14 +1306,14 @@ InModuleScope $script:subModuleName {
                 Assert-MockCalled `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Add-Type'
-                    } -Exactly -Times 0
+                    $Name -eq 'Add-Type'
+                } -Exactly -Times 0
 
                 Assert-MockCalled `
                     -CommandName Get-Command `
                     -ParameterFilter {
-                        $Name -eq 'Set-TimeZone'
-                    } -Exactly -Times 1
+                    $Name -eq 'Set-TimeZone'
+                } -Exactly -Times 1
 
                 Assert-MockCalled -CommandName Set-TimeZone -Exactly -Times 1
             }
@@ -1330,16 +1332,16 @@ InModuleScope $script:subModuleName {
         }
 
         $mockPowerSaverPowerPlan = @{
-                'FriendlyName' = 'Power saver'
-                'Guid'         = [System.Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
+            'FriendlyName' = 'Power saver'
+            'Guid'         = [System.Guid]'a1841308-3541-4fab-bc81-f71556f20b4a'
         }
 
         Context 'Only one power plan is available and "PowerPlan" parameter is not specified' {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return $mockBalancedPowerPlan
-                }
+                return $mockBalancedPowerPlan
+            }
 
             It 'Should not throw an exception' {
                 { Get-PowerPlan } | Should -Not -Throw
@@ -1363,8 +1365,8 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return $mockBalancedPowerPlan
-                }
+                return $mockBalancedPowerPlan
+            }
 
             It 'Should not throw an exception' {
                 { Get-PowerPlan -PowerPlan '381b4222-f694-41f0-9685-ff5bb260df2e' } | Should -Not -Throw
@@ -1389,8 +1391,8 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return $mockBalancedPowerPlan
-                }
+                return $mockBalancedPowerPlan
+            }
 
             It 'Should not throw an exception' {
                 { Get-PowerPlan -PowerPlan '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c' } | Should -Not -Throw
@@ -1412,8 +1414,8 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return $mockBalancedPowerPlan
-                }
+                return $mockBalancedPowerPlan
+            }
 
             It 'Should not throw an exception' {
                 { Get-PowerPlan -PowerPlan 'Balanced' } | Should -Not -Throw
@@ -1438,8 +1440,8 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return $mockBalancedPowerPlan
-                }
+                return $mockBalancedPowerPlan
+            }
 
             It 'Should not throw an exception' {
                 { Get-PowerPlan -PowerPlan 'High performance' } | Should -Not -Throw
@@ -1461,12 +1463,12 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return @(
-                        $mockBalancedPowerPlan
-                        $mockHighPerformancePowerPlan
-                        $mockPowerSaverPowerPlan
-                    )
-                }
+                return @(
+                    $mockBalancedPowerPlan
+                    $mockHighPerformancePowerPlan
+                    $mockPowerSaverPowerPlan
+                )
+            }
 
             It 'Should not throw an exception' {
                 { Get-PowerPlan } | Should -Not -Throw
@@ -1488,15 +1490,15 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return @(
-                        $mockBalancedPowerPlan
-                        $mockHighPerformancePowerPlan
-                        $mockPowerSaverPowerPlan
-                    )
-                }
+                return @(
+                    $mockBalancedPowerPlan
+                    $mockHighPerformancePowerPlan
+                    $mockPowerSaverPowerPlan
+                )
+            }
 
             It 'Should not throw an exception' {
-                { Get-PowerPlan -PowerPlan '381b4222-f694-41f0-9685-ff5bb260df2e'} | Should -Not -Throw
+                { Get-PowerPlan -PowerPlan '381b4222-f694-41f0-9685-ff5bb260df2e' } | Should -Not -Throw
             }
 
             It 'Should call expected mocks' {
@@ -1518,15 +1520,15 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return @(
-                        $mockBalancedPowerPlan
-                        $mockHighPerformancePowerPlan
-                        $mockPowerSaverPowerPlan
-                    )
-                }
+                return @(
+                    $mockBalancedPowerPlan
+                    $mockHighPerformancePowerPlan
+                    $mockPowerSaverPowerPlan
+                )
+            }
 
             It 'Should not throw an exception' {
-                { Get-PowerPlan -PowerPlan '9c5e7fda-e8bf-4a96-9a85-a7e23a8c635c'} | Should -Not -Throw
+                { Get-PowerPlan -PowerPlan '9c5e7fda-e8bf-4a96-9a85-a7e23a8c635c' } | Should -Not -Throw
             }
 
             It 'Should call expected mocks' {
@@ -1545,15 +1547,15 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return @(
-                        $mockBalancedPowerPlan
-                        $mockHighPerformancePowerPlan
-                        $mockPowerSaverPowerPlan
-                    )
-                }
+                return @(
+                    $mockBalancedPowerPlan
+                    $mockHighPerformancePowerPlan
+                    $mockPowerSaverPowerPlan
+                )
+            }
 
             It 'Should not throw an exception' {
-                { Get-PowerPlan -PowerPlan 'High performance'} | Should -Not -Throw
+                { Get-PowerPlan -PowerPlan 'High performance' } | Should -Not -Throw
             }
 
             It 'Should call expected mocks' {
@@ -1575,15 +1577,15 @@ InModuleScope $script:subModuleName {
             Mock `
                 -CommandName Get-PowerPlanUsingPInvoke `
                 -MockWith {
-                    return @(
-                        $mockBalancedPowerPlan
-                        $mockHighPerformancePowerPlan
-                        $mockPowerSaverPowerPlan
-                    )
-                }
+                return @(
+                    $mockBalancedPowerPlan
+                    $mockHighPerformancePowerPlan
+                    $mockPowerSaverPowerPlan
+                )
+            }
 
             It 'Should not throw an exception' {
-                { Get-PowerPlan -PowerPlan 'Some unavailable plan'} | Should -Not -Throw
+                { Get-PowerPlan -PowerPlan 'Some unavailable plan' } | Should -Not -Throw
             }
 
             It 'Should call expected mocks' {

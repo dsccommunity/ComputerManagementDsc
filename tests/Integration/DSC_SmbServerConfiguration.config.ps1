@@ -1,5 +1,5 @@
 # Integration Test Config Template Version: 1.0.0
-configuration DSC_SmbServerConfiguration_config
+Configuration DSC_SmbServerConfiguration_config
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 

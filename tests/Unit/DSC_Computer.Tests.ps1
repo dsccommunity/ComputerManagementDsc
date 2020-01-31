@@ -742,10 +742,10 @@ try
                     }
 
                     { Set-TargetResource `
-                        -Name $notComputerName `
-                        -DomainName 'Contoso.com' `
-                        -JoinOU 'OU=Computers,DC=contoso,DC=com' `
-                        -Credential $credential
+                            -Name $notComputerName `
+                            -DomainName 'Contoso.com' `
+                            -JoinOU 'OU=Computers,DC=contoso,DC=com' `
+                            -Credential $credential
                     } | Should -Throw $error
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
@@ -785,7 +785,7 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
-                    }
+                }
 
                 It 'Changes ComputerName and changes Workgroup to new Workgroup' {
                     Mock -CommandName Get-WMIObject -MockWith {

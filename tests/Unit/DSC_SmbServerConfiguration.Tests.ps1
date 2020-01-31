@@ -342,7 +342,7 @@ try
                     $SmbServerConfiguration.ValidateAliasNotCircular | Should -Not -BeNullOrEmpty
                     $SmbServerConfiguration.ValidateShareScope | Should -Not -BeNullOrEmpty
                     $SmbServerConfiguration.ValidateShareScopeNotAliased | Should -Not -BeNullOrEmpty
-                    $SmbServerConfiguration.ValidateTargetName| Should -Not -BeNullOrEmpty
+                    $SmbServerConfiguration.ValidateTargetName | Should -Not -BeNullOrEmpty
                 }
             }
         }

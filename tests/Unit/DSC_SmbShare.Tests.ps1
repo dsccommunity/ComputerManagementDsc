@@ -343,8 +343,8 @@ try
                 Context 'When the share exists, but on the wrong path and recreate is allowed' {
                     Mock -CommandName Get-TargetResource -MockWith {
                         return @{
-                            Name = $mockSmbShare.Name
-                            Path = $mockSmbShare.Path
+                            Name   = $mockSmbShare.Name
+                            Path   = $mockSmbShare.Path
                             Ensure = 'Present'
                         }
                     }
@@ -365,8 +365,8 @@ try
                 Context 'When the share exists, but on the wrong path and recreate is not allowed' {
                     Mock -CommandName Get-TargetResource -MockWith {
                         return @{
-                            Name = $mockSmbShare.Name
-                            Path = $mockSmbShare.Path
+                            Name   = $mockSmbShare.Name
+                            Path   = $mockSmbShare.Path
                             Ensure = 'Present'
                         }
                     }
@@ -388,18 +388,18 @@ try
                 Context 'When the share exists, but on the wrong scope and recreate is allowed' {
                     Mock -CommandName Get-TargetResource -MockWith {
                         return @{
-                            Name = $mockSmbShare.Name
-                            Path = $mockSmbShare.Path
+                            Name      = $mockSmbShare.Name
+                            Path      = $mockSmbShare.Path
                             ScopeName = $mockSmbShare.ScopeName
-                            Ensure = 'Present'
+                            Ensure    = 'Present'
                         }
                     }
 
                     $setTargetResourceParameters = @{
-                        Name  = $mockSmbShare.Name
-                        Path  = $mockSmbShare.Path
+                        Name      = $mockSmbShare.Name
+                        Path      = $mockSmbShare.Path
                         ScopeName = 'clustergroup1'
-                        Force = $true
+                        Force     = $true
                     }
 
                     It 'Should drop and recreate the share' {
@@ -412,18 +412,18 @@ try
                 Context 'When the share exists, but on the wrong scope and recreate is not allowed' {
                     Mock -CommandName Get-TargetResource -MockWith {
                         return @{
-                            Name = $mockSmbShare.Name
-                            Path = $mockSmbShare.Path
+                            Name      = $mockSmbShare.Name
+                            Path      = $mockSmbShare.Path
                             ScopeName = $mockSmbShare.ScopeName
-                            Ensure = 'Present'
+                            Ensure    = 'Present'
                         }
                     }
 
                     $setTargetResourceParameters = @{
-                        Name  = $mockSmbShare.Name
-                        Path  = $mockSmbShare.Path
+                        Name      = $mockSmbShare.Name
+                        Path      = $mockSmbShare.Path
                         ScopeName = 'clustergroup1'
-                        Force = $false
+                        Force     = $false
                     }
 
                     It 'Should display a warning with the message the share cannot be updated' {
@@ -441,14 +441,14 @@ try
                 Context 'When no member are provided in any of the access permission collections' {
                     BeforeAll {
                         $testTargetResourceParameters = @{
-                            Name                  = $mockShareName
-                            Path                  = 'TestDrive:\Temp'
-                            FullAccess            = @()
-                            ChangeAccess          = @()
-                            ReadAccess            = @()
-                            NoAccess              = @()
-                            Ensure                = 'Present'
-                            Verbose               = $true
+                            Name         = $mockShareName
+                            Path         = 'TestDrive:\Temp'
+                            FullAccess   = @()
+                            ChangeAccess = @()
+                            ReadAccess   = @()
+                            NoAccess     = @()
+                            Ensure       = 'Present'
+                            Verbose      = $true
                         }
                     }
 

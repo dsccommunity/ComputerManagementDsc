@@ -82,7 +82,7 @@ function Test-IsNanoServer
         $computerInfo = Get-ComputerInfo
 
         if ('Server' -eq $computerInfo.OsProductType `
-            -and 'NanoServer' -eq $computerInfo.OsServerLevel)
+                -and 'NanoServer' -eq $computerInfo.OsServerLevel)
         {
             return $true
         }
@@ -120,7 +120,7 @@ function New-InvalidArgumentException
     $argumentException = New-Object -TypeName 'ArgumentException' -ArgumentList @( $Message,
         $ArgumentName )
     $newObjectParams = @{
-        TypeName = 'System.Management.Automation.ErrorRecord'
+        TypeName     = 'System.Management.Automation.ErrorRecord'
         ArgumentList = @( $argumentException, $ArgumentName, 'InvalidArgument', $null )
     }
     $errorRecord = New-Object @newObjectParams
@@ -157,17 +157,17 @@ function New-InvalidOperationException
     if ($null -eq $ErrorRecord)
     {
         $invalidOperationException =
-            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message )
+        New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message )
     }
     else
     {
         $invalidOperationException =
-            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message,
-                $ErrorRecord.Exception )
+        New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message,
+            $ErrorRecord.Exception )
     }
 
     $newObjectParams = @{
-        TypeName = 'System.Management.Automation.ErrorRecord'
+        TypeName     = 'System.Management.Automation.ErrorRecord'
         ArgumentList = @( $invalidOperationException.ToString(), 'MachineStateIncorrect',
             'InvalidOperation', $null )
     }
@@ -719,7 +719,7 @@ function Get-TimeZoneId
     Write-Verbose -Message ($script:localizedData.CurrentTimeZoneMessage -f $timeZone)
 
     $timeZoneInfo = [System.TimeZoneInfo]::GetSystemTimeZones() |
-        Where-Object -Property StandardName -EQ $timeZone
+    Where-Object -Property StandardName -EQ $timeZone
 
     return $timeZoneInfo.Id
 } # function Get-TimeZoneId
@@ -1215,7 +1215,7 @@ function Set-ActivePowerPlan
     try
     {
         # Set the active power scheme with the native function
-        $returnCode = $powrprof::PowerSetActiveScheme([System.IntPtr]::Zero,$PowerPlanGuid)
+        $returnCode = $powrprof::PowerSetActiveScheme([System.IntPtr]::Zero, $PowerPlanGuid)
 
         # Check for non 0 return codes / errors form the native function
         if ($returnCode -ne 0)

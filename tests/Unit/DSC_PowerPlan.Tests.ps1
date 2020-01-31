@@ -52,18 +52,18 @@ try
                     Mock `
                         -CommandName Get-PowerPlan `
                         -MockWith {
-                            return @{
-                                FriendlyName = 'High performance'
-                                Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                            }
-                        } `
+                        return @{
+                            FriendlyName = 'High performance'
+                            Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                        }
+                    } `
                         -Verifiable
 
                     Mock `
                         -CommandName Get-ActivePowerPlan `
                         -MockWith {
-                            return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                        } `
+                        return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                    } `
                         -Verifiable
                 }
 
@@ -86,18 +86,18 @@ try
                     Mock `
                         -CommandName Get-PowerPlan `
                         -MockWith {
-                            return @{
-                                FriendlyName = 'High performance'
-                                Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                            }
-                        } `
+                        return @{
+                            FriendlyName = 'High performance'
+                            Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                        }
+                    } `
                         -Verifiable
 
                     Mock `
                         -CommandName Get-ActivePowerPlan `
                         -MockWith {
-                            return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
-                        } `
+                        return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                    } `
                         -Verifiable
                 }
 
@@ -146,11 +146,11 @@ try
                 Mock `
                     -CommandName Get-PowerPlan `
                     -MockWith {
-                        return @{
-                                FriendlyName = 'High performance'
-                                Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                            }
-                    } `
+                    return @{
+                        FriendlyName = 'High performance'
+                        Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                    }
+                } `
                     -Verifiable
 
                 Mock `
@@ -185,15 +185,15 @@ try
                         -Exactly `
                         -Times 1 `
                         -Scope It `
-                        -ParameterFilter {$PowerPlanGuid -eq '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'}
+                        -ParameterFilter { $PowerPlanGuid -eq '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c' }
                 }
             }
 
             Context 'When the preferred plan does not exist' {
                 BeforeEach {
                     Mock `
-                    -CommandName Get-PowerPlan `
-                    -Verifiable
+                        -CommandName Get-PowerPlan `
+                        -Verifiable
                 }
 
                 It 'Should throw the expected error (power plan specified as <Type>)' -TestCases $testCases {
@@ -219,18 +219,18 @@ try
                     Mock `
                         -CommandName Get-PowerPlan `
                         -MockWith {
-                            return @{
-                                    FriendlyName = 'High performance'
-                                    Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                                }
-                        } `
+                        return @{
+                            FriendlyName = 'High performance'
+                            Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                        }
+                    } `
                         -Verifiable
 
                     Mock `
                         -CommandName Get-ActivePowerPlan `
                         -MockWith {
-                            return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                        } `
+                        return [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                    } `
                         -Verifiable
                 }
 
@@ -251,18 +251,18 @@ try
                     Mock `
                         -CommandName Get-PowerPlan `
                         -MockWith {
-                            return @{
-                                    FriendlyName = 'High performance'
-                                    Guid = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
-                                }
-                        } `
+                        return @{
+                            FriendlyName = 'High performance'
+                            Guid         = [System.Guid]'8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+                        }
+                    } `
                         -Verifiable
 
                     Mock `
                         -CommandName Get-ActivePowerPlan `
                         -MockWith {
-                            return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
-                        } `
+                        return [System.Guid]'381b4222-f694-41f0-9685-ff5bb260df2e'
+                    } `
                         -Verifiable
                 }
 

@@ -1,9 +1,10 @@
 # Integration Test Config Template Version: 1.0.0
-configuration DSC_PendingReboot_config
+Configuration DSC_PendingReboot_config
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
-    node $AllNodes.NodeName {
+    node $AllNodes.NodeName
+    {
         PendingReboot TestReboot
         {
             Name                        = $Node.RebootName
