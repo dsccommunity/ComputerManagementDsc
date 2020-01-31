@@ -1,0 +1,34 @@
+TOPIC
+    about_ComputerManagementDsc
+
+SHORT DESCRIPTION
+    DSC resources for configuration of a Windows computer. These DSC resources
+    allow you to perform computer management tasks, such as renaming the computer,
+    joining a domain and scheduling tasks as well as configuring items such as
+    virtual memory, event logs, time zones and power settings.
+
+LONG DESCRIPTION
+    This module contains DSC resources for configuration of a Windows computer.
+    These DSC resources allow you to perform computer management tasks, such as
+    renaming the computer, joining a domain and scheduling tasks as well as
+    configuring items such as virtual memory, event logs, time zones and power
+    settings.
+
+EXAMPLES
+    PS C:\> Get-DscResource -Module ComputerManagementDsc
+
+NOTE:
+    Thank you to the DSC Community contributors who contributed to this module by
+    writing code, sharing opinions, and provided feedback.
+
+TROUBLESHOOTING NOTE:
+    Go to the Github repository for read about issues, submit a new issue, and read
+    about new releases. https://github.com/dsccommunity/ComputerManagementDsc
+
+SEE ALSO
+  - https://github.com/dsccommunity/ComputerManagementDsc
+
+KEYWORDS
+    DSC, DscResource, Computer, OfflineDomainJoin, PendingReboot, PowerPlan,
+    PowerShellExecutionPolicy, RemoteDesktopAdmin, ScheduledTask, SmbServerConfiguration
+    SmbShare, SystemLocale, TimeZone, VirtualMemory, WindowsEventLog, WindowsCapability

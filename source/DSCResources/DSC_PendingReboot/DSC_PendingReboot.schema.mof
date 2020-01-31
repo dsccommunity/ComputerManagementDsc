@@ -1,0 +1,16 @@
+[ClassVersion("1.0.0.0"), FriendlyName("PendingReboot")]
+class DSC_PendingReboot : OMI_BaseResource
+{
+  [Key, Description("Specifies the name of this pending reboot check.")] String Name;
+  [Write, Description("Specifies whether to skip reboots triggered by the Component-Based Servicing component.")] Boolean SkipComponentBasedServicing;
+  [Read, Description("A value indicating whether the Component-Based Servicing component requested a reboot.")] Boolean ComponentBasedServicing;
+  [Write, Description("Specifies whether to skip reboots triggered by Windows Update.")] Boolean SkipWindowsUpdate;
+  [Read, Description("A value indicating whether Windows Update requested a reboot.")] Boolean WindowsUpdate;
+  [Write, Description("Specifies whether to skip pending file rename reboots.")] Boolean SkipPendingFileRename;
+  [Read, Description("A value indicating whether a pending file rename triggered a reboot.")] Boolean PendingFileRename;
+  [Write, Description("Specifies whether to skip reboots triggered by a pending computer rename.")] Boolean SkipPendingComputerRename;
+  [Read, Description("A value indicating whether a pending computer rename triggered a reboot.")] Boolean PendingComputerRename;
+  [Write, Description("Specifies whether to skip reboots triggered by the ConfigMgr client. Defaults to True.")] Boolean SkipCcmClientSDK;
+  [Read, Description("A value indicating whether the ConfigMgr client triggered a reboot.")] Boolean CcmClientSDK;
+  [Read, Description("A value indicating whether the node requires a reboot.")] Boolean RebootRequired;
+};

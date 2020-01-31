@@ -1,0 +1,27 @@
+
+[ClassVersion("1.0.0.0"), FriendlyName("SmbShare")]
+class DSC_SmbShare : OMI_BaseResource
+{
+    [Key, Description("Specifies the name of the SMB share.")] String Name;
+    [Required, Description("Specifies the path of the SMB share.")] String Path;
+    [Write, Description("Specifies the description of the SMB share.")] String Description;
+    [Write, Description("Specifies which accounts will be granted modify permission to access the SMB share.")] String ChangeAccess[];
+    [Write, Description("Specifies the maximum number of concurrently connected users that the new SMB share may accommodate. If this parameter is set to zero (0), then the number of users is unlimited. The default value is zero (0).")] Uint32 ConcurrentUserLimit;
+    [Write, Description("Indicates that the SMB share is encrypted.")] Boolean EncryptData;
+    [Write, Description("Specifies which files and folders in the new SMB share are visible to users."), ValueMap{"AccessBased","Unrestricted"}, Values{"AccessBased","Unrestricted"}] String FolderEnumerationMode;
+    [Write, Description("Specifies the caching mode of the offline files for the SMB share."), ValueMap{"None","Manual","Programs","Documents","BranchCache"}, Values{"None","Manual","Programs","Documents","BranchCache"}] String CachingMode;
+    [Write, Description("Specifies whether the SMB share should be continuously available.")] Boolean ContinuouslyAvailable;
+    [Write, Description("Specifies which accounts are granted full permission to access the SMB share.")] String FullAccess[];
+    [Write, Description("Specifies which accounts are denied access to the SMB share.")] String NoAccess[];
+    [Write, Description("Specifies which accounts is granted read permission to access the SMB share.")] String ReadAccess[];
+    [Write, Description("Specifies if the SMB share should be added or removed."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Write, Description("Specifies if the SMB share is allowed to be dropped and recreated (required when the path changes).")] Boolean Force;
+    [Write, Description("Specifies the scope in which the share should be created.")] String ScopeName;
+    [Read, Description("Specifies the state of the SMB share.")] String ShareState;
+    [Read, Description("Specifies the type of the SMB share.")] String ShareType;
+    [Read, Description("Specifies if this SMB share is a ShadowCopy.")] Boolean ShadowCopy;
+    [Read, Description("Specifies if this SMB share is a special share. E.g. an admin share, default shares, or IPC$ share.")] Boolean Special;
+};
+
+
+

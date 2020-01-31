@@ -1,0 +1,8 @@
+
+[ClassVersion("1.0.0.0"), FriendlyName("RemoteDesktopAdmin")]
+class DSC_RemoteDesktopAdmin : OMI_BaseResource
+{
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'"), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Write, Description("Determines whether or not the computer should accept remote desktop connections.  Present sets the value to Enabled and Absent sets the value to Disabled."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Write, Description("Setting this value to Secure configures the machine to require Network Level Authentication (NLA) for remote desktop connections."), ValueMap{"Secure","NonSecure"}, Values{"Secure","NonSecure"}] String UserAuthentication;
+};

@@ -1,0 +1,6 @@
+[ClassVersion("1.0.0.0"), FriendlyName("PowerShellExecutionPolicy")]
+class DSC_PowerShellExecutionPolicy : OMI_BaseResource
+{
+    [Key, Description("Defines the scope for the preference of the Windows PowerShell execution policy."), ValueMap{"CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy"},Values{"CurrentUser","LocalMachine","MachinePolicy","Process","UserPolicy"}] String ExecutionPolicyScope;
+    [Required, Description("Changes the preference for the Windows PowerShell execution policy."), ValueMap{"Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted"}, Values{"Bypass","Restricted","AllSigned","RemoteSigned","Unrestricted"}] String ExecutionPolicy;
+};

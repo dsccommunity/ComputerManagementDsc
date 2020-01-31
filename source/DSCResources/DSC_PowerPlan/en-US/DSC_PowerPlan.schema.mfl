@@ -1,0 +1,6 @@
+[Description("This resource is used to activate a power plan.") : Amended,AMENDMENT, LOCALE("MS_409")]
+class DSC_PowerPlan : OMI_BaseResource
+{
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'.") : Amended] String IsSingleInstance;
+    [Description("The name or GUID of the power plan to activate.") : Amended] String Name;
+};
