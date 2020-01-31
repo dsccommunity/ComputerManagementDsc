@@ -1,8 +1,8 @@
 # ComputerManagementDsc
 
-[![Build Status](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_apis/build/status/dsccommunity.ComputerManagementDsc?branchName=master)](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_build/latest?definitionId=16&branchName=master)
-![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/ComputerManagementDsc/16/master)
-[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/ComputerManagementDsc/16/master)](https://dsccommunity.visualstudio.com/ComputerManagementDsc/_test/analytics?definitionId=16&contextType=build)
+[![Build Status](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_apis/build/status/dsccommunity.ComputerManagementDsc?branchName=master)](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_build/latest?definitionId=18&branchName=master)
+![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/ComputerManagementDsc/18/master)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/ComputerManagementDsc/18/master)](https://dsccommunity.visualstudio.com/ComputerManagementDsc/_test/analytics?definitionId=18&contextType=build)
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/ComputerManagementDsc?label=ComputerManagementDsc%20Preview)](https://www.powershellgallery.com/packages/ComputerManagementDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/ComputerManagementDsc?label=ComputerManagementDsc)](https://www.powershellgallery.com/packages/ComputerManagementDsc/)
 
