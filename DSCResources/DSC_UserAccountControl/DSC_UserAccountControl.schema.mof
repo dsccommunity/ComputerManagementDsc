@@ -2,7 +2,7 @@
 class DSC_UserAccountControl : OMI_BaseResource
 {
     [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'."), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
-    [Write, Description("Specifies the desired User Account Control setting."), ValueMap{"AlwaysNotify", "NotifyChanges", "NotifyChangesWithoutDimming", "NeverNotify", "NeverNotifyAndDisableAll"}, Values{"AlwaysNotify", "NotifyChanges", "NotifyChangesWithoutDimming", "NeverNotify", "NeverNotifyAndDisableAll"}] String NotificationLevel;
+    [Write, Description("Specifies the desired User Account Control setting."), ValueMap{"AlwaysNotify", "AlwaysNotifyAndAskForCredentials", "AlwaysNotifyAndAskForCredentials", "NotifyChanges", "NotifyChangesWithoutDimming", "NeverNotify", "NeverNotifyAndDisableAll"}, Values{"AlwaysNotify", "NotifyChanges", "NotifyChangesWithoutDimming", "NeverNotify", "NeverNotifyAndDisableAll"}] String NotificationLevel;
     [Write, Description("Specifies the mode for the built-in administrator account (RID 500)."), ValueMap{"0", "1"}, Values{"0", "1"}] UInt16 FilterAdministratorToken;
     [Write, Description("Specifies the prompt behavior for the Consent Administrator."), ValueMap{"0", "1", "2", "3", "4", "5"}, Values{"0", "1", "2", "3", "4", "5"}] UInt16 ConsentPromptBehaviorAdmin;
     [Write, Description("Specifies how the operations that requires elevation is handled for users."), ValueMap{"0", "1"}, Values{"0", "1"}] UInt16 ConsentPromptBehaviorUser;
