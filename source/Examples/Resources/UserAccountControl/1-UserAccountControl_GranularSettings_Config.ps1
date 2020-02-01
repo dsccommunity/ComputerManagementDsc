@@ -28,7 +28,7 @@ Configuration UserAccountControl_GranularSettings_Config
 
     Node localhost
     {
-        UserAccountControl 'GranularSettings'
+        UserAccountControl 'SetGranularSettings'
         {
             IsSingleInstance  = 'Yes'
             FilterAdministratorToken = 0
