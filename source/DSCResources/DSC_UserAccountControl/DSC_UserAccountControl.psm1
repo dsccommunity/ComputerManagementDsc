@@ -111,7 +111,7 @@ function Set-TargetResource
         $ConsentPromptBehaviorAdmin,
 
         [Parameter()]
-        [ValidateSet(0, 1)]
+        [ValidateSet(0, 1, 3)]
         [System.UInt16]
         $ConsentPromptBehaviorUser,
 
@@ -255,7 +255,7 @@ function Test-TargetResource
         $ConsentPromptBehaviorAdmin,
 
         [Parameter()]
-        [ValidateSet(0, 1)]
+        [ValidateSet(0, 1, 3)]
         [System.UInt16]
         $ConsentPromptBehaviorUser,
 
