@@ -1601,7 +1601,7 @@ InModuleScope $script:subModuleName {
         }
     }
 
-    Describe 'DscResource.LocalizationHelper\Get-LocalizedData' {
+    Describe 'ComputerManagementDsc.Common\Get-LocalizedData' {
         $mockTestPath = {
             return $mockTestPathReturnValue
         }
@@ -1695,7 +1695,7 @@ InModuleScope $script:subModuleName {
         Assert-VerifiableMock
     }
 
-    Describe 'DscResource.LocalizationHelper\New-InvalidOperationException' {
+    Describe 'ComputerManagementDsc.Common\New-InvalidOperationException' {
         Context 'When calling with Message parameter only' {
             It 'Should throw the correct error' {
                 $mockErrorMessage = 'Mocked error'
@@ -1719,7 +1719,7 @@ InModuleScope $script:subModuleName {
         Assert-VerifiableMock
     }
 
-    Describe 'DscResource.LocalizationHelper\New-InvalidArgumentException' {
+    Describe 'ComputerManagementDsc.Common\New-InvalidArgumentException' {
         Context 'When calling with both the Message and ArgumentName parameter' {
             It 'Should throw the correct error' {
                 $mockErrorMessage = 'Mocked error'
@@ -1732,7 +1732,7 @@ InModuleScope $script:subModuleName {
         Assert-VerifiableMock
     }
 
-    Describe 'DscResource.LocalizationHelper\Test-IsNanoServer' {
+    Describe 'ComputerManagementDsc.Common\Test-IsNanoServer' {
         Context 'When the cmdlet Get-ComputerInfo does not exist' {
             BeforeAll {
                 Mock -CommandName Test-Command {
@@ -1775,6 +1775,186 @@ InModuleScope $script:subModuleName {
             }
 
             Test-IsNanoServer | Should -BeFalse
+        }
+    }
+
+    Describe 'ComputerManagementDsc.Common\Get-RegistryPropertyValue' -Tag 'GetRegistryPropertyValue' {
+        BeforeAll {
+            $mockWrongRegistryPath = 'HKLM:\SOFTWARE\AnyPath'
+            $mockCorrectRegistryPath = 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\RS'
+            $mockPropertyName = 'InstanceName'
+            $mockPropertyValue = 'AnyValue'
+        }
+
+        Context 'When there are no property in the registry' {
+            BeforeAll {
+                Mock -CommandName Get-ItemProperty -MockWith {
+                    return @{
+                        'UnknownProperty' = $mockPropertyValue
+                    }
+                }
+            }
+
+            It 'Should return $null' {
+                $result = Get-RegistryPropertyValue -Path $mockWrongRegistryPath -Name $mockPropertyName
+                $result | Should -BeNullOrEmpty
+
+                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1 -Scope It
+            }
+        }
+
+        Context 'When the call to Get-ItemProperty throws an error (i.e. when the path does not exist)' {
+            BeforeAll {
+                Mock -CommandName Get-ItemProperty -MockWith {
+                    throw 'mocked error'
+                }
+            }
+
+            It 'Should not throw an error, but return $null' {
+                $result = Get-RegistryPropertyValue -Path $mockWrongRegistryPath -Name $mockPropertyName
+                $result | Should -BeNullOrEmpty
+
+                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1 -Scope It
+            }
+        }
+
+        Context 'When there are a property in the registry' {
+            BeforeAll {
+                $mockGetItemProperty_InstanceName = {
+                    return @{
+                        $mockPropertyName = $mockPropertyValue
+                    }
+                }
+
+                $mockGetItemProperty_InstanceName_ParameterFilter = {
+                    $Path -eq $mockCorrectRegistryPath `
+                    -and $Name -eq $mockPropertyName
+                }
+
+                Mock -CommandName Get-ItemProperty `
+                    -MockWith $mockGetItemProperty_InstanceName `
+                    -ParameterFilter $mockGetItemProperty_InstanceName_ParameterFilter
+            }
+
+            It 'Should return the correct value' {
+                $result = Get-RegistryPropertyValue -Path $mockCorrectRegistryPath -Name $mockPropertyName
+                $result | Should -Be $mockPropertyValue
+
+                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1 -Scope It
+            }
+        }
+    }
+
+    Describe 'ComputerManagementDsc.Common\Assert-BoundParameter' -Tag 'AssertBoundParameter' {
+        Context 'When the assert is successful' {
+            Context 'When there are no bound parameters' {
+                It 'Should not throw an error' {
+                    {
+                        $assertBoundParameterParameters = @{
+                            BoundParameterList = @{}
+                            MutualExclusiveList1 = @('a')
+                            MutualExclusiveList2 = @('b')
+                        }
+
+                        Assert-BoundParameter @assertBoundParameterParameters
+                    } | Should -Not -Throw
+                }
+            }
+
+            Context 'When there are one bound parameters' {
+                It 'Should not throw an error' {
+                    {
+                        $assertBoundParameterParameters = @{
+                            BoundParameterList = @{
+                                param1 = 'value1'
+                            }
+                            MutualExclusiveList1 = @('a')
+                            MutualExclusiveList2 = @('b')
+                        }
+
+                        Assert-BoundParameter @assertBoundParameterParameters
+                    } | Should -Not -Throw
+                }
+            }
+
+            Context 'When there are two bound parameters' {
+                It 'Should not throw an error' {
+                    {
+                        $assertBoundParameterParameters = @{
+                            BoundParameterList = @{
+                                param1 = 'value1'
+                                param2 = 'value2'
+                            }
+                            MutualExclusiveList1 = @('a', 'b')
+                            MutualExclusiveList2 = @('c', 'd')
+                        }
+
+                        Assert-BoundParameter @assertBoundParameterParameters
+                    } | Should -Not -Throw
+                }
+            }
+
+            Context 'When there are only one parameter matching a value in an exclusive list' {
+                It 'Should not throw an error' {
+                    {
+                        $assertBoundParameterParameters = @{
+                            BoundParameterList = @{
+                                param1 = 'value1'
+                            }
+                            MutualExclusiveList1 = @('param1')
+                            MutualExclusiveList2 = @('param2')
+                        }
+
+                        Assert-BoundParameter @assertBoundParameterParameters
+                    } | Should -Not -Throw
+                }
+            }
+        }
+
+        Context 'When the assert fails' {
+            Context 'When using parameters that are mutual exclusive' {
+                It 'Should throw an error' {
+                    $errorMessage = `
+                        $script:localizedData.ParameterUsageWrong `
+                            -f 'param1', 'param2'
+
+                    {
+                        $assertBoundParameterParameters = @{
+                            BoundParameterList = @{
+                                param1 = 'value1'
+                                param2 = 'value1'
+                            }
+                            MutualExclusiveList1 = @('param1')
+                            MutualExclusiveList2 = @('param2')
+                        }
+
+                        Assert-BoundParameter @assertBoundParameterParameters
+                    } | Should -Throw $errorMessage
+                }
+            }
+
+            Context 'When using several parameters that are mutual exclusive' {
+                It 'Should throw an error' {
+                    $errorMessage = `
+                        $script:localizedData.ParameterUsageWrong `
+                            -f "param1','param2", "param3','param4"
+
+                    {
+                        $assertBoundParameterParameters = @{
+                            BoundParameterList = @{
+                                param1 = 'value1'
+                                param2 = 'value2'
+                                param3 = 'value3'
+                                param4 = 'value4'
+                            }
+                            MutualExclusiveList1 = @('param1','param2')
+                            MutualExclusiveList2 = @('param3','param4')
+                        }
+
+                        Assert-BoundParameter @assertBoundParameterParameters
+                    } | Should -Throw $errorMessage
+                }
+            }
         }
     }
 }
