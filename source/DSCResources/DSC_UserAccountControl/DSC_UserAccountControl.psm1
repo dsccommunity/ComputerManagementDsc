@@ -181,7 +181,7 @@ function Set-TargetResource
     {
         foreach ($parameterName in $script:granularUserAccountControlParameterNames)
         {
-            if ($getTargetResourceResult.$parameterName -ne $PSBoundParameters.$parameterName)
+            if ($PSBoundParameters.ContainsKey($parameterName) -and $getTargetResourceResult.$parameterName -ne $PSBoundParameters.$parameterName)
             {
                 Write-Verbose -Message (
                     $script:localizedData.SetPropertyToValue `
@@ -323,7 +323,7 @@ function Test-TargetResource
 
         foreach ($parameterName in $script:granularUserAccountControlParameterNames)
         {
-            if ($getTargetResourceResult.$parameterName -ne $PSBoundParameters.$parameterName)
+            if ($PSBoundParameters.ContainsKey($parameterName) -and $getTargetResourceResult.$parameterName -ne $PSBoundParameters.$parameterName)
             {
                 $testTargetResourceReturnValue = $false
 
