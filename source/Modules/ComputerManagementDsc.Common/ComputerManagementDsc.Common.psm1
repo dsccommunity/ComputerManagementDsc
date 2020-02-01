@@ -1271,7 +1271,7 @@ function Get-RegistryPropertyValue
     }
     catch
     {
-         $getItemPropertyResult = $null
+        $getItemPropertyResult = $null
     }
 
     return $getItemPropertyResult
@@ -1309,8 +1309,10 @@ function Assert-BoundParameter
         $MutualExclusiveList2
     )
 
-    if ($BoundParameterList.Keys -in $MutualExclusiveList1 `
-    -and $BoundParameterList.Keys -in $MutualExclusiveList2)
+    $itemFoundFromList1 = $BoundParameterList.Keys.Where({ $_ -in $MutualExclusiveList1 })
+    $itemFoundFromList2 = $BoundParameterList.Keys.Where({ $_ -in $MutualExclusiveList2 })
+
+    if ($itemFoundFromList1.Count -gt 0 -and $itemFoundFromList2.Count -gt 0)
     {
         $errorMessage = `
             $script:localizedData.ParameterUsageWrong `
@@ -1341,4 +1343,5 @@ Export-ModuleMember -Function @(
     'New-InvalidOperationException'
     'Get-LocalizedData'
     'Get-RegistryPropertyValue'
+    'Assert-BoundParameter'
 )
