@@ -90,7 +90,6 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        # This is best practice when writing a single-instance DSC resource.
         [Parameter(Mandatory = $true)]
         [ValidateSet('Yes')]
         [System.String]
@@ -165,6 +164,10 @@ function Set-TargetResource
     {
         if ($getTargetResourceResult.NotificationLevel -ne $NotificationLevel)
         {
+            Write-Verbose -Message (
+                $script:localizedData.SetNotificationLevel -f $NotificationLevel
+            )
+
             Set-UserAccountControlToNotificationLevel -NotificationLevel $NotificationLevel
 
             $needRestart = $true
@@ -231,7 +234,6 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        # This is best practice when writing a single-instance DSC resource.
         [Parameter(Mandatory = $true)]
         [ValidateSet('Yes')]
         [System.String]

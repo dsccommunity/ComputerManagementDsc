@@ -8,4 +8,5 @@ ConvertFrom-StringData @'
     GranularPropertiesInDesiredState = The User Account Control properties are in desired state. (UAC0007)
     GranularPropertyNoInDesiredState = The User Account Control property '{0}' was {1}, but expected it to be {2}. (UAC0008)
     SetPropertyToValue = Setting the property '{0}' to the value '{1}'. (UAC0009)
+    SetNotificationLevel = Setting the notification level to '{0}'. (UAC0010)
 '@
