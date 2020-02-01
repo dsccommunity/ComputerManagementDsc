@@ -28,7 +28,7 @@ try
         $configData = @{
             AllNodes = @(
                 @{
-                    NodeName   = 'localhost'
+                    NodeName = 'localhost'
                 }
             )
         }
@@ -73,7 +73,7 @@ try
         $configData = @{
             AllNodes = @(
                 @{
-                    NodeName   = 'localhost'
+                    NodeName = 'localhost'
                 }
             )
         }

@@ -37,13 +37,13 @@ try
         $testCases_Enabled = @(
             # Enabled for administrators
             @{
-                Role = 'Administrators'
+                Role    = 'Administrators'
                 Enabled = $true
             },
 
             # Enabled for users
             @{
-                Role = 'Users'
+                Role    = 'Users'
                 Enabled = $true
             }
         )
@@ -51,13 +51,13 @@ try
         $testCases_Disabled = @(
             # Disabled for administrators
             @{
-                Role = 'Administrators'
+                Role    = 'Administrators'
                 Enabled = $false
             },
 
             # Disabled for users
             @{
-                Role = 'Users'
+                Role    = 'Users'
                 Enabled = $false
             }
         )
