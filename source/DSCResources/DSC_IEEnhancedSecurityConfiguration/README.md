@@ -1,4 +1,4 @@
 # Description
 
-The resource allows you to configure the IE Enhanced Security Configuration
-for both the role administrators and users.
+This resource allows you to configure the IE Enhanced Security Configuration
+for administrator or user roles.

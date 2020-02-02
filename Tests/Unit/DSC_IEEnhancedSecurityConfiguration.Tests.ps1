@@ -86,6 +86,7 @@ try
                         )
 
                         $result = Get-TargetResource -Role $Role -Enabled $Enabled -Verbose
+
                         $result.Role | Should -Be $Role
                         $result.Enabled | Should -Be $Enabled
                         $result.SuppressRestart | Should -BeFalse
@@ -114,6 +115,7 @@ try
                         )
 
                         $result = Get-TargetResource -Role $Role -Enabled $Enabled -Verbose
+
                         $result.Role | Should -Be $Role
                         $result.Enabled | Should -Be $Enabled
                         $result.SuppressRestart | Should -BeFalse
@@ -144,6 +146,7 @@ try
                         )
 
                         $result = Get-TargetResource -Role $Role -Enabled $Enabled -SuppressRestart $true -Verbose
+
                         $result.Role | Should -Be $Role
                         $result.Enabled | Should -BeFalse
                         $result.SuppressRestart | Should -BeTrue
@@ -172,9 +175,31 @@ try
                         )
 
                         $result = Get-TargetResource -Role $Role -Enabled $Enabled -Verbose
+
                         $result.Role | Should -Be $Role
                         $result.Enabled | Should -BeTrue
                         $result.SuppressRestart | Should -BeFalse
+                    }
+                }
+
+                Context 'When desired state cannot be determined' {
+                    BeforeAll {
+                        Mock -CommandName Write-Warning
+                        Mock -CommandName Get-ItemProperty -MockWith {
+                            throw
+                        }
+                    }
+
+                    It 'Should write the correct warning' {
+                        $result = Get-TargetResource -Role 'Users' -Enabled $true -Verbose
+
+                        $result.Role | Should -Be 'Users'
+                        $result.Enabled | Should -BeFalse
+                        $result.SuppressRestart | Should -BeFalse
+
+                        Assert-MockCalled -CommandName Write-Warning -ParameterFilter {
+                            $Message -eq ($script:localizedData.UnableToDetermineState -f $script:registryKey_Users)
+                        } -Exactly -Times 1 -Scope It
                     }
                 }
             }
@@ -190,9 +215,9 @@ try
                     BeforeAll {
                         Mock -CommandName Write-Warning
                         Mock -CommandName Set-ItemProperty
-                        Mock -CommandName Get-ItemProperty -MockWith {
+                        Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                IsInstalled = 1
+                                Enabled = $true
                             }
                         }
                     }
@@ -221,9 +246,9 @@ try
                     BeforeAll {
                         Mock -CommandName Write-Warning
                         Mock -CommandName Set-ItemProperty
-                        Mock -CommandName Get-ItemProperty -MockWith {
+                        Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                IsInstalled = 0
+                                Enabled = $false
                             }
                         }
                     }
@@ -258,9 +283,9 @@ try
                     BeforeAll {
                         Mock -CommandName Write-Warning
                         Mock -CommandName Set-ItemProperty
-                        Mock -CommandName Get-ItemProperty -MockWith {
+                        Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                IsInstalled = 0
+                                Enabled = $false
                             }
                         }
                     }
@@ -279,7 +304,18 @@ try
 
                         { Set-TargetResource -Role $Role -Enabled $Enabled -Verbose } | Should -Not -Throw
 
-                        Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1 -Scope It
+                        Assert-MockCalled -CommandName Set-ItemProperty -ParameterFilter {
+                            # The script variables is set in the resource module code.
+                            if ($Role -eq 'Administrators')
+                            {
+                                $Path -eq $script:registryKey_Administrators
+                            }
+                            else
+                            {
+                                $Path -eq $script:registryKey_Users
+                            }
+                        } -Exactly -Times 1 -Scope It
+
                         Assert-MockCalled -CommandName Write-Warning -Exactly -Times 0 -Scope It
                         $global:DSCMachineStatus | Should -Be 1
                     }
@@ -289,9 +325,9 @@ try
                     BeforeAll {
                         Mock -CommandName Write-Warning
                         Mock -CommandName Set-ItemProperty
-                        Mock -CommandName Get-ItemProperty -MockWith {
+                        Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                IsInstalled = 1
+                                Enabled = $true
                             }
                         }
                     }
@@ -310,7 +346,18 @@ try
 
                         { Set-TargetResource -Role $Role -Enabled $Enabled -Verbose } | Should -Not -Throw
 
-                        Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1 -Scope It
+                        Assert-MockCalled -CommandName Set-ItemProperty -ParameterFilter {
+                            # The script variables is set in the resource module code.
+                            if ($Role -eq 'Administrators')
+                            {
+                                $Path -eq $script:registryKey_Administrators
+                            }
+                            else
+                            {
+                                $Path -eq $script:registryKey_Users
+                            }
+                        } -Exactly -Times 1 -Scope It
+
                         Assert-MockCalled -CommandName Write-Warning -Exactly -Times 0 -Scope It
                         $global:DSCMachineStatus | Should -Be 1
                     }
@@ -320,9 +367,9 @@ try
                     BeforeAll {
                         Mock -CommandName Write-Warning
                         Mock -CommandName Set-ItemProperty
-                        Mock -CommandName Get-ItemProperty -MockWith {
+                        Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                IsInstalled = 1
+                                Enabled = $true
                             }
                         }
                     }
@@ -341,9 +388,40 @@ try
 
                         { Set-TargetResource -Role $Role -Enabled $Enabled -SuppressRestart $true -Verbose } | Should -Not -Throw
 
-                        Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1 -Scope It
+                        Assert-MockCalled -CommandName Set-ItemProperty -ParameterFilter {
+                            # The script variables is set in the resource module code.
+                            if ($Role -eq 'Administrators')
+                            {
+                                $Path -eq $script:registryKey_Administrators
+                            }
+                            else
+                            {
+                                $Path -eq $script:registryKey_Users
+                            }
+                        } -Exactly -Times 1 -Scope It
+
                         Assert-MockCalled -CommandName Write-Warning -Exactly -Times 1 -Scope It
                         $global:DSCMachineStatus | Should -Be 0
+                    }
+                }
+
+                Context 'When the Set-ItemProperty throws an error' {
+                    BeforeAll {
+                        Mock -CommandName Set-ItemProperty -MockWith {
+                            throw
+                        }
+
+                        Mock -CommandName Get-TargetResource -MockWith {
+                            return @{
+                                Enabled = $false
+                            }
+                        }
+                    }
+
+                    It 'Should throw the correct error' {
+                        $errorMessage = $script:localizedData.FailedToSetDesiredState -f 'Users'
+
+                        { Set-TargetResource -Role 'Users' -Enabled $true -Verbose } | Should -Throw $errorMessage
                     }
                 }
             }
@@ -353,9 +431,9 @@ try
             Context 'When the system is in the desired present state' {
                 Context 'When IE Enhanced Security Configuration is enabled for each role' {
                     BeforeAll {
-                        Mock -CommandName Get-ItemProperty -MockWith {
+                        Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                IsInstalled = 1
+                                Enabled = $true
                             }
                         }
                     }
@@ -373,15 +451,16 @@ try
                         )
 
                         $result = Test-TargetResource -Role $Role -Enabled $Enabled -Verbose
+
                         $result | Should -BeTrue
                     }
                 }
 
                 Context 'When IE Enhanced Security Configuration is disabled for each role' {
                     BeforeAll {
-                        Mock -CommandName Get-ItemProperty -MockWith {
+                        Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                IsInstalled = 0
+                                Enabled = $false
                             }
                         }
                     }
@@ -399,6 +478,7 @@ try
                         )
 
                         $result = Test-TargetResource -Role $Role -Enabled $Enabled -Verbose
+
                         $result | Should -BeTrue
                     }
                 }
@@ -407,9 +487,9 @@ try
             Context 'When the system is not in the desired present state' {
                 Context 'When IE Enhanced Security Configuration does not match the desired state enabled' {
                     BeforeAll {
-                        Mock -CommandName Get-ItemProperty -MockWith {
+                        Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                IsInstalled = 0
+                                Enabled = $false
                             }
                         }
                     }
@@ -427,15 +507,16 @@ try
                         )
 
                         $result = Test-TargetResource -Role $Role -Enabled $Enabled -Verbose
+
                         $result | Should -BeFalse
                     }
                 }
 
                 Context 'When IE Enhanced Security Configuration does not match the desired state disabled' {
                     BeforeAll {
-                        Mock -CommandName Get-ItemProperty -MockWith {
+                        Mock -CommandName Get-TargetResource -MockWith {
                             return @{
-                                IsInstalled = 1
+                                Enabled = $true
                             }
                         }
                     }
@@ -453,6 +534,7 @@ try
                         )
 
                         $result = Test-TargetResource -Role $Role -Enabled $Enabled -Verbose
+
                         $result | Should -BeFalse
                     }
                 }

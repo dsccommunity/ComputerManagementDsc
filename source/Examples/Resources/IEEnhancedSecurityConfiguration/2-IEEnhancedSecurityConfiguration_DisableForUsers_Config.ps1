@@ -20,7 +20,7 @@
 <#
     .DESCRIPTION
         This configuration will disable the IE Enhanced Security Configuration for
-        administrators.
+        users.
 #>
 Configuration IEEnhancedSecurityConfiguration_DisableForUsers_Config
 {

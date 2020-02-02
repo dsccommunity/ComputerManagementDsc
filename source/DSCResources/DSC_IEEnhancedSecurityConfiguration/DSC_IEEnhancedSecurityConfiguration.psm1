@@ -23,6 +23,10 @@ $script:registryKey_Property = 'IsInstalled'
     .PARAMETER Enabled
         Specifies if IE Enhanced Security Configuration should be enabled or
         disabled.
+
+    .PARAMETER SuppressRestart
+        Specifies if a restart of the node should be suppressed. By default the
+        node will be restarted if the value is changed.
 #>
 function Get-TargetResource
 {
@@ -48,9 +52,20 @@ function Get-TargetResource
 
     $registryKey = Get-Variable -Name ('registryKey_{0}' -f $Role) -Scope 'Script' -ValueOnly
 
+    try
+    {
+        $currentlyEnabled = [System.Boolean] (Get-ItemProperty -Path $registryKey -ErrorAction 'Stop').$script:registryKey_Property
+    }
+    catch
+    {
+        $currentlyEnabled = $false
+
+        Write-Warning -Message ($script:localizedData.UnableToDetermineState -f $registryKey)
+    }
+
     $returnValue = @{
         Role            = $Role
-        Enabled         = [System.Boolean] (Get-ItemProperty -Path $registryKey).$script:registryKey_Property
+        Enabled         = $currentlyEnabled
         SuppressRestart = $SuppressRestart
     }
 
@@ -70,8 +85,8 @@ function Get-TargetResource
         disabled.
 
     .PARAMETER SuppressRestart
-        Specifies if the needed restart is suppress. Default the node will be
-        restarted if the value is changed.
+        Specifies if a restart of the node should be suppressed. By default the
+        node will be restarted if the value is changed.
 
     .NOTES
         The change could come in affect if the process Explorer is stopped, which
@@ -100,13 +115,30 @@ function Set-TargetResource
     )
 
     $getTargetResourceResult = Get-TargetResource @PSBoundParameters
+
     if ($getTargetResourceResult.Enabled -ne $Enabled)
     {
         Write-Verbose -Message ($script:localizedData.SettingStateMessage -f $Role)
 
         $registryKey = Get-Variable -Name ('registryKey_{0}' -f $Role) -Scope 'Script' -ValueOnly
 
-        Set-ItemProperty -Path $registryKey -Name $script:registryKey_Property -Value $Enabled
+        try
+        {
+            $setItemPropertyParameters = @{
+                Path = $registryKey
+                Name = $script:registryKey_Property
+                Value = $Enabled
+                ErrorAction = 'Stop'
+            }
+
+            Set-ItemProperty @setItemPropertyParameters
+        }
+        catch
+        {
+            New-InvalidOperationException `
+                -Message ($script:localizedData.FailedToSetDesiredState -f $Role) `
+                -ErrorRecord $_
+        }
 
         if ($SuppressRestart)
         {
@@ -136,8 +168,8 @@ function Set-TargetResource
         disabled.
 
     .PARAMETER SuppressRestart
-        Specifies if the needed restart is suppress. Default the node will be
-        restarted if the value is changed.
+        Specifies if a restart of the node should be suppressed. By default the
+        node will be restarted if the value is changed.
 #>
 function Test-TargetResource
 {
@@ -162,12 +194,13 @@ function Test-TargetResource
     Write-Verbose -Message ($script:localizedData.TestingStateMessage -f $Role)
 
     $getTargetResourceResult = Get-TargetResource @PSBoundParameters
+
     if ($getTargetResourceResult.Enabled -ne $Enabled)
     {
         $testTargetResourceReturnValue = $false
 
-        $currentStateString = Get-StateStringValue -Enabled $getTargetResourceResult.Enabled
-        $desiredStateString = Get-StateStringValue -Enabled $Enabled
+        $currentStateString = Get-BooleanStringValue -Enabled $getTargetResourceResult.Enabled
+        $desiredStateString = Get-BooleanStringValue -Enabled $Enabled
 
         Write-Verbose -Message ($script:localizedData.NotInDesiredState -f $Role, $currentStateString, $desiredStateString)
     }
@@ -181,7 +214,14 @@ function Test-TargetResource
     return $testTargetResourceReturnValue
 }
 
-function Get-StateStringValue
+<#
+    .SYNOPSIS
+        Returns the string representation of a boolean value.
+
+    .PARAMETER Enabled
+        Specifies the boolean value to return the string representation for.
+#>
+function Get-BooleanStringValue
 {
     [CmdletBinding()]
     [OutputType([System.String])]
@@ -192,7 +232,7 @@ function Get-StateStringValue
         $Enabled
     )
 
-    $stringValue = switch ($Enabled)
+    $booleanStringValue = switch ($Enabled)
     {
         $false
         {
@@ -205,5 +245,5 @@ function Get-StateStringValue
         }
     }
 
-    return $stringValue
+    return $booleanStringValue
 }

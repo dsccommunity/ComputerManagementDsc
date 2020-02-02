@@ -29,13 +29,15 @@ try
             AllNodes = @(
                 @{
                     NodeName = 'localhost'
+                    Role     = 'Administrators'
+                    Enabled  = $true
                 }
             )
         }
 
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:dscResourceName)_Enable_Config" `
+                & "$($script:dscResourceName)_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
@@ -60,7 +62,7 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:dscResourceName)_Enable_Config"
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
 
             $current.Role | Should -Be 'Administrators'
@@ -74,13 +76,15 @@ try
             AllNodes = @(
                 @{
                     NodeName = 'localhost'
+                    Role     = 'Administrators'
+                    Enabled  = $false
                 }
             )
         }
 
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:dscResourceName)_Disable_Config" `
+                & "$($script:dscResourceName)_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
@@ -105,7 +109,7 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:dscResourceName)_Disable_Config"
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
 
             $current.Role | Should -Be 'Administrators'

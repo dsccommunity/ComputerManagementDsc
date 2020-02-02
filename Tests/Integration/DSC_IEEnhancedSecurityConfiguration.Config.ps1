@@ -1,30 +1,16 @@
 # Integration Test Config Template Version: 1.0.0
-configuration DSC_IEEnhancedSecurityConfiguration_Enable_Config
+configuration DSC_IEEnhancedSecurityConfiguration_Config
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
     node $AllNodes.NodeName
     {
-        IEEnhancedSecurityConfiguration 'DisableForAdministrators'
+        IEEnhancedSecurityConfiguration 'AdministratorsSetting'
         {
-            Role            = 'Administrators'
-            Enabled         = $true
+            Role            = $Node.Role
+            Enabled         = $Node.Enabled
             SuppressRestart = $true
         }
     }
 }
 
-configuration DSC_IEEnhancedSecurityConfiguration_Disable_Config
-{
-    Import-DscResource -ModuleName ComputerManagementDsc
-
-    node $AllNodes.NodeName
-    {
-        IEEnhancedSecurityConfiguration 'DisableForAdministrators'
-        {
-            Role            = 'Administrators'
-            Enabled         = $false
-            SuppressRestart = $true
-        }
-    }
-}
