@@ -210,6 +210,12 @@ try
 
                 Context 'When Set-ItemProperty fails' {
                     BeforeAll {
+                        Mock -CommandName Get-TargetResource -MockWith {
+                            return @{
+                                FilterAdministratorToken = '1'
+                            }
+                        }
+
                         Mock -CommandName Set-ItemProperty -MockWith {
                             throw
                         }
