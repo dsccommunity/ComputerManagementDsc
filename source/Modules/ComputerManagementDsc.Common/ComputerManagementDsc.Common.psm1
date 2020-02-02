@@ -1279,8 +1279,13 @@ function Get-RegistryPropertyValue
 
 <#
     .SYNOPSIS
-        Throws an error of one parameter from both mutual exclusive list are
-        found in the bound parameters.
+        Throws an error if there are a bound parameter that exist in both the
+        mutual exclusive lists.
+
+    .PARAMETER BoundParameterList
+        The parameters that should be evaluated against the mutual exclusive lists
+        MutualExclusiveList1 and MutualExclusiveList2. This parameter is normally
+        set to the $PSBoundParameters variable.
 
     .PARAMETER MutualExclusiveList1
         An array of parameter names that are not allowed to be bound at the
