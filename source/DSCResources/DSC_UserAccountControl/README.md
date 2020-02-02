@@ -1,7 +1,10 @@
 # Description
 
-The resource allows you to configure the notification level of the User
-Account Control for the computer.
+The resource allows you to configure the notification level or granularly
+configure the User Account Control for the computer.
+
+The parameter `NotificationLevel` and any of the other granular parameters
+are mutual exclusive and will throw an argument exception error.
 
 For the granular properties available in this resource, read more about
 the possible values in the article [User Account Control Group Policy and registry key settings](https://docs.microsoft.com/en-us/windows/security/identity-protection/user-account-control/user-account-control-group-policy-and-registry-key-settings).

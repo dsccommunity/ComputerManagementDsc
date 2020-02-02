@@ -29,8 +29,8 @@ $script:granularUserAccountControlParameterNames = @(
         Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER SuppressRestart
-        Specifies if the needed restart is suppress. Default the node will be
-        restarted if the value is changed.
+        Specifies if a restart of the node should be suppressed. By default the
+        node will be restarted if the value is changed.
 #>
 function Get-TargetResource
 {
@@ -77,13 +77,41 @@ function Get-TargetResource
     .PARAMETER IsSingleInstance
         Specifies the resource is a single instance, the value must be 'Yes'.
 
-    .PARAMETER Enabled
-        Specifies if IE Enhanced Security Configuration should be enabled or
-        disabled.
+    .PARAMETER NotificationLevel
+        Specifies the desired notification level for the User Account Control
+        setting. This parameter can not be used at the same time as any of the
+        granular parameters.
+
+    .PARAMETER FilterAdministratorToken
+        Specifies the mode for the built-in administrator account (RID 500).
+
+    .PARAMETER ConsentPromptBehaviorAdmin
+        Specifies the prompt behavior for the Consent Administrator.
+
+    .PARAMETER ConsentPromptBehaviorUser
+        Specifies how the operations that requires elevation is handled for users.
+
+    .PARAMETER EnableInstallerDetection
+        Specifies how package installations are handled.
+
+    .PARAMETER ValidateAdminCodeSignatures
+        Specifies how cryptographic signatures on interactive applications are
+        handled.
+
+    .PARAMETER EnableLua
+        Specifies how the 'administrator in Admin Approval Mode' user type are
+        handled.
+
+    .PARAMETER PromptOnSecureDesktop
+        Specifies if secure desktop prompting are used.
+
+    .PARAMETER EnableVirtualization
+        Specifies how redirection of legacy application File and Registry writes
+        are handled.
 
     .PARAMETER SuppressRestart
-        Specifies if the needed restart is suppress. Default the node will be
-        restarted if the value is changed.
+        Specifies if a restart of the node should be suppressed. By default the
+        node will be restarted if the value is changed.
 #>
 function Set-TargetResource
 {
@@ -160,6 +188,7 @@ function Set-TargetResource
     $needRestart = $false
 
     $getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -SuppressRestart $SuppressRestart
+
     if ($PSBoundParameters.ContainsKey('NotificationLevel'))
     {
         if ($getTargetResourceResult.NotificationLevel -ne $NotificationLevel)
@@ -220,13 +249,41 @@ function Set-TargetResource
     .PARAMETER IsSingleInstance
         Specifies the resource is a single instance, the value must be 'Yes'.
 
-    .PARAMETER Enabled
-        Specifies if IE Enhanced Security Configuration should be enabled or
-        disabled.
+    .PARAMETER NotificationLevel
+        Specifies the desired notification level for the User Account Control
+        setting. This parameter can not be used at the same time as any of the
+        granular parameters.
+
+    .PARAMETER FilterAdministratorToken
+        Specifies the mode for the built-in administrator account (RID 500).
+
+    .PARAMETER ConsentPromptBehaviorAdmin
+        Specifies the prompt behavior for the Consent Administrator.
+
+    .PARAMETER ConsentPromptBehaviorUser
+        Specifies how the operations that requires elevation is handled for users.
+
+    .PARAMETER EnableInstallerDetection
+        Specifies how package installations are handled.
+
+    .PARAMETER ValidateAdminCodeSignatures
+        Specifies how cryptographic signatures on interactive applications are
+        handled.
+
+    .PARAMETER EnableLua
+        Specifies how the 'administrator in Admin Approval Mode' user type are
+        handled.
+
+    .PARAMETER PromptOnSecureDesktop
+        Specifies if secure desktop prompting are used.
+
+    .PARAMETER EnableVirtualization
+        Specifies how redirection of legacy application File and Registry writes
+        are handled.
 
     .PARAMETER SuppressRestart
-        Specifies if the needed restart is suppress. Default the node will be
-        restarted if the value is changed.
+        Specifies if a restart of the node should be suppressed. By default the
+        node will be restarted if the value is changed.
 #>
 function Test-TargetResource
 {
@@ -302,6 +359,7 @@ function Test-TargetResource
     Assert-BoundParameter @assertBoundParameterParameters
 
     $getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -SuppressRestart $SuppressRestart
+
     if ($PSBoundParameters.ContainsKey('NotificationLevel'))
     {
         if ($getTargetResourceResult.NotificationLevel -ne $NotificationLevel)
@@ -353,7 +411,7 @@ function Get-UserAccountControl
     [OutputType([System.Collections.Hashtable])]
     param ()
 
-    $userAccountControlValues = @{
+    return @{
         FilterAdministratorToken = Get-RegistryPropertyValue -Path $script:registryKey -Name 'FilterAdministratorToken'
         ConsentPromptBehaviorAdmin = Get-RegistryPropertyValue -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin'
         ConsentPromptBehaviorUser = Get-RegistryPropertyValue -Path $script:registryKey -Name 'ConsentPromptBehaviorUser'
@@ -363,8 +421,6 @@ function Get-UserAccountControl
         PromptOnSecureDesktop = Get-RegistryPropertyValue -Path $script:registryKey -Name 'PromptOnSecureDesktop'
         EnableVirtualization = Get-RegistryPropertyValue -Path $script:registryKey -Name 'EnableVirtualization'
     }
-
-    return $userAccountControlValues
 }
 
 <#
@@ -381,7 +437,7 @@ function Get-NotificationLevel
     [OutputType([System.String])]
     param ()
 
-    $stringValue = $null
+    $notificationLevelStringValue = $null
 
     $userAccountControlValues = Get-UserAccountControl
 
@@ -390,7 +446,7 @@ function Get-NotificationLevel
         -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
     )
     {
-        $stringValue = 'AlwaysNotify'
+        $notificationLevelStringValue = 'AlwaysNotify'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 1 `
@@ -398,7 +454,7 @@ function Get-NotificationLevel
         -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
     )
     {
-        $stringValue = 'AlwaysNotifyAndAskForCredentials'
+        $notificationLevelStringValue = 'AlwaysNotifyAndAskForCredentials'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 5 `
@@ -406,7 +462,7 @@ function Get-NotificationLevel
         -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
     )
     {
-        $stringValue = 'NotifyChanges'
+        $notificationLevelStringValue = 'NotifyChanges'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 5 `
@@ -414,7 +470,7 @@ function Get-NotificationLevel
         -and $userAccountControlValues.PromptOnSecureDesktop -eq 0
     )
     {
-        $stringValue = 'NotifyChangesWithoutDimming'
+        $notificationLevelStringValue = 'NotifyChangesWithoutDimming'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 0 `
@@ -422,7 +478,7 @@ function Get-NotificationLevel
         -and $userAccountControlValues.PromptOnSecureDesktop -eq 0
     )
     {
-        $stringValue = 'NeverNotify'
+        $notificationLevelStringValue = 'NeverNotify'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 0 `
@@ -430,10 +486,10 @@ function Get-NotificationLevel
         -and $userAccountControlValues.PromptOnSecureDesktop -eq 0
     )
     {
-        $stringValue = 'NeverNotifyAndDisableAll'
+        $notificationLevelStringValue = 'NeverNotifyAndDisableAll'
     }
 
-    return $stringValue
+    return $notificationLevelStringValue
 }
 
 <#
@@ -455,49 +511,58 @@ function Set-UserAccountControlToNotificationLevel
         $NotificationLevel
     )
 
-    switch ($NotificationLevel)
+    try
     {
-        'AlwaysNotify'
+        switch ($NotificationLevel)
         {
-            Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 2
-            Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-            Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
-        }
+            'AlwaysNotify'
+            {
+                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 2
+                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
+                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
+            }
 
-        'AlwaysNotifyAndAskForCredentials'
-        {
-            Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 1
-            Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-            Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
-        }
+            'AlwaysNotifyAndAskForCredentials'
+            {
+                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 1
+                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
+                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
+            }
 
 
-        'NotifyChanges'
-        {
-            Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 5
-            Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-            Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
-        }
+            'NotifyChanges'
+            {
+                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 5
+                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
+                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
+            }
 
-        'NotifyChangesWithoutDimming'
-        {
-            Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 5
-            Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-            Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 0
-        }
+            'NotifyChangesWithoutDimming'
+            {
+                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 5
+                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
+                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 0
+            }
 
-        'NeverNotify'
-        {
-            Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 0
-            Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-            Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 0
-        }
+            'NeverNotify'
+            {
+                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 0
+                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
+                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 0
+            }
 
-        'NeverNotifyAndDisableAll'
-        {
-            Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 0
-            Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 0
-            Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 0
+            'NeverNotifyAndDisableAll'
+            {
+                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 0
+                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 0
+                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 0
+            }
         }
+    }
+    catch
+    {
+        New-InvalidOperationException `
+            -Message ($script:localizedData.FailedToSetNotificationLevel -f $NotificationLevel) `
+            -ErrorRecord $_
     }
 }
