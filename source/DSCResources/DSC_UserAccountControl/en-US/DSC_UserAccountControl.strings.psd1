@@ -10,4 +10,5 @@ ConvertFrom-StringData @'
     SetPropertyToValue = Setting the property '{0}' to the value '{1}'. (UAC0009)
     SetNotificationLevel = Setting the notification level to '{0}'. (UAC0010)
     FailedToSetNotificationLevel = Failed to set the notification level '{0}'. (UAC0011)
+    FailedToSetGranularProperty = Failed to set the property '{0}'. (UAC0012)
 '@

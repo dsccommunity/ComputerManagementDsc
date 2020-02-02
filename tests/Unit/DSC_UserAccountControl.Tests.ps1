@@ -207,6 +207,23 @@ try
                         $global:DSCMachineStatus | Should -Be 0
                     }
                 }
+
+                Context 'When Set-ItemProperty fails' {
+                    BeforeAll {
+                        Mock -CommandName Set-ItemProperty -MockWith {
+                            throw
+                        }
+                    }
+
+                    It 'Should throw the correct error' {
+                        $mockGranularProperty = 'FilterAdministratorToken'
+                        $errorMessage = $script:localizedData.FailedToSetGranularProperty -f $mockGranularProperty
+
+                        {
+                            Set-TargetResource -IsSingleInstance 'Yes' -FilterAdministratorToken 0 -Verbose
+                        } | Should -Throw $errorMessage
+                    }
+                }
             }
         }
 
@@ -306,6 +323,8 @@ try
 
         Describe 'UserAccountControl\Set-UserAccountControlToNotificationLevel' -Tag 'Helper' {
             BeforeAll {
+                Mock -CommandName Set-ItemProperty
+
                 $testCases = @(
                     @{
                         NotificationLevel = 'AlwaysNotify'
@@ -344,8 +363,6 @@ try
                         PromptOnSecureDesktop = 0
                     }
                 )
-
-                Mock -CommandName Set-ItemProperty
             }
 
             It 'Should call the mock with the correct values when notification level is ''<NotificationLevel>''' -TestCases $testCases {
@@ -368,7 +385,7 @@ try
                     $PromptOnSecureDesktop
                 )
 
-                { Set-UserAccountControlToNotificationLevel -NotificationLevel $NotificationLevel} | Should -Not -Throw
+                { Set-UserAccountControlToNotificationLevel -NotificationLevel $NotificationLevel -Verbose} | Should -Not -Throw
 
                 Assert-MockCalled -CommandName Set-ItemProperty -ParameterFilter {
                     $Name -eq 'ConsentPromptBehaviorAdmin' -and $Value -eq $ConsentPromptBehaviorAdmin
@@ -381,6 +398,23 @@ try
                 Assert-MockCalled -CommandName Set-ItemProperty -ParameterFilter {
                     $Name -eq 'PromptOnSecureDesktop' -and $Value -eq $PromptOnSecureDesktop
                 } -Exactly -Times 1 -Scope It
+            }
+
+            Context 'When Set-ItemProperty fails' {
+                BeforeAll {
+                    Mock -CommandName Set-ItemProperty -MockWith {
+                        throw
+                    }
+                }
+
+                It 'Should throw the correct error' {
+                    $mockNotificationLevel = 'AlwaysNotify'
+                    $errorMessage = $script:localizedData.FailedToSetNotificationLevel -f $mockNotificationLevel
+
+                    {
+                        Set-UserAccountControlToNotificationLevel -NotificationLevel $mockNotificationLevel -Verbose
+                    } | Should -Throw $errorMessage
+                }
             }
         }
 

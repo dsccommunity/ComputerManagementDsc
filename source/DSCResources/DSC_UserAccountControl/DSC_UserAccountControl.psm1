@@ -217,7 +217,23 @@ function Set-TargetResource
                         -f $parameterName, $PSBoundParameters.$parameterName
                 )
 
-                Set-ItemProperty -Path $script:registryKey -Name $parameterName -Value $PSBoundParameters.$parameterName
+                try
+                {
+                    $setItemPropertyParameters = @{
+                        Path = $script:registryKey
+                        Name = $parameterName
+                        Value = $PSBoundParameters.$parameterName
+                        ErrorAction = 'Stop'
+                    }
+
+                    Set-ItemProperty @setItemPropertyParameters
+                }
+                catch
+                {
+                    New-InvalidOperationException `
+                        -Message ($script:localizedData.FailedToSetGranularProperty -f $parameterName) `
+                        -ErrorRecord $_
+                }
 
                 $needRestart = $true
             }
@@ -513,49 +529,54 @@ function Set-UserAccountControlToNotificationLevel
 
     try
     {
+        $defaultSetItemPropertyParameters = @{
+            Path = $script:registryKey
+            ErrorAction = 'Stop'
+        }
+
         switch ($NotificationLevel)
         {
             'AlwaysNotify'
             {
-                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 2
-                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 2
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 1
             }
 
             'AlwaysNotifyAndAskForCredentials'
             {
-                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 1
-                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 1
             }
 
 
             'NotifyChanges'
             {
-                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 5
-                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 5
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 1
             }
 
             'NotifyChangesWithoutDimming'
             {
-                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 5
-                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 0
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 5
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 0
             }
 
             'NeverNotify'
             {
-                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 0
-                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 1
-                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 0
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 0
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 0
             }
 
             'NeverNotifyAndDisableAll'
             {
-                Set-ItemProperty -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin' -Value 0
-                Set-ItemProperty -Path $script:registryKey -Name 'EnableLUA' -Value 0
-                Set-ItemProperty -Path $script:registryKey -Name 'PromptOnSecureDesktop' -Value 0
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 0
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 0
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 0
             }
         }
     }
