@@ -55,6 +55,8 @@ The **ComputerManagementDsc** module contains the following resources:
 - **SystemLocale**: this resource is used to set the system locale on a
   Windows machine
 - **TimeZone**: this resource is used for setting the time zone on a machine.
+- **UserAccountControl**: this resource allows you to configure the notification
+  level or granularly configure the User Account Control for the computer.
 - **VirtualMemory**: allows configuration of properties of the paging file on
   the local computer.
 - **WindowsEventLog**: This resource allows configuration of a specified
