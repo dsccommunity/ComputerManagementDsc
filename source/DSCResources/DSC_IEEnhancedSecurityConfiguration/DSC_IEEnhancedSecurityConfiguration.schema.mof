@@ -1,0 +1,7 @@
+[ClassVersion("1.0.1.0"), FriendlyName("IEEnhancedSecurityConfiguration")]
+class DSC_IEEnhancedSecurityConfiguration : OMI_BaseResource
+{
+    [Key, Description("Specifies the role for which the IE Enhanced Security Configuration should be changed."), ValueMap{"Administrators","Users"}, Values{"Administrators","Users"}] String Role;
+    [Required, Description("Specifies if IE Enhanced Security Configuration should be enabled or disabled.")] Boolean Enabled;
+    [Write, Description("Specifies if a restart of the node should be suppressed. By default the node will be restarted if the value is changed.")] Boolean SuppressRestart;
+};
