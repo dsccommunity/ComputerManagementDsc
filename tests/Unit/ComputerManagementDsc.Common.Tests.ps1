@@ -1818,7 +1818,7 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'When there are no properties in the registry' {
+        Context 'When there are a property present in the registry' {
             BeforeAll {
                 $mockGetItemProperty_InstanceName = {
                     return @{
