@@ -1786,7 +1786,7 @@ InModuleScope $script:subModuleName {
             $mockPropertyValue = 'AnyValue'
         }
 
-        Context 'When there are no property in the registry' {
+        Context 'When there are no properties in the registry' {
             BeforeAll {
                 Mock -CommandName Get-ItemProperty -MockWith {
                     return @{
@@ -1818,7 +1818,7 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'When there are a property in the registry' {
+        Context 'When there are no properties in the registry' {
             BeforeAll {
                 $mockGetItemProperty_InstanceName = {
                     return @{
@@ -1852,8 +1852,8 @@ InModuleScope $script:subModuleName {
                     {
                         $assertBoundParameterParameters = @{
                             BoundParameterList = @{}
-                            MutualExclusiveList1 = @('a')
-                            MutualExclusiveList2 = @('b')
+                            MutuallyExclusiveList1 = @('a')
+                            MutuallyExclusiveList2 = @('b')
                         }
 
                         Assert-BoundParameter @assertBoundParameterParameters
@@ -1868,8 +1868,8 @@ InModuleScope $script:subModuleName {
                             BoundParameterList = @{
                                 param1 = 'value1'
                             }
-                            MutualExclusiveList1 = @('a')
-                            MutualExclusiveList2 = @('b')
+                            MutuallyExclusiveList1 = @('a')
+                            MutuallyExclusiveList2 = @('b')
                         }
 
                         Assert-BoundParameter @assertBoundParameterParameters
@@ -1885,8 +1885,8 @@ InModuleScope $script:subModuleName {
                                 param1 = 'value1'
                                 param2 = 'value2'
                             }
-                            MutualExclusiveList1 = @('a', 'b')
-                            MutualExclusiveList2 = @('c', 'd')
+                            MutuallyExclusiveList1 = @('a', 'b')
+                            MutuallyExclusiveList2 = @('c', 'd')
                         }
 
                         Assert-BoundParameter @assertBoundParameterParameters
@@ -1901,8 +1901,8 @@ InModuleScope $script:subModuleName {
                             BoundParameterList = @{
                                 param1 = 'value1'
                             }
-                            MutualExclusiveList1 = @('param1')
-                            MutualExclusiveList2 = @('param2')
+                            MutuallyExclusiveList1 = @('param1')
+                            MutuallyExclusiveList2 = @('param2')
                         }
 
                         Assert-BoundParameter @assertBoundParameterParameters
@@ -1912,7 +1912,7 @@ InModuleScope $script:subModuleName {
         }
 
         Context 'When the assert fails' {
-            Context 'When using parameters that are mutual exclusive' {
+            Context 'When using parameters that are mutually exclusive' {
                 It 'Should throw an error' {
                     $errorMessage = `
                         $script:localizedData.ParameterUsageWrong `
@@ -1924,8 +1924,8 @@ InModuleScope $script:subModuleName {
                                 param1 = 'value1'
                                 param2 = 'value1'
                             }
-                            MutualExclusiveList1 = @('param1')
-                            MutualExclusiveList2 = @('param2')
+                            MutuallyExclusiveList1 = @('param1')
+                            MutuallyExclusiveList2 = @('param2')
                         }
 
                         Assert-BoundParameter @assertBoundParameterParameters
@@ -1933,7 +1933,7 @@ InModuleScope $script:subModuleName {
                 }
             }
 
-            Context 'When using several parameters that are mutual exclusive' {
+            Context 'When using several parameters that are mutually exclusive' {
                 It 'Should throw an error' {
                     $errorMessage = `
                         $script:localizedData.ParameterUsageWrong `
@@ -1947,8 +1947,8 @@ InModuleScope $script:subModuleName {
                                 param3 = 'value3'
                                 param4 = 'value4'
                             }
-                            MutualExclusiveList1 = @('param1','param2')
-                            MutualExclusiveList2 = @('param3','param4')
+                            MutuallyExclusiveList1 = @('param1','param2')
+                            MutuallyExclusiveList2 = @('param3','param4')
                         }
 
                         Assert-BoundParameter @assertBoundParameterParameters

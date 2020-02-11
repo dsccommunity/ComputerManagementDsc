@@ -175,10 +175,10 @@ function Set-TargetResource
 
     $assertBoundParameterParameters = @{
         BoundParameterList = $PSBoundParameters
-        MutualExclusiveList1 = @(
+        MutuallyExclusiveList1 = @(
             'NotificationLevel'
         )
-        MutualExclusiveList2 = $script:granularUserAccountControlParameterNames
+        MutuallyExclusiveList2 = $script:granularUserAccountControlParameterNames
     }
 
     Assert-BoundParameter @assertBoundParameterParameters
@@ -366,10 +366,10 @@ function Test-TargetResource
 
     $assertBoundParameterParameters = @{
         BoundParameterList = $PSBoundParameters
-        MutualExclusiveList1 = @(
+        MutuallyExclusiveList1 = @(
             'NotificationLevel'
         )
-        MutualExclusiveList2 = $script:granularUserAccountControlParameterNames
+        MutuallyExclusiveList2 = $script:granularUserAccountControlParameterNames
     }
 
     Assert-BoundParameter @assertBoundParameterParameters

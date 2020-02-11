@@ -55,6 +55,7 @@ try
                 @{
                     NodeName = 'localhost'
 
+                    # Setting value that are somewhat safe to change temporarily in a build worker.
                     ConsentPromptBehaviorUser = $script:testConsentPromptBehaviorUserValue
                     EnableInstallerDetection = $script:testEnableInstallerDetectionValue
                 }
@@ -63,7 +64,7 @@ try
 
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:dscResourceName)_GranularSettings_Config" `
+                & "$($script:dscResourceName)_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
@@ -88,7 +89,7 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:dscResourceName)_GranularSettings_Config"
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
 
             $current.IsSingleInstance | Should -Be 'Yes'
@@ -108,15 +109,15 @@ try
                 @{
                     NodeName = 'localhost'
 
-                    OriginalConsentPromptBehaviorUser = $script:currentUserAccountControlSettings.ConsentPromptBehaviorUser
-                    OriginalEnableInstallerDetection = $script:currentUserAccountControlSettings.EnableInstallerDetection
+                    ConsentPromptBehaviorUser = $script:currentUserAccountControlSettings.ConsentPromptBehaviorUser
+                    EnableInstallerDetection = $script:currentUserAccountControlSettings.EnableInstallerDetection
                 }
             )
         }
 
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:dscResourceName)_Cleanup_Config" `
+                & "$($script:dscResourceName)_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
