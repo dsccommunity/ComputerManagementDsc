@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added new resource IEEnhancedSecurityConfiguration (moved from module
   xSystemSecurity).
+- Added new resource UserAccountControl (moved from module
+  xSystemSecurity).
 
 ### Changed
 

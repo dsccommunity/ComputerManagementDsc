@@ -1,0 +1,15 @@
+[ClassVersion("1.0.0.0"), FriendlyName("UserAccountControl")]
+class DSC_UserAccountControl : OMI_BaseResource
+{
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'."), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Write, Description("Specifies the desired notification level for the User Account Control setting. This parameter can not be used at the same time as any of the granular parameters."), ValueMap{"AlwaysNotify", "AlwaysNotifyAndAskForCredentials", "NotifyChanges", "NotifyChangesWithoutDimming", "NeverNotify", "NeverNotifyAndDisableAll"}, Values{"AlwaysNotify", "AlwaysNotifyAndAskForCredentials", "NotifyChanges", "NotifyChangesWithoutDimming", "NeverNotify", "NeverNotifyAndDisableAll"}] String NotificationLevel;
+    [Write, Description("Specifies the mode for the built-in administrator account (RID 500)."), ValueMap{"0", "1"}, Values{"0", "1"}] UInt16 FilterAdministratorToken;
+    [Write, Description("Specifies the prompt behavior for the Consent Administrator."), ValueMap{"0", "1", "2", "3", "4", "5"}, Values{"0", "1", "2", "3", "4", "5"}] UInt16 ConsentPromptBehaviorAdmin;
+    [Write, Description("Specifies how the operations that requires elevation is handled for users."), ValueMap{"0", "1", "3"}, Values{"0", "1", "3"}] UInt16 ConsentPromptBehaviorUser;
+    [Write, Description("Specifies how package installations are handled."), ValueMap{"0", "1"}, Values{"0", "1"}] UInt16 EnableInstallerDetection;
+    [Write, Description("Specifies how cryptographic signatures on interactive applications are handled."), ValueMap{"0", "1"}, Values{"0", "1"}] UInt16 ValidateAdminCodeSignatures;
+    [Write, Description("Specifies how the 'administrator in Admin Approval Mode' user type are handled."), ValueMap{"0", "1"}, Values{"0", "1"}] UInt16 EnableLua;
+    [Write, Description("Specifies if secure desktop prompting are used."), ValueMap{"0", "1"}, Values{"0", "1"}] UInt16 PromptOnSecureDesktop;
+    [Write, Description("Specifies how redirection of legacy application File and Registry writes are handled."), ValueMap{"0", "1"}, Values{"0", "1"}] UInt16 EnableVirtualization;
+    [Write, Description("Specifies if a restart of the node should be suppressed. By default the node will be restarted if the value is changed.")] Boolean SuppressRestart;
+};
