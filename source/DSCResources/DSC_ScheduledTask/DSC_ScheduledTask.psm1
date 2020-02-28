@@ -1408,6 +1408,8 @@ function Test-TargetResource
 
         $PSBoundParameters['LogonType'] = 'ServiceAccount'
         $currentValues['LogonType'] = 'ServiceAccount'
+
+        $PSBoundParameters['BuiltInAccount'] = 'NT AUTHORITY\' + $BuiltInAccount
     }
     elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
     {
