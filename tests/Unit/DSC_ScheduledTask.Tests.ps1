@@ -1723,7 +1723,7 @@ try
                             }
                         )
                         Principal = [pscustomobject] @{
-                            UserId    = $testParameters.BuiltInAccount
+                            UserId    = 'NT AUTHORITY\' + $testParameters.BuiltInAccount
                             LogonType = 'ServiceAccount'
                         }
                     }
