@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- ComputerManagementDsc
+  - Added new resource DismFeature.
+
 ## [8.0.0] - 2020-02-14
 
 ### Added

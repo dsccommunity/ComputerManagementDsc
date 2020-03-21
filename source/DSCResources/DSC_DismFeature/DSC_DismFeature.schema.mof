@@ -1,0 +1,9 @@
+[ClassVersion("1.0.0.0"), FriendlyName("DismFeature")]
+class DSC_DismFeature : OMI_BaseResource
+{
+    [Write, Description("Specifies if the feature should be present or absent. Defaults to 'Present'."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Key, Description("Specifies the name of the feature.")] String Name;
+    [Write, Description("Specifies the location of the source if needed to install the feature. E.g. 'C:\\sources\\sxs'.")] String Source;
+    [Write, Description("Specifies whether all the parent features should also be enabled when installing the feature. Defaults to $true.")] Boolean EnableAllParentFeatures;
+    [Write, Description("Specifies if a restart of the node should be suppressed. By default the node will be restarted if the feature requires as restart.")] Boolean SuppressRestart;
+};

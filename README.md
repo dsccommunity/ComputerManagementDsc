@@ -32,6 +32,8 @@ The **ComputerManagementDsc** module contains the following resources:
 - **Computer**: This resource allows you to configure a computer by changing its
   name and description and modifying its Active Directory domain or workgroup
   membership.
+- **DismFeature**: The resource allows you to enables or disables Windows
+  optional features that specifically need to be handled by DISM.
 - **IEEnhancedSecurityConfiguration**: This resource allows you to configure
   the IE Enhanced Security Configuration for administrator or user roles.
 - **OfflineDomainJoin**: This resource allows you to join computers to an Active
