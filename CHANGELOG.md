@@ -5,6 +5,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- ComputerManagementDsc
+  - Added build task `Generate_Conceptual_Help` to generate conceptual help
+    for the DSC resource.
+  - Added build task `Generate_Wiki_Content` to generate the wiki content
+    that can be used to update the GitHub Wiki.
+
 ## [8.0.0] - 2020-02-14
 
 ### Added

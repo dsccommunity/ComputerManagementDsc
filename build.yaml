@@ -22,6 +22,8 @@ BuildWorkflow:
     - Build_Module_ModuleBuilder
     - Build_NestedModules_ModuleBuilder
     - Create_changelog_release_output
+    - Generate_Conceptual_Help
+    - Generate_Wiki_Content
 
   pack:
     - build
@@ -37,7 +39,6 @@ BuildWorkflow:
   publish:
     - Publish_release_to_GitHub
     - publish_module_to_gallery
-
 
 ####################################################
 #       PESTER Configuration                       #
@@ -68,6 +69,8 @@ Resolve-Dependency:
 ModuleBuildTasks:
   Sampler:
     - '*.build.Sampler.ib.tasks'
+  DscResource.DocGenerator:
+    - 'Task.*'
 
 TaskHeader: |
   param($Path)
