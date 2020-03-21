@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ComputerManagementDsc
   - Updated CI pipeline files.
+  - No longer run integration tests when running the build task `test`, e.g.
+    `.\build.ps1 -Task test`. To manually run integration tests, run the
+    following:
+    ```powershell
+    .\build.ps1 -Tasks test -PesterScript 'tests/Integration' -CodeCoverageThreshold 0
+    ```
 
 ## [8.0.0] - 2020-02-14
 
