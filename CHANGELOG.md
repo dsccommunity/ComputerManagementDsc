@@ -5,9 +5,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- ScheduledTask:
-  - Added missing 'NT Authority\' domain prefix when testing tasks that use the BuiltInAccount property.
-  
 ## [8.0.0] - 2020-02-14
 
 ### Added
@@ -47,6 +44,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - WindowsCapability:
   - Fix `A parameter cannot be found that matches parameter name 'Ensure'.`
     error in `Test-TargetResource` - Fixes [Issue #297](https://github.com/dsccommunity/ComputerManagementDsc/issues/297).
+- ScheduledTask:
+  - Added missing 'NT Authority\' domain prefix when testing tasks that use the BuiltInAccount property.
+  - Fixes [Issue #317](https://github.com/dsccommunity/ComputerManagementDsc/issues/317)
 
 ### Security
 
