@@ -18,7 +18,7 @@ param
     [validateScript(
         { Test-Path -Path $_ }
     )]
-    $BuildConfig = './build.yaml',
+    $BuildConfig,
 
     [Parameter()]
     # A Specific folder to build the artefact into.
@@ -35,15 +35,15 @@ param
     [Parameter()]
     $RequiredModulesDirectory = $(Join-Path 'output' 'RequiredModules'),
 
+    [Parameter()]
+    [object[]]
+    $PesterScript,
+
     # Filter which tags to run when invoking Pester tests
     # This is used in the Invoke-Pester.pester.build.ps1 tasks
     [Parameter()]
     [string[]]
     $PesterTag,
-
-    [Parameter()]
-    [string[]]
-    $PesterScript,
 
     # Filter which tags to exclude when invoking Pester tests
     # This is used in the Invoke-Pester.pester.build.ps1 tasks
@@ -51,10 +51,21 @@ param
     [string[]]
     $PesterExcludeTag,
 
+    # Filter which tags to run when invoking DSC Resource tests
+    # This is used in the DscResource.Test.build.ps1 tasks
+    [Parameter()]
+    [string[]]
+    $DscTestTag,
+
+    # Filter which tags to exclude when invoking DSC Resource tests
+    # This is used in the DscResource.Test.build.ps1 tasks
+    [Parameter()]
+    [string[]]
+    $DscTestExcludeTag,
+
     [Parameter()]
     [Alias('bootstrap')]
-    [switch]
-    $ResolveDependency,
+    [switch]$ResolveDependency,
 
     [Parameter(DontShow)]
     [AllowNull()]
@@ -211,6 +222,22 @@ process
 
 Begin
 {
+    # Find build config if not specified
+    if (-not $BuildConfig) {
+        $config = Get-ChildItem -Path "$PSScriptRoot\*" -Include 'build.y*ml', 'build.psd1', 'build.json*' -ErrorAction:Ignore
+        if (-not $config -or ($config -is [array] -and $config.Length -le 0)) {
+            throw "No build configuration found. Specify path via -BuildConfig"
+        }
+        elseif ($config -is [array]) {
+            if ($config.Length -gt 1) {
+                throw "More than one build configuration found. Specify which one to use via -BuildConfig"
+            }
+            $BuildConfig = $config[0]
+        }
+        else {
+            $BuildConfig = $config
+        }
+    }
     # Bootstrapping the environment before using Invoke-Build as task runner
 
     if ($MyInvocation.ScriptName -notLike '*Invoke-Build.ps1')
@@ -309,7 +336,7 @@ Begin
         # If BuildConfig is a Yaml file, bootstrap powershell-yaml via ResolveDependency
         if ($BuildConfig -match '\.[yaml|yml]$')
         {
-            $ResolveDependencyParams.add('WithYaml', $true)
+            $ResolveDependencyParams.add('WithYaml', $True)
         }
 
         $ResolveDependencyAvailableParams = (Get-Command -Name '.\Resolve-Dependency.ps1').parameters.keys
