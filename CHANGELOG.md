@@ -24,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     .\build.ps1 -Tasks test -PesterScript 'tests/Integration' -CodeCoverageThreshold 0
     ```
 
+### Fixed
+
+- ScheduledTask:
+  - Added missing 'NT Authority\' domain prefix when testing tasks that use
+    the BuiltInAccount property - Fixes [Issue #317](https://github.com/dsccommunity/ComputerManagementDsc/issues/317)
+
 ## [8.0.0] - 2020-02-14
 
 ### Added

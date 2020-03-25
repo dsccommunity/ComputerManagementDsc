@@ -39,6 +39,7 @@ try
                 ExecuteAs         = 'ScheduledTaskExecuteAs'
                 ExecuteAsGroup    = 'ScheduledTaskExecuteAsGroup'
                 OnEvent           = 'ScheduledTaskOnEvent'
+                BuiltInAccount    = 'ScheduledTaskServiceAccount'
             }
 
             $configData = @{

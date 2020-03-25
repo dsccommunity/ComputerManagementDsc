@@ -259,6 +259,28 @@ Configuration ScheduledTaskOnEventAdd
     }
 }
 
+Configuration ScheduledTaskServiceAccountAdd
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskServiceAccountAdd
+        {
+            TaskName           = 'Test task BuiltInAccount'
+            TaskPath           = '\ComputerManagementDsc\'
+            Ensure             = 'Present'
+            LogonType          = 'ServiceAccount'
+            BuiltInAccount     = 'LOCAL SERVICE'
+            RunLevel           = 'Limited'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'Once'
+            RepeatInterval     = '00:15:00'
+            RepetitionDuration = 'Indefinitely'
+        }
+    }
+}
+
 Configuration ScheduledTaskOnceMod
 {
     Import-DscResource -ModuleName ComputerManagementDsc
@@ -425,6 +447,28 @@ Configuration ScheduledTaskOnEventMod
             ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
             EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7002)]]</Select></Query></QueryList>'
             Delay             = '00:00:45'
+        }
+    }
+}
+
+Configuration ScheduledTaskServiceAccountMod
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskServiceAccountMod
+        {
+            TaskName           = 'Test task BuiltInAccount'
+            TaskPath           = '\ComputerManagementDsc\'
+            Ensure             = 'Present'
+            LogonType          = 'ServiceAccount'
+            BuiltInAccount     = 'NETWORK SERVICE'
+            RunLevel           = 'Limited'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'Once'
+            RepeatInterval     = '00:15:00'
+            RepetitionDuration = 'Indefinitely'
         }
     }
 }
@@ -600,6 +644,29 @@ Configuration ScheduledTaskOnEventDel
             ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
             EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
             Delay             = '00:00:30'
+        }
+    }
+}
+
+Configuration ScheduledTaskServiceAccountDel
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskServiceAccountDel
+        {
+            TaskName           = 'Test task BuiltInAccount'
+            TaskPath           = '\ComputerManagementDsc\'
+            Ensure             = 'Absent'
+            LogonType          = 'ServiceAccount'
+            BuiltInAccount     = 'LOCAL SERVICE'
+            RunLevel           = 'Limited'
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType       = 'Once'
+            RepeatInterval     = '00:15:00'
+            RepetitionDuration = 'Indefinitely'
+            ActionWorkingPath  = (Get-Location).Path
         }
     }
 }
