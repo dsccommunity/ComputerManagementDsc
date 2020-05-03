@@ -1859,7 +1859,6 @@ function Get-CurrentResource
         if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
         {
             Write-Verbose -Message 'LogonType is ServiceAccount' -Verbose
-            Write-Verbose -Message ($result | Out-String) -Verbose
             Write-Verbose -Message ($task.Principal | Out-String) -Verbose
 
             $builtInAccount = $task.Principal.UserId
