@@ -224,7 +224,7 @@ Configuration ScheduledTaskExecuteAsGroupAdd
     {
         $executeAsCredential = New-Object `
             -TypeName System.Management.Automation.PSCredential `
-            -ArgumentList ('BUILTIN\Users', (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
+            -ArgumentList ('Users', (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
 
         ScheduledTask ScheduledTaskExecuteAsGroupAdd
         {
@@ -428,7 +428,7 @@ Configuration ScheduledTaskExecuteAsGroupMod
     {
         $executeAsCredential = New-Object `
             -TypeName System.Management.Automation.PSCredential `
-            -ArgumentList ('BUILTIN\Users', (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
+            -ArgumentList ('Users', (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
 
         ScheduledTask ScheduledTaskExecuteAsGroupMod
         {
