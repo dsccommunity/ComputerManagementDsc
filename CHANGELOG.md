@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change Azure DevOps Pipeline definition to include `source/*` - Fixes [Issue #324](https://github.com/dsccommunity/ComputerManagementDsc/issues/324).
 - Updated pipeline to use `latest` version of `ModuleBuilder` - Fixes [Issue #324](https://github.com/dsccommunity/ComputerManagementDsc/issues/324).
 - Merge `HISTORIC_CHANGELOG.md` into `CHANGELOG.md` - Fixes [Issue #325](https://github.com/dsccommunity/ComputerManagementDsc/issues/325).
+- ScheduledTask:
+  - Fix ServiceAccount behavior on Windows Server 2016 - Fixes [Issue #323](https://github.com/dsccommunity/ComputerManagementDsc/issues/323).
 
 ### Fixed
 
