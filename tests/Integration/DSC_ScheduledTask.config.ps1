@@ -403,13 +403,19 @@ Configuration ScheduledTaskExecuteAsMod
 
     node 'localhost'
     {
+        $executeAsCredential = New-Object `
+            -TypeName System.Management.Automation.PSCredential `
+            -ArgumentList ("$ENV:COMPUTERNAME\$ENV:USERNAME", (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
+
         ScheduledTask ScheduledTaskExecuteAsMod
         {
-            TaskName         = 'Test task Logon'
-            TaskPath         = '\ComputerManagementDsc\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType     = 'AtLogOn'
-            RunLevel         = 'Limited'
+            TaskName            = 'Test task Logon'
+            TaskPath            = '\ComputerManagementDsc\'
+            ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType        = 'AtLogOn'
+            ExecuteAsCredential = $executeAsCredential
+            LogonType           = 'Interactive'
+            RunLevel            = 'Highest'
         }
     }
 }
@@ -420,13 +426,19 @@ Configuration ScheduledTaskExecuteAsGroupMod
 
     node 'localhost'
     {
+        $executeAsCredential = New-Object `
+            -TypeName System.Management.Automation.PSCredential `
+            -ArgumentList ('BUILTIN\Users', (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
+
         ScheduledTask ScheduledTaskExecuteAsGroupMod
         {
-            TaskName         = 'Test task Logon with BuiltIn Group'
-            TaskPath         = '\ComputerManagementDsc\'
-            ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType     = 'AtLogOn'
-            RunLevel         = 'Limited'
+            TaskName            = 'Test task Logon with BuiltIn Group'
+            TaskPath            = '\ComputerManagementDsc\'
+            ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            LogonType           = 'Group'
+            ExecuteAsCredential = $executeAsCredential
+            ScheduleType        = 'AtLogOn'
+            RunLevel            = 'Limited'
         }
     }
 }
