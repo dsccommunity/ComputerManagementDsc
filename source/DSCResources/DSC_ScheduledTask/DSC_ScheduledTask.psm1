@@ -1808,6 +1808,9 @@ function Get-CurrentResource
             $PrincipalId = 'UserId'
         }
 
+        Write-Verbose -Message 'Principal' -Verbose
+        Write-Verbose -Message ($task.Principal | Out-String) -Verbose
+
         $result = @{
             TaskName                        = $task.TaskName
             TaskPath                        = $task.TaskPath
