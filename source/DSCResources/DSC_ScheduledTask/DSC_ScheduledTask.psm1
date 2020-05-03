@@ -1858,14 +1858,14 @@ function Get-CurrentResource
 
         if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
         {
-            $userId = $task.Principal.UserId
+            $builtInAccount = $task.Principal.UserId
 
-            if ($userId -like 'NT AUTHORITY\*')
+            if ($builtInAccount -like 'NT AUTHORITY\*')
             {
-                $userId = "NT AUTHORITY\$($userId)"
+                $builtInAccount = "NT AUTHORITY\$($builtInAccount)"
             }
 
-            $result.Add('BuiltInAccount', $task.Principal.UserId)
+            $result.Add('BuiltInAccount', $builtInAccount)
         }
     }
 
