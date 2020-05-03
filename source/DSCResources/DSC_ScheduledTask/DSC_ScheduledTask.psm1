@@ -1860,9 +1860,9 @@ function Get-CurrentResource
         {
             $builtInAccount = $task.Principal.UserId
 
-            if ($builtInAccount -like 'NT AUTHORITY\*')
+            if (-not $builtInAccount.Contains('\'))
             {
-                $builtInAccount = "NT AUTHORITY\$($builtInAccount)"
+                $builtInAccount = "NT AUTHORITY\$builtInAccount"
             }
 
             $result.Add('BuiltInAccount', $builtInAccount)
