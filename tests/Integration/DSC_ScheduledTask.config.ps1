@@ -226,7 +226,7 @@ Configuration ScheduledTaskExecuteAsGroupAdd
             -TypeName System.Management.Automation.PSCredential `
             -ArgumentList ('BUILTIN\Users', (ConvertTo-SecureString -String 'Ignore' -AsPlainText -Force))
 
-        ScheduledTask ScheduledTaskExecuteAsAdd
+        ScheduledTask ScheduledTaskExecuteAsGroupAdd
         {
             TaskName            = 'Test task Logon with BuiltIn Group'
             TaskPath            = '\ComputerManagementDsc\'
@@ -420,7 +420,7 @@ Configuration ScheduledTaskExecuteAsGroupMod
 
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskLogonMod
+        ScheduledTask ScheduledTaskExecuteAsGroupMod
         {
             TaskName         = 'Test task Logon with BuiltIn Group'
             TaskPath         = '\ComputerManagementDsc\'
@@ -600,7 +600,7 @@ Configuration ScheduledTaskExecuteAsDel
 
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskLogonDel
+        ScheduledTask ScheduledTaskExecuteAsDel
         {
             TaskName         = 'Test task Logon'
             TaskPath         = '\ComputerManagementDsc\'
@@ -617,7 +617,7 @@ Configuration ScheduledTaskExecuteAsGroupDel
 
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskLogonDel
+        ScheduledTask ScheduledTaskExecuteAsGroupDel
         {
             TaskName         = 'Test task Logon with BuiltIn Group'
             TaskPath         = '\ComputerManagementDsc\'
