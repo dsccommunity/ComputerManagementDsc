@@ -35,6 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     to use a group name that does not include a domain name `BUILTIN\`.
   - Added known issues to the documentation for describing `ExecuteAsCredential`
     behavior - Fixes [Issue #294](https://github.com/dsccommunity/ComputerManagementDsc/issues/294).
+- PendingReboot:
+  - Changed integration tests to `SkipPendingFileRename` check because
+    some Azure DevOps Agent images have the pending file rename flag set
+    to true by default.
 
 ### Fixed
 

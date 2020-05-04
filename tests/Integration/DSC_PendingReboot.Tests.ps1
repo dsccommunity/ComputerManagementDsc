@@ -59,7 +59,7 @@ try
                         RebootName                  = 'TestReboot'
                         SkipComponentBasedServicing = $false
                         SkipWindowsUpdate           = $false
-                        SkipPendingFileRename       = $false
+                        SkipPendingFileRename       = $true
                         SkipPendingComputerRename   = $false
                         SkipCcmClientSDK            = $true
                     }
