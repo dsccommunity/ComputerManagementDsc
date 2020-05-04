@@ -1861,7 +1861,7 @@ function Get-CurrentResource
 
         if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
         {
-            $buildInAccount = Set-DomainNameInAccountName -AccountName $task.Principal.UserId -DomainName 'NT AUTHORITY'
+            $builtInAccount = Set-DomainNameInAccountName -AccountName $task.Principal.UserId -DomainName 'NT AUTHORITY'
             $result.Add('BuiltInAccount', $builtInAccount)
         }
     }
