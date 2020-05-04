@@ -2189,6 +2189,32 @@ try
                 }
             }
         }
+
+        Describe 'DSC_ScheduledTask\Set-DomainNameInAccountName' {
+            Context 'When the account name does not have a domain name' {
+                It 'Should return NewDomain\Users' {
+                    Set-DomainNameInAccountName -AccountName 'Users' -DomainName 'NewDomain' | Should -BeExactly 'NewDomain\Users'
+                }
+            }
+
+            Context 'When the account name has an empty domain' {
+                It 'Should return NewDomain\Users' {
+                    Set-DomainNameInAccountName -AccountName '\Users' -DomainName 'NewDomain' | Should -BeExactly 'NewDomain\Users'
+                }
+            }
+
+            Context 'When the account name has a domain name and force is not set' {
+                It 'Should return ExistingDomain\Users' {
+                    Set-DomainNameInAccountName -AccountName 'ExistingDomain\Users' -DomainName 'NewDomain' | Should -BeExactly 'ExistingDomain\Users'
+                }
+            }
+
+            Context 'When the account name has a domain name and force is set' {
+                It 'Should return NewDomain\Users' {
+                    Set-DomainNameInAccountName -AccountName 'ExistingDomain\Users' -DomainName 'NewDomain' -Force | Should -BeExactly 'NewDomain\Users'
+                }
+            }
+        }
     }
 }
 finally
