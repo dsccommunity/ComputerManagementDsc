@@ -37,7 +37,19 @@ try
                 reboot flag and then set it to reboot required. After the tests
                 have run we will determine if the Get-TargetResource indicates
                 that a reboot would have been required.
+
+                Also, on Azure DevOps Agents, there are sometimes pending file
+                rename operations that also cause the test to fail. So we will
+                also preserve the state of this setting.
             #>
+            $rebootRegistryKeys = @{
+                ComponentBasedServicing = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\'
+                WindowsUpdate           = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\'
+                PendingFileRename       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\'
+                ActiveComputerName      = 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName'
+                PendingComputerName     = 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName'
+            }
+
             $windowsUpdateKeys = (Get-ChildItem -Path $rebootRegistryKeys.WindowsUpdate).Name
 
             if ($windowsUpdateKeys)
@@ -52,6 +64,13 @@ try
                     -Name 'RebootRequired'
             }
 
+            $script:pendingFileRenameState = (Get-ItemProperty -Path $rebootRegistryKeys.PendingFileRename).PendingFileRenameOperations
+
+            if (-not [System.String]::IsNullOrEmpty($script:pendingFileRenameState))
+            {
+                $null = Set-ItemProperty -Path $rebootRegistryKeys.PendingFileRename -Name PendingFileRenameOperations -Value ''
+            }
+
             $configData = @{
                 AllNodes = @(
                     @{
@@ -59,7 +78,7 @@ try
                         RebootName                  = 'TestReboot'
                         SkipComponentBasedServicing = $false
                         SkipWindowsUpdate           = $false
-                        SkipPendingFileRename       = $true
+                        SkipPendingFileRename       = $false
                         SkipPendingComputerRename   = $false
                         SkipCcmClientSDK            = $true
                     }
@@ -124,6 +143,11 @@ finally
         $null = Remove-Item `
             -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' `
             -ErrorAction SilentlyContinue
+    }
+
+    if (-not [System.String]::IsNullOrEmpty($script:pendingFileRenameState))
+    {
+        $null = Set-ItemProperty -Path $rebootRegistryKeys.PendingFileRename -Name PendingFileRenameOperations -Value $script:pendingFileRenameState
     }
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
