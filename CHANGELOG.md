@@ -36,9 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added known issues to the documentation for describing `ExecuteAsCredential`
     behavior - Fixes [Issue #294](https://github.com/dsccommunity/ComputerManagementDsc/issues/294).
 - PendingReboot:
-  - Changed integration tests to `SkipPendingFileRename` check because
-    some Azure DevOps Agent images have the pending file rename flag set
-    to true by default.
+  - Changed integration tests to clear pending file rename reboot flag before
+    executing tests and restoring when complete.
 
 ### Fixed
 
