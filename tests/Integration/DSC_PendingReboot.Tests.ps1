@@ -96,17 +96,23 @@ try
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $current.Name | Should -Be $configData.AllNodes[0].RebootName
-                $current.SkipComponentBasedServicing | Should -Be $configData.AllNodes[0].SkipComponentBasedServicing
                 $current.ComponentBasedServicing | Should -BeFalse
-                $current.SkipWindowsUpdate | Should -Be $configData.AllNodes[0].SkipWindowsUpdate
                 $current.WindowsUpdate | Should -BeTrue
-                $current.SkipPendingFileRename | Should -Be $configData.AllNodes[0].SkipPendingFileRename
                 $current.PendingFileRename | Should -BeFalse
-                $current.SkipPendingComputerRename | Should -Be $configData.AllNodes[0].SkipPendingComputerRename
                 $current.PendingComputerRename | Should -BeFalse
-                $current.SkipCcmClientSDK | Should -Be $configData.AllNodes[0].SkipCcmClientSDK
                 $current.CcmClientSDK | Should -BeFalse
                 $current.RebootRequired | Should -BeTrue
+                <#
+                    The actual values assigned to the Skip* parameters
+                    are not returned by Get-TargetResource because they
+                    are set only (control) parameters, so can not be
+                    evaluated except to check the default values.
+                #>
+                $current.SkipComponentBasedServicing | Should -BeFalse
+                $current.SkipWindowsUpdate | Should -BeFalse
+                $current.SkipPendingFileRename | Should -BeFalse
+                $current.SkipPendingComputerRename | Should -BeFalse
+                $current.SkipCcmClientSDK | Should -BeTrue
             }
         }
     }
