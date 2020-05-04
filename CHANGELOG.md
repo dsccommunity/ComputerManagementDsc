@@ -30,6 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Merge `HISTORIC_CHANGELOG.md` into `CHANGELOG.md` - Fixes [Issue #325](https://github.com/dsccommunity/ComputerManagementDsc/issues/325).
 - ScheduledTask:
   - Fix ServiceAccount behavior on Windows Server 2016 - Fixes [Issue #323](https://github.com/dsccommunity/ComputerManagementDsc/issues/323).
+  - Fixed problems in integration test configuration naming.
+  - Changed `ScheduledTaskExecuteAsGroupAdd` and `ScheduledTaskExecuteAsGroupMod`
+    to use a group name that does not include a domain name `BUILTIN\`.
+  - Added known issues to the documentation for describing `ExecuteAsCredential`
+    behavior - Fixes [Issue #294](https://github.com/dsccommunity/ComputerManagementDsc/issues/294).
 
 ### Fixed
 
