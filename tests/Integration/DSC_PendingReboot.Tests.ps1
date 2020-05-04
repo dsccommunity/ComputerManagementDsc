@@ -42,7 +42,7 @@ try
                 rename operations that also cause the test to fail. So we will
                 also preserve the state of this setting.
             #>
-            $rebootRegistryKeys = @{
+            $script:rebootRegistryKeys = @{
                 ComponentBasedServicing = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\'
                 WindowsUpdate           = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\'
                 PendingFileRename       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\'
@@ -50,7 +50,7 @@ try
                 PendingComputerName     = 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName'
             }
 
-            $windowsUpdateKeys = (Get-ChildItem -Path $rebootRegistryKeys.WindowsUpdate).Name
+            $windowsUpdateKeys = (Get-ChildItem -Path $script:rebootRegistryKeys.WindowsUpdate).Name
 
             if ($windowsUpdateKeys)
             {
@@ -60,15 +60,17 @@ try
             if (-not $script:currentAutoUpdateRebootState)
             {
                 $null = New-Item `
-                    -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' `
+                    -Path $script:rebootRegistryKeys.WindowsUpdate `
                     -Name 'RebootRequired'
             }
 
-            $script:pendingFileRenameState = (Get-ItemProperty -Path $rebootRegistryKeys.PendingFileRename).PendingFileRenameOperations
+            $script:currentPendingFileRenameState = (Get-ItemProperty -Path $script:rebootRegistryKeys.PendingFileRename).PendingFileRenameOperations
 
-            if (-not [System.String]::IsNullOrEmpty($script:pendingFileRenameState))
+            if ($script:currentPendingFileRenameState)
             {
-                $null = Set-ItemProperty -Path $rebootRegistryKeys.PendingFileRename -Name PendingFileRenameOperations -Value ''
+                $null = Remove-ItemProperty `
+                    -Path $script:rebootRegistryKeys.PendingFileRename `
+                    -Name PendingFileRenameOperations
             }
 
             $configData = @{
@@ -145,9 +147,12 @@ finally
             -ErrorAction SilentlyContinue
     }
 
-    if (-not [System.String]::IsNullOrEmpty($script:pendingFileRenameState))
+    if ($script:currentPendingFileRenameState)
     {
-        $null = Set-ItemProperty -Path $rebootRegistryKeys.PendingFileRename -Name PendingFileRenameOperations -Value $script:pendingFileRenameState
+        $null = Set-ItemProperty `
+            -Path $script:rebootRegistryKeys.PendingFileRename `
+            -Name PendingFileRenameOperations `
+            -Value $script:currentPendingFileRenameState
     }
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
