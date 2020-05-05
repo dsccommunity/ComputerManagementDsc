@@ -2191,13 +2191,13 @@ try
         }
 
         Describe 'DSC_ScheduledTask\Set-DomainNameInAccountName' {
-            Context 'When the account name does not have a domain name' {
+            Context 'When the account name does not have a domain name and force is not set' {
                 It 'Should return NewDomain\Users' {
                     Set-DomainNameInAccountName -AccountName 'Users' -DomainName 'NewDomain' | Should -BeExactly 'NewDomain\Users'
                 }
             }
 
-            Context 'When the account name has an empty domain' {
+            Context 'When the account name has an empty domain and force is not set' {
                 It 'Should return NewDomain\Users' {
                     Set-DomainNameInAccountName -AccountName '\Users' -DomainName 'NewDomain' | Should -BeExactly 'NewDomain\Users'
                 }
@@ -2212,6 +2212,12 @@ try
             Context 'When the account name has a domain name and force is set' {
                 It 'Should return NewDomain\Users' {
                     Set-DomainNameInAccountName -AccountName 'ExistingDomain\Users' -DomainName 'NewDomain' -Force | Should -BeExactly 'NewDomain\Users'
+                }
+            }
+
+            Context 'When the account name does not have a domain name and force is set' {
+                It 'Should return NewDomain\Users' {
+                    Set-DomainNameInAccountName -AccountName 'Users' -DomainName 'NewDomain' -Force | Should -BeExactly 'NewDomain\Users'
                 }
             }
         }

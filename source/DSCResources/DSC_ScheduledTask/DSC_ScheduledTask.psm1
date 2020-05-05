@@ -1952,8 +1952,9 @@ function Set-DomainNameInAccountName
     {
         $existingDomainName, $name = ($AccountName -Split '\\')
 
-        if (-not $force -and -not [System.String]::IsNullOrEmpty($existingDomainName))
+        if (-not [System.String]::IsNullOrEmpty($existingDomainName) -and -not $force.IsPresent)
         {
+            # Keep the existing domain name if it is set and force is not specified
             $DomainName = $existingDomainName
         }
     }
