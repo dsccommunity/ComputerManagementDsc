@@ -5,6 +5,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Change Azure DevOps Pipeline definition to include `source/*` - Fixes [Issue #324](https://github.com/dsccommunity/ComputerManagementDsc/issues/324).
+- Updated pipeline to use `latest` version of `ModuleBuilder` - Fixes [Issue #324](https://github.com/dsccommunity/ComputerManagementDsc/issues/324).
+- Merge `HISTORIC_CHANGELOG.md` into `CHANGELOG.md` - Fixes [Issue #325](https://github.com/dsccommunity/ComputerManagementDsc/issues/325).
+- ScheduledTask:
+  - Fix ServiceAccount behavior on Windows Server 2016 - Fixes [Issue #323](https://github.com/dsccommunity/ComputerManagementDsc/issues/323).
+  - Fixed problems in integration test configuration naming.
+  - Changed `ScheduledTaskExecuteAsGroupAdd` and `ScheduledTaskExecuteAsGroupMod`
+    to use a group name that does not include a domain name `BUILTIN\`.
+  - Added known issues to the documentation for describing `ExecuteAsCredential`
+    behavior - Fixes [Issue #294](https://github.com/dsccommunity/ComputerManagementDsc/issues/294).
+- PendingReboot:
+  - Changed integration tests to clear pending file rename reboot flag before
+    executing tests and restoring when complete.
+
 ## [8.1.0] - 2020-03-26
 
 ### Added
@@ -25,19 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     ```powershell
     .\build.ps1 -Tasks test -PesterScript 'tests/Integration' -CodeCoverageThreshold 0
     ```
-- Change Azure DevOps Pipeline definition to include `source/*` - Fixes [Issue #324](https://github.com/dsccommunity/ComputerManagementDsc/issues/324).
-- Updated pipeline to use `latest` version of `ModuleBuilder` - Fixes [Issue #324](https://github.com/dsccommunity/ComputerManagementDsc/issues/324).
-- Merge `HISTORIC_CHANGELOG.md` into `CHANGELOG.md` - Fixes [Issue #325](https://github.com/dsccommunity/ComputerManagementDsc/issues/325).
-- ScheduledTask:
-  - Fix ServiceAccount behavior on Windows Server 2016 - Fixes [Issue #323](https://github.com/dsccommunity/ComputerManagementDsc/issues/323).
-  - Fixed problems in integration test configuration naming.
-  - Changed `ScheduledTaskExecuteAsGroupAdd` and `ScheduledTaskExecuteAsGroupMod`
-    to use a group name that does not include a domain name `BUILTIN\`.
-  - Added known issues to the documentation for describing `ExecuteAsCredential`
-    behavior - Fixes [Issue #294](https://github.com/dsccommunity/ComputerManagementDsc/issues/294).
-- PendingReboot:
-  - Changed integration tests to clear pending file rename reboot flag before
-    executing tests and restoring when complete.
 
 ### Fixed
 
