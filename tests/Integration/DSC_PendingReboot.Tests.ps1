@@ -37,8 +37,20 @@ try
                 reboot flag and then set it to reboot required. After the tests
                 have run we will determine if the Get-TargetResource indicates
                 that a reboot would have been required.
+
+                Also, on Azure DevOps Agents, there are sometimes pending file
+                rename operations that also cause the test to fail. So we will
+                also preserve the state of this setting.
             #>
-            $windowsUpdateKeys = (Get-ChildItem -Path $rebootRegistryKeys.WindowsUpdate).Name
+            $script:rebootRegistryKeys = @{
+                ComponentBasedServicing = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\'
+                WindowsUpdate           = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\'
+                PendingFileRename       = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\'
+                ActiveComputerName      = 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName'
+                PendingComputerName     = 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName'
+            }
+
+            $windowsUpdateKeys = (Get-ChildItem -Path $script:rebootRegistryKeys.WindowsUpdate).Name
 
             if ($windowsUpdateKeys)
             {
@@ -48,8 +60,17 @@ try
             if (-not $script:currentAutoUpdateRebootState)
             {
                 $null = New-Item `
-                    -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' `
+                    -Path $script:rebootRegistryKeys.WindowsUpdate `
                     -Name 'RebootRequired'
+            }
+
+            $script:currentPendingFileRenameState = (Get-ItemProperty -Path $script:rebootRegistryKeys.PendingFileRename).PendingFileRenameOperations
+
+            if ($script:currentPendingFileRenameState)
+            {
+                $null = Remove-ItemProperty `
+                    -Path $script:rebootRegistryKeys.PendingFileRename `
+                    -Name PendingFileRenameOperations
             }
 
             $configData = @{
@@ -96,17 +117,23 @@ try
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $current.Name | Should -Be $configData.AllNodes[0].RebootName
-                $current.SkipComponentBasedServicing | Should -Be $configData.AllNodes[0].SkipComponentBasedServicing
                 $current.ComponentBasedServicing | Should -BeFalse
-                $current.SkipWindowsUpdate | Should -Be $configData.AllNodes[0].SkipWindowsUpdate
                 $current.WindowsUpdate | Should -BeTrue
-                $current.SkipPendingFileRename | Should -Be $configData.AllNodes[0].SkipPendingFileRename
                 $current.PendingFileRename | Should -BeFalse
-                $current.SkipPendingComputerRename | Should -Be $configData.AllNodes[0].SkipPendingComputerRename
                 $current.PendingComputerRename | Should -BeFalse
-                $current.SkipCcmClientSDK | Should -Be $configData.AllNodes[0].SkipCcmClientSDK
                 $current.CcmClientSDK | Should -BeFalse
                 $current.RebootRequired | Should -BeTrue
+                <#
+                    The actual values assigned to the Skip* parameters
+                    are not returned by Get-TargetResource because they
+                    are set only (control) parameters, so can not be
+                    evaluated except to check the default values.
+                #>
+                $current.SkipComponentBasedServicing | Should -BeFalse
+                $current.SkipWindowsUpdate | Should -BeFalse
+                $current.SkipPendingFileRename | Should -BeFalse
+                $current.SkipPendingComputerRename | Should -BeFalse
+                $current.SkipCcmClientSDK | Should -BeTrue
             }
         }
     }
@@ -118,6 +145,14 @@ finally
         $null = Remove-Item `
             -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' `
             -ErrorAction SilentlyContinue
+    }
+
+    if ($script:currentPendingFileRenameState)
+    {
+        $null = Set-ItemProperty `
+            -Path $script:rebootRegistryKeys.PendingFileRename `
+            -Name PendingFileRenameOperations `
+            -Value $script:currentPendingFileRenameState
     }
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment

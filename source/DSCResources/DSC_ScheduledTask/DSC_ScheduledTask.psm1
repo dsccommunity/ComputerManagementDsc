@@ -1858,7 +1858,8 @@ function Get-CurrentResource
 
         if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
         {
-            $result.Add('BuiltInAccount', $task.Principal.UserId)
+            $builtInAccount = Set-DomainNameInAccountName -AccountName $task.Principal.UserId -DomainName 'NT AUTHORITY'
+            $result.Add('BuiltInAccount', $builtInAccount)
         }
     }
 
@@ -1892,4 +1893,75 @@ function Test-DateStringContainsTimeZone
     )
 
     return $DateString.Contains('+')
+}
+
+<#
+    .SYNOPSIS
+        Set domain name in a down-level user or group name.
+
+    .DESCRIPTION
+        Set the domain name in a down-level user or group name.
+
+    .PARAMETER AccountName
+        The user or group name to set the domain name in.
+
+    .PARAMETER DomainName
+        If the AccountName does not contain a domain name them prefix
+        it with this value. If the AccountName already contains a domain
+        name then it will only be updated if the Force switch is set.
+
+    .PARAMETER Force
+        If the identity already contains a domain prefix then force
+        it to the value in Domain.
+
+    .EXAMPLE
+        Set-DomainNameInAccountName -AccountName 'Users' -DomainName 'NT AUTHORITY'
+
+        Returns 'NT AUTHORITY\Users'.
+
+    .EXAMPLE
+        Set-DomainNameInAccountName -AccountName 'MyDomain\Users' -DomainName 'NT AUTHORITY'
+
+        Returns 'MyDomain\Users'.
+
+    .EXAMPLE
+        Set-DomainNameInAccountName -AccountName 'MyDomain\Users' -DomainName 'NT AUTHORITY' -Force
+
+        Returns 'NT AUTHORITY\Users'.
+#>
+function Set-DomainNameInAccountName
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $AccountName,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DomainName,
+
+        [Parameter()]
+        [Switch]
+        $Force
+    )
+
+    if ($AccountName.Contains('\'))
+    {
+        $existingDomainName, $name = ($AccountName -Split '\\')
+
+        if (-not [System.String]::IsNullOrEmpty($existingDomainName) -and -not $force.IsPresent)
+        {
+            # Keep the existing domain name if it is set and force is not specified
+            $DomainName = $existingDomainName
+        }
+    }
+    else
+    {
+        $name = $AccountName
+    }
+
+    return "$DomainName\$name"
 }
