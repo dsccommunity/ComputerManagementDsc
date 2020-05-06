@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.2.0] - 2020-05-05
+
 ### Changed
 
 - Change Azure DevOps Pipeline definition to include `source/*` - Fixes [Issue #324](https://github.com/dsccommunity/ComputerManagementDsc/issues/324).
