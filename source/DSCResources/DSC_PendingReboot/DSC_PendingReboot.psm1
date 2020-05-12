@@ -20,7 +20,7 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 #>
 $script:localizedResourceData = Import-LocalizedData `
     -BaseDirectory $PSScriptRoot `
-    -FileName 'DSC_PendigReboot.data.psd1'
+    -FileName 'DSC_PendingReboot.data.psd1'
 $script:rebootTriggers = $script:localizedResourceData.RebootTriggers
 <#
     .SYNOPSIS

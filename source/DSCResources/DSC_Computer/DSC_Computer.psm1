@@ -267,7 +267,7 @@ function Set-TargetResource
                     }
                     else
                     {
-                        New-InvalidOperationException -ErrorRecord $_
+                        New-InvalidOperationException -Message $_.ErrorDetails.Message -ErrorRecord $_
                     }
                 }
                 catch

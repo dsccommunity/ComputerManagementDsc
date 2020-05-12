@@ -734,11 +734,11 @@ try
                     }
 
                     Mock -CommandName Add-Computer -MockWith {
-                        Throw $errorRecord
+                        throw $errorRecord
                     }
 
                     Mock -CommandName New-InvalidOperationException -MockWith {
-                        Throw $errorRecord
+                        throw $errorRecord
                     }
 
                     { Set-TargetResource `
