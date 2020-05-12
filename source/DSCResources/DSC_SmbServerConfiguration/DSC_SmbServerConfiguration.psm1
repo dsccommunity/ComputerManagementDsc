@@ -5,13 +5,10 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1')) -Force
 
-# Import the ComputerManagementDsc Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
-            -ChildPath 'ComputerManagementDsc.Common.psm1'))
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'DSC_SmbServerConfiguration'
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 $resourceData = Import-LocalizedData `
     -BaseDirectory $PSScriptRoot `

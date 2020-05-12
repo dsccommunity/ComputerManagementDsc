@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- ComputerManagementDsc
+  - Updated to use the common module _DscResource.Common_ - Fixes [Issue #327](https://github.com/dsccommunity/ComputerManagementDsc/issues/327).
+  - Fixed build failures caused by changes in `ModuleBuilder` module v1.7.0
+    by changing `CopyDirectories` to `CopyPaths` - Fixes [Issue #332](https://github.com/dsccommunity/ComputerManagementDsc/issues/332).
+
 ## [8.2.0] - 2020-05-05
 
 ### Changed
