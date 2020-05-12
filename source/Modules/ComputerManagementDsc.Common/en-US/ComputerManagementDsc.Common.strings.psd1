@@ -1,5 +1,4 @@
 ConvertFrom-StringData @'
-    StartingReverseCheck                 = Starting with a reverse check.
     CurrentTimeZoneMessage             = Current time zone is set to '{0}'.
     GettingTimeZoneMessage             = Getting current time zone using '{0}'.
     SettingTimeZoneMessage             = Setting time zone to '{0}' using '{1}'.
@@ -13,5 +12,4 @@ ConvertFrom-StringData @'
     PowerPlanFound                     = Found power scheme '{0}'. Getting friendly name.
     PowerPlanFriendlyNameFound         = Friendly name is '{0}'.
     AllPowerPlansFound                 = Enumerating of available power schemes done.
-    ParameterUsageWrong                = None of the parameter(s) '{0}' may be used at the same time as any of the parameter(s) '{1}'.
 '@
