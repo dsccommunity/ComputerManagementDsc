@@ -198,6 +198,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     } }
 
@@ -245,6 +246,7 @@ try
                         )
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -1481,6 +1483,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -1528,6 +1531,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -1599,6 +1603,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -1652,6 +1657,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -2030,12 +2036,13 @@ try
             Context 'When a scheduled task is configured with the ScheduleType AtLogon and is in desired state' {
                 $startTimeString = '2018-10-01T01:00:00'
                 $testParameters = $getTargetResourceParameters + @{
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    StartTime        = Get-Date -Date $startTimeString
-                    ScheduleType     = 'AtLogon'
-                    Delay            = '00:01:00'
-                    Enable           = $true
-                    Verbose          = $true
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime         = Get-Date -Date $startTimeString
+                    ScheduleType      = 'AtLogon'
+                    Delay             = '00:01:00'
+                    Enable            = $true
+                    Verbose           = $true
+                    MultipleInstances = 'StopExisting'
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2058,6 +2065,7 @@ try
                         )
                         Settings = [pscustomobject] @{
                             Enabled = $testParameters.Enable
+                            MultipleInstances = $testParameters.MultipleInstances
                         }
                     }
                 }
@@ -2105,6 +2113,7 @@ try
                         )
                         Settings = [pscustomobject] @{
                             Enabled = $testParameters.Enable
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }

@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add "StopExisting" to valid values for ScheduledTask MultipleInstances parameter - Fixes [Issue #333](https://github.com/dsccommunity/ComputerManagementDsc/issues/333).
+
 ## [8.2.0] - 2020-05-05
 
 ### Changed

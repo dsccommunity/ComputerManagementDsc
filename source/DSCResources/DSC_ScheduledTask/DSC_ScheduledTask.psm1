@@ -388,7 +388,7 @@ function Set-TargetResource
         $ExecutionTimeLimit = '08:00:00',
 
         [Parameter()]
-        [ValidateSet('IgnoreNew', 'Parallel', 'Queue')]
+        [ValidateSet('IgnoreNew', 'Parallel', 'Queue', 'StopExisting')]
         [System.String]
         $MultipleInstances = 'Queue',
 
@@ -544,10 +544,14 @@ function Set-TargetResource
             WakeToRun                       = $WakeToRun
             RestartOnIdle                   = $RestartOnIdle
             DontStopOnIdleEnd               = $DontStopOnIdleEnd
-            MultipleInstances               = $MultipleInstances
             Priority                        = $Priority
             RestartCount                    = $RestartCount
             RunOnlyIfNetworkAvailable       = $RunOnlyIfNetworkAvailable
+        }
+
+        if ($MultipleInstances -ne 'StopExisting')
+        {
+            $settingParameters.Add('MultipleInstances', $MultipleInstances)
         }
 
         if ($IdleDuration -gt [System.TimeSpan] '00:00:00')
@@ -576,6 +580,10 @@ function Set-TargetResource
         }
 
         $setting = New-ScheduledTaskSettingsSet @settingParameters
+
+        if ($MultipleInstances -eq 'StopExisting') {
+            $setting.CimInstanceProperties.Item('MultipleInstances').Value = 3
+        }
 
         $scheduledTaskArguments += @{
             Settings = $setting
@@ -1260,7 +1268,7 @@ function Test-TargetResource
         $ExecutionTimeLimit = '08:00:00',
 
         [Parameter()]
-        [ValidateSet('IgnoreNew', 'Parallel', 'Queue')]
+        [ValidateSet('IgnoreNew', 'Parallel', 'Queue', 'StopExisting')]
         [System.String]
         $MultipleInstances = 'Queue',
 
