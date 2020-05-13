@@ -581,7 +581,8 @@ function Set-TargetResource
 
         $setting = New-ScheduledTaskSettingsSet @settingParameters
 
-        if ($MultipleInstances -eq 'StopExisting') {
+        if ($MultipleInstances -eq 'StopExisting')
+        {
             $setting.CimInstanceProperties.Item('MultipleInstances').Value = 3
         }
 
