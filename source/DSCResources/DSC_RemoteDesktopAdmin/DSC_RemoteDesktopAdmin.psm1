@@ -5,8 +5,10 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
+
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'DSC_RemoteDesktopAdmin'
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 $script:tSRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
 $script:winStationsRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp'

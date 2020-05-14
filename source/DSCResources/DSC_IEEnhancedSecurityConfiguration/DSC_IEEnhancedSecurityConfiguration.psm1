@@ -5,8 +5,10 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
+
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'DSC_IEEnhancedSecurityConfiguration'
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 $script:registryKey_Administrators = 'HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}'
 $script:registryKey_Users = 'HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}'

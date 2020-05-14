@@ -5,7 +5,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Add "StopExisting" to valid values for ScheduledTask MultipleInstances parameter - Fixes [Issue #333](https://github.com/dsccommunity/ComputerManagementDsc/issues/333).
+- ComputerManagementDsc
+  - Updated to use the common module _DscResource.Common_ - Fixes [Issue #327](https://github.com/dsccommunity/ComputerManagementDsc/issues/327).
+  - Fixed build failures caused by changes in `ModuleBuilder` module v1.7.0
+    by changing `CopyDirectories` to `CopyPaths` - Fixes [Issue #332](https://github.com/dsccommunity/ComputerManagementDsc/issues/332).
+
+- StartedTask
+  - Add "StopExisting" to valid values for MultipleInstances parameter - Fixes [Issue #333](https://github.com/dsccommunity/ComputerManagementDsc/issues/333).
 
 ## [8.2.0] - 2020-05-05
 

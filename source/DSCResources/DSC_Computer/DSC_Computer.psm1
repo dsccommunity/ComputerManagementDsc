@@ -10,8 +10,10 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
+
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'DSC_Computer'
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 $FailToRenameAfterJoinDomainErrorId = 'FailToRenameAfterJoinDomain,Microsoft.PowerShell.Commands.AddComputerCommand'
 
@@ -265,7 +267,7 @@ function Set-TargetResource
                     }
                     else
                     {
-                        New-InvalidOperationException -ErrorRecord $_
+                        New-InvalidOperationException -Message $_.Exception.Message -ErrorRecord $_
                     }
                 }
                 catch
