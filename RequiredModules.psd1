@@ -18,6 +18,7 @@
     'DscResource.Test'          = 'latest'
     'DscResource.AnalyzerRules' = 'latest'
     'DscResource.DocGenerator'  = 'latest'
+    'DscResource.Common'        = 'latest'
     xDscResourceDesigner        = 'latest'
     LoopbackAdapter             = 'latest'
 }

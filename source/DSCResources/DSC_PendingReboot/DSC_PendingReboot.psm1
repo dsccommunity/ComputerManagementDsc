@@ -8,17 +8,19 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'ComputerManagementDsc.Common' `
             -ChildPath 'ComputerManagementDsc.Common.psm1'))
 
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
+
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'DSC_PendingReboot'
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     This data file contains a list of reboot triggers that will be checked
     when determining if reboot is required. This is stored in a separate
     data file so that it can also be used in testing.
 #>
-$script:localizedResourceData = Get-LocalizedData `
-    -ResourceName 'DSC_PendingReboot' `
-    -Postfix 'data'
+$script:localizedResourceData = Import-LocalizedData `
+    -BaseDirectory $PSScriptRoot `
+    -FileName 'DSC_PendingReboot.data.psd1'
 $script:rebootTriggers = $script:localizedResourceData.RebootTriggers
 <#
     .SYNOPSIS
