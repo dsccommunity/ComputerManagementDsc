@@ -8,7 +8,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 $script:tSRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server'
 $script:winStationsRegistryKey = 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp'

@@ -8,7 +8,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings.
-$script:localizedData = Get-LocalizedData
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
