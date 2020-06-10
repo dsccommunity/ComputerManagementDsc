@@ -128,6 +128,38 @@ try
                 }
             }
 
+            Context 'No scheduled task exists, but it should, with MultipleInstances = StopExisting' {
+                $testParameters = $getTargetResourceParameters + @{
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
+                    MultipleInstances = 'StopExisting'
+                    Verbose            = $true
+                }
+
+                Mock -CommandName Get-ScheduledTask -MockWith { return $null }
+
+                It 'Should return the correct values from Get-TargetResource for initial state' {
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Ensure | Should -Be 'Absent'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should -BeFalse
+                }
+
+                It 'Should create the scheduled task in the set method' {
+                    Set-TargetResource @testParameters
+                }
+
+                It 'Should return the correct values from Get-TargetResource for updated state' {
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.MultipleInstances | Should -Be $testParameters.MultipleInstances
+                }
+
+            }
+
             Context 'A scheduled task exists, but it should not' {
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'

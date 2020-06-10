@@ -583,6 +583,11 @@ function Set-TargetResource
 
         $setting = New-ScheduledTaskSettingsSet @settingParameters
 
+    <#  The following workaround is needed because the TASK_INSTANCES_STOP_EXISTING value of
+        https://docs.microsoft.com/en-us/windows/win32/taskschd/tasksettings-multipleinstances is missing
+        from the Microsoft.PowerShell.Cmdletization.GeneratedTypes.ScheduledTask.MultipleInstancesEnum,
+        which is used for the other values of $MultipleInstances. (at least currently, as of June, 2020)
+    #>
         if ($MultipleInstances -eq 'StopExisting')
         {
             $setting.CimInstanceProperties.Item('MultipleInstances').Value = 3
