@@ -123,9 +123,12 @@ try
                     Test-TargetResource @testParameters | Should -BeFalse
                 }
 
-                It 'Should create the scheduled task in the set method' {
+                It 'Should create the scheduled task in the set method and return the correct values from Get-TargetResource' {
                     Set-TargetResource @testParameters
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Ensure | Should -Be 'Present'
                 }
+
             }
 
             Context 'No scheduled task exists, but it should, with MultipleInstances = StopExisting' {
@@ -149,12 +152,10 @@ try
                     Test-TargetResource @testParameters | Should -BeFalse
                 }
 
-                It 'Should create the scheduled task in the set method' {
+                It 'Should create the scheduled task in the set method and return the correct values from Get-TargetResource' {
                     Set-TargetResource @testParameters
-                }
-
-                It 'Should return the correct values from Get-TargetResource for updated state' {
                     $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Ensure | Should -Be 'Present'
                     $result.MultipleInstances | Should -Be $testParameters.MultipleInstances
                 }
 
