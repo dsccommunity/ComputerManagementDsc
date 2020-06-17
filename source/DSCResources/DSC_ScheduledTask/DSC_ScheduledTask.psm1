@@ -1833,7 +1833,7 @@ function Get-CurrentResource
         {
             if ($task.settings.CimInstanceProperties.Item('MultipleInstances').Value -eq 3)
             {
-                $MultpleInstances = 'StopExisting'
+                $MultipleInstances = 'StopExisting'
             }
         }
 
