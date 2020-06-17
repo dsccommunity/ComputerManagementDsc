@@ -1824,6 +1824,17 @@ function Get-CurrentResource
             $PrincipalId = 'UserId'
         }
 
+    <#  The following workaround is needed because Get-StartedTask currently returns NULL for the value
+        of $settings.MultipleInstances when the started task is set to "Stop the existing instance".
+        https://windowsserver.uservoice.com/forums/301869-powershell/suggestions/40685125-bug-get-scheduledtask-returns-null-for-value-of-m
+    #>
+        $MultipleInstances = [System.String] $settings.MultipleInstances
+        if ($MultipleInstances -eq $NULL) {
+            if ($task.settings.CimInstanceProperties.Item('MultipleInstances').Value -eq 3) {
+                $MultpleInstances = 'StopExisting'
+            }
+        }
+
         $result = @{
             TaskName                        = $task.TaskName
             TaskPath                        = $task.TaskPath
@@ -1861,7 +1872,7 @@ function Get-CurrentResource
             RestartOnIdle                   = $settings.IdleSettings.RestartOnIdle
             DontStopOnIdleEnd               = -not $settings.IdleSettings.StopOnIdleEnd
             ExecutionTimeLimit              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.ExecutionTimeLimit
-            MultipleInstances               = [System.String] $settings.MultipleInstances
+            MultipleInstances               = $MultipleInstances
             Priority                        = $settings.Priority
             RestartCount                    = $settings.RestartCount
             RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.RestartInterval
