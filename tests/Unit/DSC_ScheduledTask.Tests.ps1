@@ -91,6 +91,135 @@ try
             )
         }
 
+        # Function to allow mocking pipeline input
+        function New-ScheduledTaskSettingsSet
+        {
+            param
+            (
+                [Parameter()]
+                [switch]
+                $DisallowDemandStart,
+
+                [Parameter()]
+                [switch]
+                $DisallowHardTerminate,
+
+                [Parameter()]
+                [Microsoft.PowerShell.Cmdletization.GeneratedTypes.ScheduledTask.CompatibilityEnum]
+                [ValidateSet('At', 'V1', 'Vista', 'Win7', 'Win8')]
+                $Compatibility,
+
+                [Parameter()]
+                [TimeSpan]
+                $DeleteExpiredTaskAfter,
+
+                [Parameter()]
+                [switch]
+                $AllowStartIfOnBatteries,
+
+                [Parameter()]
+                [switch]
+                $Disable,
+
+                [Parameter()]
+                [switch]
+                $MaintenanceExclusive,
+
+                [Parameter()]
+                [switch]
+                $Hidden,
+
+                [Parameter()]
+                [switch]
+                $RunOnlyIfIdle,
+
+                [Parameter()]
+                [TimeSpan]
+                $IdleWaitTimeout,
+
+                [Parameter()]
+                [System.String]
+                $NetworkId,
+
+                [Parameter()]
+                [System.String]
+                $NetworkName,
+
+                [Parameter()]
+                [switch]
+                $DisallowStartOnRemoteAppSession,
+
+                [Parameter()]
+                [TimeSpan]
+                $MaintenancePeriod,
+
+                [Parameter()]
+                [TimeSpan]
+                $MaintenanceDeadline,
+
+                [Parameter()]
+                [switch]
+                $StartWhenAvailable,
+
+                [Parameter()]
+                [switch]
+                $DontStopIfGoingOnBatteries,
+
+                [Parameter()]
+                [switch]
+                $WakeToRun,
+
+                [Parameter()]
+                [TimeSpan]
+                $IdleDuration,
+
+                [Parameter()]
+                [switch]
+                $RestartOnIdle,
+
+                [Parameter()]
+                [switch]
+                $DontStopOnIdleEnd,
+
+                [Parameter()]
+                [TimeSpan]
+                $ExecutionTimeLimit,
+
+                [Parameter()]
+                [Microsoft.PowerShell.Cmdletization.GeneratedTypes.ScheduledTask.MultipleInstancesEnum]
+                [ValidateSet('Parallel', 'Queue', 'IgnoreNew', 'StopExisting')]
+                $MultipleInstances,
+
+                [Parameter()]
+                [int]
+                $Priority,
+
+                [Parameter()]
+                [int]
+                $RestartCount,
+
+                [Parameter()]
+                [TimeSpan]
+                $RestartInterval,
+
+                [Parameter()]
+                [switch]
+                $RunOnlyIfNetworkAvailable,
+
+                [Parameter()]
+                [CimSession[]]
+                $CimSession,
+
+                [Parameter()]
+                [int]
+                $ThrottleLimit,
+
+                [Parameter()]
+                [switch]
+                $AsJob
+            )
+        }
+
         Describe 'DSC_ScheduledTask' {
             BeforeAll {
                 Mock -CommandName Register-ScheduledTask
@@ -132,6 +261,40 @@ try
 
             }
 
+            Context 'No scheduled task exists, but it should, with MultipleInstances = Parallel' {
+                $testParameters = $getTargetResourceParameters + @{
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
+                    MultipleInstances = 'Parallel'
+                    Verbose            = $true
+                }
+
+                $scheduledTask = $NULL
+                Mock -CommandName Get-ScheduledTask -MockWith { return $scheduledTask }
+                Mock -CommandName New-ScheduledTaskSettingsSet
+                Mock -CommandName Register-ScheduledTask
+
+                It 'Should return the correct values from Get-TargetResource for initial state' {
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Ensure | Should -Be 'Absent'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should -BeFalse
+                }
+
+                It 'Should create the scheduled task in the set method' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName New-ScheduledTaskSettingsSet -Exactly -Times 1 -ParameterFilter {
+                        $MultipleInstances -eq $testParameters.MultipleInstances
+                    }
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                }
+
+            }
+
             Context 'No scheduled task exists, but it should, with MultipleInstances = Queue' {
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
@@ -139,6 +302,40 @@ try
                     RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                     RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
                     MultipleInstances = 'Queue'
+                    Verbose            = $true
+                }
+
+                $scheduledTask = $NULL
+                Mock -CommandName Get-ScheduledTask -MockWith { return $scheduledTask }
+                Mock -CommandName New-ScheduledTaskSettingsSet
+                Mock -CommandName Register-ScheduledTask
+
+                It 'Should return the correct values from Get-TargetResource for initial state' {
+                    $result = Get-TargetResource @getTargetResourceParameters
+                    $result.Ensure | Should -Be 'Absent'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should -BeFalse
+                }
+
+                It 'Should create the scheduled task in the set method' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName New-ScheduledTaskSettingsSet -Exactly -Times 1 -ParameterFilter {
+                        $MultipleInstances -eq $testParameters.MultipleInstances
+                    }
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1
+                }
+
+            }
+
+            Context 'No scheduled task exists, but it should, with MultipleInstances = IgnoreNew' {
+                $testParameters = $getTargetResourceParameters + @{
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
+                    MultipleInstances = 'IgnoreNew'
                     Verbose            = $true
                 }
 
