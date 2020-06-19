@@ -114,31 +114,7 @@ try
 
                 $scheduledTask = $NULL
                 Mock -CommandName Get-ScheduledTask -MockWith { return $scheduledTask }
-                Mock -CommandName Register-ScheduledTask -MockWith {
-                     $scheduledTask = @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(@{
-                                Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers  = @(@{
-                                Repetition = @{
-                                    Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalMinutes)M"
-                                    Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
-                                }
-                                CimClass   = @{
-                                    CimClassName = 'MSFT_TaskTimeTrigger'
-                                }
-                            })
-                        Settings = [pscustomobject] @{
-                            Enabled = $true
-                            MultipleInstances = 'IgnoreNew'
-                        }
-                        Principal = @{
-                            UserId = 'SYSTEM'
-                        }
-                    }
-                }
+                Mock -CommandName Register-ScheduledTask
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @getTargetResourceParameters
@@ -151,12 +127,41 @@ try
 
                 It 'Should create the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled Register-ScheduledTask
+                    Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
                 }
 
-                It 'Should return the correct values from Get-TargetResource' {
+            }
+
+            Context 'No scheduled task exists, but it should, with MultipleInstances = Queue' {
+                $testParameters = $getTargetResourceParameters + @{
+                    ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType       = 'Once'
+                    RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
+                    MultipleInstances = 'Queue'
+                    Verbose            = $true
+                }
+
+                $scheduledTask = $NULL
+                Mock -CommandName Get-ScheduledTask -MockWith { return $scheduledTask }
+                Mock -CommandName New-ScheduledTaskSettingsSet
+                Mock -CommandName Register-ScheduledTask
+
+                It 'Should return the correct values from Get-TargetResource for initial state' {
                     $result = Get-TargetResource @getTargetResourceParameters
-                    $result.Ensure | Should -Be 'Present'
+                    $result.Ensure | Should -Be 'Absent'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParameters | Should -BeFalse
+                }
+
+                It 'Should create the scheduled task in the set method' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName New-ScheduledTaskSettingsSet -Exactly -Times 1 -ParameterFilter {
+                        $MultipleInstances -eq $testParameters.MultipleInstances
+                    }
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
 
             }
@@ -173,31 +178,7 @@ try
 
                 $scheduledTask = $NULL
                 Mock -CommandName Get-ScheduledTask -MockWith { return $scheduledTask }
-                Mock -CommandName Register-ScheduledTask -MockWith {
-                     $scheduledTask = @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(@{
-                                Execute = $testParameters.ActionExecutable
-                            })
-                        Triggers  = @(@{
-                                Repetition = @{
-                                    Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalMinutes)M"
-                                    Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
-                                }
-                                CimClass   = @{
-                                    CimClassName = 'MSFT_TaskTimeTrigger'
-                                }
-                            })
-                        Settings = [pscustomobject] @{
-                            Enabled = $true
-                            MultipleInstances = $testParameters.MultipleInstances
-                        }
-                        Principal = @{
-                            UserId = 'SYSTEM'
-                        }
-                    }
-                }
+                Mock -CommandName Register-ScheduledTask
 
                 It 'Should return the correct values from Get-TargetResource for initial state' {
                     $result = Get-TargetResource @getTargetResourceParameters
@@ -210,15 +191,9 @@ try
 
                 It 'Should create the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Register-ScheduledTask -ParameterFilter {
-                        $MultipleInstances -eq $testParameters.MultipleInstances
-                    }
-                }
-
-                It 'Should return the correct values from Get-TargetResource' {
-                    $result = Get-TargetResource @getTargetResourceParameters
-                    $result.Ensure | Should -Be 'Present'
-                    $result.MultipleInstances | Should -Be $testParameters.MultipleInstances
+                    Assert-MockCalled -CommandName New-ScheduledTaskSettingsSet -Exactly -Times 1
+                       # currently does not have ParameterFilter to ensure MultipleInstances is being set, like 'Queue' above
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1
                 }
 
             }
