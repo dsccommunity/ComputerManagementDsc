@@ -28,7 +28,7 @@ try
         $configurationName = "$($script:dscResourceName)_Prerequisites_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive
@@ -36,6 +36,12 @@ try
                     }
 
                     & $configurationName @configurationParameters
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive
@@ -54,7 +60,7 @@ try
         $configurationName = "$($script:dscResourceName)_CreateShare1_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive
@@ -62,6 +68,12 @@ try
                     }
 
                     & $configurationName @configurationParameters
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive
@@ -122,7 +134,7 @@ try
         $configurationName = "$($script:dscResourceName)_CreateShare2_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive
@@ -130,6 +142,12 @@ try
                     }
 
                     & $configurationName @configurationParameters
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive
@@ -189,7 +207,7 @@ try
         $configurationName = "$($script:dscResourceName)_UpdateProperties_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive
@@ -197,6 +215,12 @@ try
                     }
 
                     & $configurationName @configurationParameters
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive
@@ -227,11 +251,7 @@ try
                 $resourceCurrentState.Name | Should -Be $ConfigurationData.AllNodes.ShareName1
                 $resourceCurrentState.Path | Should -Be $ConfigurationData.AllNodes.SharePath1
                 $resourceCurrentState.Description | Should -Be 'A new description'
-                #$resourceCurrentState.EncryptData | Should -BeTrue
                 $resourceCurrentState.ConcurrentUserLimit | Should -Be 20
-                #$resourceCurrentState.FolderEnumerationMode | Should -Be 'AccessBased'
-                #$resourceCurrentState.CachingMode | Should -Be 'None'
-                #$resourceCurrentState.ContinuouslyAvailable | Should -BeTrue
                 $resourceCurrentState.ShareState | Should -Be 'Online'
                 $resourceCurrentState.ShareType | Should -Be 'FileSystemDirectory'
                 $resourceCurrentState.ShadowCopy | Should -BeFalse
@@ -258,7 +278,7 @@ try
         $configurationName = "$($script:dscResourceName)_RemovePermission_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive
@@ -266,6 +286,12 @@ try
                     }
 
                     & $configurationName @configurationParameters
+                } | Should -Not -Throw
+            }
+
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive
@@ -310,7 +336,7 @@ try
         $configurationName = "$($script:dscResourceName)_RecreateShare1_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive
@@ -318,6 +344,12 @@ try
                     }
 
                     & $configurationName @configurationParameters
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive
@@ -358,7 +390,7 @@ try
         $configurationName = "$($script:dscResourceName)_RemoveShare1_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive
@@ -366,6 +398,12 @@ try
                     }
 
                     & $configurationName @configurationParameters
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive
@@ -404,7 +442,7 @@ try
         $configurationName = "$($script:dscResourceName)_RemoveShare2_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive
@@ -412,6 +450,12 @@ try
                     }
 
                     & $configurationName @configurationParameters
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive
@@ -450,7 +494,7 @@ try
         $configurationName = "$($script:dscResourceName)_Cleanup_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive
@@ -458,6 +502,12 @@ try
                     }
 
                     & $configurationName @configurationParameters
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive

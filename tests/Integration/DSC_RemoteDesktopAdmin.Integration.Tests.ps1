@@ -34,14 +34,16 @@ try
                 $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
                 $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
-                It 'Should compile a MOF file without error' {
+                It 'Should compile the MOF without throwing' {
                     {
                         . $CurrentConfig -OutputPath $ConfigDir
                     } | Should -Not -Throw
                 }
 
-                It 'Should apply the MOF correctly' {
+                It 'Should apply the MOF without throwing' {
                     {
+                        Reset-DscLcm
+
                         Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                     } | Should -Not -Throw
                 }
@@ -66,14 +68,16 @@ try
                 $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
                 $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
-                It 'Should compile a MOF file without error' {
+                It 'Should compile the MOF without throwing' {
                     {
                         . $CurrentConfig -OutputPath $ConfigDir
                     } | Should -Not -Throw
                 }
 
-                It 'Should apply the MOF correctly' {
+                It 'Should apply the MOF without throwing' {
                     {
+                        Reset-DscLcm
+
                         Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                     } | Should -Not -Throw
                 }
@@ -98,14 +102,16 @@ try
                 $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
                 $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
-                It 'Should compile a MOF file without error' {
+                It 'Should compile the MOF without throwing' {
                     {
                         . $CurrentConfig -OutputPath $ConfigDir
                     } | Should -Not -Throw
                 }
 
-                It 'Should apply the MOF correctly' {
+                It 'Should apply the MOF without throwing' {
                     {
+                        Reset-DscLcm
+
                         Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                     } | Should -Not -Throw
                 }
@@ -132,14 +138,16 @@ try
                 $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
                 $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
 
-                It 'Should compile a MOF file without error' {
+                It 'Should compile the MOF without throwing' {
                     {
                         . $CurrentConfig -OutputPath $ConfigDir
                     } | Should -Not -Throw
                 }
 
-                It 'Should apply the MOF correctly' {
+                It 'Should apply the MOF without throwing' {
                     {
+                        Reset-DscLcm
+
                         Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
                     } | Should -Not -Throw
                 }

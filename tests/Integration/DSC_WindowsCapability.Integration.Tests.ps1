@@ -56,11 +56,17 @@ try
                     )
                 }
 
-                It 'Should compile and apply the MOF without throwing' {
+                It 'Should compile the MOF without throwing' {
                     {
                         & "$($script:dscResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
+                    } | Should -Not -Throw
+                }
+
+                It 'Should apply the MOF without throwing' {
+                    {
+                        Reset-DscLcm
 
                         $startDscConfigurationParameters = @{
                             Path         = $TestDrive
@@ -103,11 +109,17 @@ try
                     )
                 }
 
-                It 'Should compile and apply the MOF without throwing' {
+                It 'Should compile the MOF without throwing' {
                     {
                         & "$($script:dscResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
+                    } | Should -Not -Throw
+                }
+
+                It 'Should apply the MOF without throwing' {
+                    {
+                        Reset-DscLcm
 
                         $startDscConfigurationParameters = @{
                             Path         = $TestDrive

@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
 - ComputerManagementDsc
   - Updated to use the common module _DscResource.Common_ - Fixes [Issue #327](https://github.com/dsccommunity/ComputerManagementDsc/issues/327).
   - Fixed build failures caused by changes in `ModuleBuilder` module v1.7.0
@@ -13,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     coverage - Fixes [Issue #336](https://github.com/dsccommunity/ComputerManagementDsc/issues/336).
 - ScheduledTask
   - Add "StopExisting" to valid values for MultipleInstances parameter - Fixes [Issue #333](https://github.com/dsccommunity/ComputerManagementDsc/issues/333).
+
+### Fixed
+
+- ComputerManagementDsc
+  - Improved integration test reliability by resetting the DSC LCM
+    before executing each test using the `Reset-DscLcm` function - Fixes [Issue #329](https://github.com/dsccommunity/ComputerManagementDsc/issues/329).
+  - Split integration test MOF compilation out of application to standardize
+    pattern and make it easier to determine cause of failure.
 
 ## [8.2.0] - 2020-05-05
 

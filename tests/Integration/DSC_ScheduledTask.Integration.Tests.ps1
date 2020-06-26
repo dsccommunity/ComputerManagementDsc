@@ -68,6 +68,8 @@ try
 
                     It 'Should apply the MOF correctly' {
                         {
+                            Reset-DscLcm
+
                             Start-DscConfiguration `
                                 -Path $configDir `
                                 -Wait `
@@ -97,6 +99,8 @@ try
 
                     It 'Should apply the MOF correctly' {
                         {
+                            Reset-DscLcm
+
                             Start-DscConfiguration `
                                 -Path $configDir `
                                 -Wait `
@@ -126,6 +130,8 @@ try
 
                     It 'Should apply the MOF correctly' {
                         {
+                            Reset-DscLcm
+
                             Start-DscConfiguration `
                                 -Path $configDir `
                                 -Wait `
@@ -162,6 +168,9 @@ try
                 It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
                     {
                         Set-TimeZoneId -TimeZoneId 'New Zealand Standard Time'
+
+                        Reset-DscLcm
+
                         Start-DscConfiguration `
                             -Path $configDir `
                             -Wait `
@@ -212,6 +221,8 @@ try
 
                 It 'Should apply the MOF correctly' {
                     {
+                        Reset-DscLcm
+
                         Start-DscConfiguration `
                             -Path $configDir `
                             -Wait `
@@ -259,6 +270,8 @@ try
 
                 It 'Should apply the MOF correctly' {
                     {
+                        Reset-DscLcm
+
                         Start-DscConfiguration `
                             -Path $configDir `
                             -Wait `
@@ -313,6 +326,8 @@ try
 
                 It 'Should apply the MOF correctly' {
                     {
+                        Reset-DscLcm
+
                         Start-DscConfiguration `
                             -Path $configDir `
                             -Wait `
@@ -352,6 +367,8 @@ try
 
                 It 'Should apply the MOF correctly' {
                     {
+                        Reset-DscLcm
+
                         Start-DscConfiguration `
                             -Path $configDir `
                             -Wait `

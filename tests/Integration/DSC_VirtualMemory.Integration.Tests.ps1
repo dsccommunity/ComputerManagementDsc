@@ -27,91 +27,99 @@ try
 
         Describe "$($script:dscResourceName)_Integration" {
 
-            Context 'Set page file to automatically managed' {
-                $CurrentConfig = 'setToAuto'
-                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
-                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+            Context 'When setting the page file to automatically managed' {
+                $currentConfig = 'setToAuto'
+                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
-                It 'Should compile a MOF file without error' {
+                It 'Should compile the MOF without throwing' {
                     {
-                        . $CurrentConfig -OutputPath $ConfigDir
+                        . $currentConfig -OutputPath $configDir
                     } | Should -Not -Throw
                 }
 
-                It 'Should apply the MOF correctly' {
+                It 'Should apply the MOF without throwing' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                        Reset-DscLcm
+
+                        Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
                     } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -BeTrue
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
                 }
             }
 
-            Context 'Set page file to custom size' {
-                $CurrentConfig = 'setToCustom'
-                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
-                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+            Context 'When setting the page file to custom size' {
+                $currentConfig = 'setToCustom'
+                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
-                It 'Should compile a MOF file without error' {
+                It 'Should compile the MOF without throwing' {
                     {
-                        . $CurrentConfig -OutputPath $ConfigDir
+                        . $currentConfig -OutputPath $configDir
                     } | Should -Not -Throw
                 }
 
-                It 'Should apply the MOF correctly' {
+                It 'Should apply the MOF without throwing' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                        Reset-DscLcm
+
+                        Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
                     } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -BeTrue
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
                 }
             }
 
-            Context 'Set page file to system managed' {
-                $CurrentConfig = 'setToSystemManaged'
-                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
-                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+            Context 'When setting the page file to system managed' {
+                $currentConfig = 'setToSystemManaged'
+                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
-                It 'Should compile a MOF file without error' {
+                It 'Should compile the MOF without throwing' {
                     {
-                        . $CurrentConfig -OutputPath $ConfigDir
+                        . $currentConfig -OutputPath $configDir
                     } | Should -Not -Throw
                 }
 
-                It 'Should apply the MOF correctly' {
+                It 'Should apply the MOF without throwing' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                        Reset-DscLcm
+
+                        Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
                     } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -BeTrue
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
                 }
             }
 
-            Context 'Set page file to none' {
-                $CurrentConfig = 'setToNone'
-                $ConfigDir = (Join-Path -Path $TestDrive -ChildPath $CurrentConfig)
-                $ConfigMof = (Join-Path -Path $ConfigDir -ChildPath 'localhost.mof')
+            Context 'When setting the page file to none' {
+                $currentConfig = 'setToNone'
+                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
-                It 'Should compile a MOF file without error' {
+                It 'Should compile the MOF without throwing' {
                     {
-                        . $CurrentConfig -OutputPath $ConfigDir
+                        . $currentConfig -OutputPath $configDir
                     } | Should -Not -Throw
                 }
 
-                It 'Should apply the MOF correctly' {
+                It 'Should apply the MOF without throwing' {
                     {
-                        Start-DscConfiguration -Path $ConfigDir -Wait -Verbose -Force
+                        Reset-DscLcm
+
+                        Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
                     } | Should -Not -Throw
                 }
 
                 It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $ConfigMof -Verbose).InDesiredState | Should -BeTrue
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
                 }
             }
         }
