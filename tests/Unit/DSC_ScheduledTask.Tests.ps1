@@ -112,7 +112,7 @@ try
                     Verbose            = $true
                 }
 
-                $scheduledTask = $NULL
+                $scheduledTask = $null
                 Mock -CommandName Get-ScheduledTask -MockWith { return $scheduledTask }
                 Mock -CommandName Register-ScheduledTask
 

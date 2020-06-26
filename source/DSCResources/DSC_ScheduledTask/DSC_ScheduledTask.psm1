@@ -1829,7 +1829,7 @@ function Get-CurrentResource
         https://windowsserver.uservoice.com/forums/301869-powershell/suggestions/40685125-bug-get-scheduledtask-returns-null-for-value-of-m
     #>
         $MultipleInstances = [System.String] $settings.MultipleInstances
-        if ([String]::IsNullOrEmpty($MultipleInstances))
+        if ([System.String]::IsNullOrEmpty($MultipleInstances))
         {
             if ($task.settings.CimInstanceProperties.Item('MultipleInstances').Value -eq 3)
             {
