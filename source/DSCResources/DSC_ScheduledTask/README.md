@@ -6,6 +6,16 @@ scheduled tasks.
 
 ## Known Issues
 
+One of the values needed for the `MultipleInstances` parameter is missing from the
+`Microsoft.PowerShell.Cmdletization.GeneratedTypes.ScheduledTask.MultipleInstancesEnum`
+enumerator. There are four valid values defined for the `MultipleInstances` property of the
+Task Settings ([TaskSettings.MultipleInstances Property](https://docs.microsoft.com/en-us/windows/win32/taskschd/tasksettings-multipleinstances "TaskSettings.MultipleInstances Property")).
+The `MultipleInstancesEnum` enumerator has three values, which can be mapped to three
+of the four valid values, but there is no value corresponding to `TASK_INSTANCES_STOP_EXISTING`.
+The result of this omission is that a workaround is required to
+accommodate the `StopExisting` value for the `MultipleInstances` parameter,
+which would not be necessary if the enumerator had all four valid values.
+
 ### ExecuteAsCredential
 
 #### When Using a BUILTIN Group

@@ -38,7 +38,7 @@ class DSC_ScheduledTask : OMI_BaseResource
     [Write, Description("Indicates that Task Scheduler restarts the task when the computer cycles into an idle condition more than once.")] Boolean RestartOnIdle;
     [Write, Description("Indicates that Task Scheduler does not terminate the task if the idle condition ends before the task is completed.")] Boolean DontStopOnIdleEnd;
     [Write, Description("Specifies the amount of time that Task Scheduler is allowed to complete the task.")] String ExecutionTimeLimit;
-    [Write, Description("Specifies the policy that defines how Task Scheduler handles multiple instances of the task."), ValueMap{"IgnoreNew","Parallel","Queue"}, Values{"IgnoreNew","Parallel","Queue"}] String MultipleInstances;
+    [Write, Description("Specifies the policy that defines how Task Scheduler handles multiple instances of the task."), ValueMap{"IgnoreNew","Parallel","Queue", "StopExisting"}, Values{"IgnoreNew","Parallel","Queue", "StopExisting"}] String MultipleInstances;
     [Write, Description("Specifies the priority level of the task. Priority must be an integer from 0 (highest priority) to 10 (lowest priority). The default value is 7. Priority levels 7 and 8 are used for background tasks. Priority levels 4, 5, and 6 are used for interactive tasks.")] Uint32 Priority;
     [Write, Description("Specifies the number of times that Task Scheduler attempts to restart the task.")] Uint32 RestartCount;
     [Write, Description("Specifies the amount of time that Task Scheduler attempts to restart the task.")] String RestartInterval;

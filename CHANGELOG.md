@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     by changing `CopyDirectories` to `CopyPaths` - Fixes [Issue #332](https://github.com/dsccommunity/ComputerManagementDsc/issues/332).
   - Pin `Pester` module to 4.10.1 because Pester 5.0 is missing code
     coverage - Fixes [Issue #336](https://github.com/dsccommunity/ComputerManagementDsc/issues/336).
+- ScheduledTask
+  - Add "StopExisting" to valid values for MultipleInstances parameter - Fixes [Issue #333](https://github.com/dsccommunity/ComputerManagementDsc/issues/333).
 
 ## [8.2.0] - 2020-05-05
 

@@ -390,7 +390,7 @@ function Set-TargetResource
         $ExecutionTimeLimit = '08:00:00',
 
         [Parameter()]
-        [ValidateSet('IgnoreNew', 'Parallel', 'Queue')]
+        [ValidateSet('IgnoreNew', 'Parallel', 'Queue', 'StopExisting')]
         [System.String]
         $MultipleInstances = 'Queue',
 
@@ -546,10 +546,14 @@ function Set-TargetResource
             WakeToRun                       = $WakeToRun
             RestartOnIdle                   = $RestartOnIdle
             DontStopOnIdleEnd               = $DontStopOnIdleEnd
-            MultipleInstances               = $MultipleInstances
             Priority                        = $Priority
             RestartCount                    = $RestartCount
             RunOnlyIfNetworkAvailable       = $RunOnlyIfNetworkAvailable
+        }
+
+        if ($MultipleInstances -ne 'StopExisting')
+        {
+            $settingParameters.Add('MultipleInstances', $MultipleInstances)
         }
 
         if ($IdleDuration -gt [System.TimeSpan] '00:00:00')
@@ -578,6 +582,16 @@ function Set-TargetResource
         }
 
         $setting = New-ScheduledTaskSettingsSet @settingParameters
+
+    <#  The following workaround is needed because the TASK_INSTANCES_STOP_EXISTING value of
+        https://docs.microsoft.com/en-us/windows/win32/taskschd/tasksettings-multipleinstances is missing
+        from the Microsoft.PowerShell.Cmdletization.GeneratedTypes.ScheduledTask.MultipleInstancesEnum,
+        which is used for the other values of $MultipleInstances. (at least currently, as of June, 2020)
+    #>
+        if ($MultipleInstances -eq 'StopExisting')
+        {
+            $setting.CimInstanceProperties.Item('MultipleInstances').Value = 3
+        }
 
         $scheduledTaskArguments += @{
             Settings = $setting
@@ -1262,7 +1276,7 @@ function Test-TargetResource
         $ExecutionTimeLimit = '08:00:00',
 
         [Parameter()]
-        [ValidateSet('IgnoreNew', 'Parallel', 'Queue')]
+        [ValidateSet('IgnoreNew', 'Parallel', 'Queue', 'StopExisting')]
         [System.String]
         $MultipleInstances = 'Queue',
 
@@ -1810,6 +1824,19 @@ function Get-CurrentResource
             $PrincipalId = 'UserId'
         }
 
+    <#  The following workaround is needed because Get-StartedTask currently returns NULL for the value
+        of $settings.MultipleInstances when the started task is set to "Stop the existing instance".
+        https://windowsserver.uservoice.com/forums/301869-powershell/suggestions/40685125-bug-get-scheduledtask-returns-null-for-value-of-m
+    #>
+        $MultipleInstances = [System.String] $settings.MultipleInstances
+        if ([System.String]::IsNullOrEmpty($MultipleInstances))
+        {
+            if ($task.settings.CimInstanceProperties.Item('MultipleInstances').Value -eq 3)
+            {
+                $MultipleInstances = 'StopExisting'
+            }
+        }
+
         $result = @{
             TaskName                        = $task.TaskName
             TaskPath                        = $task.TaskPath
@@ -1847,7 +1874,7 @@ function Get-CurrentResource
             RestartOnIdle                   = $settings.IdleSettings.RestartOnIdle
             DontStopOnIdleEnd               = -not $settings.IdleSettings.StopOnIdleEnd
             ExecutionTimeLimit              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.ExecutionTimeLimit
-            MultipleInstances               = [System.String] $settings.MultipleInstances
+            MultipleInstances               = $MultipleInstances
             Priority                        = $settings.Priority
             RestartCount                    = $settings.RestartCount
             RestartInterval                 = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $settings.RestartInterval

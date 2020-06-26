@@ -112,7 +112,9 @@ try
                     Verbose            = $true
                 }
 
-                Mock -CommandName Get-ScheduledTask -MockWith { return $null }
+                $scheduledTask = $null
+                Mock -CommandName Get-ScheduledTask -MockWith { return $scheduledTask }
+                Mock -CommandName Register-ScheduledTask
 
                 It 'Should return the correct values from Get-TargetResource' {
                     $result = Get-TargetResource @getTargetResourceParameters
@@ -125,7 +127,9 @@ try
 
                 It 'Should create the scheduled task in the set method' {
                     Set-TargetResource @testParameters
+                    Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
                 }
+
             }
 
             Context 'A scheduled task exists, but it should not' {
@@ -154,6 +158,10 @@ try
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
                             })
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = @{
                             UserId = 'SYSTEM'
                         }
@@ -198,6 +206,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     } }
 
@@ -245,6 +254,7 @@ try
                         )
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -314,6 +324,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -364,6 +378,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -409,6 +427,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -459,6 +481,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -503,6 +529,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -549,6 +579,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -595,6 +629,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'WrongUser'
                         }
@@ -647,6 +685,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId    = 'DEMO\RightUser'
                             LogonType = 'Password'
@@ -701,6 +743,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId   = 'DEMO\RightUser'
                             RunLevel = 'Limited'
@@ -755,6 +801,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -807,6 +857,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -859,8 +913,9 @@ try
                                 }
                             }
                         )
-                        Settings  = [pscustomobject] @{
+                        Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
                         }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
@@ -919,6 +974,7 @@ try
                         Settings  = [pscustomobject] @{
                             Enabled            = $true
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalSeconds + 60)S"
+                            MultipleInstances = 'IgnoreNew'
                         }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
@@ -986,6 +1042,7 @@ try
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
                             RestartInterval    = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
+                            MultipleInstances = 'IgnoreNew'
                         }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
@@ -1036,6 +1093,7 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             Enabled = $false
+                            MultipleInstances = 'IgnoreNew'
                         }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
@@ -1086,6 +1144,7 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             Enabled = $false
+                            MultipleInstances = 'IgnoreNew'
                         }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
@@ -1140,6 +1199,7 @@ try
                         )
                         Settings  = [pscustomobject] @{
                             Enabled = $false
+                            MultipleInstances = 'IgnoreNew'
                         }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
@@ -1222,6 +1282,7 @@ try
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
                             RestartInterval    = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
+                            MultipleInstances = 'IgnoreNew'
                         }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
@@ -1287,6 +1348,7 @@ try
                             }
                             ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.ExecutionTimeLimit).TotalMinutes)M"
                             RestartInterval    = "PT$([System.TimeSpan]::Parse($testParameters.RestartInterval).TotalMinutes)M"
+                            MultipleInstances = 'IgnoreNew'
                         }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
@@ -1339,6 +1401,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -1390,6 +1456,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -1441,6 +1511,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'SYSTEM'
                         }
@@ -1481,6 +1555,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -1528,6 +1603,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -1599,6 +1675,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -1652,6 +1729,7 @@ try
                         }
                         Settings = [pscustomobject] @{
                             Enabled = $true
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -1722,6 +1800,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId    = 'NT AUTHORITY\' + $testParameters.BuiltInAccount
                             LogonType = 'ServiceAccount'
@@ -1792,6 +1874,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'gMSA$'
                         }
@@ -1839,6 +1925,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                         Principal = [pscustomobject] @{
                             UserId = 'update_gMSA$'
                         }
@@ -1892,6 +1982,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                     }
                 }
 
@@ -1922,6 +2016,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                     }
                 }
 
@@ -1966,6 +2064,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                     }
                 }
 
@@ -1996,6 +2098,10 @@ try
                                 }
                             }
                         )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
                     }
                 }
 
@@ -2030,12 +2136,13 @@ try
             Context 'When a scheduled task is configured with the ScheduleType AtLogon and is in desired state' {
                 $startTimeString = '2018-10-01T01:00:00'
                 $testParameters = $getTargetResourceParameters + @{
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    StartTime        = Get-Date -Date $startTimeString
-                    ScheduleType     = 'AtLogon'
-                    Delay            = '00:01:00'
-                    Enable           = $true
-                    Verbose          = $true
+                    ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    StartTime         = Get-Date -Date $startTimeString
+                    ScheduleType      = 'AtLogon'
+                    Delay             = '00:01:00'
+                    Enable            = $true
+                    Verbose           = $true
+                    MultipleInstances = 'StopExisting'
                 }
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2058,6 +2165,7 @@ try
                         )
                         Settings = [pscustomobject] @{
                             Enabled = $testParameters.Enable
+                            MultipleInstances = $testParameters.MultipleInstances
                         }
                     }
                 }
@@ -2105,6 +2213,7 @@ try
                         )
                         Settings = [pscustomobject] @{
                             Enabled = $testParameters.Enable
+                            MultipleInstances = 'StopExisting'
                         }
                     }
                 }
@@ -2157,6 +2266,7 @@ try
                         )
                         Settings    = [pscustomobject] @{
                             Enabled = $testParameters.Enable
+                            MultipleInstances = 'IgnoreNew'
                         }
                     }
                 }
