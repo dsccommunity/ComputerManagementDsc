@@ -97,8 +97,6 @@ try
 
             It 'Should apply the MOF without throwing' {
                 {
-
-
                     Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
