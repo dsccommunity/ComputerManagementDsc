@@ -126,10 +126,10 @@ function Test-WindowsCapabilitySourceAvailable
         test to ensure the DSC LCM is reset before another test DSC configuration
         is applied.
     .EXAMPLE
-        PS C:\> Reset-Dsc
+        PS C:\> Reset-DscLcm
         This command will reset the DSC LCM and clear out any DSC configurations.
 #>
-function Reset-Dsc
+function Reset-DscLcm
 {
     [CmdletBinding()]
     param ()
@@ -146,4 +146,4 @@ Export-ModuleMember -Function `
     Get-InvalidArgumentRecord, `
     Get-InvalidOperationRecord, `
     Test-WindowsCapabilitySourceAvailable, `
-    Reset-Dsc
+    Reset-DscLcm
