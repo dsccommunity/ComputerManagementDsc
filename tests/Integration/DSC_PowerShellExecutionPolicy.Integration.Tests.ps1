@@ -26,9 +26,15 @@ try
         . $configFile
 
         Describe "$($script:dscResourceName)_Integration" {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     & "$($script:dscResourceName)_Config" -OutputPath $TestDrive
+               } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Reset-DscLcm
 
                     $startDscConfigurationParameters = @{
                         Path         = $TestDrive
