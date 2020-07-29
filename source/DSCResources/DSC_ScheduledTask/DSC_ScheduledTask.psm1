@@ -456,7 +456,14 @@ function Set-TargetResource
             -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
         {
             Write-Verbose -Message ($script:localizedData.DisablingExistingScheduledTask -f $TaskName, $TaskPath)
-            Disable-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+            if ($PSVersionTable.PSVersion -gt [Version]"5.0.0.0")
+            {
+                Disable-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
+            }
+            else
+            {
+                Disable-ScheduledTaskCustom -TaskName $TaskName -TaskPath $TaskPath
+            }
 
             return
         }
@@ -1635,7 +1642,7 @@ function ConvertTo-TimeSpanStringFromScheduledTaskString
     .PARAMETER TaskPath
         The path to the task to disable.
 #>
-function Disable-ScheduledTask
+function Disable-ScheduledTaskCustom
 {
     [CmdletBinding()]
     param
