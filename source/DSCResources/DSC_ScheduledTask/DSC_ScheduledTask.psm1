@@ -462,7 +462,7 @@ function Set-TargetResource
             }
             else
             {
-                Disable-ScheduledTaskCustom -TaskName $TaskName -TaskPath $TaskPath
+                Disable-ScheduledTaskEx -TaskName $TaskName -TaskPath $TaskPath
             }
 
             return
@@ -1642,7 +1642,7 @@ function ConvertTo-TimeSpanStringFromScheduledTaskString
     .PARAMETER TaskPath
         The path to the task to disable.
 #>
-function Disable-ScheduledTaskCustom
+function Disable-ScheduledTaskEx
 {
     [CmdletBinding()]
     param
