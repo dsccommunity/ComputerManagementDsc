@@ -456,7 +456,8 @@ function Set-TargetResource
             -and -not $PSBoundParameters.ContainsKey('ActionExecutable'))
         {
             Write-Verbose -Message ($script:localizedData.DisablingExistingScheduledTask -f $TaskName, $TaskPath)
-            if ($PSVersionTable.PSVersion -gt [Version]"5.0.0.0")
+
+            if ($PSVersionTable.PSVersion -gt [System.Version]'5.0.0.0')
             {
                 Disable-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath
             }

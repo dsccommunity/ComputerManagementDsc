@@ -223,7 +223,8 @@ try
 
                 It 'Should remove the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    if ($PSVersionTable.PSVersion -gt [Version]"5.0.0.0")
+
+                    if ($PSVersionTable.PSVersion -gt [System.Version]'5.0.0.0')
                     {
                         Assert-MockCalled Disable-ScheduledTask -Exactly -Times 1
                     }
@@ -1581,7 +1582,8 @@ try
 
                 It 'Should disable the scheduled task in the set method' {
                     Set-TargetResource @testParameters
-                    if ($PSVersionTable.PSEdition -gt [Version]"5.0.0.0")
+
+                    if ($PSVersionTable.PSEdition -gt [System.Version]'5.0.0.0')
                     {
                         Assert-MockCalled Disable-ScheduledTask -Exactly -Times 1
                     }
