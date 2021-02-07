@@ -18,9 +18,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     when determining if reboot is required. This is stored in a separate
     data file so that it can also be used in testing.
 #>
-$script:localizedResourceData = Import-LocalizedData `
-    -BaseDirectory $PSScriptRoot `
-    -FileName 'DSC_PendingReboot.data.psd1'
+$script:localizedResourceData = Get-LocalizedData `
+    -DefaultUICulture 'en-US' `
+    -FileName 'DSC_PendingReboot.data'
 $script:rebootTriggers = $script:localizedResourceData.RebootTriggers
 <#
     .SYNOPSIS

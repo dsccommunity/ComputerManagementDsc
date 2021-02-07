@@ -1440,6 +1440,19 @@ function Test-TargetResource
         # The password of the execution credential can not be compared
         $username = $ExecuteAsCredential.UserName
         $PSBoundParameters['ExecuteAsCredential'] = $username
+
+        <#
+            Windows Server 2019 and newer versions of Windows 10 don't return fully qualified
+            username in the current ExecuteAsCredential if it is the local machine. Therefore
+            the compare will fail and show a false positive (see Issue #350).
+
+            To resolve this, add the computer name if it is missing and if it was passed in the
+            ExecuteAsCredential parameter.
+        #>
+        if ($username -cmatch '\\' -and $currentValues.ExecuteAsCredential -cnotmatch '\\')
+        {
+            $currentValues.ExecuteAsCredential = "$ENV:COMPUTERNAME\$($currentValues.ExecuteAsCredential)"
+        }
     }
     else
     {
@@ -1832,11 +1845,12 @@ function Get-CurrentResource
             $PrincipalId = 'UserId'
         }
 
-    <#  The following workaround is needed because Get-StartedTask currently returns NULL for the value
-        of $settings.MultipleInstances when the started task is set to "Stop the existing instance".
-        https://windowsserver.uservoice.com/forums/301869-powershell/suggestions/40685125-bug-get-scheduledtask-returns-null-for-value-of-m
-    #>
+        <#  The following workaround is needed because Get-StartedTask currently returns NULL for the value
+            of $settings.MultipleInstances when the started task is set to "Stop the existing instance".
+            https://windowsserver.uservoice.com/forums/301869-powershell/suggestions/40685125-bug-get-scheduledtask-returns-null-for-value-of-m
+        #>
         $MultipleInstances = [System.String] $settings.MultipleInstances
+
         if ([System.String]::IsNullOrEmpty($MultipleInstances))
         {
             if ($task.settings.CimInstanceProperties.Item('MultipleInstances').Value -eq 3)
