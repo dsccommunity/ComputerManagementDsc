@@ -13,7 +13,5 @@ ConvertFrom-StringData -StringData @'
     SetWindowsEventLogRetentionDaysWrongMode     = Unable to configure retention for event log '{0}' because LogMode must be set to AutoBackup.
     SetWindowsEventLogRetentionDaysNotClassic    = Unable to configure retention for event log '{0}' because it not a classic event log.
     SetTargetResourceProperty                    = Setting the '{1}' property of event log '{0}'. Current value '{2}'. Requested value '{3}'.
-    SetTargetResourceSkipLogRetentionDays        = The LogRetentionDays property is only valid for classic event logs.
     TestTargetResourcePropertyNotInDesiredState  = The '{1}' property of event log '{0}' is not in the desired state. Current value '{2}'. Requested value '{3}'.
-    TestWindowsEventLogRetentionDaysNotClassic   = Skipping test for retention for event log '{0}' is not a classic event log.
 '@
