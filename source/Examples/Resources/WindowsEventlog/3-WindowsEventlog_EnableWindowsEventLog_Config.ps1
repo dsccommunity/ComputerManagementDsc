@@ -19,22 +19,23 @@
 
 <#
     .DESCRIPTION
-        Example script that sets the Dsc Analytic Windows Event Log
-        to size maximum size 4096MB, with logmode 'Retain' and ensure it is enabled.
+        Example script that sets the DSC Analytic log
+        to size maximum size 4096MB, log mode to 'Retain' and
+        ensures it is enabled.
 #>
-Configuration WindowsEventlog_EnableWindowsEventLog_Config
+Configuration WindowsEventLog_EnableWindowsEventLog_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog Enable-DscAnalytic
+        WindowsEventLog DscAnalytic
         {
-            LogName             = 'Microsoft-Windows-Dsc/Analytic'
-            IsEnabled           = $True
-            LogMode             = 'Retain'
-            MaximumSizeInBytes  = 4096kb
-            LogFilePath         = "%SystemRoot%\System32\Winevt\Logs\Microsoft-Windows-DSC%4Analytic.evtx"
-        } # End of Windows Event Log Resource
-    } # End of Node
-} # End of Configuration
+            LogName            = 'Microsoft-Windows-Dsc/Analytic'
+            IsEnabled          = $true
+            LogMode            = 'Retain'
+            MaximumSizeInBytes = 4096MB
+            LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Microsoft-Windows-DSC%4Analytic.evtx'
+        }
+    }
+}

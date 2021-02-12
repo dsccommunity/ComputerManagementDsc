@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID f8fb71fd-9f4a-4ae5-93b8-53362752e37d
+.GUID 07323d21-39a0-4f62-bed7-7acc943f9234
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
 .COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
@@ -19,21 +19,19 @@
 
 <#
     .DESCRIPTION
-        Example script that sets the application Windows Event Log
-        to a maximum size 4096MB, the logmode to 'Circular' and ensure that it is enabled.
+        Example script that reconfigures the security
+        descriptor (DACL) of the Application log.
 #>
-Configuration WindowsEventlog_SetWindowsEventlogSize_Config
+Configuration WindowsEventLog_SetSecurityDescriptor_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog ApplicationEventlogSize
+        WindowsEventLog Application
         {
             LogName            = 'Application'
-            IsEnabled          = $true
-            LogMode            = 'Circular'
-            MaximumSizeInBytes = 4096KB
-        } # End of Windows Event Log Resource
-    } # End of Node
-} # End of Configuration
+            SecurityDescriptor = 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)'
+        }
+    }
+}

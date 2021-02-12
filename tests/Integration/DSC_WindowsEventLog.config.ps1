@@ -2,7 +2,7 @@
 Configuration DSC_WindowsEventLog_Default
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node 'localhost'
+    Node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
@@ -19,7 +19,7 @@ Configuration DSC_WindowsEventLog_Default
 Configuration DSC_WindowsEventLog_RetainSize
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node 'localhost'
+    Node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
@@ -34,7 +34,7 @@ Configuration DSC_WindowsEventLog_RetainSize
 Configuration DSC_WindowsEventLog_AutobackupLogRetention
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node 'localhost'
+    Node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
@@ -49,7 +49,7 @@ Configuration DSC_WindowsEventLog_AutobackupLogRetention
 Configuration DSC_WindowsEventLog_CircularLogPath
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node 'localhost'
+    Node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
@@ -65,7 +65,7 @@ Configuration DSC_WindowsEventLog_CircularLogPath
 Configuration DSC_WindowsEventLog_EnableLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node 'localhost'
+    Node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
@@ -80,7 +80,7 @@ Configuration DSC_WindowsEventLog_EnableLog
 Configuration DSC_WindowsEventLog_DisableLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node 'localhost'
+    Node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
@@ -93,7 +93,7 @@ Configuration DSC_WindowsEventLog_DisableLog
 Configuration DSC_WindowsEventLog_CircularSecurityDescriptor
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node 'localhost'
+    Node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
@@ -109,14 +109,14 @@ Configuration DSC_WindowsEventLog_CircularSecurityDescriptor
 Configuration DSC_WindowsEventLog_EnableBackupLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node 'localhost'
+    Node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
             LogName          = 'Microsoft-Windows-Backup'
             IsEnabled        = $true
             LogMode          = 'AutoBackup'
-            LogRetentionDays = '30'
+            LogRetentionDays = 30
         }
     }
 }
@@ -124,12 +124,54 @@ Configuration DSC_WindowsEventLog_EnableBackupLog
 Configuration DSC_WindowsEventLog_DisableBackupLog
 {
     Import-DscResource -ModuleName ComputerManagementDsc
-    node 'localhost'
+    Node 'localhost'
     {
         WindowsEventLog Integration_Test
         {
             LogName   = 'Microsoft-Windows-Backup'
             IsEnabled = $false
+        }
+    }
+}
+
+Configuration DSC_WindowsEventLog_CreateCustomResource
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    Node 'localhost'
+    {
+        WindowsEventLog Integration_Test
+        {
+            LogName               = 'Application'
+            RegisteredSource      = 'MyCustomSource'
+            CategoryResourceFile  = 'C:\Windows\System32\MCS.Category.dll'
+            MessageResourceFile   = 'C:\Windows\System32\MCS.Message.dll'
+            ParameterResourceFile = 'C:\Windows\System32\MCS.Parameter.dll'
+        }
+    }
+}
+
+Configuration DSC_WindowsEventLog_AppLogGuestsAllowed
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    Node 'localhost'
+    {
+        WindowsEventLog Integration_Test
+        {
+            LogName               = 'Application'
+            RestrictGuestAccess   = $false
+        }
+    }
+}
+
+Configuration DSC_WindowsEventLog_AppLogGuestsProhibited
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+    Node 'localhost'
+    {
+        WindowsEventLog Integration_Test
+        {
+            LogName               = 'Application'
+            RestrictGuestAccess   = $true
         }
     }
 }

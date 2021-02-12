@@ -19,23 +19,23 @@
 
 <#
     .DESCRIPTION
-        Example script that sets the application Windows Event Log
-        to mode AutoBackup and logsize to a maximum size of 2048MB
-        with a logfile retention for 10 days and ensure it is enabled.
+        Example script that sets the MSPaint Admin event channel
+        to log mode AutoBackup, a maximum size of 2048MB, log
+        retention for 10 days, and ensure it is enabled.
 #>
-Configuration WindowsEventlog_SetWindowsEventlogLogMode_Config
+Configuration WindowsEventLog_SetLogMode_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog ApplicationEventlogMode
+        WindowsEventLog MSPaintAdmin
         {
             LogName            = 'Microsoft-Windows-MSPaint/Admin'
             IsEnabled          = $true
             LogMode            = 'AutoBackup'
-            LogRetentionDays   = '10'
-            MaximumSizeInBytes = 2048kb
-        } # End of Windows Event Log Resource
-    } # End of Node
-} # End of Configuration
+            LogRetentionDays   = 10
+            MaximumSizeInBytes = 2048KB
+        }
+    }
+}

@@ -19,18 +19,18 @@
 
 <#
     .DESCRIPTION
-        Example script that disables the given Windows Event Log.
+        Example script that disables the DSC Analytic log.
 #>
-Configuration WindowsEventlog_DisableWindowsEventlog_Config
+Configuration WindowsEventLog_DisableWindowsEventLog_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog Enable-DscAnalytic
+        WindowsEventLog DscAnalytic
         {
-            LogName             = 'Microsoft-Windows-Dsc/Analytic'
-            IsEnabled           = $false
-        } # End of Windows Event Log Resource
-    } # End of Node
-} # End of Configuration
+            LogName   = 'Microsoft-Windows-Dsc/Analytic'
+            IsEnabled = $false
+        }
+    }
+}
