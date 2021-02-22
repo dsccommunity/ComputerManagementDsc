@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID 857f9f25-082e-4274-9efd-0908f49bb516
+.GUID cabb6778-8f48-4ce7-ad3d-2cc444bc78e9
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
 .COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
@@ -20,62 +20,38 @@
 <#
     .DESCRIPTION
         Example script that registers MyEventSource as an event
-        source on the Application log.
+        source with all resource files on the Application log.
 #>
-Configuration WindowsEventLog_RegisterEventSource_Config
+Configuration WindowsEventLog_RegisterEventSourceWithAllFiles_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog Application
+        File MyEventSourceCategoryDll
         {
-            LogName           = 'Application'
-            RegisteredSource  = 'MyEventSource'
+            Ensure          = 'Present'
+            Type            = 'File'
+            SourcePath      = '\\PULLSERVER\Files\MyEventSource.Category.dll'
+            DestinationPath = 'C:\Windows\System32\MyEventSource.Category.dll'
         }
-    }
-}
 
-<#
-    .DESCRIPTION
-        Example script that registers MyEventSource as an event
-        source with a message resource file on the Application log.
-#>
-Configuration WindowsEventLog_RegisterEventSource_Config
-{
-    Import-DSCResource -ModuleName ComputerManagementDsc
-
-    Node localhost
-    {
         File MyEventSourceMessageDll
         {
             Ensure          = 'Present'
             Type            = 'File'
-            SourcePath      = '\\PULLSERVER\Files\MyEventSource.dll'
-            DestinationPath = 'C:\Windows\System32\MyEVentSource.dll'
+            SourcePath      = '\\PULLSERVER\Files\MyEventSource.Message.dll'
+            DestinationPath = 'C:\Windows\System32\MyEventSource.Message.dll'
         }
 
-        WindowsEventLog Application
+        File MyEventSourceParameterDll
         {
-            LogName             = 'Application'
-            RegisteredSource    = 'MyEventSource'
-            MessageResourceFile = 'C:\Windows\System32\MyEventSource.dll'
-            DependsOn           = '[File]MyEventSourceMessageDll'
+            Ensure          = 'Present'
+            Type            = 'File'
+            SourcePath      = '\\PULLSERVER\Files\MyEventSource.Parameter.dll'
+            DestinationPath = 'C:\Windows\System32\MyEventSource.Parameter.dll'
         }
-    }
-}
 
-<#
-    .DESCRIPTION
-        Example script that registers MyEventSource as an event
-        source with all resource files on the Application log.
-#>
-Configuration WindowsEventLog_RegisterEventSource_Config
-{
-    Import-DSCResource -ModuleName ComputerManagementDsc
-
-    Node localhost
-    {
         WindowsEventLog Application
         {
             LogName               = 'Application'
@@ -83,6 +59,9 @@ Configuration WindowsEventLog_RegisterEventSource_Config
             CategoryResourceFile  = 'C:\Windows\System32\MyEventSource.Category.dll'
             MessageResourceFile   = 'C:\Windows\System32\MyEventSource.Messages.dll'
             ParameterResourceFile = 'C:\Windows\System32\MyEventSource.Parameters.dll'
+            DependsOn             = '[File]MyEventSourceCategoryDll',
+                                    '[File]MyEventSourceMessageDll',
+                                    '[File]MyEventSourceParameterDll'
         }
     }
 }
