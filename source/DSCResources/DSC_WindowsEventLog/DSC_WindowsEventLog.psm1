@@ -16,9 +16,6 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
     .PARAMETER LogName
         Specifies the name of a valid event log.
-
-    .PARAMETER RegisteredSource
-        Specifies the name of an event source in the specified event log.
 #>
 function Get-TargetResource
 {
@@ -28,11 +25,7 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $LogName,
-
-        [Parameter()]
-        [System.String]
-        $RegisteredSource
+        $LogName
     )
 
     Write-Verbose -Message ($script:localizedData.GetTargetResource -f $LogName)
@@ -55,32 +48,6 @@ function Get-TargetResource
         SecurityDescriptor  = $log.SecurityDescriptor
         LogRetentionDays    = $logRetentionDays
         RestrictGuestAccess = $restrictGuestAccess
-    }
-
-    if ($PSBoundParameters.ContainsKey('RegisteredSource'))
-    {
-        $returnValue.RegisteredSource = `
-            Get-WindowsEventLogRegisteredSource `
-            -LogName $LogName `
-            -SourceName $RegisteredSource
-
-        $returnValue.CategoryResourceFile = `
-            Get-WindowsEventLogRegisteredSourceFile `
-            -LogName $LogName `
-            -SourceName $returnValue.RegisteredSource `
-            -ResourceFileType Category
-
-        $returnValue.MessageResourceFile = `
-            Get-WindowsEventLogRegisteredSourceFile `
-            -LogName $LogName `
-            -SourceName $returnValue.RegisteredSource `
-            -ResourceFileType Message
-
-        $returnValue.ParameterResourceFile = `
-            Get-WindowsEventLogRegisteredSourceFile `
-            -LogName $LogName `
-            -SourceName $returnValue.RegisteredSource `
-            -ResourceFileType Parameter
     }
 
     return $returnValue

@@ -213,41 +213,6 @@ try
                     $eventLogConfiguration.SecurityDescriptor | Should -Not -BeNullOrEmpty
                     $eventLogConfiguration.RestrictGuestAccess | Should -BeOfType Boolean
                 }
-
-                It 'Should return empty strings for an undefined event source' {
-                    Mock -CommandName Get-CimInstance {
-                        return $mocks.GetCimInstancePesterTestNotExist
-                    }
-
-                    $eventLogConfiguration = Get-TargetResource `
-                        -LogName 'Application' `
-                        -RegisteredSource 'PesterTest' `
-                        -Verbose
-
-                    $eventLogConfiguration.RegisteredSource | Should -BeNullOrEmpty
-                    $eventLogConfiguration.CategoryMessageFile | Should -BeNullOrEmpty
-                    $eventLogConfiguration.MessageResourceFile | Should -BeNullOrEmpty
-                    $eventLogConfiguration.ParameterResourceFile | Should -BeNullOrEmpty
-                }
-
-                It 'Should return resource file locations for a defined event source' {
-                    Mock -CommandName Get-CimInstance {
-                        return $mocks.GetCimInstancePesterTestExist
-                    }
-                    Mock -CommandName Get-ItemProperty {
-                        return $mocks.GetWELRegisteredSourceFilePesterTestExist
-                    }
-
-                    $eventLogConfiguration = Get-TargetResource `
-                        -LogName 'Application' `
-                        -RegisteredSource 'PesterTest' `
-                        -Verbose
-
-                    $eventLogConfiguration.RegisteredSource | Should -Not -BeNullOrEmpty
-                    $eventLogConfiguration.CategoryResourceFile | Should -Not -BeNullOrEmpty
-                    $eventLogConfiguration.MessageResourceFile | Should -Not -BeNullOrEmpty
-                    $eventLogConfiguration.ParameterResourceFile | Should -Not -BeNullOrEmpty
-                }
             }
         }
 
