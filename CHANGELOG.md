@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - WindowsCapability
   - Added the 'Source' parameter for Add-WindowsCapability [Issue #361](https://github.com/dsccommunity/ComputerManagementDsc/issues/361)
+  - This is an optional parameter, since it is passed in via @PsBoundParameters
 
 ### Fixed
 
