@@ -199,7 +199,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $LogPath
+        $LogPath,
+
+        [Parameter()]
+        [System.String]
+        $Source
     )
 
     $inDesiredState = $true
