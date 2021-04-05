@@ -82,6 +82,11 @@ function Get-TargetResource
         Specifies the full path and file name to log to. This is a write
         only parameter that is used when updating the status of a Windows
         Capability. If not specified, the default is '%WINDIR%\Logs\Dism\dism.log'.
+
+    .PARAMETER Source
+        Specifies the location of the files that are required to add a Windows
+        capability package to an image. You can specify the Windows directory
+        of a mounted image or a running Windows installation that is shared on the network.
 #>
 function Set-TargetResource
 {
@@ -104,7 +109,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $LogPath
+        $LogPath,
+
+        [Parameter()]
+        [System.String]
+        $Source
     )
 
     Write-Verbose -Message ($script:localizedData.SetTargetResourceStartMessage -f $Name)
@@ -127,6 +136,12 @@ function Set-TargetResource
             if ($Ensure -ne $currentState.Ensure)
             {
                 Write-Verbose -Message ($script:localizedData.SetTargetRemoveMessage -f $Name)
+
+                if ($PSBoundParameters.ContainsKey('Source'))
+                {
+                    $PSBoundParameters.Remove('Source')
+                }
+
                 $null = Remove-WindowsCapability -Online @PSBoundParameters
             }
         }
@@ -184,7 +199,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $LogPath
+        $LogPath,
+
+        [Parameter()]
+        [System.String]
+        $Source
     )
 
     $inDesiredState = $true
