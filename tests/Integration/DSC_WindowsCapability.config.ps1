@@ -11,6 +11,7 @@ Configuration DSC_WindowsCapability_Config
             LogLevel = $Node.LogLevel
             LogPath  = $Node.LogPath
             Ensure   = $Node.Ensure
+            Source   = $Node.Source
         }
     }
 }

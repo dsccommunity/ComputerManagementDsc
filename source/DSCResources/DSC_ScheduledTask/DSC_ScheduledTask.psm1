@@ -1382,7 +1382,7 @@ function Test-TargetResource
         $PSBoundParameters['RestartInterval'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval).ToString()
     }
 
-    if ($ScheduleType -in @('Once', 'Daily', 'Weekly'))
+    if ($ScheduleType -in @('Once', 'Daily', 'Weekly') -and $PSBoundParameters.ContainsKey('StartTime'))
     {
         $PSBoundParameters['StartTime'] = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
         <#
@@ -1405,7 +1405,6 @@ function Test-TargetResource
     }
     else
     {
-        # Do not compare StartTime for triggers that aren't Once, Daily or Weekly.
         $null = $PSBoundParameters.Remove('StartTime')
         $null = $currentValues.Remove('StartTime')
     }
