@@ -202,7 +202,7 @@ try
                     $eventLogConfiguration.LogRetentionDays | Should -BeIn (0..365)
                     $eventLogConfiguration.LogFilePath | Should -Not -BeNullOrEmpty
                     $eventLogConfiguration.SecurityDescriptor | Should -Not -BeNullOrEmpty
-                    $eventLogConfiguration.RestrictGuestAccess | Should -Be $false
+                    $eventLogConfiguration.RestrictGuestAccess | Should -Be $true
                 }
             }
         }
