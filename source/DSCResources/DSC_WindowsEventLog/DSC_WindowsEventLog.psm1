@@ -526,7 +526,7 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-        Helper function for WindowsEventLog.
+        Gets the requested event log and throws an exception if it doesn't exist.
 
     .PARAMETER LogName
         Specifies the name of a valid event log.
@@ -549,7 +549,7 @@ function Get-WindowsEventLog
     catch
     {
         $message = $script:localizedData.GetWindowsEventLogFailure -f $LogName
-        New-ObjectNotFoundException -Message $message -ErrorRecord $_
+        New-InvalidOperationException -Message $message -ErrorRecord $_
     }
 
     return $log
@@ -557,7 +557,7 @@ function Get-WindowsEventLog
 
 <#
     .SYNOPSIS
-        Helper function for WindowsEventLog.
+        Gets the registered event source for an event log.
 
     .PARAMETER LogName
         Specifies the name of a valid event log.
@@ -595,7 +595,7 @@ function Get-WindowsEventLogRegisteredSource
 
 <#
     .SYNOPSIS
-        Helper function for WindowsEventLog.
+        Gets the full path of a registered event source.
 
     .PARAMETER LogName
         Specifies the name of a valid event log.
@@ -628,6 +628,7 @@ function Get-WindowsEventLogRegisteredSourceFile
     )
 
     $file = ''
+
     if ($SourceName -ne '')
     {
         $source = Get-ItemProperty `
@@ -664,7 +665,7 @@ function Get-WindowsEventLogRegisteredSourceFile
 
 <#
     .SYNOPSIS
-        Helper function for WindowsEventLog.
+        Gets the status of guest access for an event log.
 
     .PARAMETER LogName
         Specifies the name of a valid event log.
@@ -682,6 +683,7 @@ function Get-WindowsEventLogRestrictGuestAccess
 
     $eventLogRegistryPath = 'HKLM:\SYSTEM\CurrentControlSet\Services\EventLog'
     $logRegistryPath = Join-Path -Path $eventLogRegistryPath -ChildPath $LogName
+
     try
     {
         $logProperties = Get-ItemProperty -Path $logRegistryPath -ErrorAction Stop
@@ -691,19 +693,12 @@ function Get-WindowsEventLogRestrictGuestAccess
         return $false
     }
 
-    if ($logProperties.RestrictGuestAccess -eq 1)
-    {
-        return $true
-    }
-    else
-    {
-        return $false
-    }
+    return ($logProperties.RestrictGuestAccess -eq 1)
 }
 
 <#
     .SYNOPSIS
-        Helper function for WindowsEventLog.
+        Gets the retention for an event log and throws an exception if a problem occurs.
 
     .PARAMETER LogName
         Specifies the name of a valid event log.
@@ -725,7 +720,7 @@ function Get-WindowsEventLogRetentionDays
     if ($null -eq $matchingEventLog.MinimumRetentionDays)
     {
         $message = $script:localizedData.GetWindowsEventLogRetentionDaysFailure -f $LogName
-        New-ObjectNotFoundException -Message $message -ErrorRecord $_
+        New-InvalidArgumentException -Message $message -ArgumentName 'LogName'
     }
 
     return $matchingEventLog.MinimumRetentionDays
@@ -733,7 +728,7 @@ function Get-WindowsEventLogRetentionDays
 
 <#
     .SYNOPSIS
-        Helper function for WindowsEventLog.
+        Registers an event source and throws an exception if the file path is invalid or registration fails.
 
     .PARAMETER LogName
         Specifies the name of a valid event log.
@@ -776,15 +771,6 @@ function Register-WindowsEventLogSource
         $ParameterResourceFile
     )
 
-    foreach ($file in $CategoryResourceFile, $MessageResourceFile, $ParameterResourceFile)
-    {
-        if ($file -ne '' -and -not (Test-Path -Path $file -IsValid))
-        {
-            $message = $script:localizedData.RegisterWindowsEventLogSourceInvalidPath -f $SourceName, $file
-            New-InvalidArgumentException -Message $message -ErrorRecord $_
-        }
-    }
-
     $arguments = @{
         LogName = $LogName
         Source  = $SourceName
@@ -792,16 +778,40 @@ function Register-WindowsEventLogSource
 
     if ($PSBoundParameters.ContainsKey('CategoryResourceFile'))
     {
+        if (-not [System.String]::IsNullOrEmpty($CategoryResourceFile) -and `
+            -not (Test-Path -Path $CategoryResourceFile -IsValid))
+        {
+            $message = $script:localizedData.RegisterWindowsEventLogSourceInvalidPath `
+                -f $SourceName, $CategoryResourceFile
+            New-InvalidArgumentException -Message $message -ArgumentName 'CategoryResourceFile'
+        }
+
         $arguments.CategoryResourceFile = $CategoryResourceFile
     }
 
     if ($PSBoundParameters.ContainsKey('MessageResourceFile'))
     {
+        if (-not [System.String]::IsNullOrEmpty($MessageResourceFile) -and `
+            -not (Test-Path -Path $MessageResourceFile -IsValid))
+        {
+            $message = $script:localizedData.RegisterWindowsEventLogSourceInvalidPath `
+                -f $SourceName, $MessageResourceFile
+            New-InvalidArgumentException -Message $message -ArgumentName 'MessageResourceFile'
+        }
+
         $arguments.MessageResourceFile = $MessageResourceFile
     }
 
     if ($PSBoundParameters.ContainsKey('ParameterResourceFile'))
     {
+        if (-not [System.String]::IsNullOrEmpty($ParameterResourceFile) -and `
+            -not (Test-Path -Path $ParameterResourceFile -IsValid))
+        {
+            $message = $script:localizedData.RegisterWindowsEventLogSourceInvalidPath `
+                -f $SourceName, $ParameterResourceFile
+            New-InvalidArgumentException -Message $message -ArgumentName 'ParameterResourceFile'
+        }
+
         $arguments.ParameterResourceFile = $ParameterResourceFile
     }
 
@@ -826,7 +836,7 @@ function Register-WindowsEventLogSource
 
 <#
     .SYNOPSIS
-        Helper function for WindowsEventLog.
+        Saves changes to an event log and throws an exception if the operation fails.
 
     .PARAMETER Log
         Specifies the given object of a Windows Event Log.
@@ -854,7 +864,7 @@ function Save-WindowsEventLog
 
 <#
     .SYNOPSIS
-        Helper function for WindowsEventLog.
+        Sets the status of guest access for an event log and throws an exception if the operation fails.
 
     .PARAMETER LogName
         Specifies the name of a valid event log.
@@ -898,8 +908,16 @@ function Set-WindowsEventLogRestrictGuestAccess
         New-InvalidOperationException -Message $message -ErrorRecord $_
     }
 
-    $logSddl = ( $Sddl.Replace(":", ":`n").Replace(")", ")`n").Split() |
-            ForEach-Object { $PSItem | Where-Object { $PSItem -notmatch 'BG\)$' } } ) -Join ''
+    $logSddl = ''
+    $sddlDescriptors = $Sddl.Replace(":", ":`n").Replace(")", ")`n").Split()
+
+    foreach ($sddlDescriptor in $sddlDescriptors)
+    {
+        if ($sddlDescriptor -notmatch 'BG\)$')
+        {
+            $logSddl += $sddlDescriptor
+        }
+    }
 
     if ($RestrictGuestAccess -eq $false)
     {
@@ -911,7 +929,7 @@ function Set-WindowsEventLogRestrictGuestAccess
 
 <#
     .SYNOPSIS
-        Helper function for WindowsEventLog.
+        Sets retention for an event log and throws an exception if the operation fails.
 
     .PARAMETER LogName
         Specifies the name of a valid event log.
@@ -949,7 +967,7 @@ function Set-WindowsEventLogRetentionDays
         catch
         {
             $message = $script:localizedData.GetWindowsEventLogRetentionDaysFailure -f $LogName
-            New-ObjectNotFoundException -Message $message -ErrorRecord $_
+            New-InvalidOperationException -Message $message -ErrorRecord $_
         }
 
         $minimumRetentionDaysForLog = $matchingEventLog.MinimumRetentionDays
