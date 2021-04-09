@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed issue with disabling scheduled tasks that have "Run whether user is
     logged on or not" configured - Fixes [Issue #306](https://github.com/dsccommunity/ComputerManagementDsc/issues/306).
   - Fixed issue with `ExecuteAsCredential` not returning fully qualified username
-    on newer versions of Windows 10 and Windows Server 2019 - Fixes [Issue #352](https://github.com/dsccommunity/ComputerManagementDsc/issues/352).
+    on newer versions of Windows 10 and Windows Server 2019 for both local
+    accounts and domain accounts - Fixes [Issue #352](https://github.com/dsccommunity/ComputerManagementDsc/issues/352).
   - Fixed issue with `StartTime` failing Test-Resource if not specified in the
     resource - Fixes [Issue #148](https://github.com/dsccommunity/ComputerManagementDsc/issues/148).
 - PendingReboot
