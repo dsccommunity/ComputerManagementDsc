@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID 1d426e51-df3b-4723-96ac-e7d790744f69
+.GUID 3f7e83d6-f29c-45f1-a305-2addb69fb0f2
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
 .COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
@@ -19,18 +19,19 @@
 
 <#
     .DESCRIPTION
-        Example script that disables the given Windows Event Log.
+        Example script that allows guests to access
+        the Application event log.
 #>
-Configuration WindowsEventlog_DisableWindowsEventlog_Config
+Configuration WindowsEventLog_AllowGuestAccess_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog Enable-DscAnalytic
+        WindowsEventLog System
         {
-            LogName             = 'Microsoft-Windows-Dsc/Analytic'
-            IsEnabled           = $false
-        } # End of Windows Event Log Resource
-    } # End of Node
-} # End of Configuration
+            LogName             = 'System'
+            RestrictGuestAccess = $false
+        }
+    }
+}

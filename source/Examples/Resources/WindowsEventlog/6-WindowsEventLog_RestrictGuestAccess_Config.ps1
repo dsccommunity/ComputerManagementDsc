@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID f05286e4-e357-40f8-ba62-e49d4d50eb0f
+.GUID ab5cc60b-b834-49b0-80f4-f73f18bf9199
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
 .COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
@@ -19,23 +19,19 @@
 
 <#
     .DESCRIPTION
-        Example script that sets the DSC Analytic log
-        to size maximum size 4096MB, log mode to 'Retain' and
-        ensures it is enabled.
+        Example script that prohibits guests from accessing
+        the System event log.
 #>
-Configuration WindowsEventLog_EnableWindowsEventLog_Config
+Configuration WindowsEventLog_RestrictGuestAccess_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog DscAnalytic
+        WindowsEventLog System
         {
-            LogName            = 'Microsoft-Windows-Dsc/Analytic'
-            IsEnabled          = $true
-            LogMode            = 'Retain'
-            MaximumSizeInBytes = 4096MB
-            LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Microsoft-Windows-DSC%4Analytic.evtx'
+            LogName             = 'System'
+            RestrictGuestAccess = $true
         }
     }
 }

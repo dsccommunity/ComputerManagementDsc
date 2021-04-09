@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID f8fb71fd-9f4a-4ae5-93b8-53362752e37d
+.GUID 1d426e51-df3b-4723-96ac-e7d790744f69
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
 .COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
@@ -19,21 +19,18 @@
 
 <#
     .DESCRIPTION
-        Example script that sets the application Windows Event Log
-        to a maximum size 4096MB, the logmode to 'Circular' and ensure that it is enabled.
+        Example script that disables the DSC Analytic log.
 #>
-Configuration WindowsEventlog_SetWindowsEventlogSize_Config
+Configuration WindowsEventLog_DisableWindowsEventLog_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog ApplicationEventlogSize
+        WindowsEventLog DscAnalytic
         {
-            LogName            = 'Application'
-            IsEnabled          = $true
-            LogMode            = 'Circular'
-            MaximumSizeInBytes = 4096KB
-        } # End of Windows Event Log Resource
-    } # End of Node
-} # End of Configuration
+            LogName   = 'Microsoft-Windows-Dsc/Analytic'
+            IsEnabled = $false
+        }
+    }
+}

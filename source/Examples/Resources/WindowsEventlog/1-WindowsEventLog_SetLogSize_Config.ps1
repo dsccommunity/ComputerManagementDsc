@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID 07323d21-39a0-4f62-bed7-7acc943f9234
+.GUID f8fb71fd-9f4a-4ae5-93b8-53362752e37d
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
 .COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
@@ -19,23 +19,21 @@
 
 <#
     .DESCRIPTION
-        Example script that sets the application Windows Event Log
-        logmode to 'Circular' with 30 days retention,
-        with a Security Desriptor and ensure it is enabled.
+        Sets the Application log to a maximum size of 4096MB,
+        the log mode to circular, and ensure it is enabled.
 #>
-Configuration WindowsEventlog_SetWindowsEventlogSecurityDescriptor_Config
+Configuration WindowsEventLog_SetLogSize_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog ApplicationEventlogSize
+        WindowsEventLog Application
         {
             LogName            = 'Application'
             IsEnabled          = $true
             LogMode            = 'Circular'
-            MaximumSizeInBytes = 2048kb
-            SecurityDescriptor = 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)'
-        } # End of Windows Event Log Resource
-    } # End of Node
-} # End of Configuration
+            MaximumSizeInBytes = 4096MB
+        }
+    }
+}

@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID 1e24ee07-cb2f-489b-af15-ebf6ffa864fe
+.GUID 857f9f25-082e-4274-9efd-0908f49bb516
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
 .COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
@@ -19,21 +19,19 @@
 
 <#
     .DESCRIPTION
-        Example script that sets the application Windows Event Log
-        logmode to 'Autobackup' with 30 days retention and ensure it is enabled.
+        Example script that registers MyEventSource as an event
+        source on the Application log.
 #>
-Configuration WindowsEventlog_SetWindowsEventlogLogMode_Config
+Configuration WindowsEventLog_RegisterEventSource_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog ApplicationEventlogSize
+        WindowsEventLog Application
         {
-            LogName            = 'Application'
-            IsEnabled          = $true
-            LogMode            = 'AutoBackup'
-            LogRetentionDays   = 30
-        } # End of Windows Event Log Resource
-    } # End of Node
-} # End of Configuration
+            LogName           = 'Application'
+            RegisteredSource  = 'MyEventSource'
+        }
+    }
+}

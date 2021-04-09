@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID f05286e4-e357-40f8-ba62-e49d4d50eb0f
+.GUID 07323d21-39a0-4f62-bed7-7acc943f9234
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
 .COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
@@ -19,23 +19,19 @@
 
 <#
     .DESCRIPTION
-        Example script that sets the DSC Analytic log
-        to size maximum size 4096MB, log mode to 'Retain' and
-        ensures it is enabled.
+        Example script that reconfigures the security
+        descriptor (DACL) of the Application log.
 #>
-Configuration WindowsEventLog_EnableWindowsEventLog_Config
+Configuration WindowsEventLog_SetSecurityDescriptor_Config
 {
     Import-DSCResource -ModuleName ComputerManagementDsc
 
     Node localhost
     {
-        WindowsEventLog DscAnalytic
+        WindowsEventLog Application
         {
-            LogName            = 'Microsoft-Windows-Dsc/Analytic'
-            IsEnabled          = $true
-            LogMode            = 'Retain'
-            MaximumSizeInBytes = 4096MB
-            LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Microsoft-Windows-DSC%4Analytic.evtx'
+            LogName            = 'Application'
+            SecurityDescriptor = 'O:BAG:SYD:(A;;0x7;;;BA)(A;;0x7;;;SO)(A;;0x3;;;IU)(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)'
         }
     }
 }

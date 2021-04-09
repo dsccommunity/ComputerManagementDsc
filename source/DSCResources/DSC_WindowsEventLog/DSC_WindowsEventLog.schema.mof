@@ -2,11 +2,16 @@
 [ClassVersion("1.0.0.1"), FriendlyName("WindowsEventLog")]
 class DSC_WindowsEventLog : OMI_BaseResource
 {
-    [Key, Description("Specifies the given name of a Windows Event Log")] String LogName;
-    [Write, Description("Specifies the given state of a Windows Event Log")] Boolean IsEnabled;
-    [Write, Description("Specifies the given maximum size in bytes for a specified Windows Event Log")] Sint64 MaximumSizeInBytes;
-    [Write, Description("Specifies the given LogMode for a specified Windows Event Log"), ValueMap{"AutoBackup","Circular","Retain"}, Values{"AutoBackup","Circular","Retain"}] String LogMode;
-    [Write, Description("Specifies the given SecurityDescriptor for a specified Windows Event Log")] String SecurityDescriptor;
-    [Write, Description("Specifies the given LogFile path of a Windows Event Log")] String LogFilePath;
-    [Write, Description("Specifies the given LogRetentionDays for the Logmode 'AutoBackup'")] Sint32 LogRetentionDays;
+    [Key, Description("Specifies the name of a valid event log")] String LogName;
+    [Write, Description("Specifies whether the specified event log should be enabled or disabled")] Boolean IsEnabled;
+    [Write, Description("Specifies the maximum size in bytes for the specified event log")] Sint64 MaximumSizeInBytes;
+    [Write, Description("Specifies the log mode for the specified event log"), ValueMap{"AutoBackup","Circular","Retain"}, Values{"AutoBackup","Circular","Retain"}] String LogMode;
+    [Write, Description("Specifies the SDDL for the specified event log")] String SecurityDescriptor;
+    [Write, Description("Specifies the file name and path for the specified event log")] String LogFilePath;
+    [Write, Description("Specifies the number of days to retain events when the log mode is AutoBackup")] Sint32 LogRetentionDays;
+    [Write, Description("Specifies the name of an event source to register for the specified event log")] String RegisteredSource;
+    [Write, Description("Specifies the category resource file for the event source")] String CategoryResourceFile;
+    [Write, Description("Specifies the message resource file for the event source")] String MessageResourceFile;
+    [Write, Description("Specifies the parameter resource file for the event source")] String ParameterResourceFile;
+    [Write, Description("Specifies whether to allow guests to have access to the specified event log")] Boolean RestrictGuestAccess;
 };

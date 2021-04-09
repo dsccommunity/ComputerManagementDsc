@@ -32,359 +32,589 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
-        Describe 'DSC_WindowsEventLog\Get-TargetResource' -Tag 'Get' {
+        $fullParams = @{
+            IsEnabled             = $true
+            LogFilePath           = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
+            LogMode               = 'Circular'
+            LogName               = 'Application'
+            LogRetentionDays      = 0
+            MaximumSizeInBytes    = [System.Int64] 525074432
+            RestrictGuestAccess   = $true
+            SecurityDescriptor    = 'O:BAG:SYD:(A;;0x2;;;S-1-15-2-1)' + `
+                '(A;;0xf0007;;;SY)(A;;0x7;;;BA)' + `
+                '(A;;0x7;;;SO)(A;;0x3;;;IU)' + `
+                '(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)' + `
+                '(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)'
+            RegisteredSource      = 'PesterTest'
+            CategoryResourceFile  = 'C:\WINDOWS\System32\PesterTest.dll'
+            MessageResourceFile   = 'C:\WINDOWS\System32\PesterTest.dll'
+            ParameterResourceFile = 'C:\WINDOWS\System32\PesterTest.dll'
+        }
 
-            Mock -CommandName Get-WindowsEventLog -MockWith {
-                $properties = @{
-                    MaximumSizeInBytes = 4096kb
+        $mocks = @{
+            GetCimInstancePesterTestExist = New-Object -TypeName PSObject -Property @{
+                LogfileName = 'Application'
+                Name        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
+                Sources     = @(
+                    'Application',
+                    'Application Error',
+                    'Application Hang',
+                    'Application Management',
+                    'PesterTest'
+                )
+            }
+
+            GetCimInstancePesterTestNotExist = New-Object -TypeName PSObject -Property @{
+                LogfileName = 'Application'
+                Name        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
+                Sources     = @(
+                    'Application',
+                    'Application Error',
+                    'Application Hang',
+                    'Application Management'
+                )
+            }
+
+            GetEventLogAppLogDefaults = New-Object -TypeName PSObject -Property @{
+                Log                  = 'Application'
+                MinimumRetentionDays = 0
+            }
+
+            GetWinEventAppLogDefaults = New-Object `
+                -TypeName System.Diagnostics.Eventing.Reader.EventLogConfiguration `
+                -ArgumentList 'Application' `
+                -Property @{
                     IsEnabled          = $true
-                    LogMode            = 'Circular'
                     LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
-                    SecurityDescriptor = 'TestDescriptor'
-                    LogRetentionDays   = '0'
-                    LogName            = 'Application'
-                }
-
-                return (New-Object -TypeName PSObject -Property $properties)
+                    LogMode            = 'Circular'
+                    MaximumSizeInBytes = [System.Int64] 525074432
+                    SecurityDescriptor = 'O:BAG:SYD:(A;;0x2;;;S-1-15-2-1)' + `
+                        '(A;;0xf0007;;;SY)(A;;0x7;;;BA)' + `
+                        '(A;;0x7;;;SO)(A;;0x3;;;IU)' + `
+                        '(A;;0x3;;;SU)(A;;0x3;;;S-1-5-3)' + `
+                        '(A;;0x3;;;S-1-5-33)(A;;0x1;;;S-1-5-32-573)'
             }
 
-            $results = Get-TargetResource -LogName 'Application' -IsEnabled $true
-
-            It 'Should return an hashtable' {
-                $results.GetType().Name | Should -Be 'Hashtable'
-            }
-
-            It 'Should return a Logname Application' {
-                $results.LogName = 'Application'
-            }
-
-            It 'Should return a MaximumSizeInBytes of 4096kb' {
-                $results.MaximumSizeInBytes | Should -Be 4096kb
-            }
-
-            It 'Should return IsEnabled is true' {
-                $results.IsEnabled | Should -BeTrue
-            }
-
-            It 'Should return a LogMode is Circular' {
-                $results.LogMode | Should -Be 'Circular'
-            }
-
-            It 'Should return a LogRetentionDays of 0' {
-                $results.LogRetentionDays | Should -Be 0
-            }
-
-            It 'Should return a LogFilePath of %SystemRoot%\System32\Winevt\Logs\Application.evtx' {
-                $results.LogFilePath | Should -Be "%SystemRoot%\System32\Winevt\Logs\Application.evtx"
-            }
-
-            It 'Should return SecurityDescriptor with a value TestDescriptor' {
-                $results.SecurityDescriptor | Should -Be 'TestDescriptor'
+            GetWELRegisteredSourceFilePesterTestExist = New-Object -TypeName PSObject -Property @{
+                CategoryCount        = 1
+                CategoryMessageFile  = 'C:\WINDOWS\System32\PesterTest.dll'
+                EventMessageFile     = 'C:\WINDOWS\System32\PesterTest.dll'
+                ParameterMessageFile = 'C:\WINDOWS\System32\PesterTest.dll'
             }
         }
 
-        Describe 'DSC_WindowsEventLog\Test-TargetResource' -Tag 'Test' {
+        $setCasesGeneric = @(
+            @{
+                EventLogSetting = 'IsEnabled'
+                NewValue        = $false
+            }
+            @{
+                EventLogSetting = 'LogFilePath'
+                NewValue        = '%SystemRoot%\System32\Winevt\Logs\NewApplication.evtx'
+            }
+            @{
+                EventLogSetting = 'LogMode'
+                NewValue        = 'AutoBackup'
+            }
+            @{
+                EventLogSetting = 'MaximumSizeInBytes'
+                NewValue        = 1MB
+            }
+            @{
+                EventLogSetting = 'SecurityDescriptor'
+                NewValue        = 'O:BAG:SYD:(A;;0x2;;;S-1-15-2-1)(A;;0xf0007;;;SY)(A;;0x7;;;BA)'
+            }
+            @{
+                EventLogSetting = 'RestrictGuestAccess'
+                NewValue        = $false
+            }
+        )
 
-            Mock -CommandName Get-WindowsEventLog -MockWith {
-                $properties = @{
-                    MaximumSizeInBytes = 1028kb
-                    IsEnabled          = $true
-                    LogMode            = 'Circular'
-                    LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
-                    SecurityDescriptor = 'TestDescriptor'
-                    LogRetentionDays   = '7'
-                    LogName            = 'Application'
+        $testCasesGeneric = @(
+            @{
+                EventLogSetting = 'IsEnabled'
+                NewValue        = $false
+            }
+            @{
+                EventLogSetting = 'LogFilePath'
+                NewValue        = '%SystemRoot%\System32\Winevt\Logs\NewApplication.evtx'
+            }
+            @{
+                EventLogSetting = 'LogMode'
+                NewValue        = 'AutoBackup'
+            }
+            @{
+                EventLogSetting = 'LogRetentionDays'
+                NewValue        = 30
+            }
+            @{
+                EventLogSetting = 'MaximumSizeInBytes'
+                NewValue        = 1MB
+            }
+            @{
+                EventLogSetting = 'SecurityDescriptor'
+                NewValue        = 'O:BAG:SYD:(A;;0x2;;;S-1-15-2-1)(A;;0xf0007;;;SY)(A;;0x7;;;BA)'
+            }
+            @{
+                EventLogSetting = 'RegisteredSource'
+                NewValue        = 'NewPesterTest'
+            }
+            @{
+                EventLogSetting = 'RestrictGuestAccess'
+                NewValue        = $false
+            }
+        )
+
+        $testCasesEventSource = @(
+            @{
+                EventLogSetting = 'CategoryResourceFile'
+                NewValue        = 'C:\WINDOWS\System32\NewPesterTest.dll'
+            }
+            @{
+                EventLogSetting = 'MessageResourceFile'
+                NewValue        = 'C:\WINDOWS\System32\NewPesterTest.dll'
+            }
+            @{
+                EventLogSetting = 'ParameterResourceFile'
+                NewValue        = 'C:\WINDOWS\System32\NewPesterTest.dll'
+            }
+        )
+
+        Describe "DSC_WindowsEventLog\Get-TargetResource" -Tag 'Get' {
+            Context 'When getting a request for a non-existent target resource' {
+                $errorMessage = $script:localizedData.GetWindowsEventLogFailure -f 'UndefinedLog'
+                It 'Should throw when an event log does not exist' {
+                    { Get-TargetResource -LogName 'UndefinedLog'  } | Should -Throw $errorMessage
+                }
+            }
+
+            Context 'When getting the default target resource' {
+                Mock -CommandName Get-EventLog -MockWith {
+                    return $mocks.GetEventLogAppLogDefaults
+                }
+                Mock -CommandName Get-WinEvent -MockWith {
+                    return $mocks.GetWinEventAppLogDefaults
                 }
 
-                return (New-Object -TypeName PSObject -Property $properties)
-            }
+                It 'Should get the current event log configuration state' {
+                    $eventLogConfiguration = Get-TargetResource -LogName 'Application'
 
-            Mock -CommandName Get-EventLog -MockWith {
-                $params = @{
-                    MinimumRetentionDays = '7'
-                    Log                  = 'Application'
+                    $eventLogConfiguration | Should -BeOfType Hashtable
+                    $eventLogConfiguration.LogName | Should -Be 'Application'
+                    $eventLogConfiguration.MaximumSizeInBytes | Should -BeOfType Int64
+                    $eventLogConfiguration.MaximumSizeInBytes | Should -BeGreaterOrEqual 64KB
+                    $eventLogConfiguration.MaximumSizeInBytes | Should -BeLessOrEqual 4GB
+                    $eventLogConfiguration.IsEnabled | Should -Be $true
+                    $eventLogConfiguration.LogMode | Should -BeIn @('AutoBackup', 'Circular', 'Retain')
+                    $eventLogConfiguration.LogRetentionDays | Should -BeIn (0..365)
+                    $eventLogConfiguration.LogFilePath | Should -Not -BeNullOrEmpty
+                    $eventLogConfiguration.SecurityDescriptor | Should -Not -BeNullOrEmpty
+                    $eventLogConfiguration.RestrictGuestAccess | Should -Be $true
                 }
-
-                return (New-Object -TypeName PSObject -Property $params)
-            }
-
-            It 'Should not throw when passed an valid Logname' {
-                { Test-TargetResource -LogName 'Application' -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should throw when passed an invalid LogMode' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'BadLogmode' -IsEnabled $true -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should not throw when passed an valid LogMode' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should return $true if Logmode is in desired state' {
-                Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true | Should -BeTrue
-            }
-
-            It 'Should return $false if Logmode is not in desired state' {
-                Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $false | Should -BeFalse
-            }
-
-            It 'Should throw when passed an invalid MaximumSizeInBytes below 1028kb' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -MaximumSizeInBytes 1027kb -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Shoudl throw when passed an invalid MaximumSizeInBytes above 18014398509481983kb' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -IsEnabled $true -MaximumSizeInBytes 18014398509481983kb -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should return $true if MaximumSizeInBytes is in desired state' {
-                Test-TargetResource -MaximumSizeInBytes 1028kb -LogName 'Application' -IsEnabled $true | Should -BeTrue
-            }
-
-            It 'Should return $false if MaximumSizeInBytes is not in desired state' {
-                Test-TargetResource -MaximumSizeInBytes 2048kb -LogName 'Application' -IsEnabled $true | Should -BeFalse
-            }
-
-            It 'Should not throw when passed an valid MaximumSizeInBytes' {
-                { Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 1028kb -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should throw when passed an invalid LogRetentionDays below 1 day' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true -LogRetentionDays 0  -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should throw when passed an invalid LogRetentionDays above 365 days' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -IsEnabled $true -LogRetentionDays 366 -ErrorAction Stop } | Should -Throw
-            }
-
-            It 'Should not throw when passed an valid LogRetentionDays' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'AutoBackup' -LogRetentionDays 30 -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should return $false if LogRetentionDays is not in desired state' {
-                Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 13 -LogMode 'AutoBackup' | Should -BeFalse
-            }
-
-            It 'Should return $true if LogRetentionDays is in desired state' {
-                Mock -CommandName Get-WindowsEventLog -MockWith {
-                    $properties = @{
-                        MaximumSizeInBytes = 1028kb
-                        IsEnabled          = $true
-                        LogMode            = 'AutoBackup'
-                        LogFilePath        = '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
-                        SecurityDescriptor = 'TestDescriptor'
-                        LogRetentionDays   = '7'
-                        LogName            = 'Application'
-                    }
-
-                    return (New-Object -TypeName PSObject -Property $properties)
-                }
-
-                Test-TargetResource -LogName 'Application' -IsEnabled $true -LogRetentionDays 7 -LogMode 'AutoBackup' | Should -BeTrue
-            }
-
-            It 'Should not throw when passed an invalid LogRetentionDays' {
-                { Test-TargetResource -LogName 'WrongLog' -LogMode 'AutoBackup' -LogRetentionDays 30 -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should not throw when passed an invalid LogMode with LogRetention' {
-                { Test-TargetResource -LogName 'Application' -LogMode 'Circular' -LogRetentionDays 30 -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should not throw when passed an valid LogFilePath' {
-                { Test-TargetResource -LogName 'Application' -IsEnabled $true -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should return $true if LogFilePath is in desired state' {
-                Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx' -IsEnabled $true | Should -BeTrue
-            }
-
-            It 'Should return $false if LogFilePath is not in desired state' {
-                Test-TargetResource -LogName 'Application' -LogFilePath '%SystemRoot%\System32\Winevt\OtherLogs\Application.evtx' -IsEnabled $true | Should -BeFalse
-            }
-
-            It 'Should not throw when passed an valid SecurityDescriptor' {
-                { Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestDescriptor' -IsEnabled $true -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should return $true if SecurityDescriptor is in desired state' {
-                Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestDescriptor' -IsEnabled $true | Should -BeTrue
-            }
-
-            It 'Should return $false if SecurityDescriptor is not in desired state' {
-                Test-TargetResource -LogName 'Application' -SecurityDescriptor 'TestTestDescriptor' -IsEnabled $true | Should -BeFalse
-            }
-
-            It 'Should return $true if IsEnabled is in desired state' {
-                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -BeTrue
-            }
-
-            It 'Should return $false if IsEnabled is not in desired state' {
-                Test-TargetResource -LogName 'Application' -IsEnabled $false | Should -BeFalse
-            }
-
-            It 'Should return $false if IsEnabled is not in desired state' {
-                Mock -CommandName Get-WindowsEventLog -MockWith {
-                    $properties = @{
-                        MaximumSizeInBytes = 1028kb
-                        IsEnabled          = $false
-                        LogName            = 'Application'
-                    }
-
-                    return (New-Object -TypeName PSObject -Property $properties)
-                }
-
-                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -BeFalse
-            }
-
-            It 'Should return $true if IsEnabled is not in desired state' {
-                Mock -CommandName Get-WindowsEventLog -MockWith {
-                    $properties = @{
-                        MaximumSizeInBytes = 1028kb
-                        IsEnabled          = $true
-                        LogName            = 'Application'
-                    }
-
-                    return (New-Object -TypeName PSObject -Property $properties)
-                }
-
-                Test-TargetResource -LogName 'Application' -IsEnabled $true | Should -BeTrue
             }
         }
 
-        Describe 'DSC_WindowsEventLog\Set-TargetResource' -Tag 'Set' {
-            Mock -CommandName Get-WindowsEventLog -MockWith {
-                $properties = @{
-                    MaximumSizeInBytes = 5000kb
-                    IsEnabled          = $true
-                    LogMode            = 'AutoBackup'
-                    LogFilePath        = 'c:\logs\test.evtx'
-                    SecurityDescriptor = 'TestDescriptor'
-                    LogRetentionDays   = '7'
-                    LogName            = 'TestLog'
+        Describe "DSC_WindowsEventLog\Test-TargetResource" -Tag 'Test' {
+            Context 'When testing a request with values that are out of bounds or invalid' {
+                Mock -CommandName Get-EventLog -MockWith {
+                    return $mocks.GetEventLogAppLogDefaults
+                }
+                Mock -CommandName Get-WinEvent -MockWith {
+                    return $mocks.GetWinEventAppLogDefaults
                 }
 
-                return (New-Object -TypeName PSObject -Property $properties)
-            }
-
-            Mock -CommandName Get-EventLog -MockWith {
-                $params = @{
-                    MinimumRetentionDays = '7'
-                    Log                  = 'TestLog'
+                It 'Should throw when MaximumSizeInBytes is less than 64KB' {
+                    { Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 0 } | Should -Throw
                 }
 
-                return (New-Object -TypeName PSObject -Property $params)
+                It 'Should throw when MaximumSizeInBytes is greater than 4GB' {
+                    { Test-TargetResource -LogName 'Application' -MaximumSizeInBytes 5GB } | Should -Throw
+                }
+
+                It 'Should throw when LogMode is not a valid keyword' {
+                    { Test-TargetResource -LogName 'Application' -LogMode Rectangular } | Should -Throw
+                }
+
+                It 'Should throw when LogRentionDays is less than 0' {
+                    { Test-TargetResource -LogName 'Application' -LogRetentionDays -1 } | Should -Throw
+                }
+
+                It 'Should throw when LogRentionDays is greater than 365' {
+                    { Test-TargetResource -LogName 'Application' -LogRetentionDays 366 } | Should -Throw
+                }
             }
 
-            It 'Should set MaximumSizeInBytes to 1028kb' {
-                Mock -CommandName Save-LogFile
-                Set-TargetResource -MaximumSizeInBytes 1028kb -IsEnabled $true -LogName 'TestLog'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
+            Context 'When the event log is in the desired state' {
+                Mock -CommandName Get-EventLog -MockWith {
+                    return $mocks.GetEventLogAppLogDefaults
+                }
+                Mock -CommandName Get-WinEvent -MockWith {
+                    return $mocks.GetWinEventAppLogDefaults
+                }
+                Mock -CommandName Get-CimInstance -MockWith {
+                    return $mocks.GetCimInstancePesterTestExist
+                }
+                Mock -CommandName Get-ItemProperty -MockWith {
+                    return $mocks.GetWELRegisteredSourceFilePesterTestExist
+                }
+                Mock -CommandName Get-WindowsEventLogRestrictGuestAccess -MockWith {
+                    return $true
+                }
+
+                It 'Should return true when all resources are in the desired state' {
+                    $Result = Test-TargetResource @fullParams
+                    $Result | Should -BeTrue
+                }
             }
 
-            It 'MaximumSizeInBytes is in desired state' {
-                Mock -CommandName Save-LogFile
-                Set-TargetResource -MaximumSizeInBytes 5000kb -IsEnabled $true -LogName 'TestLog'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
-            }
+            Context 'When the event log is not in the desired state' {
+                Mock -CommandName Get-EventLog -MockWith {
+                    return $mocks.GetEventLogAppLogDefaults
+                }
+                Mock -CommandName Get-WinEvent -MockWith {
+                    return $mocks.GetWinEventAppLogDefaults
+                }
+                Mock -CommandName Get-CimInstance -MockWith {
+                    return $mocks.GetCimInstancePesterTestExist
+                }
+                Mock -CommandName Get-ItemProperty -MockWith {
+                    return $mocks.GetWELRegisteredSourceFilePesterTestExist
+                }
+                Mock -CommandName Get-WindowsEventLogRestrictGuestAccess -MockWith {
+                    return $true
+                }
 
-            It 'Should set SecurityDescriptor to OtherTestDescriptor' {
-                Mock -CommandName Save-LogFile
-                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'OtherTestDescriptor'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
-            }
+                It 'Should return false when <EventLogSetting> setting changes are required' `
+                    -TestCases $testCasesGeneric {
 
-            It 'SecurityDescriptor is in desired state' {
-                Mock -CommandName Save-LogFile
-                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -SecurityDescriptor 'TestDescriptor'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
-            }
+                    param (
+                        [Parameter()]
+                        $EventLogSetting,
 
-            It 'Should set LogFilePath to default path' {
-                Mock -CommandName Save-LogFile
-                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath '%SystemRoot%\System32\Winevt\Logs\Application.evtx'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
-            }
+                        [Parameter()]
+                        $NewValue
+                    )
 
-            It 'LogFilePath is in desired state' {
-                Mock -CommandName Save-LogFile
-                Set-TargetResource -IsEnabled $true -LogName 'TestLog' -LogFilePath 'c:\logs\test.evtx'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
-            }
-
-            It 'Should set LogRetentionDays to 14 days' {
-                Mock -CommandName Set-LogRetentionDays
-                Set-TargetResource -LogRetentionDays '14' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
-                Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 1 -Scope It
-            }
-
-            It 'Should set LogRetentionDays to 32 days, wrong Logmode' {
-                Mock -CommandName Set-LogRetentionDays
-                Set-TargetResource -LogRetentionDays '32' -IsEnabled $true -LogName 'TestLog' -LogMode 'Circular'
-                Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 0 -Scope It
-            }
-
-            It 'Should set LogRetentionDays is in desired state' {
-                Mock -CommandName Set-LogRetentionDays
-                Set-TargetResource -LogRetentionDays '7' -IsEnabled $true -LogName 'TestLog' -LogMode 'Autobackup'
-                Assert-MockCalled -CommandName Set-LogRetentionDays -Exactly -Times 0 -Scope It
-            }
-
-            It 'Should set IsEnabled to false' {
-                Mock -CommandName Save-LogFile
-                Set-TargetResource -IsEnabled $false -LogName 'TestLog'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
-            }
-
-            It 'IsEnabled is in desired state' {
-                Mock -CommandName Save-LogFile
-                Set-TargetResource -IsEnabled $true -LogName 'TestLog'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 0 -Scope It
-            }
-
-            It 'IsEnabled is not in desired state' {
-                Mock -CommandName Save-LogFile
-                Set-TargetResource -IsEnabled $false -LogName 'TestLog'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
-            }
-
-            It 'Should throw if IsEnabled is not in desired state' {
-                Mock -CommandName Save-LogFile
-                Mock -CommandName Get-WindowsEventLog -MockWith { throw }
-                { Set-TargetResource -LogName 'SomeLog' -IsEnabled $false } | Should -Throw
-            }
-
-            It 'IsEnabled is not in desired state' {
-                Mock -CommandName Get-WindowsEventLog -MockWith {
-                    $properties = @{
-                        MaximumSizeInBytes = 5000kb
-                        IsEnabled          = $false
-                        LogMode            = 'AutoBackup'
-                        LogFilePath        = 'c:\logs\test.evtx'
-                        SecurityDescriptor = 'TestDescriptor'
-                        LogRetentionDays   = '7'
-                        LogName            = 'TestLog'
+                    $CaseParams = @{
+                        LogName          = 'Application'
+                        $EventLogSetting = $NewValue
                     }
 
-                    return (New-Object -TypeName PSObject -Property $properties)
+                    $Result = Test-TargetResource @CaseParams
+                    $Result | Should -BeFalse
                 }
 
-                Set-TargetResource -IsEnabled $true -LogName 'TestLog'
-                Assert-MockCalled -CommandName Save-LogFile -Exactly -Times 1 -Scope It
+                It 'Should return false when <EventLogSetting> setting changes are required' `
+                    -TestCases $testCasesEventSource {
+
+                    param (
+                        [Parameter()]
+                        $EventLogSetting,
+
+                        [Parameter()]
+                        $NewValue
+                    )
+
+                    $CaseParams = @{
+                        LogName          = 'Application'
+                        RegisteredSource = 'PesterTest'
+                        $EventLogSetting = $NewValue
+                    }
+
+                    $Result = Test-TargetResource @CaseParams
+                    $Result | Should -BeFalse
+                }
             }
+        }
 
-            Describe 'DSC_WindowsEventLog\Save-LogFile' -Tag 'Helper' {
-                Mock -CommandName Limit-Eventlog -MockWith { throw }
+        Describe "DSC_WindowsEventLog\Set-TargetResource" -Tag 'Set' {
+            Context 'When configuration is required' {
+                Mock -CommandName Get-EventLog -MockWith {
+                    return $mocks.GetEventLogAppLogDefaults
+                }
+                Mock -CommandName Get-WinEvent -MockWith {
+                    return $mocks.GetWinEventAppLogDefaults
+                }
+                Mock -CommandName New-EventLog
+                Mock -CommandName Remove-EventLog
+                $NewResFile = 'C:\WINDOWS\System32\NewPesterTest.dll'
 
-                It 'Should throw if we are unable to get a log' {
-                    { Limit-Eventlog -LogName 'Application' -OverflowAction 'OverwriteOlder' -RetentionDays 30 } | Should -Throw
+                It 'Should set the <EventLogSetting> when it needs to be changed' `
+                    -TestCases $setCasesGeneric {
+
+                    param (
+                        [Parameter()]
+                        $EventLogSetting,
+
+                        [Parameter()]
+                        $NewValue
+                    )
+
+                    $CaseParams = @{
+                        LogName          = 'Application'
+                        $EventLogSetting = $NewValue
+                    }
+
+                    Mock -CommandName Save-WindowsEventLog
+
+                    Set-TargetResource @CaseParams
+                    Assert-MockCalled -CommandName Save-WindowsEventLog -Times 1
+                }
+
+                It 'Should set the LogRetentionDays when it needs to be changed' `
+                    -TestCases $SetCasesLogRetention {
+
+                    Mock -CommandName Limit-EventLog
+
+                    Set-TargetResource -LogName 'Application' -LogRetentionDays 30 -LogMode AutoBackup
+                    Assert-MockCalled -CommandName Limit-EventLog -Times 1
+                }
+
+                It 'Should set the RegisteredSource when it needs to be changed' {
+                    Set-TargetResource -LogName 'Application' -RegisteredSource 'NewPesterTest'
+                    Assert-MockCalled -CommandName New-Eventlog -Times 1
+                    Assert-MockCalled -CommandName Remove-EventLog  -Times 0
+                }
+
+                It 'Should set the CategoryResourceFile when it needs to be changed' {
+                    Mock -CommandName Get-WindowsEventLogRegisteredSource -MockWith {
+                        return 'PesterTest'
+                    }
+
+                    Set-TargetResource `
+                        -LogName 'Application' `
+                        -RegisteredSource 'PesterTest' `
+                        -CategoryResourceFile $NewResFile
+
+                    Assert-MockCalled -CommandName New-Eventlog -Times 1
+                    Assert-MockCalled -CommandName Remove-EventLog  -Times 1
+                }
+
+                It 'Should set the MessageResourceFile when it needs to be changed' {
+                    Mock -CommandName Get-WindowsEventLogRegisteredSource -MockWith {
+                        return 'PesterTest'
+                    }
+
+                    Set-TargetResource `
+                        -LogName 'Application' `
+                        -RegisteredSource 'PesterTest' `
+                        -MessageResourceFile $NewResFile
+
+                    Assert-MockCalled -CommandName New-Eventlog -Times 1
+                    Assert-MockCalled -CommandName Remove-EventLog  -Times 1
+                }
+
+                It 'Should set the ParameterResourceFile when it needs to be changed' {
+                    Mock -CommandName Get-WindowsEventLogRegisteredSource -MockWith {
+                        return 'PesterTest'
+                    }
+
+                    Set-TargetResource `
+                        -LogName 'Application' `
+                        -RegisteredSource 'PesterTest' `
+                        -ParameterResourceFile $NewResFile
+
+                    Assert-MockCalled -CommandName New-Eventlog -Times 1
+                    Assert-MockCalled -CommandName Remove-EventLog  -Times 1
+                }
+
+                It 'Should set the RestrictGuestAccess and change the user-provided DACL when it needs to be changed' {
+                    Mock -CommandName Get-WindowsEventLogRestrictGuestAccess -MockWith {
+                        return $true
+                    }
+                    Mock -CommandName Set-ItemProperty
+
+                    Set-TargetResource `
+                        -LogName 'Application' `
+                        -SecurityDescriptor 'O:BAG:SYD:(A;;0x7;;;BA)' `
+                        -RestrictGuestAccess $false
+
+                    Assert-MockCalled -CommandName Save-WindowsEventLog -Times 1
+                    Assert-MockCalled -CommandName Set-ItemProperty -Times 1
+                }
+
+                It 'Should set the RestrictGuestAccess and change the system-level DACL when it needs to be changed' {
+                    Mock -CommandName Get-WindowsEventLogRestrictGuestAccess -MockWith {
+                        return $true
+                    }
+                    Mock -CommandName Set-ItemProperty
+
+                    Set-TargetResource -LogName 'Application' -RestrictGuestAccess $false
+                    Assert-MockCalled -CommandName Save-WindowsEventLog -Times 1
+                }
+            }
+        }
+
+        Describe "DSC_WindowsEventLog\Get-WindowsEventLogRestrictGuestAccess" -Tag 'Helper' {
+            Context 'When testing the helper function' {
+
+                It 'Should not throw under any circumstances' {
+                    Mock -CommandName Get-ItemProperty
+
+                    { Get-WindowsEventLogRestrictGuestAccess -LogName 'UndefinedLog' } | Should -Not -Throw
+                }
+
+                It 'Should return true when RestrictGuestAccess is 1' {
+                    Mock -CommandName Get-ItemProperty -MockWith {
+                        return [PSCustomObject]@{
+                            RestrictGuestAccess = 1
+                        }
+                    }
+
+                    ( Get-WindowsEventLogRestrictGuestAccess -LogName 'Application' ) | Should -BeTrue
+                }
+
+                It 'Should return false when RestrictGuestAccess is 0' {
+                    Mock -CommandName Get-ItemProperty -MockWith {
+                        return [PSCustomObject]@{
+                            RestrictGuestAccess = 0
+                        }
+                    }
+
+                    ( Get-WindowsEventLogRestrictGuestAccess -LogName 'Application' ) | Should -BeFalse
+                }
+            }
+        }
+
+        Describe "DSC_WindowsEventLog\Get-WindowsEventLogRetentionDays" -Tag 'Helper' {
+            Context 'When testing the helper function' {
+
+                It 'Should throw when an event log does not exist' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message `
+                            ($script:localizedData.GetWindowsEventLogRetentionDaysFailure -f 'UndefinedLog') `
+                        -ArgumentName 'LogName'
+
+                    { Get-WindowsEventLogRetentionDays -LogName 'UndefinedLog' } | Should -Throw $errorRecord
+                }
+            }
+        }
+
+        Describe "DSC_WindowsEventLog\Register-WindowsEventLogSource" -Tag 'Helper' {
+            Context 'When testing a request with values that are out of bounds or invalid' {
+
+                It 'Should throw when CategoryResourceFile is an invalid path' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message `
+                            ($script:localizedData.RegisterWindowsEventLogSourceInvalidPath -f 'PesterTest', 'foo>bar') `
+                        -ArgumentName 'CategoryResourceFile'
+
+                    { Register-WindowsEventLogSource `
+                        -LogName 'Application' `
+                        -SourceName 'PesterTest' `
+                        -CategoryResourceFile 'foo>bar'
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should throw when MessageResourceFile is an invalid path' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message `
+                            ($script:localizedData.RegisterWindowsEventLogSourceInvalidPath -f 'PesterTest', 'foo>bar') `
+                        -ArgumentName 'MessageResourceFile'
+
+                    { Register-WindowsEventLogSource `
+                        -LogName 'Application' `
+                        -SourceName 'PesterTest' `
+                        -MessageResourceFile 'foo>bar'
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should throw when ParameterResourceFile is an invalid path' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message `
+                            ($script:localizedData.RegisterWindowsEventLogSourceInvalidPath -f 'PesterTest', 'foo>bar') `
+                        -ArgumentName 'ParameterResourceFile'
+
+                    { Register-WindowsEventLogSource `
+                        -LogName 'Application' `
+                        -SourceName 'PesterTest' `
+                        -ParameterResourceFile 'foo>bar'
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should throw when the New-EventLog cmdlet encounters an error' {
+                    Mock -CommandName New-EventLog -MockWith { throw 'New-EventLog Error' }
+
+                    { Register-WindowsEventLogSource `
+                        -LogName 'Application' `
+                        -SourceName 'PesterTest'
+                    } | Should -Throw 'New-EventLog Error'
+                }
+
+                It 'Should throw when the Remove-EventLog cmdlet encounters an error' {
+                    Mock -CommandName Remove-EventLog -MockWith { throw  }
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($script:localizedData.RegisterWindowsEventLogSourceFailure -f 'Application',  '')
+
+                    { Register-WindowsEventLogSource `
+                        -LogName 'Application' `
+                        -SourceName 'PesterTest'
+                    } | Should -Throw $errorRecord
+                }
+            }
+        }
+
+        Describe "DSC_WindowsEventLog\Set-WindowsEventLogRestrictGuestAccess" -Tag 'Helper' {
+            Context 'When testing a request with values that are out of bounds or invalid' {
+
+                It 'Should throw when the Set-ItemProperty cmdlet encounters an error' {
+                    Mock -CommandName Set-ItemProperty -MockWith { throw 'Set-ItemProperty Error' }
+
+                    { Set-WindowsEventLogRestrictGuestAccess `
+                        -LogName 'Application' `
+                        -RestrictGuestAccess $true `
+                        -Sddl 'O:BAG:SYD:(A;;0x2;;;S-1-15-2-1)'
+                    } | Should -Throw 'Set-ItemProperty Error'
+                }
+            }
+        }
+
+        Describe "DSC_WindowsEventLog\Set-WindowsEventLogRetentionDays" -Tag 'Helper' {
+            Context 'When testing the helper function' {
+
+                It 'Should throw when an event log does not exist' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($script:localizedData.GetWindowsEventLogRetentionDaysFailure -f 'UndefinedLog') `
+                        -ArgumentName 'LogName'
+
+                    { Get-WindowsEventLogRetentionDays -LogName 'UndefinedLog' } | Should -Throw $errorRecord
                 }
             }
 
-            Describe 'DSC_WindowsEventLog\Set-LogRetentionDays' -Tag 'Helper' {
-                Mock -CommandName Limit-Eventlog -MockWith { throw }
+            Context 'When testing a request with values that are out of bounds or invalid' {
 
-                It 'Should throw if we are unable to get a log' {
-                    { Limit-Eventlog -LogName 'Application' -OverflowAction 'OverwriteOlder' -RetentionDays 30 } | Should -Throw
+                It 'Should throw when setting retention days in the wrong log mode' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($script:localizedData.SetWindowsEventLogRetentionDaysWrongMode -f 'Application') `
+                        -ArgumentName 'LogMode'
+
+                    { Set-WindowsEventLogRetentionDays `
+                        -LogName 'Application' `
+                        -LogRetentionDays 30 `
+                        -LogMode Circular
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should throw when the Get-EventLog cmdlet encounters an error' {
+                    Mock -CommandName Get-EventLog -MockWith { throw 'Get-EventLog Error' }
+
+                    { Set-WindowsEventLogRetentionDays `
+                        -LogName 'Application' `
+                        -LogRetentionDays 30 `
+                        -LogMode AutoBackup
+                    } | Should -Throw 'Get-EventLog Error'
+                }
+
+                It 'Should throw when the Limit-EventLog cmdlet encounters an error' {
+                    Mock -CommandName Limit-EventLog -MockWith { throw  }
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($script:localizedData.GetWindowsEventLogRetentionDaysFailure -f 'Application')
+
+                    { Set-WindowsEventLogRetentionDays `
+                        -LogName 'Application' `
+                        -LogRetentionDays 30 `
+                        -LogMode AutoBackup
+                    } | Should -Throw $errorRecord
                 }
             }
         }

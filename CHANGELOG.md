@@ -8,8 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added the 'Source' parameter for Add-WindowsCapability as an
     optional parameter - Fixes [Issue #361](https://github.com/dsccommunity/ComputerManagementDsc/issues/361)
 
+### Added
+
+- WindowsEventLog
+  - Added support to restrict guest access - Fixes [Issue #338](https://github.com/dsccommunity/ComputerManagementDsc/issues/338).
+  - Added support to create custom event sources and optionally register
+    resource files - Fixes [Issue #355](https://github.com/dsccommunity/ComputerManagementDsc/issues/355).
+
+### Changed
+
+- WindowsEventLog
+  - Reformatted code to better align with current DSCResources coding standards.
+
 ### Fixed
 
+- WindowsEventLog
+  - Fixed issue requiring IsEnabled to be declared and set to $true in order
+    to set the MaximumSizeInBytes property - Fixes [Issue #349](https://github.com/dsccommunity/ComputerManagementDsc/issues/349).
+  - Fixed issue where configuring log retention on a non-classic event log will
+    throw.
 - ScheduledTask
   - Fixed issue with disabling scheduled tasks that have "Run whether user is
     logged on or not" configured - Fixes [Issue #306](https://github.com/dsccommunity/ComputerManagementDsc/issues/306).
