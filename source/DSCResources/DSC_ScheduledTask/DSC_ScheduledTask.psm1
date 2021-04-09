@@ -1438,7 +1438,7 @@ function Test-TargetResource
     elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
     {
         # The password of the execution credential can not be compared
-        $username = $ExecuteAsCredential.UserName
+        $username = $ExecuteAsCredential.serName
         $PSBoundParameters['ExecuteAsCredential'] = $username
 
         <#
@@ -1451,12 +1451,16 @@ function Test-TargetResource
         #>
         if ($username -match "$ENV:COMPUTERNAME\\" -and $currentValues.ExecuteAsCredential)
         {
-            $currentValues.ExecuteAsCredential = Set-DomainNameInAccountName -AccountName $currentValues.ExecuteAsCredential -DomainName $ENV:COMPUTERNAME
+            $currentValues.ExecuteAsCredential = Set-DomainNameInAccountName `
+                -AccountName $currentValues.ExecuteAsCredential `
+                -DomainName $ENV:COMPUTERNAME
         }
 
         if ($username -match "$ENV:USERDOMAIN\\" -and $currentValues.ExecuteAsCredential)
         {
-            $currentValues.ExecuteAsCredential = Set-DomainNameInAccountName -AccountName $currentValues.ExecuteAsCredential -DomainName $ENV:USERDOMAIN
+            $currentValues.ExecuteAsCredential = Set-DomainNameInAccountName `
+                -AccountName $currentValues.ExecuteAsCredential `
+                -DomainName $ENV:USERDOMAIN
         }
     }
     else
