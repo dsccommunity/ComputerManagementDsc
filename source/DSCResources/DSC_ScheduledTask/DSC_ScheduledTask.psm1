@@ -1437,7 +1437,7 @@ function Test-TargetResource
     elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
     {
         # The password of the execution credential can not be compared
-        $username = $ExecuteAsCredential.serName
+        $username = $ExecuteAsCredential.UserName
         $PSBoundParameters['ExecuteAsCredential'] = $username
 
         <#
