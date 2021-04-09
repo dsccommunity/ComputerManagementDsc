@@ -1448,9 +1448,18 @@ function Test-TargetResource
             To resolve this, add the computer name if it is missing and if it was passed in the
             ExecuteAsCredential parameter.
         #>
-        if ($username -cmatch '\\' -and $currentValues.ExecuteAsCredential -cnotmatch '\\')
+        if ($username -match "$ENV:COMPUTERNAME\\" -and $currentValues.ExecuteAsCredential)
         {
-            $currentValues.ExecuteAsCredential = "$ENV:COMPUTERNAME\$($currentValues.ExecuteAsCredential)"
+            $currentValues.ExecuteAsCredential = Set-DomainNameInAccountName `
+                -AccountName $currentValues.ExecuteAsCredential `
+                -DomainName $ENV:COMPUTERNAME
+        }
+
+        if ($username -match "$ENV:USERDOMAIN\\" -and $currentValues.ExecuteAsCredential)
+        {
+            $currentValues.ExecuteAsCredential = Set-DomainNameInAccountName `
+                -AccountName $currentValues.ExecuteAsCredential `
+                -DomainName $ENV:USERDOMAIN
         }
     }
     else
