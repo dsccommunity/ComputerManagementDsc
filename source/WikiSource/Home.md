@@ -32,4 +32,4 @@ Get-DscResource -Module ComputerManagementDsc
 
 ## Change Log
 
-A full list of changes in each version can be found in the [change log](https://github.com/dsccommunity/ComputerManagementDsc/blob/master/CHANGELOG.md).
+A full list of changes in each version can be found in the [change log](https://github.com/dsccommunity/ComputerManagementDsc/blob/main/CHANGELOG.md).
