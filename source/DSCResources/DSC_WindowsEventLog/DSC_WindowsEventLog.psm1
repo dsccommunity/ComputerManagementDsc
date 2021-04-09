@@ -991,7 +991,7 @@ function Set-WindowsEventLogRetentionDays
     else
     {
         $message = $script:localizedData.SetWindowsEventLogRetentionDaysWrongMode -f $LogName
-        New-InvalidOperationException -Message $message -ErrorRecord $_
+        New-InvalidArgumentException -Message $message -ArgumentName 'LogMode'
     }
 }
 

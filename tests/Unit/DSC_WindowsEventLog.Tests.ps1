@@ -181,6 +181,13 @@ try
         )
 
         Describe "DSC_WindowsEventLog\Get-TargetResource" -Tag 'Get' {
+            Context 'When getting a request for a non-existent target resource' {
+                $errorMessage = $script:localizedData.GetWindowsEventLogFailure -f 'UndefinedLog'
+                It 'Should throw when an event log does not exist' {
+                    { Get-TargetResource -LogName 'UndefinedLog'  } | Should -Throw $errorMessage
+                }
+            }
+
             Context 'When getting the default target resource' {
                 Mock -CommandName Get-EventLog -MockWith {
                     return $mocks.GetEventLogAppLogDefaults
@@ -526,15 +533,23 @@ try
                 }
 
                 It 'Should throw when the New-EventLog cmdlet encounters an error' {
-                    Mock -CommandName New-EventLog -MockWith { throw }
+                    Mock -CommandName New-EventLog -MockWith { throw 'New-EventLog Error' }
 
-                    { Register-WindowsEventLogSource -LogName 'Application' -SourceName 'PesterTest' } | Should -Throw
+                    { Register-WindowsEventLogSource `
+                        -LogName 'Application' `
+                        -SourceName 'PesterTest'
+                    } | Should -Throw 'New-EventLog Error'
                 }
 
                 It 'Should throw when the Remove-EventLog cmdlet encounters an error' {
-                    Mock -CommandName Remove-EventLog -MockWith { throw }
+                    Mock -CommandName Remove-EventLog -MockWith { throw  }
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($script:localizedData.RegisterWindowsEventLogSourceFailure -f 'Application',  '')
 
-                    { Register-WindowsEventLogSource -LogName 'Application' -SourceName 'PesterTest' } | Should -Throw
+                    { Register-WindowsEventLogSource `
+                        -LogName 'Application' `
+                        -SourceName 'PesterTest'
+                    } | Should -Throw $errorRecord
                 }
             }
         }
@@ -543,13 +558,13 @@ try
             Context 'When testing a request with values that are out of bounds or invalid' {
 
                 It 'Should throw when the Set-ItemProperty cmdlet encounters an error' {
-                    Mock -CommandName Set-ItemProperty -MockWith { throw }
+                    Mock -CommandName Set-ItemProperty -MockWith { throw 'Set-ItemProperty Error' }
 
                     { Set-WindowsEventLogRestrictGuestAccess `
                         -LogName 'Application' `
                         -RestrictGuestAccess $true `
                         -Sddl 'O:BAG:SYD:(A;;0x2;;;S-1-15-2-1)'
-                    } | Should -Throw
+                    } | Should -Throw 'Set-ItemProperty Error'
                 }
             }
         }
@@ -569,43 +584,37 @@ try
             Context 'When testing a request with values that are out of bounds or invalid' {
 
                 It 'Should throw when setting retention days in the wrong log mode' {
-                    Mock -CommandName Get-EventLog -MockWith { throw }
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($script:localizedData.SetWindowsEventLogRetentionDaysWrongMode -f 'Application') `
+                        -ArgumentName 'LogMode'
 
                     { Set-WindowsEventLogRetentionDays `
                         -LogName 'Application' `
                         -LogRetentionDays 30 `
                         -LogMode Circular
-                    } | Should -Throw
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should throw when the Get-EventLog cmdlet encounters an error' {
-                    Mock -CommandName Get-EventLog -MockWith { throw }
+                    Mock -CommandName Get-EventLog -MockWith { throw 'Get-EventLog Error' }
 
                     { Set-WindowsEventLogRetentionDays `
                         -LogName 'Application' `
                         -LogRetentionDays 30 `
                         -LogMode AutoBackup
-                    } | Should -Throw
-                }
-
-                It 'Should throw when the Get-EventLog cmdlet encounters an error' {
-                    Mock -CommandName Get-EventLog -MockWith { throw }
-
-                    { Set-WindowsEventLogRetentionDays `
-                        -LogName 'Application' `
-                        -LogRetentionDays 30 `
-                        -LogMode AutoBackup
-                    } | Should -Throw
+                    } | Should -Throw 'Get-EventLog Error'
                 }
 
                 It 'Should throw when the Limit-EventLog cmdlet encounters an error' {
-                    Mock -CommandName Limit-EventLog -MockWith { throw }
+                    Mock -CommandName Limit-EventLog -MockWith { throw  }
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($script:localizedData.GetWindowsEventLogRetentionDaysFailure -f 'Application')
 
                     { Set-WindowsEventLogRetentionDays `
                         -LogName 'Application' `
                         -LogRetentionDays 30 `
                         -LogMode AutoBackup
-                    } | Should -Throw
+                    } | Should -Throw $errorRecord
                 }
             }
         }
