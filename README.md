@@ -1,8 +1,8 @@
 # ComputerManagementDsc
 
-[![Build Status](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_apis/build/status/dsccommunity.ComputerManagementDsc?branchName=master)](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_build/latest?definitionId=18&branchName=master)
-![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/ComputerManagementDsc/18/master)
-[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/ComputerManagementDsc/18/master)](https://dsccommunity.visualstudio.com/ComputerManagementDsc/_test/analytics?definitionId=18&contextType=build)
+[![Build Status](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_apis/build/status/dsccommunity.ComputerManagementDsc?branchName=main)](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_build/latest?definitionId=18&branchName=main)
+![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/ComputerManagementDsc/18/main)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/ComputerManagementDsc/18/main)](https://dsccommunity.visualstudio.com/ComputerManagementDsc/_test/analytics?definitionId=18&contextType=build)
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/ComputerManagementDsc?label=ComputerManagementDsc%20Preview)](https://www.powershellgallery.com/packages/ComputerManagementDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/ComputerManagementDsc?label=ComputerManagementDsc)](https://www.powershellgallery.com/packages/ComputerManagementDsc/)
 
@@ -12,7 +12,7 @@ This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
 ## Releases
 
-For each merge to the branch `master` a preview release will be
+For each merge to the branch `main` a preview release will be
 deployed to [PowerShell Gallery](https://www.powershellgallery.com/).
 Periodically a release version tag will be pushed which will deploy a
 full release to [PowerShell Gallery](https://www.powershellgallery.com/).

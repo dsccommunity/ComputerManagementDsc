@@ -4,9 +4,6 @@ The format is based on and uses the types of changes according to [Keep a Change
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- WindowsCapability
-  - Added the 'Source' parameter for Add-WindowsCapability as an
-    optional parameter - Fixes [Issue #361](https://github.com/dsccommunity/ComputerManagementDsc/issues/361)
 
 ### Added
 
@@ -14,11 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added support to restrict guest access - Fixes [Issue #338](https://github.com/dsccommunity/ComputerManagementDsc/issues/338).
   - Added support to create custom event sources and optionally register
     resource files - Fixes [Issue #355](https://github.com/dsccommunity/ComputerManagementDsc/issues/355).
+- WindowsCapability
+  - Added the 'Source' parameter for Add-WindowsCapability as an
+    optional parameter - Fixes [Issue #361](https://github.com/dsccommunity/ComputerManagementDsc/issues/361)
 
 ### Changed
 
 - WindowsEventLog
   - Reformatted code to better align with current DSCResources coding standards.
+- Renamed `master` branch to `main` - Fixes [Issue #348](https://github.com/dsccommunity/ComputerManagementDsc/issues/348).
 
 ### Fixed
 
