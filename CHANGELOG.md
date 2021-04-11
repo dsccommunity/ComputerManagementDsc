@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - WindowsEventLog
   - Reformatted code to better align with current DSCResources coding standards.
 - Renamed `master` branch to `main` - Fixes [Issue #348](https://github.com/dsccommunity/ComputerManagementDsc/issues/348).
+- Added support for publishing code coverage to `CodeCov.io` and
+  Azure Pipelines - Fixes [Issue #367](https://github.com/dsccommunity/ComputerManagementDsc/issues/367).
+- Updated build to use `Sampler.GitHubTasks` - Fixes [Issue #365](https://github.com/dsccommunity/ComputerManagementDsc/issues/365).
+- Corrected case of module publish tasks - Fixes [Issue #368](https://github.com/dsccommunity/ComputerManagementDsc/issues/368).
 
 ### Fixed
 
