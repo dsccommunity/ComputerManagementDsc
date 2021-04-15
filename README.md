@@ -5,6 +5,8 @@
 [![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/ComputerManagementDsc/18/main)](https://dsccommunity.visualstudio.com/ComputerManagementDsc/_test/analytics?definitionId=18&contextType=build)
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/ComputerManagementDsc?label=ComputerManagementDsc%20Preview)](https://www.powershellgallery.com/packages/ComputerManagementDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/ComputerManagementDsc?label=ComputerManagementDsc)](https://www.powershellgallery.com/packages/ComputerManagementDsc/)
+[![codecov](https://codecov.io/gh/dsccommunity/ComputerManagementDsc/branch/main/graph/badge.svg)](https://codecov.io/gh/dsccommunity/StorageDsc)
+![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/dsccommunity/ComputerManagementDsc/14/main)
 
 ## Code of Conduct
 
