@@ -162,7 +162,6 @@ stages:
               summaryFileLocation: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml'
               pathToSources: '$(Build.SourcesDirectory)/$(sourceFolderName)/'
 
-
       - job: Test_Integration_2016
         displayName: 'Integration (Windows Server 2016)'
         pool:
