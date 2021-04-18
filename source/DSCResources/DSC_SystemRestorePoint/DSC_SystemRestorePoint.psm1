@@ -14,6 +14,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .SYNOPSIS
         Gets the requested restore point.
 
+    .PARAMETER Ensure
+        Indicates whether a restore point should be created or deleted.
+
     .PARAMETER Description
         Specifies the description of the restore point.
 #>
@@ -23,6 +26,11 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Present', 'Absent')]
+        [System.String]
+        $Ensure,
+
         [Parameter(Mandatory = $true)]
         [System.String]
         $Description
@@ -190,7 +198,7 @@ function Test-TargetResource
         $RestorePointType = 'APPLICATION_INSTALL'
     )
 
-    $restorePoint = Get-TargetResource -Description $Description
+    $restorePoint = Get-TargetResource -Ensure 'Present' -Description $Description
 
     Write-Verbose `
         -Message ($script:localizedData.RestorePointProperties -f $restorePoint.Ensure, $restorePoint.RestorePointType)

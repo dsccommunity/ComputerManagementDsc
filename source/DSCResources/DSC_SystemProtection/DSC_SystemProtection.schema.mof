@@ -2,7 +2,7 @@
 class DSC_SystemProtection : OMI_BaseResource
 {
     [Key, Description("Indicates that the computer restore is enabled or is disabled."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
-    [Key, Description("Specifies the drive letter to enable or disable protection on.")] String DriveLetter;
+    [Write, Description("Specifies the drive letter to enable or disable protection on.")] String DriveLetter;
     [Write, Description("Specifies the maximum disk space to use for protection as a percentage.")] Uint32 DiskUsage;
     [Write, Description("Forces desired state to be applied regardless of data loss. Defaults to False.")] Boolean Force;
     [Write, Description("Configures System Protection to allow automatic restore points every x minutes.")] Uint32 Frequency;

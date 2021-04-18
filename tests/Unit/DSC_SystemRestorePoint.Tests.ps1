@@ -71,14 +71,14 @@ try
                 Mock -CommandName Get-ComputerRestorePoint -MockWith { return $GetComputerRestorePoint }
 
                 It 'Should return absent when requested restore point does not exist' {
-                    $result = Get-TargetResource -Description 'Does Not Exist'
+                    $result = Get-TargetResource -Ensure 'Present' -Description 'Does Not Exist'
 
                     $result | Should -BeOfType Hashtable
                     $result.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return present when requested restore point exists' {
-                    $result = Get-TargetResource -Description 'DSC Unit Test'
+                    $result = Get-TargetResource -Ensure 'Present' -Description 'DSC Unit Test'
 
                     $result | Should -BeOfType Hashtable
                     $result.Ensure | Should -Be 'Present'
