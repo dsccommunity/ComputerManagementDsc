@@ -47,6 +47,8 @@
         'SmbServerConfiguration'
         'SmbShare'
         'SystemLocale'
+        'SystemProtection'
+        'SystemRestorePoint'
         'TimeZone'
         'VirtualMemory'
         'WindowsEventLog'

@@ -31,4 +31,5 @@ SEE ALSO
 KEYWORDS
     DSC, DscResource, Computer, OfflineDomainJoin, PendingReboot, PowerPlan,
     PowerShellExecutionPolicy, RemoteDesktopAdmin, ScheduledTask, SmbServerConfiguration
-    SmbShare, SystemLocale, TimeZone, VirtualMemory, WindowsEventLog, WindowsCapability
+    SmbShare, SystemLocale, SystemProtection, SystemRestorePoint, TimeZone, VirtualMemory,
+    WindowsEventLog, WindowsCapability
