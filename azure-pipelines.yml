@@ -16,6 +16,7 @@ variables:
   buildArtifactName: output
   testResultFolderName: testResults
   testArtifactName: testResults
+  sourceFolderName: source
 
 stages:
   - stage: Build
@@ -42,12 +43,13 @@ stages:
             env:
               ModuleVersion: $(gitVersion.Informationalversion)
 
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Build Artifact'
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Pipeline Artifact'
             inputs:
-              PathtoPublish: '$(buildFolderName)/'
-              ArtifactName: $(buildArtifactName)
-              publishLocation: 'Container'
+              targetPath: '$(buildFolderName)/'
+              artifact: $(buildArtifactName)
+              publishLocation: 'pipeline'
+              parallel: true
 
   - stage: Test
     dependsOn: Build
