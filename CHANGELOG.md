@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated build to use `Sampler.GitHubTasks` - Fixes [Issue #365](https://github.com/dsccommunity/ComputerManagementDsc/issues/365).
 - Corrected case of module publish tasks - Fixes [Issue #368](https://github.com/dsccommunity/ComputerManagementDsc/issues/368).
 - Corrected code coverage badge in `README.md`.
+- Updated build pipeline tasks and remove unused environment variables.
 
 ### Fixed
 

@@ -89,13 +89,6 @@ stages:
           vmImage: 'vs2017-win2016'
         timeoutInMinutes: 0
         steps:
-          - powershell: |
-              $repositoryOwner,$repositoryName = $env:BUILD_REPOSITORY_NAME -split '/'
-              echo "##vso[task.setvariable variable=RepositoryOwner;isOutput=true]$repositoryOwner"
-              echo "##vso[task.setvariable variable=RepositoryName;isOutput=true]$repositoryName"
-            name: dscBuildVariable
-            displayName: 'Set Environment Variables'
-
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
             inputs:
@@ -119,12 +112,12 @@ stages:
               testRunTitle: 'Unit (Windows Server 2016)'
             condition: succeededOrFailed()
 
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             displayName: 'Publish Test Artifact'
             inputs:
-              pathToPublish: '$(buildFolderName)/$(testResultFolderName)/'
+              targetPath: '$(buildFolderName)/$(testResultFolderName)/'
               artifactName: $(testArtifactName)
-              publishLocation: 'Container'
+              parallel: true
 
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
@@ -133,13 +126,6 @@ stages:
           vmImage: 'ubuntu 16.04'
         timeoutInMinutes: 0
         steps:
-          - pwsh: |
-              $repositoryOwner,$repositoryName = $env:BUILD_REPOSITORY_NAME -split '/'
-              echo "##vso[task.setvariable variable=RepositoryOwner;isOutput=true]$repositoryOwner"
-              echo "##vso[task.setvariable variable=RepositoryName;isOutput=true]$repositoryName"
-            name: dscBuildVariable
-            displayName: 'Set Environment Variables'
-
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
             inputs:
@@ -212,13 +198,6 @@ stages:
           vmImage: 'windows-2019'
         timeoutInMinutes: 0
         steps:
-          - powershell: |
-              $repositoryOwner,$repositoryName = $env:BUILD_REPOSITORY_NAME -split '/'
-              echo "##vso[task.setvariable variable=RepositoryOwner;isOutput=true]$repositoryOwner"
-              echo "##vso[task.setvariable variable=RepositoryName;isOutput=true]$repositoryName"
-            name: dscBuildVariable
-            displayName: 'Set Environment Variables'
-
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
             inputs:
