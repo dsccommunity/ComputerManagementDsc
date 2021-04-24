@@ -65,11 +65,12 @@ try
 
             $getComputerRestorePoint = New-Object -TypeName System.Management.ManagementObject
             $getComputerRestorePoint = $srClass.CreateInstance()
-        }
 
-        $getComputerRestorePoint.Description      = 'DSC Unit Test'
-        $getComputerRestorePoint.SequenceNumber   = 1
-        $getComputerRestorePoint.RestorePointType = 12
+            $getComputerRestorePoint.Description      = 'DSC Unit Test'
+            $getComputerRestorePoint.SequenceNumber   = 1
+            $getComputerRestorePoint.RestorePointType = 12
+
+        }
 
         $workstationMock = @{
             ParameterFilter = $([scriptblock]::Create('$ClassName -eq ''Win32_OperatingSystem'''))

@@ -111,6 +111,7 @@ try
                 It 'Should throw when the system is corrupt' {
                     $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.GetEnabledDrivesFailure
 
+                    Mock -CommandName Get-SystemProtectionState -MockWith { return $mocks.SystemProtectionStateEnabled }
                     Mock -CommandName Get-SppRegistryValue -MockWith { return $null }
                     Mock -CommandName Get-CimInstance @workstationMock
 
