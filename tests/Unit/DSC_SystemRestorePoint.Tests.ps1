@@ -69,7 +69,6 @@ try
             $getComputerRestorePoint.Description      = 'DSC Unit Test'
             $getComputerRestorePoint.SequenceNumber   = 1
             $getComputerRestorePoint.RestorePointType = 12
-
         }
 
         $workstationMock = @{
@@ -98,7 +97,6 @@ try
                 {
                     It 'Should return Absent when requested restore point does not exist' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
-                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Get-TargetResource -Ensure 'Present' -Description 'Does Not Exist'
 
@@ -108,7 +106,6 @@ try
 
                     It 'Should return present when requested restore point exists' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
-                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Get-TargetResource -Ensure 'Present' -Description 'DSC Unit Test'
 
@@ -135,7 +132,6 @@ try
                 {
                     It 'Should return true if the restore point exists' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
-                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Test-TargetResource @targetPresentArguments
 
@@ -144,7 +140,6 @@ try
 
                     It 'Should return false if the restore point does not exist' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
-                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Test-TargetResource @dnePresentArguments
 
@@ -153,7 +148,6 @@ try
 
                     It 'Should return false if the restore point description matches but the type is different' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
-                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Test-TargetResource `
                             -Ensure Present `
@@ -165,7 +159,6 @@ try
 
                     It 'Should return false if the restore point exists but should be absent' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
-                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Test-TargetResource @targetAbsentArguments
 
@@ -204,27 +197,27 @@ try
                 }
             }
 
-            Context 'When setting the target resource to Absent' {
-                It 'Should not throw even if the requested restore point does not exist' {
-                    { Set-TargetResource @dneAbsentArguments } | Should -Not -Throw
-                }
+            if ($productType -eq 1)
+            {
+                Context 'When setting the target resource to Absent' {
+                    It 'Should not throw even if the requested restore point does not exist' {
+                        { Set-TargetResource @dneAbsentArguments } | Should -Not -Throw
+                    }
 
-                if ($productType -eq 1)
-                {
                     It 'Should delete the requested restore point' {
                         Mock -CommandName Remove-RestorePoint -MockWith { return $true }
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
 
                         { Set-TargetResource @targetAbsentArguments } | Should -Not -Throw
                     }
-                }
 
-                It 'Should throw if the operating system encountered a problem deleting the restore point' {
-                    $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.DeleteCheckpointFailure
+                    It 'Should throw if the operating system encountered a problem deleting the restore point' {
+                        $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.DeleteCheckpointFailure
 
-                    Mock -CommandName Remove-RestorePoint -MockWith { return $false }
+                        Mock -CommandName Remove-RestorePoint -MockWith { return $false }
 
-                    { Set-TargetResource @targetAbsentArguments } | Should -Throw $errorRecord
+                        { Set-TargetResource @targetAbsentArguments } | Should -Throw $errorRecord
+                    }
                 }
             }
         }
