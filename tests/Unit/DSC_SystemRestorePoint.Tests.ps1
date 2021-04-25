@@ -97,6 +97,7 @@ try
                 {
                     It 'Should return Absent when requested restore point does not exist' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
+                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Get-TargetResource -Ensure 'Present' -Description 'Does Not Exist'
 
@@ -106,6 +107,7 @@ try
 
                     It 'Should return present when requested restore point exists' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
+                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Get-TargetResource -Ensure 'Present' -Description 'DSC Unit Test'
 
@@ -132,6 +134,7 @@ try
                 {
                     It 'Should return true if the restore point exists' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
+                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Test-TargetResource @targetPresentArguments
 
@@ -140,6 +143,7 @@ try
 
                     It 'Should return false if the restore point does not exist' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
+                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Test-TargetResource @dnePresentArguments
 
@@ -148,6 +152,7 @@ try
 
                     It 'Should return false if the restore point description matches but the type is different' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
+                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Test-TargetResource `
                             -Ensure Present `
@@ -159,6 +164,7 @@ try
 
                     It 'Should return false if the restore point exists but should be absent' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
+                        Mock -CommandName Get-CimInstance @workstationMock
 
                         $result = Test-TargetResource @targetAbsentArguments
 
