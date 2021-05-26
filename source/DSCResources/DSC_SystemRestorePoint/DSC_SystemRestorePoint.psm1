@@ -317,7 +317,6 @@ function Remove-RestorePoint
     param
     (
         [Parameter(Mandatory = $true)]
-        [System.Management.ManagementObject]
         $RestorePoint
     )
 

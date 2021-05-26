@@ -56,20 +56,10 @@ try
             RestorePointType = 'MODIFY_SETTINGS'
         }
 
-        $productType = (Get-CimInstance -ClassName 'Win32_OperatingSystem').ProductType
-
-        if ($productType -eq 1)
-        {
-            $srClass = New-Object -TypeName System.Management.ManagementClass `
-                -ArgumentList ('root\default', 'SystemRestore', $null)
-
-            $getComputerRestorePoint = New-Object -TypeName System.Management.ManagementObject
-            $getComputerRestorePoint = $srClass.CreateInstance()
-
-            $getComputerRestorePoint.Description      = 'DSC Unit Test'
-            $getComputerRestorePoint.SequenceNumber   = 1
-            $getComputerRestorePoint.RestorePointType = 12
-        }
+        $getComputerRestorePoint = New-Object -TypeName PSObject
+        $getComputerRestorePoint | Add-Member -MemberType NoteProperty -Name Description -Value 'DSC Unit Test'
+        $getComputerRestorePoint | Add-Member -MemberType NoteProperty -Name SequenceNumber -Value 1
+        $getComputerRestorePoint | Add-Member -MemberType NoteProperty -Name RestorePointType -Value 12
 
         $workstationMock = @{
             ParameterFilter = $([scriptblock]::Create('$ClassName -eq ''Win32_OperatingSystem'''))
@@ -82,19 +72,8 @@ try
         }
 
         Describe "DSC_SystemRestorePoint\Get-TargetResource" -Tag 'Get' {
-            Context 'When getting the target resource' {
-                It 'Should return Absent and write a warning on a server operating system' {
-                    Mock -CommandName Write-Warning
-                    Mock -CommandName Get-CimInstance @serverMock
-
-                    $protectionSettings = Get-TargetResource -Ensure 'Present' -Description 'DSC Unit Test'
-
-                    $protectionSettings.Ensure | Should -Be 'Absent'
-                    Assert-MockCalled -CommandName Write-Warning -Times 1
-                }
-
-                if ($productType -eq 1)
-                {
+            Context 'When running on a workstation OS' {
+                Context 'When getting the target resource' {
                     It 'Should return Absent when requested restore point does not exist' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
                         Mock -CommandName Get-CimInstance @workstationMock
@@ -116,22 +95,25 @@ try
                     }
                 }
             }
+
+            Context 'When running on a server OS' {
+                Context 'When getting the target resource' {
+                    It 'Should return Absent and write a warning on a server operating system' {
+                        Mock -CommandName Write-Warning
+                        Mock -CommandName Get-CimInstance @serverMock
+
+                        $protectionSettings = Get-TargetResource -Ensure 'Present' -Description 'DSC Unit Test'
+
+                        $protectionSettings.Ensure | Should -Be 'Absent'
+                        Assert-MockCalled -CommandName Write-Warning -Times 1
+                    }
+                }
+            }
         }
 
         Describe "DSC_SystemRestorePoint\Test-TargetResource" -Tag 'Test' {
-            Context 'When testing the target resource' {
-                It 'Should return Absent and write warnings on a server operating system' {
-                    Mock -CommandName Write-Warning
-                    Mock -CommandName Get-CimInstance @serverMock
-
-                    $desiredState = Test-TargetResource -Ensure 'Present' -Description 'DSC Unit Test'
-
-                    $desiredState | Should -BeTrue
-                    Assert-MockCalled -CommandName Write-Warning -Times 2
-                }
-
-                if ($productType -eq 1)
-                {
+            Context 'When running on a workstation OS' {
+                Context 'When testing the target resource' {
                     It 'Should return true if the restore point exists' {
                         Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
                         Mock -CommandName Get-CimInstance @workstationMock
@@ -172,47 +154,53 @@ try
                     }
                 }
             }
+
+            Context 'When running on a server OS' {
+                Context 'When testing the target resource' {
+                    It 'Should return Absent and write warnings on a server operating system' {
+                        Mock -CommandName Write-Warning
+                        Mock -CommandName Get-CimInstance @serverMock
+
+                        $desiredState = Test-TargetResource -Ensure 'Present' -Description 'DSC Unit Test'
+
+                        $desiredState | Should -BeTrue
+                        Assert-MockCalled -CommandName Write-Warning -Times 2
+                    }
+                }
+            }
         }
 
         Describe "DSC_SystemRestorePoint\Set-TargetResource" -Tag 'Set' {
-            Context 'When setting the target resource' {
-                It 'Should throw when applied to a server operating system' {
-                    $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.NotWorkstationOS
+            Context 'When running on a workstation OS' {
+                Context 'When setting the target resource to Present' {
+                    Mock -CommandName Get-CimInstance @workstationMock
 
-                    Mock -CommandName Get-CimInstance @serverMock
+                    It 'Should throw if the operating system encounters a problem' {
+                        $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.CheckpointFailure
 
-                    { Set-TargetResource @targetPresentArguments } | Should -Throw $errorRecord
-                }
-            }
+                        Mock -CommandName Checkpoint-Computer -MockWith { throw }
 
-            Context 'When setting the target resource to Present' {
-                Mock -CommandName Get-CimInstance @workstationMock
+                        { Set-TargetResource @targetPresentArguments } | Should -Throw $errorRecord
+                    }
 
-                It 'Should throw if the operating system encounters a problem' {
-                    $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.CheckpointFailure
+                    It 'Should create the restore point' {
+                        Mock -CommandName Checkpoint-Computer
 
-                    Mock -CommandName Checkpoint-Computer -MockWith { throw }
-
-                    { Set-TargetResource @targetPresentArguments } | Should -Throw $errorRecord
+                        { Set-TargetResource @targetPresentArguments } | Should -Not -Throw
+                    }
                 }
 
-                It 'Should create the restore point' {
-                    Mock -CommandName Checkpoint-Computer
-
-                    { Set-TargetResource @targetPresentArguments } | Should -Not -Throw
-                }
-            }
-
-            if ($productType -eq 1)
-            {
                 Context 'When setting the target resource to Absent' {
+                    Mock -CommandName Add-Type
+                    Mock -CommandName Get-CimInstance @workstationMock
+                    Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
+
                     It 'Should not throw even if the requested restore point does not exist' {
                         { Set-TargetResource @dneAbsentArguments } | Should -Not -Throw
                     }
 
                     It 'Should delete the requested restore point' {
                         Mock -CommandName Remove-RestorePoint -MockWith { return $true }
-                        Mock -CommandName Get-ComputerRestorePoint -MockWith { return $getComputerRestorePoint }
 
                         { Set-TargetResource @targetAbsentArguments } | Should -Not -Throw
                     }
@@ -224,6 +212,50 @@ try
 
                         { Set-TargetResource @targetAbsentArguments } | Should -Throw $errorRecord
                     }
+                }
+            }
+
+            Context 'When running on a server OS' {
+                Context 'When setting the target resource' {
+                    It 'Should throw when applied to a server operating system' {
+                        $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.NotWorkstationOS
+
+                        Mock -CommandName Get-CimInstance @serverMock
+
+                        { Set-TargetResource @targetPresentArguments } | Should -Throw $errorRecord
+                    }
+                }
+            }
+        }
+
+        Describe "DSC_SystemRestorePoint\ConvertTo-RestorePointValue" -Tag 'Helper' {
+            Context 'When testing the helper function' {
+                It 'Should return null for an unrecognized name' {
+                    ( ConvertTo-RestorePointValue -Type 'DOES_NOT_EXIST' ) | Should -BeNullOrEmpty
+                }
+
+                It 'Should return correct values for restore point names' {
+                    ( ConvertTo-RestorePointValue -Type 'APPLICATION_INSTALL' )   | Should -Be 0
+                    ( ConvertTo-RestorePointValue -Type 'APPLICATION_UNINSTALL' ) | Should -Be 1
+                    ( ConvertTo-RestorePointValue -Type 'DEVICE_DRIVER_INSTALL' ) | Should -Be 10
+                    ( ConvertTo-RestorePointValue -Type 'MODIFY_SETTINGS' )       | Should -Be 12
+                    ( ConvertTo-RestorePointValue -Type 'CANCELLED_OPERATION' )   | Should -Be 13
+                }
+            }
+        }
+
+        Describe "DSC_SystemRestorePoint\ConvertTo-RestorePointName" -Tag 'Helper' {
+            Context 'When testing the helper function' {
+                It 'Should return null for an unrecognized value' {
+                    ( ConvertTo-RestorePointName -Type '-1' ) | Should -BeNullOrEmpty
+                }
+
+                It 'Should return correct names for restore point values' {
+                    ( ConvertTo-RestorePointName -Type '0' )  | Should -Be 'APPLICATION_INSTALL'
+                    ( ConvertTo-RestorePointName -Type '1' )  | Should -Be 'APPLICATION_UNINSTALL'
+                    ( ConvertTo-RestorePointName -Type '10' ) | Should -Be 'DEVICE_DRIVER_INSTALL'
+                    ( ConvertTo-RestorePointName -Type '12' ) | Should -Be 'MODIFY_SETTINGS'
+                    ( ConvertTo-RestorePointName -Type '13' ) | Should -Be 'CANCELLED_OPERATION'
                 }
             }
         }

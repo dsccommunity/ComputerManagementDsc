@@ -97,47 +97,108 @@ try
         }
 
         Describe "DSC_SystemProtection\Get-TargetResource" -Tag 'Get' {
-            Context 'When getting the target resource' {
-                It 'Should return Absent and write a warning on a server operating system' {
-                    Mock -CommandName Write-Warning
-                    Mock -CommandName Get-CimInstance @serverMock
+            Context 'When running on a workstation OS' {
+                Context 'When getting the target resource' {
+                    It 'Should throw when the system is corrupt' {
+                        $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.GetEnabledDrivesFailure
 
-                    $protectionSettings = Get-TargetResource -Ensure 'Present' -DriveLetter 'C'
+                        Mock -CommandName Get-SystemProtectionState -MockWith { return $mocks.SystemProtectionStateEnabled }
+                        Mock -CommandName Get-SppRegistryValue -MockWith { return $null }
+                        Mock -CommandName Get-CimInstance @workstationMock
 
-                    $protectionSettings.Ensure | Should -Be 'Absent'
-                    Assert-MockCalled -CommandName Write-Warning -Times 1
+                        { Get-TargetResource -Ensure 'Present' -DriveLetter 'P' } | Should -Throw $errorRecord
+                    }
                 }
 
-                It 'Should throw when the system is corrupt' {
-                    $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.GetEnabledDrivesFailure
+                Context 'When getting the target resource with Drive P protected' {
+                    It 'Should get the system protection settings' {
+                        Mock -CommandName Get-SystemProtectionState -MockWith { return $mocks.SystemProtectionStateEnabled }
+                        Mock -CommandName Get-SppRegistryValue -MockWith { return $mocks.SppRegistryValueDriveP }
+                        Mock -CommandName Get-DiskUsageConfiguration -MockWith { return $mocks.MaxPercentValueDriveP }
+                        Mock -CommandName Get-CimInstance @workstationMock
 
-                    Mock -CommandName Get-SystemProtectionState -MockWith { return $mocks.SystemProtectionStateEnabled }
-                    Mock -CommandName Get-SppRegistryValue -MockWith { return $null }
-                    Mock -CommandName Get-CimInstance @workstationMock
+                        $protectionSettings = Get-TargetResource -Ensure 'Present' -DriveLetter 'P'
 
-                    { Get-TargetResource -Ensure 'Present' -DriveLetter 'P' } | Should -Throw $errorRecord
+                        $protectionSettings | Should -BeOfType Hashtable
+                        $protectionSettings.Ensure | Should -Be 'Present'
+                        $protectionSettings.DriveLetter | Should -Be 'P'
+                        $protectionSettings.DiskUsage | Should -Be 5
+                    }
                 }
             }
 
-            Context 'When getting the target resource with Drive P protected' {
-                It 'Should get the system protection settings' {
-                    Mock -CommandName Get-SystemProtectionState -MockWith { return $mocks.SystemProtectionStateEnabled }
-                    Mock -CommandName Get-SppRegistryValue -MockWith { return $mocks.SppRegistryValueDriveP }
-                    Mock -CommandName Get-DiskUsageConfiguration -MockWith { return $mocks.MaxPercentValueDriveP }
-                    Mock -CommandName Get-CimInstance @workstationMock
+            Context 'When running on a server OS' {
+                Context 'When getting the target resource' {
+                    It 'Should return Absent and write a warning on a server operating system' {
+                        Mock -CommandName Write-Warning
+                        Mock -CommandName Get-CimInstance @serverMock
 
-                    $protectionSettings = Get-TargetResource -Ensure 'Present' -DriveLetter 'P'
+                        $protectionSettings = Get-TargetResource -Ensure 'Present' -DriveLetter 'C'
 
-                    $protectionSettings | Should -BeOfType Hashtable
-                    $protectionSettings.Ensure | Should -Be 'Present'
-                    $protectionSettings.DriveLetter | Should -Be 'P'
-                    $protectionSettings.DiskUsage | Should -Be 5
+                        $protectionSettings.Ensure | Should -Be 'Absent'
+                        Assert-MockCalled -CommandName Write-Warning -Times 1
+                    }
                 }
             }
         }
 
         Describe "DSC_SystemProtection\Test-TargetResource" -Tag 'Test' {
-            Context 'When testing the target resource' {
+            Context 'When running on a workstation OS' {
+                Context 'When testing the target resource' {
+                    It 'Should throw when Ensure is neither Present nor Absent' {
+                        { Test-TargetResource -Ensure 'Purgatory' } | Should -Throw
+                    }
+
+                    It 'Should throw when DriveLetter is invalid' {
+                        { Test-TargetResource -Ensure 'Present' -DriveLetter '5' } | Should -Throw
+                        { Test-TargetResource -Ensure 'Present' -DriveLetter 'CD' } | Should -Throw
+                    }
+
+                    It 'Should throw when DiskUsage is less than 1' {
+                        { Test-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 0 } | Should -Throw
+                    }
+
+                    It 'Should throw when DiskUsage is greater than 100' {
+                        { Test-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 101 } | Should -Throw
+                    }
+                }
+
+                Context 'When system protection is in the desired state' {
+                    Mock -CommandName Get-SppRegistryValue -MockWith { return $mocks.SppRegistryValueDriveP }
+                    Mock -CommandName Get-DiskUsageConfiguration -MockWith { return $mocks.MaxPercentValueDriveP }
+                    Mock -CommandName Get-CimInstance @workstationMock
+
+                    It 'Should return true when only the drive letter is specified' {
+                        $result = Test-TargetResource @partialDriveParams
+                        $result | Should -BeTrue
+                    }
+
+                    It 'Should return true when drive letter and disk usage are specified' {
+                        $result = Test-TargetResource @fullDriveParams
+                        $result | Should -BeTrue
+                    }
+                }
+
+                Context 'When system protection is not in the desired state' {
+                    Mock -CommandName Get-SppRegistryValue -MockWith { return $mocks.SppRegistryValueDriveP }
+                    Mock -CommandName Get-DiskUsageConfiguration -MockWith { return $mocks.MaxPercentValueDriveP }
+                    Mock -CommandName Get-CimInstance @workstationMock
+
+                    It 'Should return false when drive protection changes are necessary' {
+                        $result = Test-TargetResource -Ensure 'Absent' -DriveLetter 'P'
+
+                        $result | Should -BeFalse
+                    }
+
+                    It 'Should return false when disk usage changes are necessary' {
+                        $result = Test-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 25
+
+                        $result | Should -BeFalse
+                    }
+                }
+            }
+
+            Context 'When running on a server OS' {
                 It 'Should return Absent and write warnings on a server operating system' {
                     Mock -CommandName Write-Warning
                     Mock -CommandName Get-CimInstance @serverMock
@@ -147,210 +208,163 @@ try
                     $desiredState | Should -BeTrue
                     Assert-MockCalled -CommandName Write-Warning -Times 2
                 }
-
-                It 'Should throw when Ensure is neither Present nor Absent' {
-                    { Test-TargetResource -Ensure 'Purgatory' } | Should -Throw
-                }
-
-                It 'Should throw when DriveLetter is invalid' {
-                    { Test-TargetResource -Ensure 'Present' -DriveLetter '5' } | Should -Throw
-                    { Test-TargetResource -Ensure 'Present' -DriveLetter 'CD' } | Should -Throw
-                }
-
-                It 'Should throw when DiskUsage is less than 1' {
-                    { Test-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 0 } | Should -Throw
-                }
-
-                It 'Should throw when DiskUsage is greater than 100' {
-                    { Test-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 101 } | Should -Throw
-                }
-            }
-
-            Context 'When system protection is in the desired state' {
-                Mock -CommandName Get-SppRegistryValue -MockWith { return $mocks.SppRegistryValueDriveP }
-                Mock -CommandName Get-DiskUsageConfiguration -MockWith { return $mocks.MaxPercentValueDriveP }
-                Mock -CommandName Get-CimInstance @workstationMock
-
-                It 'Should return true when only the drive letter is specified' {
-                    $result = Test-TargetResource @partialDriveParams
-                    $result | Should -BeTrue
-                }
-
-                It 'Should return true when drive letter and disk usage are specified' {
-                    $result = Test-TargetResource @fullDriveParams
-                    $result | Should -BeTrue
-                }
-            }
-
-            Context 'When system protection is not in the desired state' {
-                Mock -CommandName Get-SppRegistryValue -MockWith { return $mocks.SppRegistryValueDriveP }
-                Mock -CommandName Get-DiskUsageConfiguration -MockWith { return $mocks.MaxPercentValueDriveP }
-                Mock -CommandName Get-CimInstance @workstationMock
-
-                It 'Should return false when drive protection changes are necessary' {
-                    $result = Test-TargetResource -Ensure 'Absent' -DriveLetter 'P'
-
-                    $result | Should -BeFalse
-                }
-
-                It 'Should return false when disk usage changes are necessary' {
-                    $result = Test-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 25
-
-                    $result | Should -BeFalse
-                }
             }
         }
 
         Describe "DSC_SystemProtection\Set-TargetResource" -Tag 'Set' {
-            Context 'When setting the target resource' {
+            Context 'When running on a workstation OS' {
+                Context 'When setting the target resource' {
+                    It 'Should throw when Ensure is neither Present nor Absent' {
+                        { Set-TargetResource -Ensure 'Purgatory' } | Should -Throw
+                    }
+
+                    It 'Should throw when DriveLetter is invalid' {
+                        { Set-TargetResource -Ensure 'Present' -DriveLetter '5' } | Should -Throw
+                        { Set-TargetResource -Ensure 'Present' -DriveLetter 'CD' } | Should -Throw
+                    }
+
+                    It 'Should throw when DiskUsage is less than 1' {
+                        { Set-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 0 } | Should -Throw
+                    }
+
+                    It 'Should throw when DiskUsage is greater than 100' {
+                        { Set-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 110 } | Should -Throw
+                    }
+
+                    It 'Should throw when the operating system cannot enable system protection' {
+                        $errorRecord = Get-InvalidOperationRecord `
+                            -Message ($script:localizedData.EnableComputerRestoreFailure -f 'C')
+
+                        Mock -CommandName Enable-ComputerRestore -MockWith { throw  }
+                        Mock -CommandName Get-CimInstance @workstationMock
+
+                        { Set-TargetResource -Ensure 'Present' -DriveLetter 'C' } | Should -Throw $errorRecord
+                    }
+
+                    It 'Should throw when the operating system cannot disable system protection' {
+                        $errorRecord = Get-InvalidOperationRecord `
+                            -Message ($script:localizedData.DisableComputerRestoreFailure -f 'C')
+
+                        Mock -CommandName Disable-ComputerRestore -MockWith { throw  }
+                        Mock -CommandName Get-CimInstance @workstationMock
+
+                        { Set-TargetResource -Ensure 'Absent' -DriveLetter 'C' } | Should -Throw $errorRecord
+                    }
+                }
+
+                Context 'When configuration is required' {
+                    Mock -CommandName Get-CimInstance @workstationMock
+
+                    It 'Should enable system protection for Drive P' {
+                        Mock -CommandName Enable-ComputerRestore
+
+                        Set-TargetResource -Ensure 'Present' -DriveLetter 'P'
+
+                        Assert-MockCalled -CommandName Enable-ComputerRestore -Times 1
+                    }
+
+                    It 'Should disable system protection for Drive P' {
+                        Mock -CommandName Disable-ComputerRestore
+
+                        Set-TargetResource -Ensure 'Absent' -DriveLetter 'P'
+
+                        Assert-MockCalled -CommandName Disable-ComputerRestore
+                    }
+
+                    It 'Should enable set maximum disk usage to 20%' {
+                        Mock -CommandName Enable-ComputerRestore
+                        Mock -CommandName Invoke-VssAdmin -MockWith { return $mocks.VssAdminSuccess }
+
+                        Set-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 20
+
+                        Assert-MockCalled -CommandName Enable-ComputerRestore -Times 1
+                        Assert-MockCalled -CommandName Invoke-VssAdmin -Times 1
+                    }
+
+                    It 'Should throw if the attempt to reisze fails without the Force option' {
+                        $errorRecord = Get-InvalidOperationRecord `
+                            -Message ($script:localizedData.VssShadowResizeFailure -f 'P')
+
+                        Mock -CommandName Enable-ComputerRestore
+                        Mock -CommandName Invoke-VssAdmin `
+                            -MockWith { $mocks.VssAdminFailure } `
+                            -ParameterFilter { $Operation -eq 'Resize' }
+
+                        { Set-TargetResource `
+                            -Ensure  'Present' -DriveLetter 'P' -DiskUsage 1 } | Should -Throw $errorRecord
+                    }
+
+                    It 'Should delete restore points on disk usage reduction with Force option' {
+                        $script:wasCalledPreviously = $false
+
+                        Mock -CommandName Enable-ComputerRestore
+                        Mock -CommandName Invoke-VssAdmin `
+                            -MockWith { $mocks.VssAdminSuccess } `
+                            -ParameterFilter { $Operation -eq 'Delete' }
+                        Mock -CommandName Invoke-VssAdmin `
+                            -ParameterFilter { $Operation -eq 'Resize' } `
+                            -MockWith {
+                                if ($script:wasCalledPreviously)
+                                {
+                                    $mocks.VssAdminSuccess
+                                }
+                                else
+                                {
+                                    $script:wasCalledPreviously = $true
+                                    $mocks.VssAdminFailure
+                                }
+                            }
+
+                        Set-TargetResource -Ensure  'Present' -DriveLetter 'P' -DiskUsage 1 -Force $true
+
+                        Assert-MockCalled -CommandName Enable-ComputerRestore -Times 1
+                        Assert-MockCalled -CommandName Invoke-VssAdmin `
+                            -ParameterFilter {  $Operation -eq 'Resize' } -Times 2
+                        Assert-MockCalled -CommandName Invoke-VssAdmin `
+                            -ParameterFilter { $Operation -eq 'Delete' } -Times 1
+                    }
+
+                    It 'Should throw if the attempt to delete restore points fails' {
+                        $errorRecord = Get-InvalidOperationRecord `
+                            -Message ($script:localizedData.VssShadowDeleteFailure -f 'P')
+
+                        Mock -CommandName Enable-ComputerRestore
+                        Mock -CommandName Invoke-VssAdmin `
+                            -MockWith { $mocks.VssAdminFailure } `
+                            -ParameterFilter { $Operation -eq 'Resize' }
+                        Mock -CommandName Invoke-VssAdmin `
+                            -MockWith { $mocks.VssAdminFailure } `
+                            -ParameterFilter { $Operation -eq 'Delete' }
+
+                        { Set-TargetResource `
+                            -Ensure  'Present' -DriveLetter 'P' -DiskUsage 1 -Force $true } | Should -Throw $errorRecord
+                    }
+
+                    It 'Should throw if all attempts to resize fails with Force option' {
+                        $errorRecord = Get-InvalidOperationRecord `
+                            -Message ($script:localizedData.VssShadowResizeFailureWithForce2 -f 'P')
+
+                        Mock -CommandName Enable-ComputerRestore
+                        Mock -CommandName Invoke-VssAdmin `
+                            -MockWith { $mocks.VssAdminFailure } `
+                            -ParameterFilter { $Operation -eq 'Resize' }
+                        Mock -CommandName Invoke-VssAdmin `
+                            -MockWith { $mocks.VssAdminSuccess } `
+                            -ParameterFilter { $Operation -eq 'Delete' }
+
+                        { Set-TargetResource `
+                            -Ensure  'Present' -DriveLetter 'P' -DiskUsage 1 -Force $true } | Should -Throw $errorRecord
+                    }
+                }
+            }
+
+            Context 'When running on a server OS' {
                 It 'Should throw when applied to a server operating system' {
                     $errorRecord = Get-InvalidOperationRecord -Message $script:localizedData.NotWorkstationOS
 
                     Mock -CommandName Get-CimInstance @serverMock
 
                     { Set-TargetResource -Ensure 'Present' -DriveLetter 'C' } | Should -Throw $errorRecord
-                }
-
-                It 'Should throw when Ensure is neither Present nor Absent' {
-                    { Set-TargetResource -Ensure 'Purgatory' } | Should -Throw
-                }
-
-                It 'Should throw when DriveLetter is invalid' {
-                    { Set-TargetResource -Ensure 'Present' -DriveLetter '5' } | Should -Throw
-                    { Set-TargetResource -Ensure 'Present' -DriveLetter 'CD' } | Should -Throw
-                }
-
-                It 'Should throw when DiskUsage is less than 1' {
-                    { Set-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 0 } | Should -Throw
-                }
-
-                It 'Should throw when DiskUsage is greater than 100' {
-                    { Set-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 110 } | Should -Throw
-                }
-
-                It 'Should throw when the operating system cannot enable system protection' {
-                    $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($script:localizedData.EnableComputerRestoreFailure -f 'C')
-
-                    Mock -CommandName Enable-ComputerRestore -MockWith { throw  }
-                    Mock -CommandName Get-CimInstance @workstationMock
-
-                    { Set-TargetResource -Ensure 'Present' -DriveLetter 'C' } | Should -Throw $errorRecord
-                }
-
-                It 'Should throw when the operating system cannot disable system protection' {
-                    $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($script:localizedData.DisableComputerRestoreFailure -f 'C')
-
-                    Mock -CommandName Disable-ComputerRestore -MockWith { throw  }
-                    Mock -CommandName Get-CimInstance @workstationMock
-
-                    { Set-TargetResource -Ensure 'Absent' -DriveLetter 'C' } | Should -Throw $errorRecord
-                }
-            }
-
-            Context 'When configuration is required' {
-                Mock -CommandName Get-CimInstance @workstationMock
-
-                It 'Should enable system protection for Drive P' {
-                    Mock -CommandName Enable-ComputerRestore
-
-                    Set-TargetResource -Ensure 'Present' -DriveLetter 'P'
-
-                    Assert-MockCalled -CommandName Enable-ComputerRestore -Times 1
-                }
-
-                It 'Should disable system protection for Drive P' {
-                    Mock -CommandName Disable-ComputerRestore
-
-                    Set-TargetResource -Ensure 'Absent' -DriveLetter 'P'
-
-                    Assert-MockCalled -CommandName Disable-ComputerRestore
-                }
-
-                It 'Should enable set maximum disk usage to 20%' {
-                    Mock -CommandName Enable-ComputerRestore
-                    Mock -CommandName Invoke-VssAdmin -MockWith { return $mocks.VssAdminSuccess }
-
-                    Set-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 20
-
-                    Assert-MockCalled -CommandName Enable-ComputerRestore -Times 1
-                    Assert-MockCalled -CommandName Invoke-VssAdmin -Times 1
-                }
-
-                It 'Should throw if the attempt to reisze fails without the Force option' {
-                    $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($script:localizedData.VssShadowResizeFailure -f 'P')
-
-                    Mock -CommandName Enable-ComputerRestore
-                    Mock -CommandName Invoke-VssAdmin `
-                        -MockWith { $mocks.VssAdminFailure } `
-                        -ParameterFilter { $Operation -eq 'Resize' }
-
-                    { Set-TargetResource `
-                        -Ensure  'Present' -DriveLetter 'P' -DiskUsage 1 } | Should -Throw $errorRecord
-                }
-
-                It 'Should delete restore points on disk usage reduction with Force option' {
-                    $script:wasCalledPreviously = $false
-
-                    Mock -CommandName Enable-ComputerRestore
-                    Mock -CommandName Invoke-VssAdmin `
-                        -MockWith { $mocks.VssAdminSuccess } `
-                        -ParameterFilter { $Operation -eq 'Delete' }
-                    Mock -CommandName Invoke-VssAdmin `
-                        -ParameterFilter { $Operation -eq 'Resize' } `
-                        -MockWith {
-                            if ($script:wasCalledPreviously)
-                            {
-                                $mocks.VssAdminSuccess
-                            }
-                            else
-                            {
-                                $script:wasCalledPreviously = $true
-                                $mocks.VssAdminFailure
-                            }
-                        }
-
-                    Set-TargetResource -Ensure  'Present' -DriveLetter 'P' -DiskUsage 1 -Force $true
-
-                    Assert-MockCalled -CommandName Enable-ComputerRestore -Times 1
-                    Assert-MockCalled -CommandName Invoke-VssAdmin `
-                        -ParameterFilter {  $Operation -eq 'Resize' } -Times 2
-                    Assert-MockCalled -CommandName Invoke-VssAdmin `
-                        -ParameterFilter { $Operation -eq 'Delete' } -Times 1
-                }
-
-                It 'Should throw if the attempt to delete restore points fails' {
-                    $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($script:localizedData.VssShadowDeleteFailure -f 'P')
-
-                    Mock -CommandName Enable-ComputerRestore
-                    Mock -CommandName Invoke-VssAdmin `
-                        -MockWith { $mocks.VssAdminFailure } `
-                        -ParameterFilter { $Operation -eq 'Resize' }
-                    Mock -CommandName Invoke-VssAdmin `
-                        -MockWith { $mocks.VssAdminFailure } `
-                        -ParameterFilter { $Operation -eq 'Delete' }
-
-                    { Set-TargetResource `
-                        -Ensure  'Present' -DriveLetter 'P' -DiskUsage 1 -Force $true } | Should -Throw $errorRecord
-                }
-
-                It 'Should throw if all attempts to resize fails with Force option' {
-                    $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($script:localizedData.VssShadowResizeFailureWithForce2 -f 'P')
-
-                    Mock -CommandName Enable-ComputerRestore
-                    Mock -CommandName Invoke-VssAdmin `
-                        -MockWith { $mocks.VssAdminFailure } `
-                        -ParameterFilter { $Operation -eq 'Resize' }
-                    Mock -CommandName Invoke-VssAdmin `
-                        -MockWith { $mocks.VssAdminSuccess } `
-                        -ParameterFilter { $Operation -eq 'Delete' }
-
-                    { Set-TargetResource `
-                        -Ensure  'Present' -DriveLetter 'P' -DiskUsage 1 -Force $true } | Should -Throw $errorRecord
                 }
             }
         }
