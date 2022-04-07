@@ -9,5 +9,7 @@ class DSC_Computer : OMI_BaseResource
     [Write, Description("The name of the workgroup.")] String WorkGroupName;
     [Write, Description("The value assigned here will be set as the local computer description.")] String Description;
     [Write, Description("The Active Directory Domain Controller to use to join the domain")] String Server;
+    [Write, Description("Specifies advanced options for the Add-Computer join operation")] String Options;
     [Read, Description("A read-only property that specifies the organizational unit that the computer account is currently in.")] String CurrentOU;
 };
+
