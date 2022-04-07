@@ -45,6 +45,9 @@ $FailToRenameAfterJoinDomainErrorId = 'FailToRenameAfterJoinDomain,Microsoft.Pow
 
     .PARAMETER Server
         The Active Directory Domain Controller to use to join the domain.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
 #>
 function Get-TargetResource
 {
@@ -87,7 +90,8 @@ function Get-TargetResource
         $Server,
 
         [Parameter()]
-        [System.String()]
+        [ValidateSet('AccountCreate','Win9XUpgrade','UnsecuredJoin','PasswordPass','JoinWithNewName','JoinReadOnly','InstallInvoke')]
+        [System.String[]]
         $Options
     )
 
@@ -154,6 +158,9 @@ function Get-TargetResource
 
     .PARAMETER Server
         The Active Directory Domain Controller to use to join the domain.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
 #>
 function Set-TargetResource
 {
@@ -195,7 +202,8 @@ function Set-TargetResource
         $Server,
 
         [Parameter()]
-        [System.String()]
+        [ValidateSet('AccountCreate','Win9XUpgrade','UnsecuredJoin','PasswordPass','JoinWithNewName','JoinReadOnly','InstallInvoke')]
+        [System.String[]]
         $Options
     )
 
@@ -260,21 +268,20 @@ function Set-TargetResource
                         See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/add-computer?view=powershell-5.1#parameters for available options and their description
                     #>
                     $joinOptions = New-Object System.Collections.Generic.List[string]
-                    $available_options = @("AccountCreate","Win9XUpgrade","UnsecuredJoin","PasswordPass","JoinWithNewName","JoinReadOnly","InstallInvoke")
                     foreach ($option in $Options) {
-                        if ($option -in $available_options) {
-                            if ($option -eq 'PasswordPass') {
-                                if ('UnsecuredJoin' -in $Options) {
-                                    # PasswordPass must be used in conjunction with UnsecuredJoin
-                                    if ([System.String]::IsNullOrEmpty($Credential.UserName)){
-                                        $joinOptions.Add($option)
-                                    }
+                        if ($option -eq 'PasswordPass') {
+                            if ('UnsecuredJoin' -in $Options) {
+                                # PasswordPass must be used in conjunction with UnsecuredJoin
+                                if ([System.String]::IsNullOrEmpty($Credential.UserName)){
+                                    $joinOptions.Add($option)
                                 } else {
-                                    New-InvalidOperationException -Message "PasswordPass is valid only when teh UnsecuredJoin option is specified"
+                                    New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
                                 }
+                            } else {
+                                New-InvalidArgumentException -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin -ArgumentName 'PasswordPass'
                             }
-                            $joinOptions.Add($option)
                         }
+                        $joinOptions.Add($option)
                     }
                     $addComputerParameters.Add("Options", $joinOptions)
                 }
@@ -454,6 +461,9 @@ function Set-TargetResource
 
     .PARAMETER Description
         The value assigned here will be set as the local computer description.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
 #>
 function Test-TargetResource
 {
@@ -496,7 +506,8 @@ function Test-TargetResource
         $Server,
 
         [Parameter()]
-        [System.String()]
+        [ValidateSet('AccountCreate','Win9XUpgrade','UnsecuredJoin','PasswordPass','JoinWithNewName','JoinReadOnly','InstallInvoke')]
+        [System.String[]]
         $Options
     )
 
