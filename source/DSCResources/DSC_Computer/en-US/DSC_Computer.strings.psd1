@@ -17,5 +17,5 @@ ConvertFrom-StringData @'
     DomainNameAndWorkgroupNameError = Only DomainName or WorkGroupName can be specified at once.
     ComputerNotInDomainMessage = This machine is not a domain member.
     InvalidOptionPasswordPassUnsecuredJoin = Domain Join option "PasswordPass" may not be specified if "UnsecuredJoin" is specified.
-    InvalidOptionCredentialUnsecuredJoinNullUsername = "Credential" username must be null
+    InvalidOptionCredentialUnsecuredJoinNullUsername = "Credential" username must be null if "UnsecuredJoin" is specified.
 '@
