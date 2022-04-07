@@ -84,7 +84,11 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        $Server
+        $Server,
+
+        [Parameter()]
+        [System.String()]
+        $Options
     )
 
     Write-Verbose -Message ($script:localizedData.GettingComputerStateMessage -f $Name)
@@ -188,7 +192,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $Server
+        $Server,
+
+        [Parameter()]
+        [System.String()]
+        $Options
     )
 
     Write-Verbose -Message ($script:localizedData.SettingComputerStateMessage -f $Name)
@@ -245,6 +253,30 @@ function Set-TargetResource
                 if ($Server)
                 {
                     $addComputerParameters.Add("Server", $Server)
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($Options)){
+                    <#
+                        See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/add-computer?view=powershell-5.1#parameters for available options and their description
+                    #>
+                    $joinOptions = New-Object System.Collections.Generic.List[string]
+                    $available_options = @("AccountCreate","Win9XUpgrade","UnsecuredJoin","PasswordPass","JoinWithNewName","JoinReadOnly","InstallInvoke")
+                    foreach ($option in $Options) {
+                        if ($option -in $available_options) {
+                            if ($option -eq 'PasswordPass') {
+                                if ('UnsecuredJoin' -in $Options) {
+                                    # PasswordPass must be used in conjunction with UnsecuredJoin
+                                    if ([System.String]::IsNullOrEmpty($Credential.UserName)){
+                                        $joinOptions.Add($option)
+                                    }
+                                } else {
+                                    New-InvalidOperationException -Message "PasswordPass is valid only when teh UnsecuredJoin option is specified"
+                                }
+                            }
+                            $joinOptions.Add($option)
+                        }
+                    }
+                    $addComputerParameters.Add("Options", $joinOptions)
                 }
 
                 # Rename the computer, and join it to the domain.
@@ -461,7 +493,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $Server
+        $Server,
+
+        [Parameter()]
+        [System.String()]
+        $Options
     )
 
     Write-Verbose -Message ($script:localizedData.TestingComputerStateMessage -f $Name)
