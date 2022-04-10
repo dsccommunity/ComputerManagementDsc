@@ -24,7 +24,7 @@ stages:
       - job: Package_Module
         displayName: 'Package Module'
         pool:
-          vmImage: 'ubuntu 16.04'
+          vmImage: 'ubuntu-latest'
         steps:
           - task: GitVersion@5
             name: gitversion
@@ -123,7 +123,7 @@ stages:
         displayName: 'Publish Code Coverage'
         dependsOn: Test_Unit_2016
         pool:
-          vmImage: 'ubuntu 16.04'
+          vmImage: 'ubuntu-latest'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -273,7 +273,7 @@ stages:
       - job: Deploy_Module
         displayName: 'Deploy Module'
         pool:
-          vmImage: 'ubuntu 16.04'
+          vmImage: 'ubuntu-latest'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'

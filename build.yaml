@@ -48,9 +48,10 @@ BuildWorkflow:
     - Pester_If_Code_Coverage_Under_Threshold
 
   publish:
+    - publish_module_to_gallery
     - Publish_Release_To_GitHub
-    - Publish_Module_To_gallery
     - Publish_GitHub_Wiki_Content
+    - Create_ChangeLog_GitHub_PR
 
 ####################################################
 #       PESTER Configuration                       #
@@ -108,3 +109,16 @@ GitHubConfig:
   GitHubConfigUserName: dscbot
   GitHubConfigUserEmail: dsccommunity@outlook.com
   UpdateChangelogOnPrerelease: false
+
+####################################################
+#      DscResource.DocGenerator Configuration      #
+####################################################
+DscResource.DocGenerator:
+  Generate_Conceptual_Help:
+    MarkdownCodeRegularExpression:
+      - '\`(.+?)\`' # Match inline code-block
+      - '\\(\\)' # Match escaped backslash
+      - '\[[^\[]+\]\((.+?)\)' # Match markdown URL
+      - '_(.+?)_' # Match Italic (underscore)
+      - '\*\*(.+?)\*\*' # Match bold
+      - '\*(.+?)\*' # Match Italic (asterisk)
