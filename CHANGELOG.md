@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added SECURITY.md.
 - Updated pipeline Deploy_Module anb Code_Coverage jobs to use ubuntu-latest
   images - Fixes [Issue #383](https://github.com/dsccommunity/ComputerManagementDsc/issues/382).
+- Updated pipeline unit tests and integration tests to use Windows Server 2019 and
+  Windows Server 2022 images - Fixes [Issue #383](https://github.com/dsccommunity/ComputerManagementDsc/issues/382).
 
 ### Fixed
 
@@ -55,7 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PendingReboot
   - Fixed issue with loading localized data on non en-US operating systems -
     Fixes [Issue #350](https://github.com/dsccommunity/ComputerManagementDsc/issues/350).
-- Replaced the GitVersion task in the `azure-pipelines.yml` with script.
+- Fixed pipeline by replacing the GitVersion task in the `azure-pipelines.yml`
+  with a script.
 
 ## [8.4.0] - 2020-08-03
 

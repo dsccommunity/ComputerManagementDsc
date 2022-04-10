@@ -86,10 +86,10 @@ stages:
               testRunTitle: 'HQRM'
             condition: succeededOrFailed()
 
-      - job: Test_Unit_2016
-        displayName: 'Unit (Windows Server 2016)'
+      - job: Test_Unit_2019
+        displayName: 'Unit (Windows Server 2019)'
         pool:
-          vmImage: 'vs2017-win2016'
+          vmImage: 'windows-2019'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -112,7 +112,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit (Windows Server 2016)'
+              testRunTitle: 'Unit (Windows Server 2019)'
             condition: succeededOrFailed()
 
           - task: PublishPipelineArtifact@1
@@ -124,7 +124,7 @@ stages:
 
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
-        dependsOn: Test_Unit_2016
+        dependsOn: Test_Unit_2019
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 0
@@ -154,10 +154,10 @@ stages:
               bash <(curl -s https://codecov.io/bash) -f "./$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml"
             displayName: 'Publish Code Coverage to Codecov.io'
 
-      - job: Test_Integration_2016
-        displayName: 'Integration (Windows Server 2016)'
+      - job: Test_Integration_2019
+        displayName: 'Integration (Windows Server 2019)'
         pool:
-          vmImage: 'vs2017-win2016'
+          vmImage: 'windows-2019'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -192,13 +192,13 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration (Windows Server 2016)'
+              testRunTitle: 'Integration (Windows Server 2019)'
             condition: succeededOrFailed()
 
-      - job: Test_Unit_2019
-        displayName: 'Unit (Windows Server 2019)'
+      - job: Test_Unit_2022
+        displayName: 'Unit (Windows Server 2022)'
         pool:
-          vmImage: 'windows-2019'
+          vmImage: 'windows-2022'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -221,13 +221,13 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit (Windows Server 2019)'
+              testRunTitle: 'Unit (Windows Server 2022)'
             condition: succeededOrFailed()
 
-      - job: Test_Integration_2019
-        displayName: 'Integration (Windows Server 2019)'
+      - job: Test_Integration_2022
+        displayName: 'Integration (Windows Server 2022)'
         pool:
-          vmImage: 'windows-2019'
+          vmImage: 'windows-2022'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -258,7 +258,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration (Windows Server 2019)'
+              testRunTitle: 'Integration (Windows Server 2022)'
             condition: succeededOrFailed()
 
   - stage: Deploy
