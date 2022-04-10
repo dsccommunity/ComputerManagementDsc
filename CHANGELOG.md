@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PendingReboot
   - Fixed issue with loading localized data on non en-US operating systems -
     Fixes [Issue #350](https://github.com/dsccommunity/ComputerManagementDsc/issues/350).
+- Replaced the GitVersion task in the `azure-pipelines.yml` with script.
 
 ## [8.4.0] - 2020-08-03
 
