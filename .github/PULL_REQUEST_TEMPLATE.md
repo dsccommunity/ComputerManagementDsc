@@ -11,21 +11,29 @@
     You may remove this comment block, and the other comment blocks, but please
     keep the headers and the task list.
 -->
+
 #### Pull Request (PR) description
+
 <!--
     Replace this comment block with a description of your PR.
+    Also, make sure you have updated the CHANGELOG.md, see the
+    task list below. An entry in the CHANGELOG.md is mandatory
+    for all PRs.
 -->
 
 #### This Pull Request (PR) fixes the following issues
+
 <!--
     If this PR does not fix an open issue, replace this comment block with None.
     If this PR resolves one or more open issues, replace this comment block with
-    a list the issues using a GitHub closing keyword, e.g.:
-    - Fixes #123
-    - Fixes #124
+    a list of the issues using a GitHub closing keyword, e.g.:
+
+- Fixes #123
+- Fixes #124
 -->
 
 #### Task list
+
 <!--
     To aid community reviewers in reviewing and merging your PR, please take
     the time to run through the below checklist and make sure your PR has
@@ -34,14 +42,17 @@
     Change to [x] for each task in the task list that applies to your PR.
     For those task that don't apply to you PR, leave those as is.
 -->
-- [ ] Added an entry under the Unreleased section of the change log in the CHANGELOG.md.
-      Entry should say what was changed, and how that affects users (if applicable).
-- [ ] Resource documentation added/updated in README.md in resource folder.
-- [ ] Resource parameter descriptions added/updated in schema.mof
+
+- [ ] Added an entry to the change log under the Unreleased section of the
+      file CHANGELOG.md. Entry should say what was changed and how that
+      affects users (if applicable), and reference the issue being resolved
+      (if applicable).
+- [ ] Resource documentation added/updated in README.md.
+- [ ] Resource parameter descriptions added/updated in README.md, schema.mof
       and comment-based help.
 - [ ] Comment-based help added/updated.
 - [ ] Localization strings added/updated in all localization files as appropriate.
 - [ ] Examples appropriately added/updated.
-- [ ] Unit tests added/updated. See [DSC Resource Testing Guidelines](https://github.com/PowerShell/DscResources/blob/master/TestsGuidelines.md).
-- [ ] Integration tests added/updated (where possible). See [DSC Resource Testing Guidelines](https://github.com/PowerShell/DscResources/blob/master/TestsGuidelines.md).
-- [ ] New/changed code adheres to [DSC Resource Style Guidelines](https://github.com/PowerShell/DscResources/blob/master/StyleGuidelines.md) and [Best Practices](https://github.com/PowerShell/DscResources/blob/master/BestPractices.md).
+- [ ] Unit tests added/updated. See [DSC Community Testing Guidelines](https://dsccommunity.org/guidelines/testing-guidelines).
+- [ ] Integration tests added/updated (where possible). See [DSC Community Testing Guidelines](https://dsccommunity.org/guidelines/testing-guidelines).
+- [ ] New/changed code adheres to [DSC Community Style Guidelines](https://dsccommunity.org/styleguidelines).
