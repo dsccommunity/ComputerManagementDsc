@@ -1115,7 +1115,7 @@ try
                     Set-TargetResource `
                         -Name $env:COMPUTERNAME `
                         -Options @('PasswordPass') `
-                        -Verbose | Should -Throw @ErrorRecord
+                        -Verbose | Should -Throw $ErrorRecord
                 }
 
                 It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
@@ -1139,7 +1139,7 @@ try
                         -Name $env:COMPUTERNAME `
                         -Options @('PasswordPass', 'UnsecuredJoin') `
                         -Credential $machinePassword `
-                        -Verbose | Should -Throw @ErrorRecord
+                        -Verbose | Should -Throw $ErrorRecord
                 }
             }
 
