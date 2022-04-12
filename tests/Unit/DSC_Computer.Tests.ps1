@@ -1186,26 +1186,26 @@ try
 
             Context 'DSC_Computer\Assert-ResourceProperty' {
                 It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername) `
-                        -ArgumentName 'Credential'
+                    # $errorRecord = Get-InvalidArgumentRecord `
+                    #     -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername) `
+                    #     -ArgumentName 'Credential'
 
                     Assert-ResourceProperty `
                         -Name $env:COMPUTERNAME `
                         -Options @('PasswordPass', 'UnsecuredJoin') `
                         -Credential $machinePassword `
-                        -Verbose | Should -Throw $errorRecord
+                        -Verbose | Should -Throw #$errorRecord
                 }
 
                 It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin) `
-                        -ArgumentName 'PasswordPass'
+                    # $errorRecord = Get-InvalidArgumentRecord `
+                    #     -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin) `
+                    #     -ArgumentName 'PasswordPass'
 
                     Assert-ResourceProperty `
                         -Name $env:COMPUTERNAME `
                         -Options @('PasswordPass') `
-                        -Verbose | Should -Throw $errorRecord
+                        -Verbose | Should -Throw #$errorRecord
                 }
             }
         }
