@@ -1096,7 +1096,7 @@ try
                 }
 
                 It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
-                    $errorRecord = New-InvalidArgumentException `
+                    $errorRecord = Get-InvalidArgumentException `
                         -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin) `
                         -ArgumentName 'PasswordPass'
 
@@ -1119,7 +1119,7 @@ try
                 }
 
                 It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
-                    $errorRecord = New-InvalidArgumentException `
+                    $errorRecord = Get-InvalidArgumentException `
                         -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername) `
                         -ArgumentName 'Credential'
 
