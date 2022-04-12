@@ -1096,6 +1096,9 @@ try
                 }
 
                 It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin)
+
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
                             Domain       = 'Contoso.com';
@@ -1115,6 +1118,9 @@ try
                 }
 
                 It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername)
+
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
                             Domain       = 'Contoso.com';
@@ -1129,7 +1135,7 @@ try
 
                     Set-TargetResource `
                         -Name $env:COMPUTERNAME `
-                        -Options @('PasswordPass') `
+                        -Options @('PasswordPass', 'UnsecuredJoin') `
                         -Credential $machinePassword `
                         -Verbose | Should -Throw @ErrorRecord
                 }
