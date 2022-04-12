@@ -36,6 +36,10 @@ try
             # A real password isn't needed here - use this next line to avoid triggering PSSA rule
             $securePassword = New-Object -Type SecureString
             $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
+            $machinePassword = New-Object PSCredential -ArgumentList ([pscustomobject] @{
+                UserName = '';
+                Password = $securePassword[0]
+              })
             $notComputerName = if ($env:COMPUTERNAME -ne 'othername')
             {
                 'othername'
@@ -1089,6 +1093,21 @@ try
                         -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1 -Scope It
+                }
+
+                It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
+                    Set-TargetResource `
+                        -Name $env:COMPUTERNAME `
+                        -Options @('PasswordPass') `
+                        -Verbose | Should -Throw @ErrorRecord
+                }
+
+                It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
+                    Set-TargetResource `
+                        -Name $env:COMPUTERNAME `
+                        -Options @('PasswordPass') `
+                        -Credential $machinePassword `
+                        -Verbose | Should -Throw @ErrorRecord
                 }
             }
 
