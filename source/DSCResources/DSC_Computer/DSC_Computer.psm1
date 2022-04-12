@@ -263,17 +263,27 @@ function Set-TargetResource
                     $addComputerParameters.Add("Server", $Server)
                 }
 
-                if (-not [System.String]::IsNullOrEmpty($Options)){
+                if (-not [System.String]::IsNullOrEmpty($Options))
+                {
                     <#
                         See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/add-computer?view=powershell-5.1#parameters for available options and their description
                     #>
                     $joinOptions = New-Object System.Collections.Generic.List[string]
 
-                    if (($options -contains 'PasswordPass') -and ($options -notcontains 'UnsecuredJoin')){
+                    if (
+                        ($options -contains 'PasswordPass') -and
+                        ($options -notcontains 'UnsecuredJoin')
+                       )
+                    {
                         New-InvalidArgumentException -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin -ArgumentName 'PasswordPass'
                     }
 
-                    if (($Options -contains 'PasswordPass') -and ($options -contains 'UnsecuredJoin') -and (-not [System.String]::IsNullOrEmpty($Credential.UserName))){
+                    if (
+                        ($Options -contains 'PasswordPass') -and
+                        ($options -contains 'UnsecuredJoin') -and
+                        (-not [System.String]::IsNullOrEmpty($Credential.UserName))
+                        )
+                    {
                         New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
                     }
 
