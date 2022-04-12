@@ -1094,53 +1094,6 @@ try
 
                     Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1 -Scope It
                 }
-
-                It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
-                    $errorRecord = Get-InvalidArgumentException `
-                        -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin) `
-                        -ArgumentName 'PasswordPass'
-
-                    Mock -CommandName Get-WMIObject -MockWith {
-                        [PSCustomObject] @{
-                            Domain       = 'Contoso.com';
-                            Workgroup    = 'Contoso.com';
-                            PartOfDomain = $true
-                        }
-                    }
-
-                    Mock -CommandName Get-ComputerDomain -MockWith {
-                        'contoso.com'
-                    }
-
-                    Set-TargetResource `
-                        -Name $env:COMPUTERNAME `
-                        -Options @('PasswordPass') `
-                        -Verbose | Should -Throw
-                }
-
-                It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
-                    $errorRecord = Get-InvalidArgumentException `
-                        -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername) `
-                        -ArgumentName 'Credential'
-
-                    Mock -CommandName Get-WMIObject -MockWith {
-                        [PSCustomObject] @{
-                            Domain       = 'Contoso.com';
-                            Workgroup    = 'Contoso.com';
-                            PartOfDomain = $true
-                        }
-                    }
-
-                    Mock -CommandName Get-ComputerDomain -MockWith {
-                        'contoso.com'
-                    }
-
-                    Set-TargetResource `
-                        -Name $env:COMPUTERNAME `
-                        -Options @('PasswordPass', 'UnsecuredJoin') `
-                        -Credential $machinePassword `
-                        -Verbose | Should -Throw
-                }
             }
 
             Context 'DSC_Computer\Get-ComputerDomain' {
@@ -1228,6 +1181,31 @@ try
             Context 'DSC_Computer\Get-LogonServer' {
                 It 'Should return a non-empty string' {
                     Get-LogonServer | Should -Not -BeNullOrEmpty
+                }
+            }
+
+            Context 'DSC_Computer\Assert-ResourceProperty' {
+                It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername) `
+                        -ArgumentName 'Credential'
+
+                    Assert-ResourceProperty `
+                        -Name $env:COMPUTERNAME `
+                        -Options @('PasswordPass', 'UnsecuredJoin') `
+                        -Credential $machinePassword `
+                        -Verbose | Should -Throw $errorRecord
+                }
+
+                It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin) `
+                        -ArgumentName 'PasswordPass'
+
+                    Assert-ResourceProperty `
+                        -Name $env:COMPUTERNAME `
+                        -Options @('PasswordPass') `
+                        -Verbose | Should -Throw $errorRecord
                 }
             }
         }

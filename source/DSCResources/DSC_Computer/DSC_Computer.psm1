@@ -268,25 +268,7 @@ function Set-TargetResource
                     <#
                         See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/add-computer?view=powershell-5.1#parameters for available options and their description
                     #>
-                    $joinOptions = New-Object System.Collections.Generic.List[string]
-
-                    if (
-                        ($options -contains 'PasswordPass') -and
-                        ($options -notcontains 'UnsecuredJoin')
-                       )
-                    {
-                        New-InvalidArgumentException -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin -ArgumentName 'PasswordPass'
-                    }
-
-                    if (
-                        ($Options -contains 'PasswordPass') -and
-                        ($options -contains 'UnsecuredJoin') -and
-                        (-not [System.String]::IsNullOrEmpty($Credential.UserName))
-                        )
-                    {
-                        New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
-                    }
-
+                    Assert-ResourceProperty @PSBoundParameters
                     $addComputerParameters.Add("Options", $Options)
                 }
 
@@ -699,3 +681,97 @@ function Get-LogonServer
 }
 
 Export-ModuleMember -Function *-TargetResource
+
+<#
+    .SYNOPSIS
+    This function validates the parameters passed. Called by Set-Resource.
+        Will throw an error if any parameters are invalid.
+
+    .PARAMETER Name
+        The desired computer name.
+
+    .PARAMETER DomainName
+        The name of the domain to join.
+
+    .PARAMETER JoinOU
+        The distinguished name of the organizational unit that the computer
+        account will be created in.
+
+    .PARAMETER Credential
+        Credential to be used to join a domain.
+
+    .PARAMETER UnjoinCredential
+        Credential to be used to leave a domain.
+
+    .PARAMETER WorkGroupName
+        The name of the workgroup.
+
+    .PARAMETER Description
+        The value assigned here will be set as the local computer description.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
+#>
+function Assert-ResourceProperty
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateLength(1, 15)]
+        [ValidateScript( { $_ -inotmatch '[\/\\:*?"<>|]' })]
+        [System.String]
+        $Name,
+
+        [Parameter()]
+        [System.String]
+        $DomainName,
+
+        [Parameter()]
+        [System.String]
+        $JoinOU,
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $Credential,
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $UnjoinCredential,
+
+        [Parameter()]
+        [System.String]
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description,
+
+        [Parameter()]
+        [System.String]
+        $Server,
+
+        [Parameter()]
+        [ValidateSet('AccountCreate','Win9XUpgrade','UnsecuredJoin','PasswordPass','JoinWithNewName','JoinReadOnly','InstallInvoke')]
+        [System.String[]]
+        $Options
+    )
+
+    if (
+        ($options -contains 'PasswordPass') -and
+        ($options -notcontains 'UnsecuredJoin')
+       )
+    {
+        New-InvalidArgumentException -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin -ArgumentName 'PasswordPass'
+    }
+
+    if (
+        ($Options -contains 'PasswordPass') -and
+        ($options -contains 'UnsecuredJoin') -and
+        (-not [System.String]::IsNullOrEmpty($Credential.UserName))
+        )
+    {
+        New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
+    }
+
+}
