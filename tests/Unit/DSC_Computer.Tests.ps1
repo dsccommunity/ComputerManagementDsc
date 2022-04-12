@@ -1097,7 +1097,8 @@ try
 
                 It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin)
+                        -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin) `
+                        -ArgumentName 'PasswordPass'
 
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
@@ -1119,7 +1120,8 @@ try
 
                 It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername)
+                        -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername) `
+                        -ArgumentName 'Credential'
 
                     Mock -CommandName Get-WMIObject -MockWith {
                         [PSCustomObject] @{
