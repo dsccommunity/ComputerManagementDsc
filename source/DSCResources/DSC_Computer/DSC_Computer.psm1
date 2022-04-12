@@ -268,22 +268,16 @@ function Set-TargetResource
                         See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/add-computer?view=powershell-5.1#parameters for available options and their description
                     #>
                     $joinOptions = New-Object System.Collections.Generic.List[string]
-                    foreach ($option in $Options) {
-                        if ($option -eq 'PasswordPass') {
-                            if ('UnsecuredJoin' -in $Options) {
-                                # PasswordPass must be used in conjunction with UnsecuredJoin
-                                if ([System.String]::IsNullOrEmpty($Credential.UserName)){
-                                    $joinOptions.Add($option)
-                                } else {
-                                    New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
-                                }
-                            } else {
-                                New-InvalidArgumentException -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin -ArgumentName 'PasswordPass'
-                            }
-                        }
-                        $joinOptions.Add($option)
+
+                    if (($options -contains 'PasswordPass') -and ($options -notcontains 'UnsecuredJoin')){
+                        New-InvalidArgumentException -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin -ArgumentName 'PasswordPass'
                     }
-                    $addComputerParameters.Add("Options", $joinOptions)
+
+                    if (($Options -contains 'PasswordPass') -and ($options -contains 'UnsecuredJoin') -and (-not [System.String]::IsNullOrEmpty($Credential.UserName))){
+                        New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
+                    }
+
+                    $addComputerParameters.Add("Options", $Options)
                 }
 
                 # Rename the computer, and join it to the domain.
