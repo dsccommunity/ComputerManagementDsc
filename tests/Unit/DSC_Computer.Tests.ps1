@@ -1096,6 +1096,18 @@ try
                 }
 
                 It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso.com';
+                            Workgroup    = 'Contoso.com';
+                            PartOfDomain = $true
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        'contoso.com'
+                    }
+
                     Set-TargetResource `
                         -Name $env:COMPUTERNAME `
                         -Options @('PasswordPass') `
@@ -1103,6 +1115,18 @@ try
                 }
 
                 It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso.com';
+                            Workgroup    = 'Contoso.com';
+                            PartOfDomain = $true
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        'contoso.com'
+                    }
+
                     Set-TargetResource `
                         -Name $env:COMPUTERNAME `
                         -Options @('PasswordPass') `
