@@ -37,9 +37,9 @@ try
             $securePassword = New-Object -Type SecureString
             $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
             $machinePassword = New-Object PSCredential -ArgumentList ([pscustomobject] @{
-                UserName = '';
-                Password = $securePassword[0]
-              })
+                    UserName = '';
+                    Password = $securePassword[0]
+                })
             $notComputerName = if ($env:COMPUTERNAME -ne 'othername')
             {
                 'othername'
@@ -1190,13 +1190,13 @@ try
                         -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername) `
                         -ArgumentName 'Credential'
 
-                        {
-                            Assert-ResourceProperty `
-                                -Name $env:COMPUTERNAME `
-                                -Options @('PasswordPass', 'UnsecuredJoin') `
-                                -Credential $machinePassword `
-                                -Verbose
-                        } | Should -Throw $errorRecord
+                    {
+                        Assert-ResourceProperty `
+                            -Name $env:COMPUTERNAME `
+                            -Options @('PasswordPass', 'UnsecuredJoin') `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
@@ -1204,12 +1204,12 @@ try
                         -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin) `
                         -ArgumentName 'PasswordPass'
 
-                        {
-                            Assert-ResourceProperty `
-                                -Name $env:COMPUTERNAME `
-                                -Options @('PasswordPass') `
-                                -Verbose
-                        } | Should -Throw $errorRecord
+                    {
+                        Assert-ResourceProperty `
+                            -Name $env:COMPUTERNAME `
+                            -Options @('PasswordPass') `
+                            -Verbose
+                    } | Should -Throw $errorRecord
                 }
             }
         }
