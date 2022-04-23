@@ -36,10 +36,6 @@ try
             # A real password isn't needed here - use this next line to avoid triggering PSSA rule
             $securePassword = New-Object -Type SecureString
             $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
-            $machinePassword = New-Object PSCredential -ArgumentList ([pscustomobject] @{
-                    UserName = '';
-                    Password = $securePassword[0]
-                })
             $notComputerName = if ($env:COMPUTERNAME -ne 'othername')
             {
                 'othername'
