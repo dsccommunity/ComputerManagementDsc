@@ -90,7 +90,7 @@ function Get-TargetResource
         $Server,
 
         [Parameter()]
-        [ValidateSet('AccountCreate','Win9XUpgrade','UnsecuredJoin','PasswordPass','JoinWithNewName','JoinReadOnly','InstallInvoke')]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
         [System.String[]]
         $Options
     )
@@ -100,18 +100,18 @@ function Get-TargetResource
     $convertToCimCredential = New-CimInstance `
         -ClassName DSC_Credential `
         -Property @{
-            Username = [System.String] $Credential.UserName
-            Password = [System.String] $null
-        } `
+        Username = [System.String] $Credential.UserName
+        Password = [System.String] $null
+    } `
         -Namespace root/microsoft/windows/desiredstateconfiguration `
         -ClientOnly
 
     $convertToCimUnjoinCredential = New-CimInstance `
         -ClassName DSC_Credential `
         -Property @{
-            Username = [System.String] $UnjoinCredential.UserName
-            Password = [System.String] $null
-        } `
+        Username = [System.String] $UnjoinCredential.UserName
+        Password = [System.String] $null
+    } `
         -Namespace root/microsoft/windows/desiredstateconfiguration `
         -ClientOnly
 
@@ -202,7 +202,7 @@ function Set-TargetResource
         $Server,
 
         [Parameter()]
-        [ValidateSet('AccountCreate','Win9XUpgrade','UnsecuredJoin','PasswordPass','JoinWithNewName','JoinReadOnly','InstallInvoke')]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
         [System.String[]]
         $Options
     )
@@ -492,7 +492,7 @@ function Test-TargetResource
         $Server,
 
         [Parameter()]
-        [ValidateSet('AccountCreate','Win9XUpgrade','UnsecuredJoin','PasswordPass','JoinWithNewName','JoinReadOnly','InstallInvoke')]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
         [System.String[]]
         $Options
     )
@@ -752,7 +752,7 @@ function Assert-ResourceProperty
         $Server,
 
         [Parameter()]
-        [ValidateSet('AccountCreate','Win9XUpgrade','UnsecuredJoin','PasswordPass','JoinWithNewName','JoinReadOnly','InstallInvoke')]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
         [System.String[]]
         $Options
     )
@@ -760,18 +760,20 @@ function Assert-ResourceProperty
     if (
         ($options -contains 'PasswordPass') -and
         ($options -notcontains 'UnsecuredJoin')
-       )
+    )
     {
         New-InvalidArgumentException -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin -ArgumentName 'PasswordPass'
     }
 
     if (
         ($Options -contains 'PasswordPass') -and
-        ($options -contains 'UnsecuredJoin') -and
-        (-not [System.String]::IsNullOrEmpty($Credential.UserName))
-        )
+        ($options -contains 'UnsecuredJoin')
+    )
     {
-        New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
+        if ( -not [System.String]::IsNullOrEmpty($machinePassword.UserName) )
+        {
+            New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
+        }
     }
 
 }
