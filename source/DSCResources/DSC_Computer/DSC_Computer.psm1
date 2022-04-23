@@ -770,7 +770,7 @@ function Assert-ResourceProperty
         ($options -contains 'UnsecuredJoin')
     )
     {
-        if ( -not [System.String]::IsNullOrEmpty($machinePassword.UserName) )
+        if ( -not [System.String]::IsNullOrEmpty($Credential.UserName) )
         {
             New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
         }
