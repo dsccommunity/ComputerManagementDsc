@@ -703,8 +703,8 @@ try
                         -DomainName 'adventure-works.com' `
                         -Credential $credential `
                         -UnjoinCredential $credential `
-                        -Options @('InstallInvoke')
-                    -Verbose | Should -BeNullOrEmpty
+                        -Options @('InstallInvoke') `
+                        -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
