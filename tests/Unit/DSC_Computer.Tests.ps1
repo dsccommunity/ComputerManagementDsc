@@ -683,6 +683,34 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
                 }
 
+                It 'Changes ComputerName and changes Domain to new Domain with Options passed' {
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso.com';
+                            Workgroup    = 'Contoso.com';
+                            PartOfDomain = $true
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        'contoso.com'
+                    }
+
+                    Mock -CommandName Add-Computer
+
+                    Set-TargetResource `
+                        -Name $notComputerName `
+                        -DomainName 'adventure-works.com' `
+                        -Credential $credential `
+                        -UnjoinCredential $credential `
+                        -Options @('InstallInvoke')
+                    -Verbose | Should -BeNullOrEmpty
+
+                    Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                }
+
                 It 'Should try a separate rename if ''FailToRenameAfterJoinDomain'' occured during domain join' {
                     $message = "Computer '' was successfully joined to the new domain '', but renaming it to '' failed with the following error message: The directory service is busy."
                     $exception = [System.InvalidOperationException]::new($message)

@@ -100,18 +100,18 @@ function Get-TargetResource
     $convertToCimCredential = New-CimInstance `
         -ClassName DSC_Credential `
         -Property @{
-            Username = [System.String] $Credential.UserName
-            Password = [System.String] $null
-        } `
+        Username = [System.String] $Credential.UserName
+        Password = [System.String] $null
+    } `
         -Namespace root/microsoft/windows/desiredstateconfiguration `
         -ClientOnly
 
     $convertToCimUnjoinCredential = New-CimInstance `
         -ClassName DSC_Credential `
         -Property @{
-            Username = [System.String] $UnjoinCredential.UserName
-            Password = [System.String] $null
-        } `
+        Username = [System.String] $UnjoinCredential.UserName
+        Password = [System.String] $null
+    } `
         -Namespace root/microsoft/windows/desiredstateconfiguration `
         -ClientOnly
 
@@ -269,7 +269,7 @@ function Set-TargetResource
                         See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/add-computer?view=powershell-5.1#parameters for available options and their description
                     #>
                     Assert-ResourceProperty @PSBoundParameters
-                    $addComputerParameters.Add("Options", $Options)
+                    $addComputerParameters.Add('Options', $Options)
                 }
 
                 # Rename the computer, and join it to the domain.
@@ -757,23 +757,22 @@ function Assert-ResourceProperty
         $Options
     )
 
-    if (
-        ($options -contains 'PasswordPass') -and
-        ($options -notcontains 'UnsecuredJoin')
-    )
+    if ($options -contains 'PasswordPass' -and
+        $options -notcontains 'UnsecuredJoin')
     {
-        New-InvalidArgumentException -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin -ArgumentName 'PasswordPass'
+        New-InvalidArgumentException `
+            -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin `
+            -ArgumentName 'PasswordPass'
     }
 
-    if (
-        ($Options -contains 'PasswordPass') -and
-        ($options -contains 'UnsecuredJoin')
-    )
+    if ($Options -contains 'PasswordPass' -and
+        $options -contains 'UnsecuredJoin' -and
+        -not [System.String]::IsNullOrEmpty($Credential.UserName))
     {
-        if ( -not [System.String]::IsNullOrEmpty($Credential.UserName) )
-        {
-            New-InvalidArgumentException -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername -ArgumentName 'Credential'
-        }
+
+        New-InvalidArgumentException `
+            -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername `
+            -ArgumentName 'Credential'
     }
 
 }
