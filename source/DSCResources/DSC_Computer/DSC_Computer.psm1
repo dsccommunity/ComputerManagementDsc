@@ -92,18 +92,18 @@ function Get-TargetResource
     $convertToCimCredential = New-CimInstance `
         -ClassName DSC_Credential `
         -Property @{
-            Username = [System.String] $Credential.UserName
-            Password = [System.String] $null
-        } `
+        Username = [System.String] $Credential.UserName
+        Password = [System.String] $null
+    } `
         -Namespace root/microsoft/windows/desiredstateconfiguration `
         -ClientOnly
 
     $convertToCimUnjoinCredential = New-CimInstance `
         -ClassName DSC_Credential `
         -Property @{
-            Username = [System.String] $UnjoinCredential.UserName
-            Password = [System.String] $null
-        } `
+        Username = [System.String] $UnjoinCredential.UserName
+        Password = [System.String] $null
+    } `
         -Namespace root/microsoft/windows/desiredstateconfiguration `
         -ClientOnly
 
@@ -245,6 +245,35 @@ function Set-TargetResource
                 if ($Server)
                 {
                     $addComputerParameters.Add("Server", $Server)
+                }
+
+                # Check for existing computer objecst using ADSI without ActiveDirectory module
+                try
+                {
+                    $searcher = New-Object -TypeName System.DirectoryServices.DirectorySearcher `
+                        -ErrorAction Stop
+                    $searcher.Filter = "(&(objectCategory=Computer)(name=$Name))"
+                    if ( $DomainDN -notlike "LDAP://*")
+                    {
+                        $DomainDN = "LDAP://$DomainDN"
+                    }
+                    $searcher.SearchRoot = $DomainDN
+
+                    $directoryEntry = New-Object -TypeName System.DirectoryServices.DirectoryEntry `
+                        -ArgumentList $DomainDN, $($Credential.UserName), $($Credential.GetNetworkCredential().password) `
+                        -ErrorAction Stop
+                    $searcher.SearchRoot = $directoryEntry
+
+                    $computerObj = $searcher.FindOne()
+                    if ($computerObj)
+                    {
+                        $objectPath = [adsi]$computerObj.Path
+                        $objectPath.psbase.DeleteTree()
+                    }
+                }
+                catch
+                {
+
                 }
 
                 # Rename the computer, and join it to the domain.
