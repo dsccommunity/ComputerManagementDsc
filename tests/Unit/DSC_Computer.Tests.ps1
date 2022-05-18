@@ -619,8 +619,6 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $WorkGroupName -and $NewName -and $credential }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $DomainName -or $UnjoinCredential }
-                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Workgroup to Domain' {
@@ -862,8 +860,6 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $WorkGroupName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $DomainName }
-                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only the Domain to new Domain' {
@@ -1013,8 +1009,6 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $WorkGroupName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $DomainName }
-                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only Domain to Workgroup when Name is [localhost]' {
