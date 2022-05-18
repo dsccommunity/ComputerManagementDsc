@@ -253,7 +253,7 @@ function Set-TargetResource
                 if ($computerObject)
                 {
                     Delete-ADSIObject -Path $computerObject.Path -Credential $Credential
-                    Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f @($Name, $computerObject.Path))
+                    Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
                 }
 
                 # Rename the computer, and join it to the domain.
