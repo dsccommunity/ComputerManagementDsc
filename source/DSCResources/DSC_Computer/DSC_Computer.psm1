@@ -252,7 +252,7 @@ function Set-TargetResource
 
                 if ($computerObject)
                 {
-                    Delete-ADSIObject -Name $computerObject.Path -Credential $Credential
+                    Delete-ADSIObject -Path $computerObject.Path -Credential $Credential
                     Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f @($Name, $computerObject.Path))
                 }
 
@@ -727,7 +727,7 @@ function Delete-ADSIObject
     param
     (
         [Parameter(Mandatory = $true)]
-        [System.DirectoryServices.DirectoryEntry]
+        [System.String]
         $Path,
 
         [Parameter(Mandatory = $true)]
@@ -738,7 +738,7 @@ function Delete-ADSIObject
     try
     {
         $adsiObj = New-Object -TypeName System.DirectoryServices.DirectoryEntry `
-            -ArgumentList $computerObj.Path, $($Credential.UserName), $($Credential.GetNetworkCredential().password) `
+            -ArgumentList $Path, $($Credential.UserName), $($Credential.GetNetworkCredential().password) `
             -ErrorAction Stop
 
         $adsiObj.psbase.DeleteTree()
