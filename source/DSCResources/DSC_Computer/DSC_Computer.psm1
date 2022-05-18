@@ -248,32 +248,12 @@ function Set-TargetResource
                 }
 
                 # Check for existing computer objecst using ADSI without ActiveDirectory module
-                try
+                $computerObject = Get-ADSIComputer -Name $Name -DomainName $DomainName -Credential $Credential
+
+                if ($computerObject)
                 {
-                    $searcher = New-Object -TypeName System.DirectoryServices.DirectorySearcher `
-                        -ErrorAction Stop
-                    $searcher.Filter = "(&(objectCategory=Computer)(name=$Name))"
-                    if ( $DomainDN -notlike "LDAP://*")
-                    {
-                        $DomainDN = "LDAP://$DomainDN"
-                    }
-                    $searcher.SearchRoot = $DomainDN
-
-                    $directoryEntry = New-Object -TypeName System.DirectoryServices.DirectoryEntry `
-                        -ArgumentList $DomainDN, $($Credential.UserName), $($Credential.GetNetworkCredential().password) `
-                        -ErrorAction Stop
-                    $searcher.SearchRoot = $directoryEntry
-
-                    $computerObj = $searcher.FindOne()
-                    if ($computerObj)
-                    {
-                        $objectPath = [adsi]$computerObj.Path
-                        $objectPath.psbase.DeleteTree()
-                    }
-                }
-                catch
-                {
-
+                    Delete-ADSIObject -Name $computerObject.Path -Credential $Credential
+                    Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f @($Name, $computerObject.Path))
                 }
 
                 # Rename the computer, and join it to the domain.
@@ -674,6 +654,99 @@ function Get-LogonServer
 
     $logonserver = $env:LOGONSERVER -replace "\\", ""
     return $logonserver
+}
+
+<#
+    .SYNOPSIS
+        Returns an ADSI Computer Object.
+
+    .PARAMETER Name
+        Name of the computer to search for in the given domain
+
+    .PARAMETER Domain
+        Domain to search
+
+    .PARAMETER Credential
+        Credential to search domain with
+#>
+function Get-ADSIComputer
+{
+    [CmdletBinding()]
+    [OutputType([System.DirectoryServices.SearchResult])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateLength(1, 15)]
+        [ValidateScript( { $_ -inotmatch '[\/\\:*?"<>|]' })]
+        [System.String]
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DomainName,
+
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.PSCredential]
+        $Credential
+    )
+
+    $searcher = ([adsisearcher]"(&(objectCategory=computer)(objectClass=computer)(cn=$Name))")
+    if ( $DomainName -notlike "LDAP://*")
+    {
+        $DomainName = "LDAP://$DomainName"
+    }
+
+    try
+    {
+        $searchRoot = New-Object -TypeName System.DirectoryServices.DirectoryEntry `
+            -ArgumentList $DomainName, $($Credential.UserName), $($Credential.GetNetworkCredential().password) `
+            -ErrorAction Stop
+    }
+    catch
+    {
+        New-InvalidOperationException -Message $_.Exception.Message -ErrorRecord $_
+    }
+    $searcher.SearchRoot = $searchRoot
+
+    return $searcher.FindOne()
+}
+
+<#
+    .SYNOPSIS
+        Deletes an ADSI DirectoryEntry Object.
+
+    .PARAMETER Path
+        Path to Object to delete
+
+    .PARAMETER Credential
+        Credential to authenticate to the domain
+#>
+function Delete-ADSIObject
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.DirectoryServices.DirectoryEntry]
+        $Path,
+
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.PSCredential]
+        $Credential
+    )
+
+    try
+    {
+        $adsiObj = New-Object -TypeName System.DirectoryServices.DirectoryEntry `
+            -ArgumentList $computerObj.Path, $($Credential.UserName), $($Credential.GetNetworkCredential().password) `
+            -ErrorAction Stop
+
+        $adsiObj.psbase.DeleteTree()
+    }
+    catch
+    {
+        New-InvalidOperationException -Message $_.Exception.Message -ErrorRecord $_
+    }
 }
 
 Export-ModuleMember -Function *-TargetResource
