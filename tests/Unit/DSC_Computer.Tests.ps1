@@ -485,6 +485,8 @@ try
             Context 'DSC_Computer\Set-TargetResource' {
                 Mock -CommandName Rename-Computer
                 Mock -CommandName Set-CimInstance
+                Mock -CommandName Get-ADSIComputer
+                Mock -CommandName Delete-ADSIObject
 
                 It 'Throws if both DomainName and WorkGroupName are specified' {
                     $errorRecord = Get-InvalidOperationRecord `
@@ -531,6 +533,12 @@ try
                         }
                     }
 
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
+                        }
+                    }
+
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         'contoso.com'
                     }
@@ -547,6 +555,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Domain to new Domain with specified OU' {
@@ -562,6 +572,12 @@ try
                         'contoso.com'
                     }
 
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
+                        }
+                    }
+
                     Mock -CommandName Add-Computer
 
                     Set-TargetResource `
@@ -575,6 +591,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Domain to Workgroup' {
@@ -601,6 +619,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $WorkGroupName -and $NewName -and $credential }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $DomainName -or $UnjoinCredential }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Workgroup to Domain' {
@@ -609,6 +629,12 @@ try
                             Domain       = 'Contoso';
                             Workgroup    = 'Contoso';
                             PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
                         }
                     }
 
@@ -627,6 +653,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Workgroup to Domain with specified Domain Controller' {
@@ -635,6 +663,12 @@ try
                             Domain       = 'Contoso';
                             Workgroup    = 'Contoso';
                             PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
                         }
                     }
 
@@ -654,6 +688,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName -and $Server }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Workgroup to Domain with specified OU' {
@@ -662,6 +698,12 @@ try
                             Domain       = 'Contoso';
                             Workgroup    = 'Contoso';
                             PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
                         }
                     }
 
@@ -681,6 +723,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Should try a separate rename if ''FailToRenameAfterJoinDomain'' occured during domain join' {
@@ -696,6 +740,10 @@ try
                             Workgroup    = 'Contoso'
                             PartOfDomain = $false
                         }
+                    }
+
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        $null
                     }
 
                     Mock -CommandName Get-ComputerDomain -MockWith {
@@ -715,6 +763,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Should Throw the correct error if Add-Computer errors with an unknown InvalidOperationException' {
@@ -785,6 +835,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Workgroup to new Workgroup' {
@@ -810,6 +862,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $WorkGroupName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $DomainName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only the Domain to new Domain' {
@@ -838,6 +892,8 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only the Domain to new Domain when name is [localhost]' {
@@ -866,6 +922,8 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only the Domain to new Domain with specified OU' {
@@ -895,6 +953,8 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only the Domain to new Domain with specified OU when Name is [localhost]' {
@@ -924,6 +984,8 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only Domain to Workgroup' {
@@ -951,6 +1013,8 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $WorkGroupName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $DomainName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only Domain to Workgroup when Name is [localhost]' {
