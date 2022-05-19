@@ -1237,6 +1237,28 @@ try
                     Get-LogonServer | Should -Not -BeNullOrEmpty
                 }
             }
+
+            Context 'DSC_Computer\Get-ADSIComputer' {
+                It 'Throws if name is to long' {
+                    {
+                        Get-ADSIComputer `
+                            -Name 'ThisNameIsTooLong' `
+                            -Domain 'Contoso.com' `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Throw
+                }
+
+                It 'Throws if name contains illegal characters' {
+                    {
+                        Get-ADSIComputer `
+                            -Name 'IllegalName[<' `
+                            -Domain 'Contoso.com' `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Throw
+                }
+            }
         }
     }
 }
