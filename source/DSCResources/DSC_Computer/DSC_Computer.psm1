@@ -690,7 +690,8 @@ function Get-ADSIComputer
         $Credential
     )
 
-    $searcher = ([adsisearcher]"(&(objectCategory=computer)(objectClass=computer)(cn=$Name))")
+    $searcher = New-Object -TypeName System.DirectoryServices.DirectorySearcher
+    $searcher.Filter = "(&(objectCategory=computer)(objectClass=computer)(cn=$Name))"
     if ( $DomainName -notlike "LDAP://*")
     {
         $DomainName = "LDAP://$DomainName"

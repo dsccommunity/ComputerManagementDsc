@@ -1258,6 +1258,43 @@ try
                             -Verbose
                     } | Should -Throw
                 }
+
+                It 'Return ADSI object' {
+                    class fake_adsi_directoryentry {
+                        [string] $Domain
+                        [PSCredential] $Credential
+                    }
+
+                    class fake_adsi_searcher {
+                        [string] $SearchRoot
+                        [string] $Filter
+                        [hashtable] FindOne( ){
+                            return @{
+                                path = 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
+                            }
+                         }
+                    }
+
+                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
+
+                    Mock 'New-Object' { New-Object 'fake_adsi_searcher' } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
+                        }
+
+                    {
+                        Get-ADSIComputer `
+                            -Name 'IllegalName[<' `
+                            -Domain 'Contoso.com' `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Not -BeNullOrEmpty
+                }
             }
         }
     }
