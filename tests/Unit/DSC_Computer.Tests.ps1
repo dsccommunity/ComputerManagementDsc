@@ -1321,6 +1321,11 @@ try
                     [string] $Username
                     [string] $password
                     [fake_psbase_object] $psbase
+
+                    fake_adsi_directoryentry() {
+                        $this.psbase = `
+                            New-Object 'fake_psbase_object'
+                    }
                 }
 
                 Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
