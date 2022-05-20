@@ -1291,51 +1291,54 @@ try
 
                     {
                         Get-ADSIComputer `
-                            -Name 'IllegalName[<' `
+                            -Name 'LegalName' `
                             -Domain 'LDAP://Contoso.com' `
                             -Credential $credential `
                             -Verbose
                     } | Should -Not -BeNullOrEmpty
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
                 }
 
                 It 'Returns ADSI object with domain name' {
 
                     {
                         Get-ADSIComputer `
-                            -Name 'IllegalName[<' `
+                            -Name 'LegalName' `
                             -Domain 'Contoso.com' `
                             -Credential $credential `
                             -Verbose
                     } | Should -Not -BeNullOrEmpty
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
                 }
             }
 
             Context 'DSC_Computer\Delete-ADSIObject' {
 
+                class fake_psbase_object {
+                    [void] DeleteTree(){ }
+                }
+
+                class fake_adsi_directoryentry {
+                    [string] $Domain
+                    [string] $Username
+                    [string] $password
+                    [fake_psbase_object] $psbase
+                }
+
+                Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
+                    -ParameterFilter {
+                        $TypeName -and
+                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                    }
+
                 It 'Deletes ADSI Object' {
-                    class fake_psbase_object {
-                        [void] DeleteTree(){ }
-                    }
-
-                    class fake_adsi_directoryentry {
-                        [string] $Domain
-                        [string] $Username
-                        [string] $password
-                        [fake_psbase_object] $psbase
-                    }
-
-                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
-                        -ParameterFilter {
-                            $TypeName -and
-                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-                        }
-
                     {
                         Delete-ADSIObject `
                             -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -BeNullOrEmpty
+                    } | Should -Not -Throw
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
                 }
             }
         }
