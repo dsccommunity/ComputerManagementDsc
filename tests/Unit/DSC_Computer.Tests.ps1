@@ -1313,6 +1313,7 @@ try
             Context 'DSC_Computer\Delete-ADSIObject' {
 
                 class fake_psbase_object {
+                    [string] $name
                     [void] DeleteTree(){ }
                 }
 
