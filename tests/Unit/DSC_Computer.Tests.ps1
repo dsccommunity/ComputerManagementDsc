@@ -1377,7 +1377,7 @@ try
                     {
                         Delete-ADSIObject `
                             -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
-                            -Credential $credential`
+                            -Credential $credential `
                             -Verbose
                     } | Should -Throw
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
