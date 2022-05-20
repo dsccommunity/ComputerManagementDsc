@@ -1289,25 +1289,23 @@ try
 
                 It 'Returns ADSI object with ADSI path ' {
 
-                    {
-                        Get-ADSIComputer `
-                            -Name 'LegalName' `
-                            -Domain 'LDAP://Contoso.com' `
-                            -Credential $credential `
-                            -Verbose
-                    } | Should -Not -BeNullOrEmpty
+                    $obj = Get-ADSIComputer `
+                        -Name 'LegalName' `
+                        -Domain 'LDAP://Contoso.com' `
+                        -Credential $credential `
+                        -Verbose
+                    $obj.path | Should -Be 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
                 }
 
                 It 'Returns ADSI object with domain name' {
 
-                    {
-                        Get-ADSIComputer `
+                    $obj = Get-ADSIComputer `
                             -Name 'LegalName' `
                             -Domain 'Contoso.com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -Not -BeNullOrEmpty
+                    $obj.Path | Should -Be 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
                 }
             }
