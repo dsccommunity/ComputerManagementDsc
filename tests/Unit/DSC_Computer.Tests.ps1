@@ -1255,12 +1255,6 @@ try
                      }
                 }
 
-                Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
-                    -ParameterFilter {
-                        $TypeName -and
-                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-                    }
-
                 Mock 'New-Object' { New-Object 'fake_adsi_searcher' } `
                     -ParameterFilter {
                         $TypeName -and
@@ -1289,6 +1283,12 @@ try
 
                 It 'Returns ADSI object with ADSI path ' {
 
+                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
+                    -ParameterFilter {
+                        $TypeName -and
+                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                    }
+
                     $obj = Get-ADSIComputer `
                         -Name 'LegalName' `
                         -Domain 'LDAP://Contoso.com' `
@@ -1299,6 +1299,12 @@ try
                 }
 
                 It 'Returns ADSI object with domain name' {
+
+                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
+                    -ParameterFilter {
+                        $TypeName -and
+                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                    }
 
                     $obj = Get-ADSIComputer `
                             -Name 'LegalName' `
@@ -1336,13 +1342,13 @@ try
                     [void] DeleteTree(){ }
                 }
 
-                Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
+                It 'Deletes ADSI Object' {
+                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
                     -ParameterFilter {
                         $TypeName -and
                         $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
                     }
 
-                It 'Deletes ADSI Object' {
                     {
                         Delete-ADSIObject `
                             -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
