@@ -1239,6 +1239,34 @@ try
             }
 
             Context 'DSC_Computer\Get-ADSIComputer' {
+                class fake_adsi_directoryentry {
+                    [string] $Domain
+                    [string] $Username
+                    [string] $password
+                }
+
+                class fake_adsi_searcher {
+                    [string] $SearchRoot
+                    [string] $Filter
+                    [hashtable] FindOne( ){
+                        return @{
+                            path = 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
+                        }
+                     }
+                }
+
+                Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
+                    -ParameterFilter {
+                        $TypeName -and
+                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                    }
+
+                Mock 'New-Object' { New-Object 'fake_adsi_searcher' } `
+                    -ParameterFilter {
+                        $TypeName -and
+                        $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
+                    }
+
                 It 'Throws if name is to long' {
                     {
                         Get-ADSIComputer `
@@ -1259,33 +1287,18 @@ try
                     } | Should -Throw
                 }
 
-                It 'Return ADSI object' {
-                    class fake_adsi_directoryentry {
-                        [string] $Domain
-                        [PSCredential] $Credential
-                    }
+                It 'Returns ADSI object with ADSI path ' {
 
-                    class fake_adsi_searcher {
-                        [string] $SearchRoot
-                        [string] $Filter
-                        [hashtable] FindOne( ){
-                            return @{
-                                path = 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
-                            }
-                         }
-                    }
+                    {
+                        Get-ADSIComputer `
+                            -Name 'IllegalName[<' `
+                            -Domain 'LDAP://Contoso.com' `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Not -BeNullOrEmpty
+                }
 
-                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
-                        -ParameterFilter {
-                            $TypeName -and
-                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-                        }
-
-                    Mock 'New-Object' { New-Object 'fake_adsi_searcher' } `
-                        -ParameterFilter {
-                            $TypeName -and
-                            $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
-                        }
+                It 'Returns ADSI object with domain name' {
 
                     {
                         Get-ADSIComputer `
@@ -1294,6 +1307,35 @@ try
                             -Credential $credential `
                             -Verbose
                     } | Should -Not -BeNullOrEmpty
+                }
+            }
+
+            Context 'DSC_Computer\Delete-ADSIObject' {
+
+                It 'Deletes ADSI Object' {
+                    class fake_psbase_object {
+                        [void] DeleteTree(){ }
+                    }
+
+                    class fake_adsi_directoryentry {
+                        [string] $Domain
+                        [string] $Username
+                        [string] $password
+                        [fake_psbase_object] $psbase
+                    }
+
+                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
+
+                    {
+                        Delete-ADSIObject `
+                            -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -BeNullOrEmpty
                 }
             }
         }
