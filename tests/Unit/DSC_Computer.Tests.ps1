@@ -1312,18 +1312,19 @@ try
 
             Context 'DSC_Computer\Delete-ADSIObject' {
 
-
+                class fake_psbase {
+                    [void] DeleteTree(){ }
+                }
 
                 class fake_adsi_directoryentry {
                     [string] $Domain
                     [string] $Username
                     [string] $password
-                    $psbase
+                    [fake_psbase] $psbase
 
                     fake_adsi_directoryentry() {
-                        $this.psbase = class fake_psbase {
-                            [void] DeleteTree(){ }
-                        }
+                        $this.psbase = `
+                            New-Object -TypeName fake_psbase
                     }
                 }
 
