@@ -45,6 +45,23 @@ try
                 'name'
             }
 
+            # These classes are used in Delete-ADSIObject
+            class fake_psbase_object {
+                [void] DeleteTree(){ }
+            }
+
+            class fake_adsi_directoryentry {
+                [string] $Domain
+                [string] $Username
+                [string] $password
+                [fake_psbase_object] $psbase
+
+                fake_adsi_directoryentry() {
+                    $this.psbase = `
+                        New-Object 'fake_psbase_object'
+                }
+            }
+
             Context 'DSC_Computer\Test-TargetResource' {
                 Mock -CommandName Get-WMIObject -MockWith {
                     [PSCustomObject] @{
@@ -1311,22 +1328,6 @@ try
             }
 
             Context 'DSC_Computer\Delete-ADSIObject' {
-
-                class fake_psbase_object {
-                    [void] DeleteTree(){ }
-                }
-
-                class fake_adsi_directoryentry {
-                    [string] $Domain
-                    [string] $Username
-                    [string] $password
-                    [fake_psbase_object] $psbase
-
-                    fake_adsi_directoryentry() {
-                        $this.psbase = `
-                            New-Object 'fake_psbase_object'
-                    }
-                }
 
                 Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
                     -ParameterFilter {
