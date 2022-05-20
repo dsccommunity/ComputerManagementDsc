@@ -1326,7 +1326,7 @@ try
                         Get-ADSIComputer `
                             -Name 'LegalName' `
                             -Domain 'Contoso.com' `
-                            -Credential $credential`
+                            -Credential $credential `
                             -Verbose
                     } | Should -Throw
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
