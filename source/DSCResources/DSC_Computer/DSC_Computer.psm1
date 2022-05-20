@@ -742,7 +742,7 @@ function Delete-ADSIObject
             -ArgumentList $Path, $($Credential.UserName), $($Credential.GetNetworkCredential().password) `
             -ErrorAction Stop
 
-        $adsiObj.psbase.DeleteTree()
+        $adsiObj.DeleteTree()
     }
     catch
     {
