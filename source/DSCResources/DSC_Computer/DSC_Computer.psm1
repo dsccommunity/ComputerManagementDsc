@@ -728,6 +728,7 @@ function Delete-ADSIObject
     param
     (
         [Parameter(Mandatory = $true)]
+        [ValidateScript( { $_ -imatch "LDAP://*" })]
         [System.String]
         $Path,
 

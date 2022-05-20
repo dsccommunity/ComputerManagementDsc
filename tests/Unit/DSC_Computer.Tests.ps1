@@ -1361,13 +1361,22 @@ try
                     {
                         Delete-ADSIObject `
                             -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
-                            -Domain 'Contoso.com' `
                             -Credential $credential`
                             -Verbose
                     } | Should -Throw
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
             }
+
+            It 'Should throw if path does not begin with LDAP://' {
+                {
+                    Delete-ADSIObject `
+                            -Path 'contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
+                            -Credential $credential`
+                            -Verbose
+                    } | Should -Throw
+                }
             }
+
         }
     }
 }
