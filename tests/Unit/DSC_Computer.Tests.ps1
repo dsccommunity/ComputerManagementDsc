@@ -1316,7 +1316,7 @@ try
                 }
 
                 It 'Should throw if Credential is incorrect' {
-                    Mock 'New-Object' { throw } `
+                    Mock 'New-Object' { Write-Error -message "error" } `
                         -ParameterFilter {
                             $TypeName -and
                             $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
@@ -1368,7 +1368,7 @@ try
                 }
 
                 It 'Should throw if Credential is incorrect' {
-                    Mock 'New-Object' { throw } `
+                    Mock 'New-Object' { Write-Error -message "error" } `
                         -ParameterFilter {
                             $TypeName -and
                             $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
