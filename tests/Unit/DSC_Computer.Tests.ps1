@@ -1308,6 +1308,22 @@ try
                     $obj.Path | Should -Be 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
                 }
+
+                It 'Should throw if Credential is incorrect' {
+                    Mock 'New-Object' { throw } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
+
+                    {
+                        Get-ADSIComputer `
+                            -Name 'LegalName' `
+                            -Domain 'Contoso.com' `
+                            -Credential $credential`
+                            -Verbose
+                    } | Should -Throw
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
             }
 
             Context 'DSC_Computer\Delete-ADSIObject' {
@@ -1334,6 +1350,23 @@ try
                     } | Should -Not -Throw
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
                 }
+
+                It 'Should throw if Credential is incorrect' {
+                    Mock 'New-Object' { throw } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
+
+                    {
+                        Delete-ADSIObject `
+                            -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
+                            -Domain 'Contoso.com' `
+                            -Credential $credential`
+                            -Verbose
+                    } | Should -Throw
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
+            }
             }
         }
     }
