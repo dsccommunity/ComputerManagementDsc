@@ -1324,6 +1324,7 @@ try
                             -Verbose
                     } | Should -Throw
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
+                }
             }
 
             Context 'DSC_Computer\Delete-ADSIObject' {
@@ -1351,6 +1352,15 @@ try
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
                 }
 
+                It 'Should throw if path does not begin with LDAP://' {
+                    {
+                        Delete-ADSIObject `
+                                -Path 'contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
+                                -Credential $credential`
+                                -Verbose
+                    } | Should -Throw
+                }
+
                 It 'Should throw if Credential is incorrect' {
                     Mock 'New-Object' { throw } `
                         -ParameterFilter {
@@ -1365,18 +1375,8 @@ try
                             -Verbose
                     } | Should -Throw
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
-            }
-
-            It 'Should throw if path does not begin with LDAP://' {
-                {
-                    Delete-ADSIObject `
-                            -Path 'contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
-                            -Credential $credential`
-                            -Verbose
-                    } | Should -Throw
                 }
             }
-
         }
     }
 }
