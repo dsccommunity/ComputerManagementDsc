@@ -1424,8 +1424,9 @@ function Test-TargetResource
     if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
     {
 
-        $PSBoundParameters.User = Set-DomainNameInAccountName -AccountName $BuiltInAccount -DomainName 'NT AUTHORITY'
-        $currentValues.User = Set-DomainNameInAccountName -AccountName $BuiltInAccount -DomainName 'NT AUTHORITY'
+        $user = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
+        $PSBoundParameters.User = $user
+        $currentValues.User = $user
 
         $PSBoundParameters.ExecuteAsCredential = $BuiltInAccount
         $currentValues.ExecuteAsCredential = $BuiltInAccount
@@ -1465,8 +1466,9 @@ function Test-TargetResource
     }
     else
     {
-        $PSBoundParameters.User = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
-        $currentValues.User = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
+        $user = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
+        $PSBoundParameters.User = $user
+        $currentValues.User = $user
 
         $PSBoundParameters.ExecuteAsCredential = 'SYSTEM'
         $currentValues.ExecuteAsCredential = 'SYSTEM'
@@ -1927,7 +1929,9 @@ function Get-CurrentResource
 
         if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
         {
-            $result.User = Set-DomainNameInAccountName -AccountName $task.Principal.UserId -DomainName 'NT AUTHORITY'
+            $result.User = Set-DomainNameInAccountName `
+                -AccountName $task.Principal.UserId `
+                -DomainName 'NT AUTHORITY'
             $builtInAccount = $task.Principal.UserId
             $result.Add('BuiltInAccount', $builtInAccount)
         }
