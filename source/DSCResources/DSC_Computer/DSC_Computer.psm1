@@ -699,9 +699,16 @@ function Get-ADSIComputer
 
     try
     {
-        $searchRoot = New-Object -TypeName System.DirectoryServices.DirectoryEntry `
-            -ArgumentList $DomainName, $($Credential.UserName), $($Credential.GetNetworkCredential().password) `
-            -ErrorAction Stop
+        $params = @{
+            TypeName     = 'System.DirectoryServices.DirectoryEntry'
+            ArgumentList = @(
+                $DomainName,
+                $($Credential.UserName),
+                $($Credential.GetNetworkCredential().password)
+                )
+            ErrorAction  = 'Stop'
+        }
+        $searchRoot = New-Object @params
     }
     catch
     {
@@ -739,9 +746,16 @@ function Delete-ADSIObject
 
     try
     {
-        $adsiObj = New-Object -TypeName System.DirectoryServices.DirectoryEntry `
-            -ArgumentList $Path, $($Credential.UserName), $($Credential.GetNetworkCredential().password) `
-            -ErrorAction Stop
+        $params = @{
+            TypeName     = 'System.DirectoryServices.DirectoryEntry'
+            ArgumentList = @(
+                $DomainName,
+                $($Credential.UserName),
+                $($Credential.GetNetworkCredential().password)
+                )
+            ErrorAction  = 'Stop'
+        }
+        $adsiObj = New-Object @params
 
         $adsiObj.DeleteTree()
     }
