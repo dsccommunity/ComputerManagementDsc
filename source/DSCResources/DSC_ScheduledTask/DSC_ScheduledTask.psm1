@@ -1423,7 +1423,6 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
     {
-
         $user = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
         $PSBoundParameters.User = $user
         $currentValues.User = $user
@@ -1929,6 +1928,14 @@ function Get-CurrentResource
 
         if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
         {
+            $result.User = Set-DomainNameInAccountName `
+                -AccountName $task.Principal.UserId `
+                -DomainName 'NT AUTHORITY'
+            $builtInAccount = $task.Principal.UserId
+            $result.Add('BuiltInAccount', $builtInAccount)
+        }
+
+        if ($result.Principal.UserID -in @('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')){
             $result.User = Set-DomainNameInAccountName `
                 -AccountName $task.Principal.UserId `
                 -DomainName 'NT AUTHORITY'
