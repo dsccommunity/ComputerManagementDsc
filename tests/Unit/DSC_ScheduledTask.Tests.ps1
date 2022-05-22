@@ -1781,12 +1781,12 @@ try
                     Verbose             = $true
                 }
 
-                It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
-                    Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
-                        $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
-                    }
-                }
+                # It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
+                #     Set-TargetResource @testParameters
+                #     Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                #         $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
+                #     }
+                # }
 
                 $testParameters.Add('LogonType', 'Password')
 
