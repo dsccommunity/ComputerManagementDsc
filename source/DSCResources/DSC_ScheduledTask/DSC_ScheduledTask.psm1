@@ -1926,16 +1926,11 @@ function Get-CurrentResource
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
         }
 
-        if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
+        if (
+            (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount')) -or
+            $result.Principal.UserID -in @('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')
+            )
         {
-            $result.User = Set-DomainNameInAccountName `
-                -AccountName $task.Principal.UserId `
-                -DomainName 'NT AUTHORITY'
-            $builtInAccount = $task.Principal.UserId
-            $result.Add('BuiltInAccount', $builtInAccount)
-        }
-
-        if ($result.Principal.UserID -in @('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')){
             $result.User = Set-DomainNameInAccountName `
                 -AccountName $task.Principal.UserId `
                 -DomainName 'NT AUTHORITY'
