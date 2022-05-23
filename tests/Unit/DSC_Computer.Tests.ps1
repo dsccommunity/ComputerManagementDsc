@@ -725,6 +725,34 @@ try
                     Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
+                It 'Changes ComputerName and changes Domain to new Domain with Options passed' {
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso.com';
+                            Workgroup    = 'Contoso.com';
+                            PartOfDomain = $true
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        'contoso.com'
+                    }
+
+                    Mock -CommandName Add-Computer
+
+                    Set-TargetResource `
+                        -Name $notComputerName `
+                        -DomainName 'adventure-works.com' `
+                        -Credential $credential `
+                        -UnjoinCredential $credential `
+                        -Options @('InstallInvoke') `
+                        -Verbose | Should -BeNullOrEmpty
+
+                    Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                }
+
                 It 'Should try a separate rename if ''FailToRenameAfterJoinDomain'' occured during domain join' {
                     $message = "Computer '' was successfully joined to the new domain '', but renaming it to '' failed with the following error message: The directory service is busy."
                     $exception = [System.InvalidOperationException]::new($message)
@@ -1381,6 +1409,32 @@ try
                             -Verbose
                     } | Should -Throw
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
+            Context 'DSC_Computer\Assert-ResourceProperty' {
+                It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername) `
+                        -ArgumentName 'Credential'
+
+                    {
+                        Assert-ResourceProperty `
+                            -Name $env:COMPUTERNAME `
+                            -Options @('PasswordPass', 'UnsecuredJoin') `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin) `
+                        -ArgumentName 'PasswordPass'
+
+                    {
+                        Assert-ResourceProperty `
+                            -Name $env:COMPUTERNAME `
+                            -Options @('PasswordPass') `
+                            -Verbose
+                    } | Should -Throw $errorRecord
                 }
             }
         }

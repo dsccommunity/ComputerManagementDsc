@@ -45,6 +45,9 @@ $FailToRenameAfterJoinDomainErrorId = 'FailToRenameAfterJoinDomain,Microsoft.Pow
 
     .PARAMETER Server
         The Active Directory Domain Controller to use to join the domain.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
 #>
 function Get-TargetResource
 {
@@ -84,7 +87,12 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        $Server
+        $Server,
+
+        [Parameter()]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
+        [System.String[]]
+        $Options
     )
 
     Write-Verbose -Message ($script:localizedData.GettingComputerStateMessage -f $Name)
@@ -150,6 +158,9 @@ function Get-TargetResource
 
     .PARAMETER Server
         The Active Directory Domain Controller to use to join the domain.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
 #>
 function Set-TargetResource
 {
@@ -188,7 +199,12 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $Server
+        $Server,
+
+        [Parameter()]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
+        [System.String[]]
+        $Options
     )
 
     Write-Verbose -Message ($script:localizedData.SettingComputerStateMessage -f $Name)
@@ -254,6 +270,15 @@ function Set-TargetResource
                 {
                     Delete-ADSIObject -Path $computerObject.Path -Credential $Credential
                     Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($Options))
+                {
+                    <#
+                        See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/add-computer?view=powershell-5.1#parameters for available options and their description
+                    #>
+                    Assert-ResourceProperty @PSBoundParameters
+                    $addComputerParameters.Add('Options', $Options)
                 }
 
                 # Rename the computer, and join it to the domain.
@@ -431,6 +456,9 @@ function Set-TargetResource
 
     .PARAMETER Description
         The value assigned here will be set as the local computer description.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
 #>
 function Test-TargetResource
 {
@@ -470,7 +498,12 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $Server
+        $Server,
+
+        [Parameter()]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
+        [System.String[]]
+        $Options
     )
 
     Write-Verbose -Message ($script:localizedData.TestingComputerStateMessage -f $Name)
@@ -766,3 +799,98 @@ function Delete-ADSIObject
 }
 
 Export-ModuleMember -Function *-TargetResource
+
+<#
+    .SYNOPSIS
+    This function validates the parameters passed. Called by Set-Resource.
+        Will throw an error if any parameters are invalid.
+
+    .PARAMETER Name
+        The desired computer name.
+
+    .PARAMETER DomainName
+        The name of the domain to join.
+
+    .PARAMETER JoinOU
+        The distinguished name of the organizational unit that the computer
+        account will be created in.
+
+    .PARAMETER Credential
+        Credential to be used to join a domain.
+
+    .PARAMETER UnjoinCredential
+        Credential to be used to leave a domain.
+
+    .PARAMETER WorkGroupName
+        The name of the workgroup.
+
+    .PARAMETER Description
+        The value assigned here will be set as the local computer description.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
+#>
+function Assert-ResourceProperty
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateLength(1, 15)]
+        [ValidateScript( { $_ -inotmatch '[\/\\:*?"<>|]' })]
+        [System.String]
+        $Name,
+
+        [Parameter()]
+        [System.String]
+        $DomainName,
+
+        [Parameter()]
+        [System.String]
+        $JoinOU,
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $Credential,
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $UnjoinCredential,
+
+        [Parameter()]
+        [System.String]
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description,
+
+        [Parameter()]
+        [System.String]
+        $Server,
+
+        [Parameter()]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
+        [System.String[]]
+        $Options
+    )
+
+    if ($options -contains 'PasswordPass' -and
+        $options -notcontains 'UnsecuredJoin')
+    {
+        New-InvalidArgumentException `
+            -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin `
+            -ArgumentName 'PasswordPass'
+    }
+
+    if ($Options -contains 'PasswordPass' -and
+        $options -contains 'UnsecuredJoin' -and
+        -not [System.String]::IsNullOrEmpty($Credential.UserName))
+    {
+
+        New-InvalidArgumentException `
+            -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername `
+            -ArgumentName 'Credential'
+    }
+
+}
