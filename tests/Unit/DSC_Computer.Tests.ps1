@@ -1409,6 +1409,9 @@ try
                             -Verbose
                     } | Should -Throw
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
+                }
+            }
+
             Context 'DSC_Computer\Assert-ResourceProperty' {
                 It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
                     $errorRecord = Get-InvalidArgumentRecord `
