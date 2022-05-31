@@ -1291,7 +1291,7 @@ try
                         $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
                     }
 
-                $message = "Cannot validate argument on parameter 'Name'. The character length of the 17 argument is too long. Shorten the character length of the argument so it is fewer than or equal to "15" characters, and then try the command again."
+                $message = "Cannot validate argument on parameter 'Name'. The character length of the 17 argument is too long. Shorten the character length of the argument so it is fewer than or equal to `"15`" characters, and then try the command again."
                 It 'Should throw the expected exception if the name is to long' {
                     {
                        $error = Get-ADSIComputer `
