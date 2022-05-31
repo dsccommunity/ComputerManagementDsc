@@ -19,4 +19,5 @@ ConvertFrom-StringData @'
     DeletedExistingComputerObject = Deleted existing computer object with name '{0}' at path '{1}'.
     InvalidOptionPasswordPassUnsecuredJoin = Domain Join option 'PasswordPass' may not be specified if 'UnsecuredJoin' is specified.
     InvalidOptionCredentialUnsecuredJoinNullUsername = 'Credential' username must be null if 'UnsecuredJoin' is specified.
+    InvalidUserNameorPassword = Password specified for UserName {0} is invalid.
 '@
