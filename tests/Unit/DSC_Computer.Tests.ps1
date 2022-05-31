@@ -1284,13 +1284,14 @@ try
                 }
 
                 Mock -CommandName New-Object -MockWith {
-                        New-Object -TypeName 'fake_adsi_directoryentry'
+                        New-Object -TypeName 'fake_adsi_searcher'
                     } `
                     -ParameterFilter {
                         $TypeName -and
-                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
                     }
 
+                $message = "Cannot validate argument on parameter 'Name'. The character length of the 17 argument is too long. Shorten the character length of the argument so it is fewer than or equal to "15" characters, and then try the command again."
                 It 'Should throw the expected exception if the name is to long' {
                     {
                        $error = Get-ADSIComputer `
@@ -1299,7 +1300,7 @@ try
                             -Credential $credential `
                             -Verbose
                         $error
-                    } | Should -Throw "Test-ParamValidator: Cannot validate argument on parameter 'Name'. The character length of the 17 argument is too long. Shorten the character length of the argument so it is fewer than or equal to `"15`" characters, and then try the command again."
+                    } | Should -Throw $message
                 }
 
                 It 'Should throws if the expected exception if the name contains illegal characters' {
@@ -1309,7 +1310,7 @@ try
                             -Domain 'Contoso.com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -Throw "Test-ParamValidator: Cannot validate argument on parameter 'Name'. The `" $_ -inotmatch '[\/\\:*?`"<>|]' `" validation script for the argument with value `"IllegalName[<`" did not return a result of True. Determine why the validation script failed, and then try the command again."
+                    } | Should -Throw "Cannot validate argument on parameter 'Name'. The `" $_ -inotmatch '[\/\\:*?`"<>|]' `" validation script for the argument with value `"IllegalName[<`" did not return a result of True. Determine why the validation script failed, and then try the command again."
                 }
 
                 It 'Returns ADSI object with ADSI path ' {
@@ -1333,11 +1334,11 @@ try
                 It 'Returns ADSI object with domain name' {
 
                     Mock -CommandName New-Object -MockWith {
-                            New-Object -TypeName 'fake_adsi_directoryentry'
+                            New-Object -TypeName 'fake_adsi_searcher'
                         } `
                         -ParameterFilter {
                             $TypeName -and
-                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                            $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
                         }
 
                     $obj = Get-ADSIComputer `
@@ -1398,7 +1399,7 @@ try
                             -Path 'contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
                             -Credential $credential`
                             -Verbose
-                    } | Should -Throw "Test-ParamValidator: Cannot validate argument on parameter 'Path'. The `" $_ -imatch `"LDAP://*`" `" validation script for the argument with value `"contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com`" did not return a result of True. Determine why the validation script failed, and then try the command again."
+                    } | Should -Throw "Cannot validate argument on parameter 'Path'. The `" $_ -imatch `"LDAP://*`" `" validation script for the argument with value `"contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com`" did not return a result of True. Determine why the validation script failed, and then try the command again."
                 }
 
                 It 'Should throw if Credential is incorrect' {
