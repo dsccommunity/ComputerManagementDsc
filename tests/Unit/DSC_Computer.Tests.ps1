@@ -1303,6 +1303,7 @@ try
                     } | Should -Throw $message
                 }
 
+                $message = "Cannot validate argument on parameter 'Name'. The `" $_ -inotmatch '[\/\\:*?`"<>|]' `" validation script for the argument with value `"IllegalName[<`" did not return a result of True. Determine why the validation script failed, and then try the command again."
                 It 'Should throws if the expected exception if the name contains illegal characters' {
                     {
                         Get-ADSIComputer `
@@ -1310,7 +1311,7 @@ try
                             -Domain 'Contoso.com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -Throw "Cannot validate argument on parameter 'Name'. The `" $_ -inotmatch '[\/\\:*?`"<>|]' `" validation script for the argument with value `"IllegalName[<`" did not return a result of True. Determine why the validation script failed, and then try the command again."
+                    } | Should -Throw $message
                 }
 
                 It 'Returns ADSI object with ADSI path ' {
@@ -1393,13 +1394,14 @@ try
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
                 }
 
+                $message = "Cannot validate argument on parameter 'Path'. The `" $_ -imatch `"LDAP://*`" `" validation script for the argument with value `"contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com`" did not return a result of True. Determine why the validation script failed, and then try the command again."
                 It 'Should throw if path does not begin with LDAP://' {
                     {
                         Delete-ADSIObject `
                             -Path 'contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
                             -Credential $credential`
                             -Verbose
-                    } | Should -Throw "Cannot validate argument on parameter 'Path'. The `" $_ -imatch `"LDAP://*`" `" validation script for the argument with value `"contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com`" did not return a result of True. Determine why the validation script failed, and then try the command again."
+                    } | Should -Throw $message
                 }
 
                 It 'Should throw if Credential is incorrect' {
