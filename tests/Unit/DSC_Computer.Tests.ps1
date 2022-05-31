@@ -1283,39 +1283,43 @@ try
                      }
                 }
 
-                Mock 'New-Object' { New-Object 'fake_adsi_searcher' } `
+                Mock -CommandName New-Object -MockWith {
+                        New-Object -TypeName 'fake_adsi_directoryentry'
+                    } `
                     -ParameterFilter {
                         $TypeName -and
-                        $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
+                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
                     }
 
-                It 'Throws if name is to long' {
+                It 'Should throw the expected exception if the name is to long' {
                     {
-                        Get-ADSIComputer `
+                       $error = Get-ADSIComputer `
                             -Name 'ThisNameIsTooLong' `
                             -Domain 'Contoso.com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -Throw
+                        $error
+                    } | Should -Throw "Test-ParamValidator: Cannot validate argument on parameter 'Name'. The character length of the 17 argument is too long. Shorten the character length of the argument so it is fewer than or equal to `"15`" characters, and then try the command again."
                 }
 
-                It 'Throws if name contains illegal characters' {
+                It 'Should throws if the expected exception if the name contains illegal characters' {
                     {
                         Get-ADSIComputer `
                             -Name 'IllegalName[<' `
                             -Domain 'Contoso.com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -Throw
+                    } | Should -Throw "Test-ParamValidator: Cannot validate argument on parameter 'Name'. The `" $_ -inotmatch '[\/\\:*?`"<>|]' `" validation script for the argument with value `"IllegalName[<`" did not return a result of True. Determine why the validation script failed, and then try the command again."
                 }
 
                 It 'Returns ADSI object with ADSI path ' {
-
-                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
-                    -ParameterFilter {
-                        $TypeName -and
-                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-                    }
+                    Mock -CommandName New-Object -MockWith {
+                            New-Object -TypeName 'fake_adsi_directoryentry'
+                        } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
 
                     $obj = Get-ADSIComputer `
                         -Name 'LegalName' `
@@ -1328,11 +1332,13 @@ try
 
                 It 'Returns ADSI object with domain name' {
 
-                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
-                    -ParameterFilter {
-                        $TypeName -and
-                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-                    }
+                    Mock -CommandName New-Object -MockWith {
+                            New-Object -TypeName 'fake_adsi_directoryentry'
+                        } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
 
                     $obj = Get-ADSIComputer `
                             -Name 'LegalName' `
@@ -1343,8 +1349,8 @@ try
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
                 }
 
-                It 'Should throw if Credential is incorrect' {
-                    Mock 'New-Object' { Write-Error -message "error" } `
+                It 'Should throw the expected exception if Credential is incorrect' {
+                    Mock 'New-Object' { Write-Error -message "Invalid Credentials" } `
                         -ParameterFilter {
                             $TypeName -and
                             $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
@@ -1356,7 +1362,7 @@ try
                             -Domain 'Contoso.com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -Throw
+                    } | Should -Throw "Invalid Credentials"
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
                 }
             }
@@ -1370,7 +1376,7 @@ try
                     [void] DeleteTree(){ }
                 }
 
-                It 'Deletes ADSI Object' {
+                It 'Should delete the ADSI Object' {
                     Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
                     -ParameterFilter {
                         $TypeName -and
@@ -1389,14 +1395,14 @@ try
                 It 'Should throw if path does not begin with LDAP://' {
                     {
                         Delete-ADSIObject `
-                                -Path 'contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
-                                -Credential $credential`
-                                -Verbose
-                    } | Should -Throw
+                            -Path 'contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
+                            -Credential $credential`
+                            -Verbose
+                    } | Should -Throw "Test-ParamValidator: Cannot validate argument on parameter 'Path'. The `" $_ -imatch `"LDAP://*`" `" validation script for the argument with value `"contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com`" did not return a result of True. Determine why the validation script failed, and then try the command again."
                 }
 
                 It 'Should throw if Credential is incorrect' {
-                    Mock 'New-Object' { Write-Error -message "error" } `
+                    Mock 'New-Object' { Write-Error -message "Invalid Credential" } `
                         -ParameterFilter {
                             $TypeName -and
                             $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
@@ -1407,7 +1413,7 @@ try
                             -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -Throw
+                    } | Should -Throw "Invalid Credential"
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
                 }
             }

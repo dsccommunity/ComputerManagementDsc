@@ -757,10 +757,10 @@ function Get-ADSIComputer
         Deletes an ADSI DirectoryEntry Object.
 
     .PARAMETER Path
-        Path to Object to delete
+        Path to Object to delete.
 
     .PARAMETER Credential
-        Credential to authenticate to the domain
+        Credential to authenticate to the domain.
 #>
 function Delete-ADSIObject
 {
@@ -783,9 +783,9 @@ function Delete-ADSIObject
             TypeName     = 'System.DirectoryServices.DirectoryEntry'
             ArgumentList = @(
                 $DomainName,
-                $($Credential.UserName),
-                $($Credential.GetNetworkCredential().password)
-                )
+                $Credential.UserName
+                $Credential.GetNetworkCredential().password
+            )
             ErrorAction  = 'Stop'
         }
         $adsiObj = New-Object @params
