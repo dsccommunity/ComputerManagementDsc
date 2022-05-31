@@ -1352,7 +1352,9 @@ try
                 }
 
                 It 'Should throw the expected exception if Credential is incorrect' {
-                    Mock 'New-Object' { Write-Error -message "Invalid Credentials" } `
+                    Mock -CommandName New-Object -MockWith {
+                         Write-Error -message "Invalid Credentials"
+                        } `
                         -ParameterFilter {
                             $TypeName -and
                             $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
@@ -1364,13 +1366,12 @@ try
                             -Domain 'Contoso.com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -Throw "Invalid Credentials"
+                    } | Should -Throw 'Invalid Credentials'
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
                 }
             }
 
             Context 'DSC_Computer\Delete-ADSIObject' {
-
                 class fake_adsi_directoryentry {
                     [string] $Domain
                     [string] $Username
@@ -1379,11 +1380,13 @@ try
                 }
 
                 It 'Should delete the ADSI Object' {
-                    Mock 'New-Object' { New-Object 'fake_adsi_directoryentry' } `
-                    -ParameterFilter {
-                        $TypeName -and
-                        $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-                    }
+                    Mock -CommandName New-Object -MockWith {
+                        New-Object 'fake_adsi_directoryentry'
+                        } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
 
                     {
                         Delete-ADSIObject `
@@ -1404,8 +1407,10 @@ try
                     } | Should -Throw $message
                 }
 
-                It 'Should throw if Credential is incorrect' {
-                    Mock 'New-Object' { Write-Error -message "Invalid Credential" } `
+                It 'Should throw the expected exception if Credential is incorrect' {
+                    Mock -CommandName New-Object -MockWith {
+                        Write-Error -message 'Invalid Credential'
+                        } `
                         -ParameterFilter {
                             $TypeName -and
                             $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
@@ -1416,7 +1421,7 @@ try
                             -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
                             -Credential $credential `
                             -Verbose
-                    } | Should -Throw "Invalid Credential"
+                    } | Should -Throw 'Invalid Credential'
                     Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
                 }
             }

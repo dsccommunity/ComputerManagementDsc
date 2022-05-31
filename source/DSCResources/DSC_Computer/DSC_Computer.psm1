@@ -742,14 +742,7 @@ function Get-ADSIComputer
     $searchRoot = New-Object @params
     $searcher.SearchRoot = $searchRoot
 
-    try
-    {
-        return $searcher.FindOne()
-    }
-    catch
-    {
-        New-InvalidOperationException -Message ($script:localizedData.InvalidUserNameorPassword -f $Credential.Username)
-    }
+    return $searcher.FindOne()
 }
 
 <#
@@ -777,28 +770,19 @@ function Delete-ADSIObject
         $Credential
     )
 
-    try
-    {
-        $params = @{
-            TypeName     = 'System.DirectoryServices.DirectoryEntry'
-            ArgumentList = @(
-                $DomainName,
-                $Credential.UserName
-                $Credential.GetNetworkCredential().password
-            )
-            ErrorAction  = 'Stop'
-        }
-        $adsiObj = New-Object @params
+    $params = @{
+        TypeName     = 'System.DirectoryServices.DirectoryEntry'
+        ArgumentList = @(
+            $DomainName,
+            $Credential.UserName
+            $Credential.GetNetworkCredential().password
+        )
+        ErrorAction  = 'Stop'
+    }
+    $adsiObj = New-Object @params
 
-        $adsiObj.DeleteTree()
-    }
-    catch
-    {
-        New-InvalidOperationException -Message $_.Exception.Message -ErrorRecord $_
-    }
+    $adsiObj.DeleteTree()
 }
-
-Export-ModuleMember -Function *-TargetResource
 
 <#
     .SYNOPSIS
@@ -892,5 +876,6 @@ function Assert-ResourceProperty
             -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername `
             -ArgumentName 'Credential'
     }
-
 }
+
+Export-ModuleMember -Function *-TargetResource
