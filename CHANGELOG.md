@@ -4,12 +4,12 @@ The format is based on and uses the types of changes according to [Keep a Change
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Computer
-  - When joining a computer to a domain, existing AD computer objects will be deleted.
 
 ### Added
+
 - Computer
   - Support Options Parameter for domain join - Fixes [Issue #234](https://github.com/dsccommunity/ComputerManagementDsc/issues/234).
+  - When joining a computer to a domain, existing AD computer objects will be deleted. [Issue #55](https://github.com/dsccommunity/ComputerManagementDsc/issues/55), [Issue #58](https://github.com/dsccommunity/ComputerManagementDsc/issues/58)
 
 ## [8.5.0] - 2021-09-13
 

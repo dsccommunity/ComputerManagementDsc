@@ -1353,7 +1353,7 @@ try
 
                 It 'Should throw the expected exception if Credential is incorrect' {
                     Mock -CommandName New-Object -MockWith {
-                         Write-Error -message "Invalid Credentials"
+                         Write-Error -message 'Invalid Credentials'
                         } `
                         -ParameterFilter {
                             $TypeName -and
