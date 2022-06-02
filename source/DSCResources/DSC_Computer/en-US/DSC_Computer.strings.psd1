@@ -16,6 +16,7 @@ ConvertFrom-StringData @'
     CheckingWorkgroupMemberMessage = Checking if the machine is a member of workgroup '{0}'.
     DomainNameAndWorkgroupNameError = Only DomainName or WorkGroupName can be specified at once.
     ComputerNotInDomainMessage = This machine is not a domain member.
+    DeletedExistingComputerObject = Deleted existing computer object with name '{0}' at path '{1}'.
     InvalidOptionPasswordPassUnsecuredJoin = Domain Join option 'PasswordPass' may not be specified if 'UnsecuredJoin' is specified.
     InvalidOptionCredentialUnsecuredJoinNullUsername = 'Credential' username must be null if 'UnsecuredJoin' is specified.
 '@

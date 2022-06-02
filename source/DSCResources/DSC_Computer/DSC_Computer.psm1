@@ -263,6 +263,15 @@ function Set-TargetResource
                     $addComputerParameters.Add("Server", $Server)
                 }
 
+                # Check for existing computer objecst using ADSI without ActiveDirectory module
+                $computerObject = Get-ADSIComputer -Name $Name -DomainName $DomainName -Credential $Credential
+
+                if ($computerObject)
+                {
+                    Delete-ADSIObject -Path $computerObject.Path -Credential $Credential
+                    Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
+                }
+
                 if (-not [System.String]::IsNullOrEmpty($Options))
                 {
                     <#
@@ -680,7 +689,100 @@ function Get-LogonServer
     return $logonserver
 }
 
-Export-ModuleMember -Function *-TargetResource
+<#
+    .SYNOPSIS
+        Returns an ADSI Computer Object.
+
+    .PARAMETER Name
+        Name of the computer to search for in the given domain.
+
+    .PARAMETER Domain
+        Domain to search.
+
+    .PARAMETER Credential
+        Credential to search domain with.
+#>
+function Get-ADSIComputer
+{
+    [CmdletBinding()]
+    [OutputType([System.DirectoryServices.SearchResult])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateLength(1, 15)]
+        [ValidateScript( { $_ -inotmatch '[\/\\:*?"<>|]' })]
+        [System.String]
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DomainName,
+
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.PSCredential]
+        $Credential
+    )
+
+    $searcher = New-Object -TypeName System.DirectoryServices.DirectorySearcher
+    $searcher.Filter = "(&(objectCategory=computer)(objectClass=computer)(cn=$Name))"
+    if ($DomainName -notlike "LDAP://*")
+    {
+        $DomainName = "LDAP://$DomainName"
+    }
+
+    $params = @{
+        TypeName     = 'System.DirectoryServices.DirectoryEntry'
+        ArgumentList = @(
+            $DomainName,
+            $Credential.UserName,
+            $Credential.GetNetworkCredential().password
+        )
+        ErrorAction  = 'Stop'
+    }
+    $searchRoot = New-Object @params
+    $searcher.SearchRoot = $searchRoot
+
+    return $searcher.FindOne()
+}
+
+<#
+    .SYNOPSIS
+        Deletes an ADSI DirectoryEntry Object.
+
+    .PARAMETER Path
+        Path to Object to delete.
+
+    .PARAMETER Credential
+        Credential to authenticate to the domain.
+#>
+function Delete-ADSIObject
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateScript( { $_ -imatch "LDAP://*" })]
+        [System.String]
+        $Path,
+
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.PSCredential]
+        $Credential
+    )
+
+    $params = @{
+        TypeName     = 'System.DirectoryServices.DirectoryEntry'
+        ArgumentList = @(
+            $DomainName,
+            $Credential.UserName
+            $Credential.GetNetworkCredential().password
+        )
+        ErrorAction  = 'Stop'
+    }
+    $adsiObj = New-Object @params
+
+    $adsiObj.DeleteTree()
+}
 
 <#
     .SYNOPSIS
@@ -774,5 +876,6 @@ function Assert-ResourceProperty
             -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername `
             -ArgumentName 'Credential'
     }
-
 }
+
+Export-ModuleMember -Function *-TargetResource
