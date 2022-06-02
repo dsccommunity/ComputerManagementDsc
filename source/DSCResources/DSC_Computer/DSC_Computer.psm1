@@ -694,13 +694,13 @@ function Get-LogonServer
         Returns an ADSI Computer Object.
 
     .PARAMETER Name
-        Name of the computer to search for in the given domain
+        Name of the computer to search for in the given domain.
 
     .PARAMETER Domain
-        Domain to search
+        Domain to search.
 
     .PARAMETER Credential
-        Credential to search domain with
+        Credential to search domain with.
 #>
 function Get-ADSIComputer
 {
@@ -725,28 +725,21 @@ function Get-ADSIComputer
 
     $searcher = New-Object -TypeName System.DirectoryServices.DirectorySearcher
     $searcher.Filter = "(&(objectCategory=computer)(objectClass=computer)(cn=$Name))"
-    if ( $DomainName -notlike "LDAP://*")
+    if ($DomainName -notlike "LDAP://*")
     {
         $DomainName = "LDAP://$DomainName"
     }
 
-    try
-    {
-        $params = @{
-            TypeName     = 'System.DirectoryServices.DirectoryEntry'
-            ArgumentList = @(
-                $DomainName,
-                $($Credential.UserName),
-                $($Credential.GetNetworkCredential().password)
-                )
-            ErrorAction  = 'Stop'
-        }
-        $searchRoot = New-Object @params
+    $params = @{
+        TypeName     = 'System.DirectoryServices.DirectoryEntry'
+        ArgumentList = @(
+            $DomainName,
+            $Credential.UserName,
+            $Credential.GetNetworkCredential().password
+        )
+        ErrorAction  = 'Stop'
     }
-    catch
-    {
-        New-InvalidOperationException -Message $_.Exception.Message -ErrorRecord $_
-    }
+    $searchRoot = New-Object @params
     $searcher.SearchRoot = $searchRoot
 
     return $searcher.FindOne()
@@ -757,10 +750,10 @@ function Get-ADSIComputer
         Deletes an ADSI DirectoryEntry Object.
 
     .PARAMETER Path
-        Path to Object to delete
+        Path to Object to delete.
 
     .PARAMETER Credential
-        Credential to authenticate to the domain
+        Credential to authenticate to the domain.
 #>
 function Delete-ADSIObject
 {
@@ -777,28 +770,19 @@ function Delete-ADSIObject
         $Credential
     )
 
-    try
-    {
-        $params = @{
-            TypeName     = 'System.DirectoryServices.DirectoryEntry'
-            ArgumentList = @(
-                $DomainName,
-                $($Credential.UserName),
-                $($Credential.GetNetworkCredential().password)
-                )
-            ErrorAction  = 'Stop'
-        }
-        $adsiObj = New-Object @params
+    $params = @{
+        TypeName     = 'System.DirectoryServices.DirectoryEntry'
+        ArgumentList = @(
+            $DomainName,
+            $Credential.UserName
+            $Credential.GetNetworkCredential().password
+        )
+        ErrorAction  = 'Stop'
+    }
+    $adsiObj = New-Object @params
 
-        $adsiObj.DeleteTree()
-    }
-    catch
-    {
-        New-InvalidOperationException -Message $_.Exception.Message -ErrorRecord $_
-    }
+    $adsiObj.DeleteTree()
 }
-
-Export-ModuleMember -Function *-TargetResource
 
 <#
     .SYNOPSIS
@@ -892,5 +876,6 @@ function Assert-ResourceProperty
             -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername `
             -ArgumentName 'Credential'
     }
-
 }
+
+Export-ModuleMember -Function *-TargetResource
