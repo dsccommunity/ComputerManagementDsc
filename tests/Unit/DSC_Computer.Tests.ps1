@@ -485,6 +485,8 @@ try
             Context 'DSC_Computer\Set-TargetResource' {
                 Mock -CommandName Rename-Computer
                 Mock -CommandName Set-CimInstance
+                Mock -CommandName Get-ADSIComputer
+                Mock -CommandName Delete-ADSIObject
 
                 It 'Throws if both DomainName and WorkGroupName are specified' {
                     $errorRecord = Get-InvalidOperationRecord `
@@ -531,6 +533,12 @@ try
                         }
                     }
 
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
+                        }
+                    }
+
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         'contoso.com'
                     }
@@ -547,6 +555,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Domain to new Domain with specified OU' {
@@ -562,6 +572,12 @@ try
                         'contoso.com'
                     }
 
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
+                        }
+                    }
+
                     Mock -CommandName Add-Computer
 
                     Set-TargetResource `
@@ -575,6 +591,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Domain to Workgroup' {
@@ -612,6 +630,12 @@ try
                         }
                     }
 
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
+                        }
+                    }
+
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         ''
                     }
@@ -627,6 +651,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Workgroup to Domain with specified Domain Controller' {
@@ -635,6 +661,12 @@ try
                             Domain       = 'Contoso';
                             Workgroup    = 'Contoso';
                             PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
                         }
                     }
 
@@ -654,6 +686,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName -and $Server }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Workgroup to Domain with specified OU' {
@@ -662,6 +696,12 @@ try
                             Domain       = 'Contoso';
                             Workgroup    = 'Contoso';
                             PartOfDomain = $false
+                        }
+                    }
+
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        [PSCustomObject] @{
+                            Path       = 'LDAP://Contoso.com/CN=mocked-comp,OU=Computers,DC=Contoso,DC=com';
                         }
                     }
 
@@ -676,6 +716,36 @@ try
                         -DomainName 'Contoso.com' `
                         -JoinOU 'OU=Computers,DC=contoso,DC=com' `
                         -Credential $credential `
+                        -Verbose | Should -BeNullOrEmpty
+
+                    Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
+                    Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
+                }
+
+                It 'Changes ComputerName and changes Domain to new Domain with Options passed' {
+                    Mock -CommandName Get-WMIObject -MockWith {
+                        [PSCustomObject] @{
+                            Domain       = 'Contoso.com';
+                            Workgroup    = 'Contoso.com';
+                            PartOfDomain = $true
+                        }
+                    }
+
+                    Mock -CommandName Get-ComputerDomain -MockWith {
+                        'contoso.com'
+                    }
+
+                    Mock -CommandName Add-Computer
+
+                    Set-TargetResource `
+                        -Name $notComputerName `
+                        -DomainName 'adventure-works.com' `
+                        -Credential $credential `
+                        -UnjoinCredential $credential `
+                        -Options @('InstallInvoke') `
                         -Verbose | Should -BeNullOrEmpty
 
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
@@ -698,6 +768,10 @@ try
                         }
                     }
 
+                    Mock -CommandName Get-ADSIComputer -MockWith {
+                        $null
+                    }
+
                     Mock -CommandName Get-ComputerDomain -MockWith {
                         ''
                     }
@@ -715,6 +789,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 1 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Should Throw the correct error if Add-Computer errors with an unknown InvalidOperationException' {
@@ -785,6 +861,8 @@ try
                     Assert-MockCalled -CommandName Rename-Computer -Exactly -Times 0 -Scope It
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes ComputerName and changes Workgroup to new Workgroup' {
@@ -838,6 +916,8 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only the Domain to new Domain when name is [localhost]' {
@@ -866,6 +946,8 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only the Domain to new Domain with specified OU' {
@@ -895,6 +977,8 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only the Domain to new Domain with specified OU when Name is [localhost]' {
@@ -924,6 +1008,8 @@ try
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
                     Assert-MockCalled -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
+                    Assert-MockCalled -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
+                    Assert-MockCalled -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
                 }
 
                 It 'Changes only Domain to Workgroup' {
@@ -1177,6 +1263,195 @@ try
             Context 'DSC_Computer\Get-LogonServer' {
                 It 'Should return a non-empty string' {
                     Get-LogonServer | Should -Not -BeNullOrEmpty
+                }
+            }
+
+            Context 'DSC_Computer\Get-ADSIComputer' {
+                class fake_adsi_directoryentry {
+                    [string] $Domain
+                    [string] $Username
+                    [string] $password
+                }
+
+                class fake_adsi_searcher {
+                    [string] $SearchRoot
+                    [string] $Filter
+                    [hashtable] FindOne( ){
+                        return @{
+                            path = 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
+                        }
+                     }
+                }
+
+                Mock -CommandName New-Object -MockWith {
+                        New-Object -TypeName 'fake_adsi_searcher'
+                    } `
+                    -ParameterFilter {
+                        $TypeName -and
+                        $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
+                    }
+
+                $message = "Cannot validate argument on parameter 'Name'. The character length of the 17 argument is too long. Shorten the character length of the argument so it is fewer than or equal to `"15`" characters, and then try the command again."
+                It 'Should throw the expected exception if the name is to long' {
+                    {
+                       $error = Get-ADSIComputer `
+                            -Name 'ThisNameIsTooLong' `
+                            -Domain 'Contoso.com' `
+                            -Credential $credential `
+                            -Verbose
+                        $error
+                    } | Should -Throw $message
+                }
+
+                $message = "Cannot validate argument on parameter 'Name'. The `" `$_ -inotmatch '[\/\\:*?`"<>|]' `" validation script for the argument with value `"IllegalName[<`" did not return a result of True. Determine why the validation script failed, and then try the command again."
+                It 'Should throws if the expected exception if the name contains illegal characters' {
+                    {
+                        Get-ADSIComputer `
+                            -Name 'IllegalName[<' `
+                            -Domain 'Contoso.com' `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Throw $message
+                }
+
+                It 'Returns ADSI object with ADSI path ' {
+                    Mock -CommandName New-Object -MockWith {
+                            New-Object -TypeName 'fake_adsi_directoryentry'
+                        } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
+
+                    $obj = Get-ADSIComputer `
+                        -Name 'LegalName' `
+                        -Domain 'LDAP://Contoso.com' `
+                        -Credential $credential `
+                        -Verbose
+                    $obj.path | Should -Be 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
+                }
+
+                It 'Returns ADSI object with domain name' {
+
+                    Mock -CommandName New-Object -MockWith {
+                            New-Object -TypeName 'fake_adsi_searcher'
+                        } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
+                        }
+
+                    $obj = Get-ADSIComputer `
+                            -Name 'LegalName' `
+                            -Domain 'Contoso.com' `
+                            -Credential $credential `
+                            -Verbose
+                    $obj.Path | Should -Be 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
+                }
+
+                It 'Should throw the expected exception if Credential is incorrect' {
+                    Mock -CommandName New-Object -MockWith {
+                         Write-Error -message 'Invalid Credentials'
+                        } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
+
+                    {
+                        Get-ADSIComputer `
+                            -Name 'LegalName' `
+                            -Domain 'Contoso.com' `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Throw 'Invalid Credentials'
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 2 -Scope It
+                }
+            }
+
+            Context 'DSC_Computer\Delete-ADSIObject' {
+                class fake_adsi_directoryentry {
+                    [string] $Domain
+                    [string] $Username
+                    [string] $password
+                    [void] DeleteTree(){ }
+                }
+
+                It 'Should delete the ADSI Object' {
+                    Mock -CommandName New-Object -MockWith {
+                        New-Object 'fake_adsi_directoryentry'
+                        } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
+
+                    {
+                        Delete-ADSIObject `
+                            -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Not -Throw
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
+                }
+
+                $message = "Cannot validate argument on parameter 'Path'. The `" `$_ -imatch `"LDAP://*`" `" validation script for the argument with value `"contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com`" did not return a result of True. Determine why the validation script failed, and then try the command again."
+                It 'Should throw if path does not begin with LDAP://' {
+                    {
+                        Delete-ADSIObject `
+                            -Path 'contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
+                            -Credential $credential`
+                            -Verbose
+                    } | Should -Throw $message
+                }
+
+                It 'Should throw the expected exception if Credential is incorrect' {
+                    Mock -CommandName New-Object -MockWith {
+                        Write-Error -message 'Invalid Credential'
+                        } `
+                        -ParameterFilter {
+                            $TypeName -and
+                            $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+                        }
+
+                    {
+                        Delete-ADSIObject `
+                            -Path 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Throw 'Invalid Credential'
+                    Assert-MockCalled -CommandName New-Object -Exactly -Times 1 -Scope It
+                }
+            }
+
+            Context 'DSC_Computer\Assert-ResourceProperty' {
+                It 'Should throw if PasswordPass and UnsecuredJoin is present but credential username is not null' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.InvalidOptionCredentialUnsecuredJoinNullUsername) `
+                        -ArgumentName 'Credential'
+
+                    {
+                        Assert-ResourceProperty `
+                            -Name $env:COMPUTERNAME `
+                            -Options @('PasswordPass', 'UnsecuredJoin') `
+                            -Credential $credential `
+                            -Verbose
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should throw if PasswordPass is present in options without UnsecuredJoin' {
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.InvalidOptionPasswordPassUnsecuredJoin) `
+                        -ArgumentName 'PasswordPass'
+
+                    {
+                        Assert-ResourceProperty `
+                            -Name $env:COMPUTERNAME `
+                            -Options @('PasswordPass') `
+                            -Verbose
+                    } | Should -Throw $errorRecord
                 }
             }
         }
