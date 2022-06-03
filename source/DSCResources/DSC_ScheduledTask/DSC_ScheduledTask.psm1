@@ -1473,7 +1473,7 @@ function Test-TargetResource
         $currentValues.ExecuteAsCredential = 'SYSTEM'
 
         $PSBoundParameters.Add('BuiltInAccount', $BuiltInAccount)
-        $currentValues.Add('BuiltInAccount', $BuiltInAccount)
+        $currentValues.BuiltInAccount = $BuiltInAccount
 
         # Must be running as System, login type is ServiceAccount
         $PSBoundParameters['LogonType'] = 'ServiceAccount'
