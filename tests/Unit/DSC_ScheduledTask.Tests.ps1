@@ -1822,7 +1822,7 @@ try
                             MultipleInstances = 'IgnoreNew'
                         }
                         Principal = [pscustomobject] @{
-                            UserId    = 'NT AUTHORITY\' + $testParameters.BuiltInAccount
+                            UserId    = $testParameters.BuiltInAccount
                             LogonType = 'ServiceAccount'
                         }
                     }
