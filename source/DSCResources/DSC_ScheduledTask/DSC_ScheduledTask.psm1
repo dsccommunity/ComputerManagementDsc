@@ -829,7 +829,7 @@ function Set-TargetResource
                 privileges, should we default to 'NT AUTHORITY\LOCAL SERVICE'
                 instead?
             #>
-            $username = Set-DomainNameInAccountName -AccountName SYSTEM -DomainName 'NT AUTHORITY'
+            $username = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
             $registerArguments.Add('User', $username)
             $LogonType = 'ServiceAccount'
         }
