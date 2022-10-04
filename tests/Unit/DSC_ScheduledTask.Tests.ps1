@@ -1783,6 +1783,8 @@ try
 
                 It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
                     Set-TargetResource @testParameters + @{User = 'DEMO\WrongUser'}
+                    $task = Get-TargetResource -TaskName $testParameters.TaskName -TaskPath $testParameters.TaskPath
+                    (($task.UserID -eq 'NETWORK SERVICE') -and ($task.BuiltInAccount -eq 'NT AUTHORITY\NETWORK SERVICE')) | Should -BeTrue
                     Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It
                 }
 
