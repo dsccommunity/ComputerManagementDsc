@@ -804,7 +804,6 @@ function Set-TargetResource
         elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
         {
             $username = $ExecuteAsCredential.UserName
-
             # If the LogonType is not specified then set it to password
             if ([System.String]::IsNullOrEmpty($LogonType))
             {
