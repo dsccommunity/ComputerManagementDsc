@@ -1781,10 +1781,17 @@ try
                     Verbose             = $true
                 }
 
-                It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
+                It 'Should Disregard User Parameter and Set User to the BuiltInAccount' {
                     Set-TargetResource @testParameters + @{User = 'DEMO\WrongUser'}
                     $task = Get-TargetResource -TaskName $testParameters.TaskName -TaskPath $testParameters.TaskPath
-                    (($task.UserID -eq 'NETWORK SERVICE') -and ($task.BuiltInAccount -eq 'NT AUTHORITY\NETWORK SERVICE')) | Should -BeTrue
+                    $task.User -eq 'NETWORK SERVICE' | Should -BeTrue
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It
+                }
+
+                It 'Should Disregard User Parameter and Set BuiltInAccount Correctly' {
+                    Set-TargetResource @testParameters + @{User = 'DEMO\WrongUser'}
+                    $task = Get-TargetResource -TaskName $testParameters.TaskName -TaskPath $testParameters.TaskPath
+                    $task.BuiltInAccount -eq 'NT AUTHORITY\NETWORK SERVICE' | Should -BeTrue
                     Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It
                 }
 
