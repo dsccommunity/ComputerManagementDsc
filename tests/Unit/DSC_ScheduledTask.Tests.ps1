@@ -1782,10 +1782,8 @@ try
                 }
 
                 It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
-                    Set-TargetResource @testParameters
-                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
-                        $User -ieq ($testParameters['BuiltInAccount'])
-                    }
+                    Set-TargetResource @testParameters + @{User = 'DEMO\WrongUser'}
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It
                 }
 
                 $testParameters.Add('LogonType', 'Password')
