@@ -1771,6 +1771,37 @@ try
             }
 
             Context 'When a scheduled task is created using a Built In Service Account' {
+                Mock -CommandName Get-ScheduledTask -MockWith {
+                    @{
+                        TaskName  = $testParameters.TaskName
+                        TaskPath  = $testParameters.TaskPath
+                        Actions   = @(
+                            [pscustomobject] @{
+                                Execute = $testParameters.ActionExecutable
+                            }
+                        )
+                        Triggers  = @(
+                            [pscustomobject] @{
+                                Repetition = @{
+                                    Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
+                                    Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
+                                }
+                                CimClass   = @{
+                                    CimClassName = 'MSFT_TaskTimeTrigger'
+                                }
+                            }
+                        )
+                        Settings = [pscustomobject] @{
+                            Enabled = $true
+                            MultipleInstances = 'IgnoreNew'
+                        }
+                        Principal = [pscustomobject] @{
+                            UserId    = $testParameters.BuiltInAccount
+                            LogonType = 'ServiceAccount'
+                        }
+                    }
+                }
+
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType        = 'Once'
@@ -1803,36 +1834,6 @@ try
                     }
                 }
 
-                Mock -CommandName Get-ScheduledTask -MockWith {
-                    @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
-                            [pscustomobject] @{
-                                Execute = $testParameters.ActionExecutable
-                            }
-                        )
-                        Triggers  = @(
-                            [pscustomobject] @{
-                                Repetition = @{
-                                    Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
-                                    Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
-                                }
-                                CimClass   = @{
-                                    CimClassName = 'MSFT_TaskTimeTrigger'
-                                }
-                            }
-                        )
-                        Settings = [pscustomobject] @{
-                            Enabled = $true
-                            MultipleInstances = 'IgnoreNew'
-                        }
-                        Principal = [pscustomobject] @{
-                            UserId    = $testParameters.BuiltInAccount
-                            LogonType = 'ServiceAccount'
-                        }
-                    }
-                }
 
                 $testParameters.LogonType = 'Password'
 
