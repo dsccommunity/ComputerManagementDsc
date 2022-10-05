@@ -1773,14 +1773,16 @@ try
             Context 'When a scheduled task is created using a Built In Service Account' {
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
+                        Description = '+'
+                        TaskName    = $testParameters.TaskName
+                        TaskPath    = $testParameters.TaskPath
+                        Actions     = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        ActionArguments = '-File "C:\something\right.ps1"'
+                        Triggers    = @(
                             [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
@@ -1791,11 +1793,11 @@ try
                                 }
                             }
                         )
-                        Settings = [pscustomobject] @{
+                        Settings    = [pscustomobject] @{
                             Enabled = $true
                             MultipleInstances = 'IgnoreNew'
                         }
-                        Principal = [pscustomobject] @{
+                        Principal   = [pscustomobject] @{
                             UserId    = $testParameters.BuiltInAccount
                             LogonType = 'ServiceAccount'
                         }
