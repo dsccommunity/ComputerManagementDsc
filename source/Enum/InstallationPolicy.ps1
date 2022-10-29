@@ -1,4 +1,5 @@
-enum InstallationPolicy {
+enum InstallationPolicy
+{
     Trusted
     Untrusted
 }
