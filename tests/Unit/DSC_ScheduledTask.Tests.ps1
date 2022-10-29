@@ -1771,6 +1771,33 @@ try
             }
 
             Context 'When a scheduled task is created using a Built In Service Account' {
+                #
+                $testParameters = $getTargetResourceParameters + @{
+                    ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    ScheduleType        = 'Once'
+                    RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
+                    RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
+                    BuiltInAccount      = 'NETWORK SERVICE'
+                    ExecuteAsCredential = [pscredential]::new('DEMO\WrongUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
+                    Verbose             = $true
+                }
+
+                It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
+                    }
+                }
+
+                $testParameters.Add('LogonType', 'Password')
+
+                It 'Should overwrite LogonType to "ServiceAccount"' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $Inputobject.Principal.LogonType -ieq 'ServiceAccount'
+                    }
+                }
+                #
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         Description = '+'
