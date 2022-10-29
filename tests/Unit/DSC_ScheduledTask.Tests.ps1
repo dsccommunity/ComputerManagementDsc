@@ -1771,6 +1771,7 @@ try
             }
 
             Context 'When a scheduled task is created using a Built In Service Account' {
+                #
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType        = 'Once'
@@ -1781,18 +1782,20 @@ try
                     Verbose             = $true
                 }
 
-                It 'Should Disregard User Parameter and Set User to the BuiltInAccount' {
-                    Set-TargetResource @testParameters + @{User = 'DEMO\WrongUser'}
-                    $task = Get-TargetResource -TaskName $testParameters.TaskName -TaskPath $testParameters.TaskPath
-                    $task.User -eq 'NETWORK SERVICE' | Should -BeTrue
-                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It
+                It 'Should Disregard ExecuteAsCredential and Set User to the BuiltInAccount' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
+                    }
                 }
 
-                It 'Should Disregard User Parameter and Set BuiltInAccount Correctly' {
-                    Set-TargetResource @testParameters + @{User = 'DEMO\WrongUser'}
-                    $task = Get-TargetResource -TaskName $testParameters.TaskName -TaskPath $testParameters.TaskPath
-                    $task.BuiltInAccount -eq 'NT AUTHORITY\NETWORK SERVICE' | Should -BeTrue
-                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It
+                $testParameters.Add('User', 'WrongUser')
+
+                It 'Should Disregard User and Set User to the BuiltInAccount' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
+                    }
                 }
 
                 $testParameters.Add('LogonType', 'Password')
@@ -1803,17 +1806,19 @@ try
                         $Inputobject.Principal.LogonType -ieq 'ServiceAccount'
                     }
                 }
-
+                #
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
+                        Description = '+'
+                        TaskName    = $testParameters.TaskName
+                        TaskPath    = $testParameters.TaskPath
+                        Actions     = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        ActionArguments = '-File "C:\something\right.ps1"'
+                        Triggers    = @(
                             [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
@@ -1824,11 +1829,11 @@ try
                                 }
                             }
                         )
-                        Settings = [pscustomobject] @{
+                        Settings    = [pscustomobject] @{
                             Enabled = $true
                             MultipleInstances = 'IgnoreNew'
                         }
-                        Principal = [pscustomobject] @{
+                        Principal   = [pscustomobject] @{
                             UserId    = $testParameters.BuiltInAccount
                             LogonType = 'ServiceAccount'
                         }
