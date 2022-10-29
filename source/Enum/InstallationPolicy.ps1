@@ -1,5 +1,0 @@
-enum InstallationPolicy
-{
-    Trusted
-    Untrusted
-}
