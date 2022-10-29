@@ -1840,39 +1840,6 @@ try
                     }
                 }
 
-                # $testParameters = $getTargetResourceParameters + @{
-                #     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                #     ScheduleType        = 'Once'
-                #     RepeatInterval      = (New-TimeSpan -Minutes 15).ToString()
-                #     RepetitionDuration  = (New-TimeSpan -Hours 8).ToString()
-                #     BuiltInAccount      = 'NETWORK SERVICE'
-                #     ExecuteAsCredential = [pscredential]::new('DEMO\WrongUser', (ConvertTo-SecureString 'ExamplePassword' -AsPlainText -Force))
-                #     Verbose             = $true
-                # }
-
-                # It 'Should Disregard User Parameter and Set User and BuiltInAccount Correctly' {
-
-                #     Test-TargetResource @testParameters + @{User = 'DEMO\WrongUser'} | Should -BeTrue
-                #     Assert-MockCalled -CommandName Get-ScheduledTask -Times 1 -Scope It
-                # }
-
-                # # It 'Should Disregard User Parameter and Set BuiltInAccount Correctly' {
-                # #     Set-TargetResource @testParameters + @{User = 'DEMO\WrongUser'}
-                # #     $result = Get-TargetResource -TaskName $testParameters.TaskName -TaskPath $testParameters.TaskPath
-                # #     $result.BuiltInAccount -eq 'NETWORK SERVICE' | Should -BeTrue
-                # #     Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It
-                # # }
-
-                # $testParameters.Add('LogonType', 'Password')
-
-                # It 'Should overwrite LogonType to "ServiceAccount"' {
-                #     Set-TargetResource @testParameters
-                #     Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
-                #         $Inputobject.Principal.LogonType -ieq 'ServiceAccount'
-                #     }
-                # }
-
-
                 $testParameters.LogonType = 'Password'
 
                 It 'Should return true when BuiltInAccount set even if LogonType parameter different' {
