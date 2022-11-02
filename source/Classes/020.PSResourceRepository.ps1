@@ -29,40 +29,56 @@ class PSResourceRepository : ResourceBase
 {
 
     [DscProperty()]
-    [Ensure]$Ensure = [Ensure]::Present
-
+    [Ensure] $Ensure = [Ensure]::Present
 
     [DscProperty(Key)]
-    [String] $Name
+    [System.String] $Name
+
+    [DscProperty(Mandatory)]
+    [System.String] $SourceLocation
 
     [DscProperty()]
-    [String] $URL
+    [pscredential] $Credential
 
     [DscProperty()]
-    [String] $Priority
+    [System.String] $ScriptSourceLocation
 
     [DscProperty()]
-    [InstallationPolicy] $InstallationPolicy
+    [System.String] $PublishLocation
+
+    [DscProperty()]
+    [System.String] $ScriptPublishLocation
+
+    [DscProperty()]
+    [System.String] $SourceLocation
+
+    [DscProperty()]
+    [System.String] $Proxy
+
+    [DscProperty()]
+    [pscredential] $ProxyCredential
+
+    [DscProperty()]
+    [InstallationPolicy] $InstallationPolicy = [InstallationPolicy]::Untrusted
+
+    [DscProperty()]
+    [System.String] $PackageManagementProvider = 'NuGet'
 
     [DscProperty(NotConfigurable)]
-    [Boolean] $Trusted;
+    [System.Boolean] $Trusted;
 
     [DscProperty(NotConfigurable)]
-    [Boolean] $Registered;
+    [System.Boolean] $Registered;
 
     [PSResourceRepository] Get()
     {
         $returnValue = [PSResourceRepository]@{
             Ensure                    = [Ensure]::Absent
             Name                      = $this.Name
-            URL                       = $null
-            Priority                  = $null
-            #InstallationPolicy        = $null
-            #Trusted                   = $false
-            Registered                = $false
+            SourceLocation            = $this.SourceLocation
         }
 
-        Write-Verbose -Message ($localizedData.GetTargetResourceMessage -f $this.Name)
+        Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
         $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
 
         if ($repository)
@@ -72,6 +88,8 @@ class PSResourceRepository : ResourceBase
             $returnValue.ScriptSourceLocation      = $repository.ScriptSourceLocation
             $returnValue.PublishLocation           = $repository.PublishLocation
             $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
+            $returnValue.Proxy                     = $repository.Proxy
+            $returnValue.ProxyCredential           = $repository.ProxyCredental
             $returnValue.InstallationPolicy        = [InstallationPolicy]::$($repository.InstallationPolicy)
             $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
             $returnValue.Trusted                   = $repository.Trusted
@@ -79,19 +97,95 @@ class PSResourceRepository : ResourceBase
         }
         else
         {
-            Write-Verbose -Message ($localizedData.RepositoryNotFound -f $this.Name)
+            Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
         }
         return returnValue
     }
 
     [void] Set()
     {
+        $repository_state = $this.Get()
 
+        Write-Verbose -Message ($this.localizedData.RepositoryState -f $this.name, $this.Ensure)
+
+        if ($this.Ensure -eq [Ensure]::Present)
+        {
+            $params = @{
+                name           = $this.name
+                SourceLocation = $this.SourceLocation
+            }
+
+            if ($repository_state.Ensure -ne [Ensure]::Present)
+            {
+                #* repo does not exist, need to add
+                if (-not [System.String]::IsNullOrEmpty($this.ScriptSourceLocation))
+                {
+                    $params.ScriptSourceLocation = $this.ScriptSourceLocation
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($this.PublishLocation))
+                {
+                    $params.PublishLocation = $this.PublishLocation
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($this.ScriptPublishLocation))
+                {
+                    $params.ScriptPublishLocation = $this.ScriptPublishLocation
+                }
+
+                $this.CheckProxyConfiguration()
+
+                if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
+                {
+                    $params.ProxyCredential = $this.ProxyCredential
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($this.Proxy))
+                {
+                    $params.Proxy = $this.Proxy
+                }
+
+                $params.InstallationPolicy        = $this.InstallationPolicy
+                $params.PackageManagementProvider = $this.PackageManagementProvider
+
+                Register-PsRepository @params
+            } else
+            {
+                #* repo does exist, need to enforce each property
+
+            }
+
+        }
+        else
+        {
+            if ($repository_state.Ensure -eq [Ensure]::Present)
+            {
+                Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
+                Unregister-PSRepository -Name $this.Name
+            }
+        }
     }
 
     [Boolean] Test()
     {
-        $result = $false
-        return $result
+        return ([ResourceBase] $this).Test()
+    }
+
+    hidden [void] RemoveExistingRepository()
+    {
+        Write-Verbose -Message ($this.localizedData.RemoveRepository -f $this.Name)
+        Remove-PSRepository -Name $this.name -ErrorAction
+    }
+
+    #* Throws if proxy credential was passed without Proxy uri
+    hidden [void] CheckProxyConfiguration()
+    {
+        if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
+        {
+            if ( [System.String]::IsNullOrEmpty($this.Proxy))
+            {
+                throw $this.localizedData.ProxyCredentialPassedWithoutProxyUri
+            }
+        }
     }
 }
