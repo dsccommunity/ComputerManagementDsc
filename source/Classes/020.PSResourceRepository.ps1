@@ -196,6 +196,6 @@ class PSResourceRepository : ResourceBase
 
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
     {
-
+        return $this.Get()
     }
 }
