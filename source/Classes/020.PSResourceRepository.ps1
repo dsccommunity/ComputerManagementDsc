@@ -94,4 +94,14 @@ class PSResourceRepository : ResourceBase
         $result = $false
         return $result
     }
+
+    hidden [void] Modify([System.Collections.Hashtable] $properties)
+    {
+
+    }
+
+    hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
+    {
+
+    }
 }
