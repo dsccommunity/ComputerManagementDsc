@@ -50,9 +50,6 @@ class PSResourceRepository : ResourceBase
     [System.String] $ScriptPublishLocation
 
     [DscProperty()]
-    [System.String] $SourceLocation
-
-    [DscProperty()]
     [System.String] $Proxy
 
     [DscProperty()]
