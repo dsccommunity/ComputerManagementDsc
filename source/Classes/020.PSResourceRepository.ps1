@@ -108,9 +108,11 @@ class PSResourceRepository : ResourceBase
         if ($this.Ensure -eq [Ensure]::Present)
         {
             $params = @{
-                name           = $this.name
+                Name           = $this.Name
                 SourceLocation = $this.SourceLocation
             }
+
+            $this.CheckProxyConfiguration()
 
             if ($repository_state.Ensure -ne [Ensure]::Present)
             {
@@ -129,8 +131,6 @@ class PSResourceRepository : ResourceBase
                 {
                     $params.ScriptPublishLocation = $this.ScriptPublishLocation
                 }
-
-                $this.CheckProxyConfiguration()
 
                 if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
                 {
@@ -184,8 +184,6 @@ class PSResourceRepository : ResourceBase
                     }
                 }
 
-                $this.CheckProxyConfiguration()
-
                 if (-not [System.String]::IsNullOrEmpty($this.Proxy))
                 {
                     if ($repository_state.Proxy -ne $this.Proxy)
@@ -204,13 +202,16 @@ class PSResourceRepository : ResourceBase
                     }
                 }
 
-                if (-not [System.String]::IsNullOrEmpty($this.InstallationPolicy))
+                if ($repository_state.InstallationPolicy -ne $this.InstallationPolicy)
                 {
-                    if ($repository_state.InstallationPolicy -ne $this.InstallationPolicy)
-                    {
-                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'InstallationPolicy', $repository_state.InstallationPolicy, $this.InstallationPolicy)
-                        $params['InstallationPolicy'] = $this.InstallationPolicy
-                    }
+                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'InstallationPolicy', $repository_state.InstallationPolicy, $this.InstallationPolicy)
+                    $params['InstallationPolicy'] = $this.InstallationPolicy
+                }
+
+                if ($repository_state.PackageManagementProvider -ne $this.PackageManagementProvider)
+                {
+                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'PackageManagementProvider', $repository_state.PackageManagementProvider, $this.PackageManagementProvider)
+                    $params['PackageManagementProvider'] = $this.PackageManagementProvider
                 }
 
                 Set-PSRepository @params
@@ -231,13 +232,7 @@ class PSResourceRepository : ResourceBase
         return ([ResourceBase] $this).Test()
     }
 
-    hidden [void] RemoveExistingRepository()
-    {
-        Write-Verbose -Message ($this.localizedData.RemoveRepository -f $this.Name)
-        Remove-PSRepository -Name $this.name -ErrorAction
-    }
-
-    #* Throws if proxy credential was passed without Proxy uri
+    #* Throws if ProxyCredential was passed without Proxy uri
     hidden [void] CheckProxyConfiguration()
     {
         if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
