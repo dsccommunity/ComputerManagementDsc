@@ -1379,6 +1379,7 @@ try
                     [void] DeleteTree(){ }
                 }
 
+                It 'Should delete the ADSI Object' {
                     Mock -CommandName New-Object -MockWith {
                         New-Object 'fake_adsi_directoryentry'
                         } `
@@ -1403,6 +1404,12 @@ try
                             -Path 'contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com' `
                             -Credential $credential`
                             -Verbose
+                    } | Should -Throw $message
+                }
+
+                It 'Should throw the expected exception if Credential is incorrect' {
+                    Mock -CommandName New-Object -MockWith {
+                        Write-Error -message 'Invalid Credential'
                         } `
                         -ParameterFilter {
                             $TypeName -and
