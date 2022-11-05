@@ -149,7 +149,9 @@ class PSResourceRepository : ResourceBase
             } else
             {
                 #* repo does exist, need to enforce each property
-                $params = @{Name = $this.Name}
+                $params = @{
+                    Name = $this.Name
+                }
 
                 if ($repository_state.SourceLocation -ne $this.SourceLocation)
                 {
