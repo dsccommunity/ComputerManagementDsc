@@ -149,9 +149,72 @@ class PSResourceRepository : ResourceBase
             } else
             {
                 #* repo does exist, need to enforce each property
+                $params = @{Name = $this.Name}
 
+                if ($repository_state.SourceLocation -ne $this.SourceLocation)
+                {
+                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'SourceLocation', $repository_state.SourceLocation, $this.SourceLocation)
+                    $params['SourceLocation'] = $this.SourceLocation
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($this.ScriptSourceLocation))
+                {
+                    if ($repository_state.ScriptSourceLocation -ne $this.ScriptSourceLocation)
+                    {
+                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'ScriptSourceLocation', $repository_state.ScriptSourceLocation, $this.ScriptSourceLocation)
+                        $params['ScriptSourceLocation'] = $this.ScriptSourceLocation
+                    }
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($this.PublishLocation))
+                {
+                    if ($repository_state.PublishLocation -ne $this.PublishLocation)
+                    {
+                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'PublishLocation', $repository_state.PublishLocation, $this.PublishLocation)
+                        $params['PublishLocation'] = $this.PublishLocation
+                    }
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($this.ScriptPublishLocation))
+                {
+                    if ($repository_state.ScriptPublishLocation -ne $this.ScriptPublishLocation)
+                    {
+                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'ScriptPublishLocation', $repository_state.ScriptPublishLocation, $this.ScriptPublishLocation)
+                        $params['ScriptPublishLocation'] = $this.ScriptPublishLocation
+                    }
+                }
+
+                $this.CheckProxyConfiguration()
+
+                if (-not [System.String]::IsNullOrEmpty($this.Proxy))
+                {
+                    if ($repository_state.Proxy -ne $this.Proxy)
+                    {
+                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'Proxy', $repository_state.Proxy, $this.Proxy)
+                        $params['Proxy'] = $this.Proxy
+                    }
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
+                {
+                    if ($repository_state.ProxyCredential -ne $this.ProxyCredential)
+                    {
+                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'ProxyCredential', $repository_state.ProxyCredential, $this.ProxyCredential)
+                        $params['ProxyCredential'] = $this.ProxyCredential
+                    }
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($this.InstallationPolicy))
+                {
+                    if ($repository_state.InstallationPolicy -ne $this.InstallationPolicy)
+                    {
+                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'InstallationPolicy', $repository_state.InstallationPolicy, $this.InstallationPolicy)
+                        $params['InstallationPolicy'] = $this.InstallationPolicy
+                    }
+                }
+
+                Set-PSRepository @params
             }
-
         }
         else
         {

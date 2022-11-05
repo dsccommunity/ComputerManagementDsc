@@ -14,5 +14,6 @@ ConvertFrom-StringData -StringData @'
     RepositoryDoesNotExist               = Creating the repository '{0}'.
     RemoveExistingRepository             = Removing the repository '{0}'.
     ProxyCredentialPassedWithoutProxyUri = Proxy Credential passed without Proxy Uri.
-    RepositoryState                      = Repository '{0}' should be '{1}'
+    RepositoryState                      = Repository '{0}' should be '{1}'.
+    PropertyOutOfSync                    = Repository property '{0}' is not in the desired state. Currently '{1}', should be '{2}'.
 '@
