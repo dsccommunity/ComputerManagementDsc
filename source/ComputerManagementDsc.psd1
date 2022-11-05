@@ -21,7 +21,7 @@
     Description          = 'DSC resources for configuration of a Windows computer. These DSC resources allow you to perform computer management tasks, such as renaming the computer, joining a domain and scheduling tasks as well as configuring items such as virtual memory, event logs, time zones and power settings.'
 
     # Minimum version of the Windows PowerShell engine required by this module
-    PowerShellVersion    = '4.0'
+    PowerShellVersion    = '5.0'
 
     # Minimum version of the common language runtime (CLR) required by this module
     CLRVersion           = '4.0'

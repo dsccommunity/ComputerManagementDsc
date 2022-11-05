@@ -188,7 +188,7 @@ class PSResourceRepository : ResourceBase
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-
+        # TODO: Add logic to function. Comment to avoid HQRM test to throw on empty function.
     }
 
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
