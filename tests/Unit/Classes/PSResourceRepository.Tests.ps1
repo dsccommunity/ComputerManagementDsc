@@ -68,7 +68,6 @@ try
                 It 'Should return the correct result when the Repository is present and all params are passed' {
                     Mock Get-PSRepository {
                         return @{
-                            Ensure                    = 'Present'
                             Name                      = 'PSGallery'
                             SourceLocation            = 'https://www.powershellgallery.com/api/v2'
                             ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
@@ -105,24 +104,53 @@ try
                 It 'Should return the correct result when the Repository is present and the minimum params are passed' {
                     Mock Get-PSRepository {
                         return @{
-                            Name               = 'PSGallery'
-                            SourceLocation     = 'https://www.powershellgallery.com/api/v2'
-                            InstallationPolicy = 'Trusted'
+                            Name                      = 'PSGallery'
+                            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                            PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                            InstallationPolicy        = 'Untrusted'
+                            PackageManagementProvider = 'NuGet'
                         }
                     }
 
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                             Name           = 'PSGallery'
-                            Ensure         = 'Present'
+                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                            Ensure         = 'Absent'
+                        }
+                        $currentState = $script:mockPSResourceRepositoryInstance.Get()
+                        $currentState.Name                      | Should -Be 'PSGallery'
+                        $currentState.Ensure                    | Should -Be 'Present'
+                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                        $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
+                        $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
+                    }
+                }
+            }
+
+            Context 'When the respository should be Absent' {
+                It 'Should return the correct result when the Repository is Absent' {
+                    Mock Get-PSRepository {
+                        return $Null
+                    }
+
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                            Name           = 'PSGallery'
+                            Ensure         = 'Absent'
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                         }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'PSGallery'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
-                        $currentState.Ensure                    | Should -Be 'Present'
-                        $currentState.InstallationPolicy        | Should -Be 'Trusted'
+                        $currentState.Ensure                    | Should -Be 'Absent'
+                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
@@ -130,13 +158,40 @@ try
                     }
                 }
             }
-
-            Context 'When the respository should be Absent' {
-
-            }
         }
 
         Context 'When the system is not in the desired state' {
+            Context 'When the repository is present but should be absent' {
+
+                Mock Get-PSRepository {
+                    return @{
+                        Name                      = 'PSGallery'
+                        SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                        ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                        PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                        ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                        InstallationPolicy        = 'Untrusted'
+                        PackageManagementProvider = 'NuGet'
+                    }
+                }
+
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                        Name           = 'PSGallery'
+                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                        Ensure         = 'Present'
+                    }
+                    $currentState = $script:mockPSResourceRepositoryInstance.Get()
+                    $currentState.Name                      | Should -Be 'PSGallery'
+                    $currentState.Ensure                    | Should -Be 'Present'
+                    $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                    $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
+                    $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                    $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                    $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                    $currentState.PackageManagementProvider | Should -Be 'NuGet'
+                }
+            }
         }
     }
 
