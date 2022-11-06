@@ -4,10 +4,11 @@ The format is based on and uses the types of changes according to [Keep a Change
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Computer
-  - When joining a computer to a domain, existing AD computer objects will be deleted.
 
 ### Added
+
+- PSResourceRepository
+  - New class-based resource to manage PowerShell Resource Repositories - Fixes [Issue #393](https://github.com/dsccommunity/ComputerManagementDsc/issues/393)
 
 - Computer
   - Support Options Parameter for domain join - Fixes [Issue #234](https://github.com/dsccommunity/ComputerManagementDsc/issues/234).
