@@ -104,7 +104,7 @@ class PSResourceRepository : ResourceBase
         Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
         $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
 
-        if ($null -eq $repository)
+        if ($repository)
         {
             $returnValue.Ensure                    = [Ensure]::Present
             $returnValue.SourceLocation            = $repository.SourceLocation
