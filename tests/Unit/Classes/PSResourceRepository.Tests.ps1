@@ -63,6 +63,36 @@ try
 
     Describe 'PSResourceRepository\Get()' -Tag 'Get' {
         Context 'When the system is in the desired state' {
+            Context 'When the repository should be Present' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                        Name                      = 'PSGallery'
+                        SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                        ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                        PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                        ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                        InstallationPolicy        = 'Untrusted'
+                        PackageManagementProvider = 'NuGet'
+                    }
+                }
+
+                It 'Should return the correct result when the Repository is present' {
+                    InModuleScope -ScriptBlock {
+                        $currentState = $script:mockPSResourceRepositoryInstance.Get()
+                        $currentState.Name                      | Should -Be 'PSGallery'
+                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                        $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
+                        $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
+                    }
+                }
+            }
+
+            Context 'When the respository should be Absent' {
+
+            }
         }
 
         Context 'When the system is not in the desired state' {
