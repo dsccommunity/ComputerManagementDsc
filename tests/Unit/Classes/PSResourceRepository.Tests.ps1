@@ -133,11 +133,11 @@ try
                 }
             }
 
-            Context 'en the respository should be Absent' {
+            Context 'When the respository should be Absent' {
                 It 'Should return the correct result when the Repository is Absent' {
                     InModuleScope -ScriptBlock {
                         Mock Get-PSRepository {
-                            return $Null
+                            return $null
                         }
 
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
@@ -150,7 +150,7 @@ try
                         $currentState.Name                      | Should -Be 'PSGallery'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.Ensure                    | Should -Be 'Absent'
-                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
