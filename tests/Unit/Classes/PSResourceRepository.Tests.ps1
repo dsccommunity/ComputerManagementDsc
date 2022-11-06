@@ -162,34 +162,36 @@ try
 
         Context 'When the system is not in the desired state' {
             Context 'When the repository is present but should be absent' {
-
-                Mock Get-PSRepository {
-                    return @{
-                        Name                      = 'PSGallery'
-                        SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                        ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-                        PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-                        ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-                        InstallationPolicy        = 'Untrusted'
-                        PackageManagementProvider = 'NuGet'
+                It 'Should return the correct value'
+                {
+                    Mock Get-PSRepository {
+                        return @{
+                            Name                      = 'PSGallery'
+                            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                            PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                            InstallationPolicy        = 'Untrusted'
+                            PackageManagementProvider = 'NuGet'
+                        }
                     }
-                }
 
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name           = 'PSGallery'
-                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                        Ensure         = 'Absent'
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                            Name           = 'PSGallery'
+                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                            Ensure         = 'Absent'
+                        }
+                        $currentState = $script:mockPSResourceRepositoryInstance.Get()
+                        $currentState.Name                      | Should -Be 'PSGallery'
+                        $currentState.Ensure                    | Should -Be 'Present'
+                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                        $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
+                        $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
                     }
-                    $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                    $currentState.Name                      | Should -Be 'PSGallery'
-                    $currentState.Ensure                    | Should -Be 'Present'
-                    $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
-                    $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
-                    $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
-                    $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
-                    $currentState.InstallationPolicy        | Should -Be 'Untrusted'
-                    $currentState.PackageManagementProvider | Should -Be 'NuGet'
                 }
             }
         }
