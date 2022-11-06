@@ -176,14 +176,16 @@ try
         }
 
         Context 'When the expected repo is present but not in the correct state' {
-            return @{
-                Name                      = 'PSGallery'
-                SourceLocation            = 'https://www.notcorrect.com/api/v2'
-                ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
-                PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
-                ScriptPublishLocation     = 'https://www.notcorrect.com/api/v2/package/'
-                InstallationPolicy        = 'Trusted'
-                PackageManagementProvider = 'Package'
+            Mock Get-PSRespository {
+                return @{
+                    Name                      = 'PSGallery'
+                    SourceLocation            = 'https://www.notcorrect.com/api/v2'
+                    ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
+                    PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
+                    ScriptPublishLocation     = 'https://www.notcorrect.com/api/v2/package/'
+                    InstallationPolicy        = 'Trusted'
+                    PackageManagementProvider = 'Package'
+                }
             }
 
             It 'Should return the correct results when ensure is Present' {
