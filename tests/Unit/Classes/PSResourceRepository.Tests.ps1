@@ -66,7 +66,7 @@ try
             Context 'When the repository should be Present' {
 
                 It 'Should return the correct result when the Repository is present and all params are passed' {
-                    Mock-Command Get-PSRepository {
+                    Mock Get-PSRepository {
                         return @{
                             Ensure                    = 'Present'
                             Name                      = 'PSGallery'
@@ -103,7 +103,7 @@ try
                 }
 
                 It 'Should return the correct result when the Repository is present and the minimum params are passed' {
-                    Mock-Command Get-PSRepository {
+                    Mock Get-PSRepository {
                         return @{
                             Name           = 'PSGallery'
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
