@@ -193,6 +193,30 @@ try
                     }
                 }
             }
+
+            Context 'When the repository is absent but should be present' {
+                Mock Get-PSRepository {
+                    return $null
+                }
+
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                        Name           = 'PSGallery'
+                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                        Ensure         = 'Present'
+                    }
+                    $currentState = $script:mockPSResourceRepositoryInstance.Get()
+                    $currentState.Name                      | Should -Be 'PSGallery'
+                    $currentState.Ensure                    | Should -Be 'Absent'
+                    $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                    $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
+                    $currentState.PublishLocation           | Should -BeNullOrEmpty
+                    $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+                    $currentState.InstallationPolicy        | Should -BeNullOrEmpty
+                    $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+                }
+
+            }
         }
     }
 
