@@ -150,7 +150,7 @@ try
                         $currentState.Name                      | Should -Be 'PSGallery'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.Ensure                    | Should -Be 'Absent'
-                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
+                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
@@ -179,7 +179,7 @@ try
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                         Name           = 'PSGallery'
                         SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                        Ensure         = 'Present'
+                        Ensure         = 'Absent'
                     }
                     $currentState = $script:mockPSResourceRepositoryInstance.Get()
                     $currentState.Name                      | Should -Be 'PSGallery'
