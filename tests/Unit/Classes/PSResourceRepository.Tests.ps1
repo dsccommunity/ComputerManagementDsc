@@ -162,8 +162,7 @@ try
 
         Context 'When the system is not in the desired state' {
             Context 'When the repository is present but should be absent' {
-                It 'Should return the correct value'
-                {
+                It 'Should return the correct value' {
                     Mock Get-PSRepository {
                         return @{
                             Name                      = 'PSGallery'
