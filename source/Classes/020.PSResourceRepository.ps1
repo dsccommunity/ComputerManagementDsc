@@ -122,7 +122,7 @@ class PSResourceRepository : ResourceBase
         {
             Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
         }
-        return returnValue
+        return $returnValue
     }
 
     [void] Set()
