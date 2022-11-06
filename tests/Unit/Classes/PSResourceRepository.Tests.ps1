@@ -105,8 +105,9 @@ try
                 It 'Should return the correct result when the Repository is present and the minimum params are passed' {
                     Mock Get-PSRepository {
                         return @{
-                            Name           = 'PSGallery'
-                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                            Name               = 'PSGallery'
+                            SourceLocation     = 'https://www.powershellgallery.com/api/v2'
+                            InstallationPolicy = 'Trusted'
                         }
                     }
 
@@ -121,10 +122,10 @@ try
                         $currentState.Name                      | Should -Be 'PSGallery'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.Ensure                    | Should -Be 'Present'
+                        $currentState.InstallationPolicy        | Should -Be 'Trusted'
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                         $currentState.PackageManagementProvider | Should -BeNullOrEmpty
                     }
                 }
