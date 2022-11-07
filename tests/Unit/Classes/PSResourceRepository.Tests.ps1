@@ -338,11 +338,11 @@ try
                         }
                 }
             }
-        }
 
-        It 'Should return $true' {
-            InModuleScope -ScriptBlock {
-                $script:mockPSResourceRepositoryInstance.Test() | Should -BeTrue
+            It 'Should return $true' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Test() | Should -BeTrue
+                }
             }
         }
 

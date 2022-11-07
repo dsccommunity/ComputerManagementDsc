@@ -274,7 +274,10 @@ class PSResourceRepository : ResourceBase
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        # TODO: Add logic to function. Comment to avoid HQRM test to throw on empty function.
+        if ($properties.ContainsKey('Ensure'))
+        {
+            # begin to try and use Modify rather than have the function in Set()
+        }
     }
 
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
