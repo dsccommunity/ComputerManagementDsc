@@ -315,6 +315,21 @@ try
 
     Describe 'PSResourceRepository\Test()' -Tag 'Test' {
         Context 'When the system is in the desired state' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepository |
+                        # Mock method Compare() which is called by the base method Test ()
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'Compare' -Value {
+                            return $null
+                        }
+                }
+            }
+        }
+
+        It 'Should return $true' {
+            InModuleScope -ScriptBlock {
+                $script:mockSQLPermissionInstance.Test() | Should -BeTrue
+            }
         }
 
         Context 'When the system is not in the desired state' {
