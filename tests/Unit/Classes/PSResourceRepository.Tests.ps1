@@ -216,24 +216,25 @@ try
                         return $null
                     }
                 }
+                It 'Should return the correct data' {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                            Name           = 'FakePSGallery'
+                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                            Ensure         = 'Present'
+                        }
+                        $currentState = $script:mockPSResourceRepositoryInstance.Get()
+                        $currentState.Name                      | Should -Be 'FakePSGallery'
+                        $currentState.Ensure                    | Should -Be 'Absent'
+                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                        $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
+                        $currentState.PublishLocation           | Should -BeNullOrEmpty
+                        $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name           = 'FakePSGallery'
-                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                        Ensure         = 'Present'
+                        Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
-                    $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                    $currentState.Name                      | Should -Be 'FakePSGallery'
-                    $currentState.Ensure                    | Should -Be 'Absent'
-                    $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
-                    $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
-                    $currentState.PublishLocation           | Should -BeNullOrEmpty
-                    $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                    $currentState.InstallationPolicy        | Should -Be 'Untrusted'
-                    $currentState.PackageManagementProvider | Should -Be 'NuGet'
-
-                    Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }
             }
 
