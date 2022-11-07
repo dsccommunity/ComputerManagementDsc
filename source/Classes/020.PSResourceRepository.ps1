@@ -121,6 +121,16 @@ class PSResourceRepository : ResourceBase
         else
         {
             Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
+            #* I don't want to do this
+            $returnValue.ScriptSourceLocation      = $null
+            $returnValue.PublishLocation           = $null
+            $returnValue.ScriptPublishLocation     = $null
+            $returnValue.Proxy                     = $null
+            $returnValue.ProxyCredential           = $null
+            $returnValue.InstallationPolicy        = $null
+            $returnValue.PackageManagementProvider = $null
+            $returnValue.Trusted                   = $null
+            $returnValue.Registered                = $null
         }
         return $returnValue
     }
