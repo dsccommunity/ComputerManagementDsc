@@ -156,7 +156,7 @@ try
                     $currentState.PublishLocation           | Should -BeNullOrEmpty
                     $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                     $currentState.InstallationPolicy        | Should -Be 'Untrusted'
-                    $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+                    $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
                     Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }
@@ -178,7 +178,7 @@ try
                     $currentState.PublishLocation           | Should -BeNullOrEmpty
                     $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                     $currentState.InstallationPolicy        | Should -Be 'Untrusted'
-                    $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+                    $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
                     Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }
@@ -349,7 +349,7 @@ try
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
@@ -412,7 +412,7 @@ try
                     $currentState.PublishLocation           | Should -BeNullOrEmpty
                     $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                     $currentState.InstallationPolicy        | Should -Be 'Untrusted'
-                    $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+                    $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
                     Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }

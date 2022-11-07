@@ -106,17 +106,17 @@ class PSResourceRepository : ResourceBase
 
         if ($repository)
         {
-            $returnValue['Ensure']                    = [Ensure]::Present
-            $returnValue['SourceLocation']            = $repository.SourceLocation
-            $returnValue['ScriptSourceLocation']      = $repository.ScriptSourceLocation
-            $returnValue['PublishLocation']           = $repository.PublishLocation
-            $returnValue['ScriptPublishLocation']     = $repository.ScriptPublishLocation
-            $returnValue['Proxy']                     = $repository.Proxy
-            $returnValue['ProxyCredential']           = $repository.ProxyCredental
-            $returnValue['InstallationPolicy']        = [InstallationPolicy]::$($repository.InstallationPolicy)
-            $returnValue['PackageManagementProvider'] = $repository.PackageManagementProvider
-            $returnValue['Trusted']                   = $repository.Trusted
-            $returnValue['Registered']                = $repository.Registered
+            $returnValue.Ensure                    = [Ensure]::Present
+            $returnValue.SourceLocation            = $repository.SourceLocation
+            $returnValue.ScriptSourceLocation      = $repository.ScriptSourceLocation
+            $returnValue.PublishLocation           = $repository.PublishLocation
+            $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
+            $returnValue.Proxy                     = $repository.Proxy
+            $returnValue.ProxyCredential           = $repository.ProxyCredental
+            $returnValue.InstallationPolicy        = [InstallationPolicy]::$($repository.InstallationPolicy)
+            $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
+            $returnValue.Trusted                   = $repository.Trusted
+            $returnValue.Registered                = $repository.Registered
         }
         else
         {
