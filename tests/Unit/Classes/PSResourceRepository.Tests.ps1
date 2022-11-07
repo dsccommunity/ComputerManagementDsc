@@ -68,7 +68,7 @@ try
         #     BeforeEach {
         #         Mock Get-PSRepository {
         #             return @{
-        #                 Name                      = 'PSGallery'
+        #                 Name                      = 'FakePSGallery'
         #                 SourceLocation            = 'https://www.powershellgallery.com/api/v2'
         #                 ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
         #                 PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
@@ -82,7 +82,7 @@ try
         #     It 'Should return the correct results when ensure is Present' {
         #         InModuleScope -ScriptBlock {
         #             $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-        #                 Name                      = 'PSGallery'
+        #                 Name                      = 'FakePSGallery'
         #                 SourceLocation            = 'https://www.powershellgallery.com/api/v2'
         #                 ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
         #                 PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
@@ -93,7 +93,7 @@ try
         #             }
 
         #             $currentState = $script:mockPSResourceRepositoryInstance.Get()
-        #             $currentState.Name                      | Should -Be 'PSGallery'
+        #             $currentState.Name                      | Should -Be 'FakePSGallery'
         #             $currentState.Ensure                    | Should -Be 'Present'
         #             $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
         #             $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
@@ -107,13 +107,13 @@ try
         #     It 'Should return the correct results when ensure is Absent' {
         #         InModuleScope -ScriptBlock {
         #             $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-        #                 Name           = 'PSGallery'
+        #                 Name           = 'FakePSGallery'
         #                 SourceLocation = 'https://www.powershellgallery.com/api/v2'
         #                 Ensure         = 'Absent'
         #             }
 
         #             $currentState = $script:mockPSResourceRepositoryInstance.Get()
-        #             $currentState.Name                      | Should -Be 'PSGallery'
+        #             $currentState.Name                      | Should -Be 'FakePSGallery'
         #             $currentState.Ensure                    | Should -Be 'Present'
         #             $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
         #             $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
@@ -138,7 +138,7 @@ try
             It 'Should return the correct results when ensure is Present' {
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name                      = 'PSGallery'
+                        Name                      = 'FakePSGallery'
                         SourceLocation            = 'https://www.powershellgallery.com/api/v2'
                         ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
                         PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
@@ -149,7 +149,7 @@ try
                     }
 
                     $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                    $currentState.Name                      | Should -Be 'PSGallery'
+                    $currentState.Name                      | Should -Be 'FakePSGallery'
                     $currentState.Ensure                    | Should -Be 'Absent'
                     $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                     $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
@@ -163,13 +163,13 @@ try
             It 'Should return the correct results when ensure is Absent' {
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name           = 'PSGallery'
+                        Name           = 'FakePSGallery'
                         SourceLocation = 'https://www.powershellgallery.com/api/v2'
                         Ensure         = 'Absent'
                     }
 
                     $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                    $currentState.Name                      | Should -Be 'PSGallery'
+                    $currentState.Name                      | Should -Be 'FakePSGallery'
                     $currentState.Ensure                    | Should -Be 'Absent'
                     $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                     $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
@@ -185,7 +185,7 @@ try
 
             Mock -CommandName Get-PSRepository -MockWith {
                 return @{
-                    Name                      = 'PSGallery'
+                    Name                      = 'FakePSGallery'
                     SourceLocation            = 'https://www.notcorrect.com/api/v2'
                     ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
                     PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
@@ -198,7 +198,7 @@ try
             It 'Should return the correct results when ensure is Present' {
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name                      = 'PSGallery'
+                        Name                      = 'FakePSGallery'
                         SourceLocation            = 'https://www.powershellgallery.com/api/v2'
                         ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
                         PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
@@ -209,7 +209,7 @@ try
                     }
 
                     $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                    $currentState.Name                      | Should -Be 'PSGallery'
+                    $currentState.Name                      | Should -Be 'FakePSGallery'
                     $currentState.Ensure                    | Should -Be 'Present'
                     $currentState.SourceLocation            | Should -Be 'https://www.notcorrect.com/api/v2'
                     $currentState.ScriptSourceLocation      | Should -Be 'https://www.notcorrect.com/api/v2/items/psscript'
@@ -223,13 +223,13 @@ try
             It 'Should return the correct results when ensure is Absent' {
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name                      = 'PSGallery'
+                        Name                      = 'FakePSGallery'
                         SourceLocation            = 'https://www.powershellgallery.com/api/v2'
                         Ensure                    = 'Absent'
                     }
 
                     $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                    $currentState.Name                      | Should -Be 'PSGallery'
+                    $currentState.Name                      | Should -Be 'FakePSGallery'
                     $currentState.Ensure                    | Should -Be 'Present'
                     $currentState.SourceLocation            | Should -Be 'https://www.notcorrect.com/api/v2'
                     $currentState.ScriptSourceLocation      | Should -Be 'https://www.notcorrect.com/api/v2/items/psscript'
@@ -246,7 +246,7 @@ try
                 BeforeEach {
                     Mock -CommandName Get-PSRepository -MockWith {
                         return @{
-                            Name                      = 'PSGallery'
+                            Name                      = 'FakePSGallery'
                             SourceLocation            = 'https://www.powershellgallery.com/api/v2'
                             ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
                             PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
@@ -261,7 +261,7 @@ try
 
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                            Name                      = 'PSGallery'
+                            Name                      = 'FakePSGallery'
                             SourceLocation            = 'https://www.powershellgallery.com/api/v2'
                             ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
                             PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
@@ -271,7 +271,7 @@ try
                         }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                        $currentState.Name                      | Should -Be 'PSGallery'
+                        $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
@@ -286,7 +286,7 @@ try
                     BeforeEach {
                         Mock -CommandName Get-PSRepository -MockWith {
                             return @{
-                                Name                      = 'PSGallery'
+                                Name                      = 'FakePSGallery'
                                 SourceLocation            = 'https://www.powershellgallery.com/api/v2'
                                 ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
                                 PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
@@ -299,12 +299,12 @@ try
 
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                            Name           = 'PSGallery'
+                            Name           = 'FakePSGallery'
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Absent'
                         }
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                        $currentState.Name                      | Should -Be 'PSGallery'
+                        $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
@@ -324,13 +324,13 @@ try
                         }
 
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                                Name           = 'PSGallery'
+                                Name           = 'FakePSGallery'
                                 Ensure         = 'Absent'
                                 SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                        $currentState.Name                      | Should -Be 'PSGallery'
+                        $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.Ensure                    | Should -Be 'Absent'
                         $currentState.InstallationPolicy        | Should -BeNullOrEmpty
@@ -348,7 +348,7 @@ try
                 It 'Should return the correct value' {
                     Mock -CommandName Get-PSRepository -MockWith {
                         return @{
-                            Name                      = 'PSGallery'
+                            Name                      = 'FakePSGallery'
                             SourceLocation            = 'https://www.powershellgallery.com/api/v2'
                             ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
                             PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
@@ -360,12 +360,12 @@ try
 
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                            Name           = 'PSGallery'
+                            Name           = 'FakePSGallery'
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Absent'
                         }
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                        $currentState.Name                      | Should -Be 'PSGallery'
+                        $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
@@ -384,12 +384,12 @@ try
                     }
 
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name           = 'PSGallery'
+                        Name           = 'FakePSGallery'
                         SourceLocation = 'https://www.powershellgallery.com/api/v2'
                         Ensure         = 'Present'
                     }
                     $currentState = $script:mockPSResourceRepositoryInstance.Get()
-                    $currentState.Name                      | Should -Be 'PSGallery'
+                    $currentState.Name                      | Should -Be 'FakePSGallery'
                     $currentState.Ensure                    | Should -Be 'Absent'
                     $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                     $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
