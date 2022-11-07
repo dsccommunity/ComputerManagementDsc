@@ -127,7 +127,7 @@ try
         # }
 
         Context 'When the expected repo is absent' {
-            Mock Get-PSRepository {
+            Mock -CommandName Get-PSRepository -MockWith {
                 return $null
             }
 
@@ -179,7 +179,7 @@ try
 
         Context 'When the expected repo is present but not in the correct state' {
 
-            Mock Get-PSRespository {
+            Mock -CommandName Get-PSRepository -MockWith {
                 return @{
                     Name                      = 'PSGallery'
                     SourceLocation            = 'https://www.notcorrect.com/api/v2'
@@ -240,7 +240,7 @@ try
         Context 'When the system is in the desired state' {
             Context 'When the repository should be Present' {
                 BeforeEach {
-                    Mock Get-PSRepository {
+                    Mock -CommandName Get-PSRepository -MockWith {
                         return @{
                             Name                      = 'PSGallery'
                             SourceLocation            = 'https://www.powershellgallery.com/api/v2'
@@ -280,7 +280,7 @@ try
 
                 It 'Should return the correct result when the Repository is present and the minimum params are passed' {
                     BeforeEach {
-                        Mock Get-PSRepository {
+                        Mock -CommandName Get-PSRepository -MockWith {
                             return @{
                                 Name                      = 'PSGallery'
                                 SourceLocation            = 'https://www.powershellgallery.com/api/v2'
@@ -315,7 +315,7 @@ try
             Context 'When the respository should be Absent' {
                 It 'Should return the correct result when the Repository is Absent' {
                     InModuleScope -ScriptBlock {
-                        Mock Get-PSRepository {
+                        Mock -CommandName Get-PSRepository -MockWith {
                             return $null
                         }
 
@@ -342,7 +342,7 @@ try
         Context 'When the system is not in the desired state' {
             Context 'When the repository is present but should be absent' {
                 It 'Should return the correct value' {
-                    Mock Get-PSRepository {
+                    Mock -CommandName Get-PSRepository -MockWith {
                         return @{
                             Name                      = 'PSGallery'
                             SourceLocation            = 'https://www.powershellgallery.com/api/v2'
@@ -375,7 +375,7 @@ try
 
             Context 'When the repository is absent but should be present' {
                 InModuleScope -ScriptBlock {
-                    Mock Get-PSRepository {
+                    Mock -CommandName Get-PSRepository -MockWith {
                         return $null
                     }
 
