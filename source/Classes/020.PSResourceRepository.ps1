@@ -106,31 +106,21 @@ class PSResourceRepository : ResourceBase
 
         if ($repository)
         {
-            $returnValue.Ensure                    = [Ensure]::Present
-            $returnValue.SourceLocation            = $repository.SourceLocation
-            $returnValue.ScriptSourceLocation      = $repository.ScriptSourceLocation
-            $returnValue.PublishLocation           = $repository.PublishLocation
-            $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
-            $returnValue.Proxy                     = $repository.Proxy
-            $returnValue.ProxyCredential           = $repository.ProxyCredental
-            $returnValue.InstallationPolicy        = [InstallationPolicy]::$($repository.InstallationPolicy)
-            $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
-            $returnValue.Trusted                   = $repository.Trusted
-            $returnValue.Registered                = $repository.Registered
+            $returnValue['Ensure']                    = [Ensure]::Present
+            $returnValue['SourceLocation']            = $repository.SourceLocation
+            $returnValue['ScriptSourceLocation']      = $repository.ScriptSourceLocation
+            $returnValue['PublishLocation']           = $repository.PublishLocation
+            $returnValue['ScriptPublishLocation']     = $repository.ScriptPublishLocation
+            $returnValue['Proxy']                     = $repository.Proxy
+            $returnValue['ProxyCredential']           = $repository.ProxyCredental
+            $returnValue['InstallationPolicy']        = [InstallationPolicy]::$($repository.InstallationPolicy)
+            $returnValue['PackageManagementProvider'] = $repository.PackageManagementProvider
+            $returnValue['Trusted']                   = $repository.Trusted
+            $returnValue['Registered']                = $repository.Registered
         }
         else
         {
             Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
-            #* I don't want to do this
-            $returnValue.ScriptSourceLocation      = $null
-            $returnValue.PublishLocation           = $null
-            $returnValue.ScriptPublishLocation     = $null
-            $returnValue.Proxy                     = $null
-            $returnValue.ProxyCredential           = $null
-            $returnValue.InstallationPolicy        = $null
-            $returnValue.PackageManagementProvider = $null
-            $returnValue.Trusted                   = $null
-            $returnValue.Registered                = $null
         }
         return $returnValue
     }
