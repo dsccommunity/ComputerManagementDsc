@@ -314,6 +314,19 @@ try
     }
 
     Describe 'PSResourceRepository\Test()' -Tag 'Test' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceRepository = [PSResourceRepository] @{
+                    Name                      = 'FakePSGallery'
+                    SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                    ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                    PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                    ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                    InstallationPolicy        = 'Untrusted'
+                    PackageManagementProvider = 'NuGet'
+                }
+            }
+        }
         Context 'When the system is in the desired state' {
             BeforeAll {
                 InModuleScope -ScriptBlock {
@@ -328,7 +341,7 @@ try
 
         It 'Should return $true' {
             InModuleScope -ScriptBlock {
-                $script:mockSQLPermissionInstance.Test() | Should -BeTrue
+                $script:mockPSResourceRepository.Test() | Should -BeTrue
             }
         }
 
