@@ -157,6 +157,8 @@ try
                     $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                     $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                     $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+
+                    Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }
             }
 
@@ -177,6 +179,8 @@ try
                     $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                     $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                     $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+
+                    Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }
             }
         }
@@ -217,6 +221,8 @@ try
                     $currentState.ScriptPublishLocation     | Should -Be 'https://www.notcorrect.com/api/v2/package/'
                     $currentState.InstallationPolicy        | Should -Be 'Trusted'
                     $currentState.PackageManagementProvider | Should -Be 'Package'
+
+                    Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }
             }
 
@@ -237,6 +243,8 @@ try
                     $currentState.ScriptPublishLocation     | Should -Be 'https://www.notcorrect.com/api/v2/package/'
                     $currentState.InstallationPolicy        | Should -Be 'Trusted'
                     $currentState.PackageManagementProvider | Should -Be 'Package'
+
+                    Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }
             }
         }
@@ -279,6 +287,8 @@ try
                         $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
+
+                        Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
                 }
 
@@ -312,6 +322,8 @@ try
                         $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
+
+                        Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
                 }
             }
@@ -338,6 +350,8 @@ try
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                         $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+
+                        Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
                 }
             }
@@ -373,6 +387,8 @@ try
                         $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
+
+                        Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
                 }
             }
@@ -397,6 +413,8 @@ try
                     $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                     $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                     $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+
+                    Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }
             }
         }
