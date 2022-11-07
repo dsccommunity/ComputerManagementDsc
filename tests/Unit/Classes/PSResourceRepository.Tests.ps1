@@ -127,8 +127,12 @@ try
         # }
 
         Context 'When the expected repo is absent' {
-            Mock -CommandName Get-PSRepository -MockWith {
-                return $null
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    Mock -CommandName Get-PSRepository -MockWith {
+                        return $null
+                    }
+                }
             }
 
             It 'Should return the correct results when ensure is Present' {
