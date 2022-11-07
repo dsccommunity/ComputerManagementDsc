@@ -65,15 +65,17 @@ try
 
         Context 'When the expected repo is present' {
 
-            Mock Get-PSRepository {
-                return @{
-                    Name                      = 'PSGallery'
-                    SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                    ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-                    PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-                    ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-                    InstallationPolicy        = 'Untrusted'
-                    PackageManagementProvider = 'NuGet'
+            BeforeEach {
+                Mock Get-PSRepository {
+                    return @{
+                        Name                      = 'PSGallery'
+                        SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                        ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                        PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                        ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                        InstallationPolicy        = 'Untrusted'
+                        PackageManagementProvider = 'NuGet'
+                    }
                 }
             }
 
@@ -125,8 +127,10 @@ try
         }
 
         Context 'When the expected repo is absent' {
-            Mock Get-PSRepository {
-                return $null
+            BeforeEach {
+                Mock Get-PSRepository {
+                    return $null
+                }
             }
 
             It 'Should return the correct results when ensure is Present' {
@@ -176,15 +180,17 @@ try
         }
 
         Context 'When the expected repo is present but not in the correct state' {
-            Mock Get-PSRespository {
-                return @{
-                    Name                      = 'PSGallery'
-                    SourceLocation            = 'https://www.notcorrect.com/api/v2'
-                    ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
-                    PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
-                    ScriptPublishLocation     = 'https://www.notcorrect.com/api/v2/package/'
-                    InstallationPolicy        = 'Trusted'
-                    PackageManagementProvider = 'Package'
+            BeforeEach {
+                Mock Get-PSRespository {
+                    return @{
+                        Name                      = 'PSGallery'
+                        SourceLocation            = 'https://www.notcorrect.com/api/v2'
+                        ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
+                        PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
+                        ScriptPublishLocation     = 'https://www.notcorrect.com/api/v2/package/'
+                        InstallationPolicy        = 'Trusted'
+                        PackageManagementProvider = 'Package'
+                    }
                 }
             }
 
@@ -236,16 +242,17 @@ try
 
         Context 'When the system is in the desired state' {
             Context 'When the repository should be Present' {
-
-                Mock Get-PSRepository {
-                    return @{
-                        Name                      = 'PSGallery'
-                        SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                        ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-                        PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-                        ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-                        InstallationPolicy        = 'Untrusted'
-                        PackageManagementProvider = 'NuGet'
+                BeforeEach {
+                    Mock Get-PSRepository {
+                        return @{
+                            Name                      = 'PSGallery'
+                            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                            PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                            InstallationPolicy        = 'Untrusted'
+                            PackageManagementProvider = 'NuGet'
+                        }
                     }
                 }
 
@@ -275,15 +282,17 @@ try
                 }
 
                 It 'Should return the correct result when the Repository is present and the minimum params are passed' {
-                    Mock Get-PSRepository {
-                        return @{
-                            Name                      = 'PSGallery'
-                            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-                            PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-                            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-                            InstallationPolicy        = 'Untrusted'
-                            PackageManagementProvider = 'NuGet'
+                    BeforeEach {
+                        Mock Get-PSRepository {
+                            return @{
+                                Name                      = 'PSGallery'
+                                SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                                ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                                PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                                ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                                InstallationPolicy        = 'Untrusted'
+                                PackageManagementProvider = 'NuGet'
+                            }
                         }
                     }
 
