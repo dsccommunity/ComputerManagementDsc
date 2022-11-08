@@ -382,26 +382,25 @@ try
 
     Describe 'PSResourceRepository\CheckProxyConfiguration()' -Tag 'CheckProxyConfiguration' {
         Context 'When ProxyCredential is passed with Proxy' {
+            BeforeAll {
+                $securePassword = New-Object -Type SecureString
+                $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
+            }
+
             It 'Should not throw when ProxyCredential is passed with Proxy' {
                 InModuleScope -ScriptBlock {
-                    $securePassword = New-Object -Type SecureString
-                    $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
-
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                         Name            = 'FakePSGallery'
                         Proxy           = 'https://fakeproxy.com'
                         ProxyCredential = $credential
                     }
 
-                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -NotThrow
+                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -Not -Throw
                 }
             }
 
             It 'Should throw when ProxyCredential is passed without Proxy' {
                 InModuleScope -ScriptBlock {
-                    $securePassword = New-Object -Type SecureString
-                    $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
-
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                         Name            = 'FakePSGallery'
                         ProxyCredential = $credential
@@ -418,7 +417,7 @@ try
                         Proxy           = 'https://fakeproxy.com'
                     }
 
-                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -NotThrow
+                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -Not -Throw
                 }
             }
         }
