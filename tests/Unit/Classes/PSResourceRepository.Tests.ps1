@@ -317,10 +317,58 @@ try
     }
 
     Describe 'PSResourceRepository\Test()' -Tag 'Test' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                    Name                      = 'FakePSGallery'
+                    SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                    ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                    PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                    ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                    InstallationPolicy        = 'Untrusted'
+                    PackageManagementProvider = 'NuGet'
+                }
+            }
+        }
+
         Context 'When the system is in the desired state' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance |
+                        # Mock method Compare() which is called by the base method Test ()
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'Compare' -Value {
+                            return $null
+                        }
+                }
+            }
+
+            It 'Should return $true' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Test() | Should -BeTrue
+                }
+            }
         }
 
         Context 'When the system is not in the desired state' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance |
+                        # Mock method Compare() which is called by the base method Test ()
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'Compare' -Value {
+                            return @{
+                                Property      = 'SourceLocation'
+                                ExpectedValue = 'https://www.powershellgallery.com/api/v2'
+                                ActualValue   = 'https://www.incorrectpowershellgallery.com/api/v2'
+                            }
+                        }
+                }
+            }
+
+            It 'Should return $false' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Test() | Should -BeFalse
+                }
+            }
         }
     }
 
