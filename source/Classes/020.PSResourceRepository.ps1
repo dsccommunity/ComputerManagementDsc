@@ -287,7 +287,6 @@ class PSResourceRepository : ResourceBase
         {
             switch ($properties.Ensure)
             {
-
                 'Absent' {
                     Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
                     Unregister-PSRepository -Name $this.Name

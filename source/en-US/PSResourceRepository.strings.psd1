@@ -16,4 +16,6 @@ ConvertFrom-StringData -StringData @'
     ProxyCredentialPassedWithoutProxyUri = Proxy Credential passed without Proxy Uri.
     RepositoryState                      = Repository '{0}' should be '{1}'.
     PropertyOutOfSync                    = Repository property '{0}' is not in the desired state. Currently '{1}', should be '{2}'.
+    RegisterRepository                   = Registering repository '{0}'.
+    UpdateRepository                     = Updating repository '{0}'.
 '@
