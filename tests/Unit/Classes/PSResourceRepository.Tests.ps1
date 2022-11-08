@@ -391,6 +391,7 @@ try
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                         Name            = 'FakePSGallery'
+                        SourceLocation  = 'https://www.powershellgallery.com/api/v2'
                         Proxy           = 'https://fakeproxy.com'
                         ProxyCredential = $credential
                     }
@@ -403,6 +404,7 @@ try
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                         Name            = 'FakePSGallery'
+                        SourceLocation  = 'https://www.powershellgallery.com/api/v2'
                         ProxyCredential = $credential
                     }
 
@@ -413,8 +415,9 @@ try
             It 'Should not throw when Proxy is passed without ProxyCredential' {
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name            = 'FakePSGallery'
-                        Proxy           = 'https://fakeproxy.com'
+                        Name           = 'FakePSGallery'
+                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                        Proxy          = 'https://fakeproxy.com'
                     }
 
                     $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -Not -Throw
