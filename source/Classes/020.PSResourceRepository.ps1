@@ -95,165 +95,168 @@ class PSResourceRepository : ResourceBase
 
     [PSResourceRepository] Get()
     {
-        $returnValue = [PSResourceRepository]@{
-            Ensure                    = [Ensure]::Absent
-            Name                      = $this.Name
-            SourceLocation            = $this.SourceLocation
-        }
+        return ([ResourceBase]$this).Get()
+        # $returnValue = [PSResourceRepository]@{
+        #     Ensure                    = [Ensure]::Absent
+        #     Name                      = $this.Name
+        #     SourceLocation            = $this.SourceLocation
+        # }
 
-        Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
-        $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
+        # Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
+        # $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
 
-        if ($repository)
-        {
-            $returnValue.Ensure                    = [Ensure]::Present
-            $returnValue.SourceLocation            = $repository.SourceLocation
-            $returnValue.ScriptSourceLocation      = $repository.ScriptSourceLocation
-            $returnValue.PublishLocation           = $repository.PublishLocation
-            $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
-            $returnValue.Proxy                     = $repository.Proxy
-            $returnValue.ProxyCredential           = $repository.ProxyCredental
-            $returnValue.InstallationPolicy        = [InstallationPolicy]::$($repository.InstallationPolicy)
-            $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
-            $returnValue.Trusted                   = $repository.Trusted
-            $returnValue.Registered                = $repository.Registered
-        }
-        else
-        {
-            Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
-        }
-        return $returnValue
+        # if ($repository)
+        # {
+        #     $returnValue.Ensure                    = [Ensure]::Present
+        #     $returnValue.SourceLocation            = $repository.SourceLocation
+        #     $returnValue.ScriptSourceLocation      = $repository.ScriptSourceLocation
+        #     $returnValue.PublishLocation           = $repository.PublishLocation
+        #     $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
+        #     $returnValue.Proxy                     = $repository.Proxy
+        #     $returnValue.ProxyCredential           = $repository.ProxyCredental
+        #     $returnValue.InstallationPolicy        = [InstallationPolicy]::$($repository.InstallationPolicy)
+        #     $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
+        #     $returnValue.Trusted                   = $repository.Trusted
+        #     $returnValue.Registered                = $repository.Registered
+        # }
+        # else
+        # {
+        #     Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
+        # }
+        # return $returnValue
     }
 
     [void] Set()
     {
-        $repository_state = $this.Get()
+        ([ResourceBase]$this).Set()
+        #* Just dont want to lose this while deving
+        # $repository_state = $this.Get()
 
-        Write-Verbose -Message ($this.localizedData.RepositoryState -f $this.name, $this.Ensure)
+        # Write-Verbose -Message ($this.localizedData.RepositoryState -f $this.name, $this.Ensure)
 
-        if ($this.Ensure -eq [Ensure]::Present)
-        {
-            $params = @{
-                Name           = $this.Name
-                SourceLocation = $this.SourceLocation
-            }
+        # if ($this.Ensure -eq [Ensure]::Present)
+        # {
+        #     $params = @{
+        #         Name           = $this.Name
+        #         SourceLocation = $this.SourceLocation
+        #     }
 
-            $this.CheckProxyConfiguration()
+        #     $this.CheckProxyConfiguration()
 
-            if ($repository_state.Ensure -ne [Ensure]::Present)
-            {
-                #* repo does not exist, need to add
-                if (-not [System.String]::IsNullOrEmpty($this.ScriptSourceLocation))
-                {
-                    $params.ScriptSourceLocation = $this.ScriptSourceLocation
-                }
+        #     if ($repository_state.Ensure -ne [Ensure]::Present)
+        #     {
+        #         #* repo does not exist, need to add
+        #         if (-not [System.String]::IsNullOrEmpty($this.ScriptSourceLocation))
+        #         {
+        #             $params.ScriptSourceLocation = $this.ScriptSourceLocation
+        #         }
 
-                if (-not [System.String]::IsNullOrEmpty($this.PublishLocation))
-                {
-                    $params.PublishLocation = $this.PublishLocation
-                }
+        #         if (-not [System.String]::IsNullOrEmpty($this.PublishLocation))
+        #         {
+        #             $params.PublishLocation = $this.PublishLocation
+        #         }
 
-                if (-not [System.String]::IsNullOrEmpty($this.ScriptPublishLocation))
-                {
-                    $params.ScriptPublishLocation = $this.ScriptPublishLocation
-                }
+        #         if (-not [System.String]::IsNullOrEmpty($this.ScriptPublishLocation))
+        #         {
+        #             $params.ScriptPublishLocation = $this.ScriptPublishLocation
+        #         }
 
-                if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
-                {
-                    $params.ProxyCredential = $this.ProxyCredential
-                }
+        #         if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
+        #         {
+        #             $params.ProxyCredential = $this.ProxyCredential
+        #         }
 
-                if (-not [System.String]::IsNullOrEmpty($this.Proxy))
-                {
-                    $params.Proxy = $this.Proxy
-                }
+        #         if (-not [System.String]::IsNullOrEmpty($this.Proxy))
+        #         {
+        #             $params.Proxy = $this.Proxy
+        #         }
 
-                $params.InstallationPolicy        = $this.InstallationPolicy
-                $params.PackageManagementProvider = $this.PackageManagementProvider
+        #         $params.InstallationPolicy        = $this.InstallationPolicy
+        #         $params.PackageManagementProvider = $this.PackageManagementProvider
 
-                Register-PsRepository @params
-            }
-            else
-            {
-                #* repo does exist, need to enforce each property
-                $params = @{
-                    Name = $this.Name
-                }
+        #         Register-PsRepository @params
+        #     }
+        #     else
+        #     {
+        #         #* repo does exist, need to enforce each property
+        #         $params = @{
+        #             Name = $this.Name
+        #         }
 
-                if ($repository_state.SourceLocation -ne $this.SourceLocation)
-                {
-                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'SourceLocation', $repository_state.SourceLocation, $this.SourceLocation)
-                    $params['SourceLocation'] = $this.SourceLocation
-                }
+        #         if ($repository_state.SourceLocation -ne $this.SourceLocation)
+        #         {
+        #             Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'SourceLocation', $repository_state.SourceLocation, $this.SourceLocation)
+        #             $params['SourceLocation'] = $this.SourceLocation
+        #         }
 
-                if (-not [System.String]::IsNullOrEmpty($this.ScriptSourceLocation))
-                {
-                    if ($repository_state.ScriptSourceLocation -ne $this.ScriptSourceLocation)
-                    {
-                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'ScriptSourceLocation', $repository_state.ScriptSourceLocation, $this.ScriptSourceLocation)
-                        $params['ScriptSourceLocation'] = $this.ScriptSourceLocation
-                    }
-                }
+        #         if (-not [System.String]::IsNullOrEmpty($this.ScriptSourceLocation))
+        #         {
+        #             if ($repository_state.ScriptSourceLocation -ne $this.ScriptSourceLocation)
+        #             {
+        #                 Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'ScriptSourceLocation', $repository_state.ScriptSourceLocation, $this.ScriptSourceLocation)
+        #                 $params['ScriptSourceLocation'] = $this.ScriptSourceLocation
+        #             }
+        #         }
 
-                if (-not [System.String]::IsNullOrEmpty($this.PublishLocation))
-                {
-                    if ($repository_state.PublishLocation -ne $this.PublishLocation)
-                    {
-                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'PublishLocation', $repository_state.PublishLocation, $this.PublishLocation)
-                        $params['PublishLocation'] = $this.PublishLocation
-                    }
-                }
+        #         if (-not [System.String]::IsNullOrEmpty($this.PublishLocation))
+        #         {
+        #             if ($repository_state.PublishLocation -ne $this.PublishLocation)
+        #             {
+        #                 Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'PublishLocation', $repository_state.PublishLocation, $this.PublishLocation)
+        #                 $params['PublishLocation'] = $this.PublishLocation
+        #             }
+        #         }
 
-                if (-not [System.String]::IsNullOrEmpty($this.ScriptPublishLocation))
-                {
-                    if ($repository_state.ScriptPublishLocation -ne $this.ScriptPublishLocation)
-                    {
-                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'ScriptPublishLocation', $repository_state.ScriptPublishLocation, $this.ScriptPublishLocation)
-                        $params['ScriptPublishLocation'] = $this.ScriptPublishLocation
-                    }
-                }
+        #         if (-not [System.String]::IsNullOrEmpty($this.ScriptPublishLocation))
+        #         {
+        #             if ($repository_state.ScriptPublishLocation -ne $this.ScriptPublishLocation)
+        #             {
+        #                 Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'ScriptPublishLocation', $repository_state.ScriptPublishLocation, $this.ScriptPublishLocation)
+        #                 $params['ScriptPublishLocation'] = $this.ScriptPublishLocation
+        #             }
+        #         }
 
-                if (-not [System.String]::IsNullOrEmpty($this.Proxy))
-                {
-                    if ($repository_state.Proxy -ne $this.Proxy)
-                    {
-                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'Proxy', $repository_state.Proxy, $this.Proxy)
-                        $params['Proxy'] = $this.Proxy
-                    }
-                }
+        #         if (-not [System.String]::IsNullOrEmpty($this.Proxy))
+        #         {
+        #             if ($repository_state.Proxy -ne $this.Proxy)
+        #             {
+        #                 Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'Proxy', $repository_state.Proxy, $this.Proxy)
+        #                 $params['Proxy'] = $this.Proxy
+        #             }
+        #         }
 
-                if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
-                {
-                    if ($repository_state.ProxyCredential -ne $this.ProxyCredential)
-                    {
-                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'ProxyCredential', $repository_state.ProxyCredential, $this.ProxyCredential)
-                        $params['ProxyCredential'] = $this.ProxyCredential
-                    }
-                }
+        #         if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
+        #         {
+        #             if ($repository_state.ProxyCredential -ne $this.ProxyCredential)
+        #             {
+        #                 Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'ProxyCredential', $repository_state.ProxyCredential, $this.ProxyCredential)
+        #                 $params['ProxyCredential'] = $this.ProxyCredential
+        #             }
+        #         }
 
-                if ($repository_state.InstallationPolicy -ne $this.InstallationPolicy)
-                {
-                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'InstallationPolicy', $repository_state.InstallationPolicy, $this.InstallationPolicy)
-                    $params['InstallationPolicy'] = $this.InstallationPolicy
-                }
+        #         if ($repository_state.InstallationPolicy -ne $this.InstallationPolicy)
+        #         {
+        #             Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'InstallationPolicy', $repository_state.InstallationPolicy, $this.InstallationPolicy)
+        #             $params['InstallationPolicy'] = $this.InstallationPolicy
+        #         }
 
-                if ($repository_state.PackageManagementProvider -ne $this.PackageManagementProvider)
-                {
-                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'PackageManagementProvider', $repository_state.PackageManagementProvider, $this.PackageManagementProvider)
-                    $params['PackageManagementProvider'] = $this.PackageManagementProvider
-                }
+        #         if ($repository_state.PackageManagementProvider -ne $this.PackageManagementProvider)
+        #         {
+        #             Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f 'PackageManagementProvider', $repository_state.PackageManagementProvider, $this.PackageManagementProvider)
+        #             $params['PackageManagementProvider'] = $this.PackageManagementProvider
+        #         }
 
-                Set-PSRepository @params
-            }
-        }
-        else
-        {
-            if ($repository_state.Ensure -eq [Ensure]::Present)
-            {
-                Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
-                Unregister-PSRepository -Name $this.Name
-            }
-        }
+        #         Set-PSRepository @params
+        #     }
+        # }
+        # else
+        # {
+        #     if ($repository_state.Ensure -eq [Ensure]::Present)
+        #     {
+        #         Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
+        #         Unregister-PSRepository -Name $this.Name
+        #     }
+        # }
     }
 
     [Boolean] Test()
@@ -284,9 +287,6 @@ class PSResourceRepository : ResourceBase
         {
             switch ($properties.Ensure)
             {
-                'Present' {
-                    $registerRepository = $True
-                }
 
                 'Absent' {
                     Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
@@ -319,7 +319,7 @@ class PSResourceRepository : ResourceBase
                         $params[$property.Property] = $property.ExpectedValue
                     }
                 }
-                if ($registerRepository)
+                if (-not $this.Registered)
                 {
                     Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name)
                     Register-PSRepository @params
