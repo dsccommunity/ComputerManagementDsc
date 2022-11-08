@@ -148,6 +148,7 @@ try
                         return $null
                     }
                 }
+
                 It 'Should return the correct result when the Repository is Absent' {
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
@@ -187,7 +188,8 @@ try
                         }
                     }
                 }
-                It 'Should return the correct value' {
+
+                It 'Should return the correct result when the Repository is present but should be absent' {
 
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
@@ -216,7 +218,8 @@ try
                         return $null
                     }
                 }
-                It 'Should return the correct data' {
+
+                It 'Should return the correct result when the Repository is absent but should be present' {
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                             Name           = 'FakePSGallery'
@@ -253,7 +256,7 @@ try
                     }
                 }
 
-                It 'Should return the correct results when ensure is Present' {
+                It 'Should return the correct results when the Repository is Present but not in the correct state' {
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                             Name                      = 'FakePSGallery'
@@ -280,7 +283,7 @@ try
                     }
                 }
 
-                It 'Should return the correct results when ensure is Absent' {
+                It 'Should return the correct results when the Repository is Present but should be Absent' {
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                             Name                      = 'FakePSGallery'

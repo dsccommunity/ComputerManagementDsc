@@ -274,7 +274,66 @@ class PSResourceRepository : ResourceBase
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
+        #* If the repository is not on the system already, Register-PSRepository is used
+        #*  otherwise, use Set-PSRepository
+        $registerRepository = $False
+
         # TODO: Add logic to function. Comment to avoid HQRM test to throw on empty function.
+        if ($properties.Keys -contains 'Ensure')
+        {
+            switch ($properties.Ensure)
+            {
+                'Present' {
+                    $registerRepository = $True
+                }
+
+                'Absent' {
+                    Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
+                    Unregister-PSRepository -Name $this.Name
+                }
+            }
+        }
+        else
+        {
+            <#
+                Update any properties not in desired state if the PSResourceRepository
+                should be present. At this point it is assumed the PSResourceRepository
+                exist since Ensure property was in desired state.
+                If the desired state happens to be Absent then ignore any properties not
+                in desired state (user have in that case wrongly added properties to an
+                "absent configuration").
+            #>
+            if ($this.Ensure -eq [Ensure]::Present)
+            {
+                $params = @{
+                    Name = $this.Name
+                }
+
+                foreach ($property in $properties)
+                {
+                    #? Registered & Trusted are both hidden, does Compare() return them?
+                    if ($property.Property -in @('Ensure','Registered','Trusted'))
+                    {
+                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $property.Property, $property.ActualValue, $property.ExpectedValue)
+                        $params[$property.Property] = $property.ExpectedValue
+                    }
+                }
+                if ($registerRepository)
+                {
+                    Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name)
+                    Register-PSRepository @params
+                }
+                else
+                {
+                    #* Dont waste time running Set-PSRepository if params only has the 'Name' key.
+                    if ($params.Keys.Counts -gt 1)
+                    {
+                        Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name)
+                        Set-PSRepository @params
+                    }
+                }
+            }
+        }
     }
 
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
