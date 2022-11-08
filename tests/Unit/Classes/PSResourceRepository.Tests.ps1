@@ -380,6 +380,50 @@ try
         }
     }
 
+    Describe 'PSResourceRepository\CheckProxyConfiguration()' -Tag 'CheckProxyConfiguration' {
+        Context 'When ProxyCredential is passed with Proxy' {
+            It 'Should not throw when ProxyCredential is passed with Proxy' {
+                InModuleScope -ScriptBlock {
+                    $securePassword = New-Object -Type SecureString
+                    $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
+
+                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                        Name            = 'FakePSGallery'
+                        Proxy           = 'https://fakeproxy.com'
+                        ProxyCredential = $credential
+                    }
+
+                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | -Should -NotThrow
+                }
+            }
+
+            It 'Should throw when ProxyCredential is passed without Proxy' {
+                InModuleScope -ScriptBlock {
+                    $securePassword = New-Object -Type SecureString
+                    $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
+
+                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                        Name            = 'FakePSGallery'
+                        ProxyCredential = $credential
+                    }
+
+                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | -Should -Throw
+                }
+            }
+
+            It 'Should not throw when Proxy is passed without ProxyCredential' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                        Name            = 'FakePSGallery'
+                        Proxy           = 'https://fakeproxy.com'
+                    }
+
+                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | -Should -NotThrow
+                }
+            }
+        }
+    }
+
     Describe 'PSResourceRepository\AssertProperties()' -Tag 'AssertProperties' {
     }
 }
