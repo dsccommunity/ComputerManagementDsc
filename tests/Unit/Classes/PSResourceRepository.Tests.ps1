@@ -393,7 +393,7 @@ try
                         ProxyCredential = $credential
                     }
 
-                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | -Should -NotThrow
+                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -NotThrow
                 }
             }
 
@@ -407,7 +407,7 @@ try
                         ProxyCredential = $credential
                     }
 
-                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | -Should -Throw
+                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -Throw
                 }
             }
 
@@ -418,7 +418,7 @@ try
                         Proxy           = 'https://fakeproxy.com'
                     }
 
-                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | -Should -NotThrow
+                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -NotThrow
                 }
             }
         }
