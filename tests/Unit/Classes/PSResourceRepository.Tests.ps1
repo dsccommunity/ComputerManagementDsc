@@ -286,9 +286,9 @@ try
                 It 'Should return the correct results when the Repository is Present but should be Absent' {
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                            Name                      = 'FakePSGallery'
-                            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                            Ensure                    = 'Absent'
+                            Name           = 'FakePSGallery'
+                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                            Ensure         = 'Absent'
                         }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
@@ -385,42 +385,43 @@ try
             BeforeAll {
                 $securePassword = New-Object -Type SecureString
                 $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
-            }
-
-            It 'Should not throw when ProxyCredential is passed with Proxy' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                    $script:mockPSResourceRepositoryInstanceFull = [PSResourceRepository] @{
                         Name            = 'FakePSGallery'
                         SourceLocation  = 'https://www.powershellgallery.com/api/v2'
                         Proxy           = 'https://fakeproxy.com'
                         ProxyCredential = $credential
                     }
 
-                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -Not -Throw
-                }
-            }
-
-            It 'Should throw when ProxyCredential is passed without Proxy' {
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                    $script:mockPSResourceRepositoryInstanceCred = [PSResourceRepository] @{
                         Name            = 'FakePSGallery'
                         SourceLocation  = 'https://www.powershellgallery.com/api/v2'
                         ProxyCredential = $credential
                     }
 
-                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -Throw
+                    $script:mockPSResourceRepositoryInstanceProxy = [PSResourceRepository] @{
+                        Name           = 'FakePSGallery'
+                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                        Proxy          = 'https://fakeproxy.com'
+                    }
+                }
+            }
+
+            It 'Should not throw when ProxyCredential is passed with Proxy' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstanceFull.CheckProxyConfiguration() | Should -Not -Throw
+                }
+            }
+
+            It 'Should throw when ProxyCredential is passed without Proxy' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstanceCred.CheckProxyConfiguration() | Should -Throw
                 }
             }
 
             It 'Should not throw when Proxy is passed without ProxyCredential' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name           = 'FakePSGallery'
-                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                        Proxy          = 'https://fakeproxy.com'
-                    }
-
-                    $script:mockPSResourceRepositoryInstance.CheckProxyConfiguration() | Should -Not -Throw
+                    $script:mockPSResourceRepositoryInstanceProxy.CheckProxyConfiguration() | Should -Not -Throw
                 }
             }
         }
