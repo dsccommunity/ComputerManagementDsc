@@ -172,7 +172,8 @@ class PSResourceRepository : ResourceBase
                 $params.PackageManagementProvider = $this.PackageManagementProvider
 
                 Register-PsRepository @params
-            } else
+            }
+            else
             {
                 #* repo does exist, need to enforce each property
                 $params = @{
@@ -338,6 +339,33 @@ class PSResourceRepository : ResourceBase
 
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
     {
-        return $this.Get()
+        $returnValue = @{
+            Ensure                    = [Ensure]::Absent
+            Name                      = $this.Name
+            SourceLocation            = $this.SourceLocation
+        }
+
+        Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
+        $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
+
+        if ($repository)
+        {
+            $returnValue.Ensure                    = [Ensure]::Present
+            $returnValue.SourceLocation            = $repository.SourceLocation
+            $returnValue.ScriptSourceLocation      = $repository.ScriptSourceLocation
+            $returnValue.PublishLocation           = $repository.PublishLocation
+            $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
+            $returnValue.Proxy                     = $repository.Proxy
+            $returnValue.ProxyCredential           = $repository.ProxyCredental
+            $returnValue.InstallationPolicy        = [InstallationPolicy]::$($repository.InstallationPolicy)
+            $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
+            $returnValue.Trusted                   = $repository.Trusted
+            $returnValue.Registered                = $repository.Registered
+        }
+        else
+        {
+            Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
+        }
+        return $returnValue
     }
 }
