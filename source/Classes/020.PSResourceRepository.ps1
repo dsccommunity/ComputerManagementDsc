@@ -375,6 +375,9 @@ class PSResourceRepository : ResourceBase
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('AvoidEmptyNamedBlocks', '')]
     hidden [void] AssertProperties([System.Collections.Hashtable] $properties)
     {
+        Assert-Module PowerShellGet
+        Assert-Module PackageManagement
+
         if ($this.ProxyCredental -and (-not $this.Proxy))
         {
             $errorMessage = $this.localizedData.ProxyCredentialPassedWithoutProxyUri
