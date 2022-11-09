@@ -264,17 +264,17 @@ class PSResourceRepository : ResourceBase
         return ([ResourceBase] $this).Test()
     }
 
-    #* Throws if ProxyCredential was passed without Proxy uri
-    hidden [void] CheckProxyConfiguration()
-    {
-        if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
-        {
-            if ( [System.String]::IsNullOrEmpty($this.Proxy))
-            {
-                throw $this.localizedData.ProxyCredentialPassedWithoutProxyUri
-            }
-        }
-    }
+    # #* Throws if ProxyCredential was passed without Proxy uri
+    # hidden [void] CheckProxyConfiguration()
+    # {
+    #     if (-not [System.String]::IsNullOrEmpty($this.ProxyCredential))
+    #     {
+    #         if ( [System.String]::IsNullOrEmpty($this.Proxy))
+    #         {
+    #             throw $this.localizedData.ProxyCredentialPassedWithoutProxyUri
+    #         }
+    #     }
+    # }
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
@@ -367,4 +367,19 @@ class PSResourceRepository : ResourceBase
         }
         return $returnValue
     }
+
+    <#
+        The parameter properties will contain the properties that was
+        assigned a value.
+    #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('AvoidEmptyNamedBlocks', '')]
+    hidden [void] AssertProperties([System.Collections.Hashtable] $properties)
+    {
+        if ($this.ProxyCredental -and (-not $this.Proxy))
+        {
+            $errorMessage = $this.localizedData.ProxyCredentialPassedWithoutProxyUri
+            New-InvalidArgumentException -ArgumentName 'ProxyCredential' -Message $errorMessage
+        }
+    }
+
 }
