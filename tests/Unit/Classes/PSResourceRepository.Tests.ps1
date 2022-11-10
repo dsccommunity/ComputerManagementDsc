@@ -402,7 +402,16 @@ try
                             PackageManagementProvider = 'NuGet'
                         }
 
-                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState()
+                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState(@{
+                                Name                      = 'FakePSGallery'
+                                SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                                ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                                PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                                ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                                InstallationPolicy        = 'Untrusted'
+                                PackageManagementProvider = 'NuGet'
+                            })
+
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
