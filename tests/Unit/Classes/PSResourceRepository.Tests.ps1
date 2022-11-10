@@ -428,6 +428,23 @@ try
     # }
 
     Describe 'PSResourceRepository\AssertProperties()' -Tag 'AssertProperties' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{}
+            }
+        }
+        Context 'When passing dependant parameters' {
+            Context 'When passing ProxyCredential without Proxy' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $securePassword = New-Object -Type SecureString
+                        $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
+                        $mockPSResourceRepositoryInstance.ProxyCredental = $credential
+                        $mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'Proxy Credential passed without Proxy Uri.'
+                    }
+                }
+            }
+        }
     }
 }
 finally
