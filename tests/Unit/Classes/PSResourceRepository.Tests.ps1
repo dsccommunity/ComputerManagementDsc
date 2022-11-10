@@ -446,7 +446,11 @@ try
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Absent'
                         }
-                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState()
+                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState(@{
+                                Name           = 'FakePSGallery'
+                                SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                                Ensure         = 'Absent'
+                            })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
@@ -476,7 +480,11 @@ try
                                 SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             }
 
-                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState()
+                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState(@{
+                                Name           = 'FakePSGallery'
+                                Ensure         = 'Absent'
+                                SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                            })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.Ensure                    | Should -Be 'Absent'
@@ -516,7 +524,13 @@ try
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Absent'
                         }
-                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState()
+                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState(
+                            Name           = 'FakePSGallery'
+                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                            Ensure         = 'Absent'
+                            PackageManagementProvider = 'Nuget'
+                            InstallationPolicy = 'Untrusted'
+                        )
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
