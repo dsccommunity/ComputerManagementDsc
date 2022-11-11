@@ -376,7 +376,7 @@ try
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance.Set()
 
-                    $script:mockPSResourceRepositoryInstance | Should -Be 0
+                    $script:mockMethodModifyCallCount | Should -Be 0
                 }
             }
         }
@@ -403,7 +403,7 @@ try
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance.Set()
 
-                    $script:mockPSResourceRepositoryInstance | Should -Be 1
+                    $script:mockMethodModifyCallCount | Should -Be 1
                 }
             }
         }
