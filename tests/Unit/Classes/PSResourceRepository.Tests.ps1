@@ -399,10 +399,9 @@ try
                 }
             }
 
-            It 'Should not call method Modify()' {
+            It 'Should call method Modify()' {
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance.Set()
-
                     $script:mockMethodModifyCallCount | Should -Be 1
                 }
             }
@@ -756,7 +755,32 @@ try
     }
 
     Describe 'PSResourceRepository\Modify()' -Tag 'Modify' {
-        Context 'When the system is not in the desired state' {
+        Context 'When the system is not in the desired state and the repository is not registered' {
+            Context 'When the repository is present but should be absent' {
+                BeforeAll {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                            Name           = 'FakePSGallery'
+                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                            Ensure         = 'Absent'
+                         }
+                    }
+
+                    Mock -CommandName Unregister-PSRepository
+
+                    $script:mockPSResourceRepositoryInstance.Modify(
+                        @{
+                            Ensure = 'Absent'
+                        }
+                    )
+                    Should -Invoke -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
+                }
+            }
+
+        }
+
+        Context 'When the system is not in the desired state and the repository is registered' {
+
         }
     }
 
