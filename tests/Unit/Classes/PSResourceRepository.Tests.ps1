@@ -64,15 +64,12 @@ try
     Describe 'PSResourceRepository\Get()' -Tag 'Get' {
 
         Context 'When the system is in the desired state' {
-            Context 'When the repository should be Present' {
+            Context 'When the repository is Present with default values' {
                 BeforeEach {
                     Mock -CommandName Get-PSRepository -MockWith {
                         return @{
                             Name                      = 'FakePSGallery'
                             SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-                            PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-                            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
                             InstallationPolicy        = 'Untrusted'
                             PackageManagementProvider = 'NuGet'
                         }
@@ -85,20 +82,33 @@ try
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                             Name                      = 'FakePSGallery'
                             SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-                            PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-                            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-                            InstallationPolicy        = 'Untrusted'
-                            PackageManagementProvider = 'NuGet'
+                        }
+
+                        <#
+                            This mocks the method GetCurrentState().
+                            Method Get() will call the base method Get() which will
+                            call back to the derived class method GetCurrentState()
+                            to get the result to return from the derived method Get().
+                        #>
+                        $script:mockPSResourceRepositoryInstance |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                            return [System.Collections.Hashtable] @{
+                                Name           = 'FakePSGallery'
+                                SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                                Ensure         = 'Present'
+                            }
+                        } -PassThru |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                            return
                         }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
-                        $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
-                        $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
-                        $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
+                        $currentState.PublishLocation           | Should -BeNullOrEmpty
+                        $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
@@ -106,7 +116,7 @@ try
                     }
                 }
 
-                It 'Should return the correct result when the Repository is present and the minimum params are passed' {
+                It 'Should return the correct result when the Repository is Present and all properties are passed' {
                     BeforeEach {
                         Mock -CommandName Get-PSRepository -MockWith {
                             return @{
@@ -123,10 +133,28 @@ try
 
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                            Name           = 'FakePSGallery'
-                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                            Ensure         = 'Absent'
+                            Name                      = 'FakePSGallery'
+                            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                            Ensure                    = 'Absent'
+                            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                            PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                            InstallationPolicy        = 'Untrusted'
+                            PackageManagementProvider = 'NuGet'
                         }
+
+                        $script:mockPSResourceRepositoryInstance |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                            return [System.Collections.Hashtable] @{
+                                Name           = 'FakePSGallery'
+                                SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                                Ensure         = 'Present'
+                            }
+                        } -PassThru |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                            return
+                        }
+
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
@@ -152,11 +180,21 @@ try
                 It 'Should return the correct result when the Repository is Absent' {
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                            Name           = 'FakePSGallery'
+                            Ensure         = 'Absent'
+                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                        }
+                        $script:mockPSResourceRepositoryInstance |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                            return [System.Collections.Hashtable] @{
                                 Name           = 'FakePSGallery'
-                                Ensure         = 'Absent'
                                 SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                                Ensure         = 'Absent'
                             }
-
+                        } -PassThru |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                            return
+                        }
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
