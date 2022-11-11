@@ -481,9 +481,11 @@ try
                             }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState(@{
-                                Name           = 'FakePSGallery'
-                                Ensure         = 'Absent'
-                                SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                                Name                      = 'FakePSGallery'
+                                Ensure                    = 'Absent'
+                                SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                                InstallationPolicy        = 'Untrusted'
+                                PackageManagementProvider = 'NuGet'
                             })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
@@ -534,9 +536,9 @@ try
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
-                        $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
-                        $currentState.PublishLocation           | Should -BeNullOrEmpty
-                        $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+                        $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
+                        $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
