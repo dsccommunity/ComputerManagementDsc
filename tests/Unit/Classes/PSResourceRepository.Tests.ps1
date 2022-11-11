@@ -524,19 +524,20 @@ try
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Absent'
                         }
-                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState(
-                            Name           = 'FakePSGallery'
-                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                            Ensure         = 'Absent'
+                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState(@{
+                            Name                      = 'FakePSGallery'
+                            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                            Ensure                    = 'Absent'
                             PackageManagementProvider = 'Nuget'
-                            InstallationPolicy = 'Untrusted'
+                            InstallationPolicy        = 'Untrusted'
+                            }
                         )
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
-                        $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
-                        $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
-                        $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
+                        $currentState.PublishLocation           | Should -BeNullOrEmpty
+                        $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
