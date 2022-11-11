@@ -488,7 +488,7 @@ try
                                 PackageManagementProvider = 'NuGet'
                             })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
-                        $currentState.SourceLocation            | Should -BeNullOrEmpty
+                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.Ensure                    | Should -Be 'Absent'
                         $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
@@ -570,7 +570,7 @@ try
                         })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Absent'
-                        $currentState.SourceLocation            | Should -BeNullOrEmpty
+                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
