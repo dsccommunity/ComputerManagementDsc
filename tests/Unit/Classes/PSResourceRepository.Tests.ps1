@@ -756,6 +756,33 @@ try
 
     Describe 'PSResourceRepository\Modify()' -Tag 'Modify' {
         Context 'When the system is not in the desired state and the repository is not registered' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                        Name           = 'FakePSGallery'
+                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                        Ensure         = 'Present'
+                    }
+
+                    $script:mockPSResourceRepositoryInstance.Registered = $False
+
+                    Mock -CommandName Register-PSRepository
+                }
+            }
+
+            It 'Should call the correct mock' {
+                $script:mockPSResourceRepositoryInstance.Modify(
+                    @{
+                        SourceLocation = 'https://www.fakepsgallery.com/api/v2'
+                    }
+                )
+                Should -Invoke -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
+            }
+
+
+        }
+
+        Context 'When the system is not in the desired state and the repository is registered' {
             Context 'When the repository is present but should be absent' {
                 BeforeAll {
                     InModuleScope -ScriptBlock {
@@ -767,20 +794,17 @@ try
                     }
 
                     Mock -CommandName Unregister-PSRepository
-
+                }
+                It 'Should call the correct mock' {
                     $script:mockPSResourceRepositoryInstance.Modify(
                         @{
                             Ensure = 'Absent'
                         }
                     )
                     Should -Invoke -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
+
                 }
             }
-
-        }
-
-        Context 'When the system is not in the desired state and the repository is registered' {
-
         }
     }
 
