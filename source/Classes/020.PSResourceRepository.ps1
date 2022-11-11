@@ -278,9 +278,6 @@ class PSResourceRepository : ResourceBase
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        #* If the repository is not on the system already, Register-PSRepository is used
-        #*  otherwise, use Set-PSRepository
-        $registerRepository = $False
 
         # TODO: Add logic to function. Comment to avoid HQRM test to throw on empty function.
         if ($properties.Keys -contains 'Ensure')

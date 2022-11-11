@@ -770,8 +770,7 @@ try
 
             It 'Should call the correct mock' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance.Modify(
-                        @{
+                    $script:mockPSResourceRepositoryInstance.Modify(@{
                             SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                         }
                     )
@@ -784,7 +783,7 @@ try
             Context 'When the repository is present but should be absent' {
                 BeforeAll {
                     InModuleScope -ScriptBlock {
-                        $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                        $script:mockPSResourceRepositoryInstance = [PSResourceRepository]@{
                             Name           = 'FakePSGallery'
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Absent'
@@ -795,8 +794,7 @@ try
                 }
                 It 'Should call the correct mock' {
                     InModuleScope -ScriptBlock {
-                        $script:mockPSResourceRepositoryInstance.Modify(
-                            @{
+                        $script:mockPSResourceRepositoryInstance.Modify(@{
                                 Ensure = 'Absent'
                             }
                         )
@@ -821,8 +819,7 @@ try
 
                 It 'Should call the correct mock' {
                     InModuleScope -ScriptBlock {
-                        $script:mockPSResourceRepositoryInstance.Modify(
-                            @{
+                        $script:mockPSResourceRepositoryInstance.Modify(@{
                                 SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                             }
                         )
