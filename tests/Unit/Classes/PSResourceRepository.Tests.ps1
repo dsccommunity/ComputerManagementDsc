@@ -338,10 +338,74 @@ try
     }
 
     Describe 'PSResourceRepository\Set()' -Tag 'Set' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                    Name           = 'FakePSGallery'
+                    SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                    Ensure         = 'Present'
+                } |
+                    # Mock method Modify which is called by the base method Set().
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'Modify' -Value {
+                        $script:mockMethodModifyCallCount += 1
+                    } -PassThru
+            }
+        }
+
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockMethodModifyCallCount = 0
+            }
+        }
+
         Context 'When the system is in the desired state' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance |
+                        # Mock method Compare() which is called by the base method Set()
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'Compare' -Value {
+                            return $null
+                        } -PassThru |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                            return
+                        }
+                }
+            }
+
+            It 'Should not call method Modify()' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Set()
+
+                    $script:mockPSResourceRepositoryInstance | Should -Be 0
+                }
+            }
         }
 
         Context 'When the system is not in the desired state' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance |
+                        # Mock method Compare() which is called by the base method Set()
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'Compare' -Value {
+                            return @{
+                                Property      = 'SourceLocation'
+                                ExpectedValue = 'https://www.fakegallery.com/api/v2'
+                                ActualValue   = 'https://www.powershellgallery.com/api/v2'
+                            }
+                        } -PassThru |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                            return
+                        }
+                }
+            }
+
+            It 'Should not call method Modify()' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Set()
+
+                    $script:mockPSResourceRepositoryInstance | Should -Be 1
+                }
+            }
         }
     }
 
