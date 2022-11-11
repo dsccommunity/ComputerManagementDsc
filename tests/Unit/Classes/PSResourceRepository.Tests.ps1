@@ -771,15 +771,15 @@ try
             }
 
             It 'Should call the correct mock' {
-                $script:mockPSResourceRepositoryInstance.Modify(
-                    @{
-                        SourceLocation = 'https://www.fakepsgallery.com/api/v2'
-                    }
-                )
-                Should -Invoke -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Modify(
+                        @{
+                            SourceLocation = 'https://www.fakepsgallery.com/api/v2'
+                        }
+                    )
+                    Should -Invoke -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
+                }
             }
-
-
         }
 
         Context 'When the system is not in the desired state and the repository is registered' {
@@ -796,13 +796,41 @@ try
                     Mock -CommandName Unregister-PSRepository
                 }
                 It 'Should call the correct mock' {
-                    $script:mockPSResourceRepositoryInstance.Modify(
-                        @{
-                            Ensure = 'Absent'
-                        }
-                    )
-                    Should -Invoke -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceRepositoryInstance.Modify(
+                            @{
+                                Ensure = 'Absent'
+                            }
+                        )
+                        Should -Invoke -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
+                    }
 
+                }
+            }
+
+            Context 'When the repository is present but not in desired state' {
+                BeforeAll {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                            Name           = 'FakePSGallery'
+                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                            Ensure         = 'Present'
+                         }
+                         $script:mockPSResourceRepositoryInstance.Registered = $True
+                    }
+
+                    Mock -CommandName Set-PSRepository
+                }
+
+                It 'Should call the correct mock' {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceRepositoryInstance.Modify(
+                            @{
+                                SourceLocation = 'https://www.fakepsgallery.com/api/v2'
+                            }
+                        )
+                        Should -Invoke -CommandName Set-PSRepository -Exactly -Times 1 -Scope It
+                    }
                 }
             }
         }
