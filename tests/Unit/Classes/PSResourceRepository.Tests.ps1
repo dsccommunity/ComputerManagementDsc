@@ -468,10 +468,7 @@ try
             Context 'When the respository should be Absent' {
                 BeforeEach {
                     Mock -CommandName Get-PSRepository -MockWith {
-                        return @{
-                            PackageManagementProvider = 'NuGet'
-                            InstallationPolicy        = 'Untrusted'
-                        }
+                        return $null
                     }
                 }
 
@@ -491,13 +488,13 @@ try
                                 PackageManagementProvider = 'NuGet'
                             })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
-                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                        $currentState.SourceLocation            | Should -BeNullOrEmpty
                         $currentState.Ensure                    | Should -Be 'Absent'
-                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
+                        $currentState.PackageManagementProvider | Should -BeNullOrEmpty
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
@@ -553,10 +550,7 @@ try
             Context 'When the repository is absent but should be present' {
                 BeforeEach {
                     Mock -CommandName Get-PSRepository -MockWith {
-                        return @{
-                            PackageManagementProvider = 'NuGet'
-                            InstallationPolicy        = 'Untrusted'
-                        }
+                        return $null
                     }
                 }
 
@@ -576,12 +570,12 @@ try
                         })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Absent'
-                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                        $currentState.SourceLocation            | Should -BeNullOrEmpty
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
-                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
+                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
+                        $currentState.PackageManagementProvider | Should -BeNullOrEmpty
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
