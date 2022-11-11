@@ -764,8 +764,6 @@ try
                         Ensure         = 'Present'
                     }
 
-                    $script:mockPSResourceRepositoryInstance.Registered = $False
-
                     Mock -CommandName Register-PSRepository
                 }
             }
@@ -804,7 +802,6 @@ try
                         )
                         Should -Invoke -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
                     }
-
                 }
             }
 
