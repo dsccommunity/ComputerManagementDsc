@@ -468,7 +468,10 @@ try
             Context 'When the respository should be Absent' {
                 BeforeEach {
                     Mock -CommandName Get-PSRepository -MockWith {
-                        return $null
+                        return @{
+                            PackageManagementProvider = 'NuGet'
+                            InstallationPolicy        = 'Untrusted'
+                        }
                     }
                 }
 
@@ -550,7 +553,10 @@ try
             Context 'When the repository is absent but should be present' {
                 BeforeEach {
                     Mock -CommandName Get-PSRepository -MockWith {
-                        return $null
+                        return @{
+                            PackageManagementProvider = 'NuGet'
+                            InstallationPolicy        = 'Untrusted'
+                        }
                     }
                 }
 
