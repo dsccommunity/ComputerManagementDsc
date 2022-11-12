@@ -59,13 +59,13 @@ configuration PSResourceRepository_Modify_Config
     {
         PSResourceRepository "Modify PSRepository $($ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.Name)"
         {
-            Name                  = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Name
-            Ensure                = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Ensure
-            SourceLocation        = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.SourceLocation
-            ScriptSourceLocation  = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.ScriptSourceLocation
-            PublishLocation       = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.PublishLocation
-            ScriptPublishLocation = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.ScriptPublishLocation
-            InstallationPolicy    = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.InstallationPolicy
+            Name                  = $ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.Name
+            Ensure                = $ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.Ensure
+            SourceLocation        = $ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.SourceLocation
+            ScriptSourceLocation  = $ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.ScriptSourceLocation
+            PublishLocation       = $ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.PublishLocation
+            ScriptPublishLocation = $ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.ScriptPublishLocation
+            InstallationPolicy    = $ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.InstallationPolicy
         }
     }
 }
