@@ -168,17 +168,17 @@ class PSResourceRepository : ResourceBase
                         Write-Verbose -Message ($this.localizedData.SetProperty -f $_, $propertiesToModify.$_)
                     }
 
-                if (-not $propertiesToModify.Keys -contains 'SourceLocation')
-                {
+                # if (-not $propertiesToModify.Keys -contains 'SourceLocation')
+                # {
                     Write-Verbose "Appending SourceLocation to propertiesToModify"
-                    $propertiesToModify += @{'SourceLocation' = $this.SourceLocation}
-                }
+                    $propertiesToModify['SourceLocation'] = $this.SourceLocation
+                # }
 
-                if (-not $propertiesToModify.Keys -contains 'Name')
-                {
+                # if (-not $propertiesToModify.Keys -contains 'Name')
+                # {
                     Write-Verbose "Appending Name to propertiesToModify"
-                    $propertiesToModify += @{'Name' = $this.Name}
-                }
+                    $propertiesToModify['Name'] = $this.Name
+                # }
 
                 foreach ($key in $propertiesToModify.Keys)
                 {
