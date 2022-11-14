@@ -140,7 +140,7 @@ class PSResourceRepository : ResourceBase
                     Name = $this.Name
                 }
 
-                Write-Verbose "this.reg'd equals ${this.registered}"
+                Write-Verbose "this.reg'd equals $($this.registered)"
 
                 foreach ($property in $properties)
                 {
