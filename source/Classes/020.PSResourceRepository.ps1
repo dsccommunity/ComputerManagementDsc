@@ -159,7 +159,7 @@ class PSResourceRepository : ResourceBase
             if (-not $this.Registered)
             {
                 Write-Verbose "IN NOT REGSITERED"
-                $propertiesNotInDesiredState = $this.Compare($this.GetCurrentState($($this | Get-DscProperty -Type 'Key')), $this.ExcludedProperties)
+                $propertiesNotInDesiredState = $this.Compare($this.GetCurrentState($($this | Get-DscProperty -Type 'Key')), $this.ExcludedProperties + 'Ensure')
 
                 $propertiesToModify = $propertiesNotInDesiredState | ConvertFrom-CompareResult
 
