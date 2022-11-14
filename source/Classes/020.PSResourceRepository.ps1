@@ -168,7 +168,19 @@ class PSResourceRepository : ResourceBase
                         Write-Verbose -Message ($this.localizedData.SetProperty -f $_, $propertiesToModify.$_)
                     }
 
-                Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name)
+                if (-not $propertiesToModify.Keys -contains 'SourceLocation')
+                {
+                    Write-Verbose "Appending SourceLocation to propertiesToModify"
+                    $propertiesToModify += @{'SourceLocation' = $this.SourceLocation}
+                }
+
+                if (-not $propertiesToModify.Keys -contains 'Name')
+                {
+                    Write-Verbose "Appending Name to propertiesToModify"
+                    $propertiesToModify += @{'Name' = $this.Name}
+                }
+
+                Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
                 Register-PSRepository @propertiesToModify
             }
             else
@@ -176,7 +188,7 @@ class PSResourceRepository : ResourceBase
                 #* Dont waste time running Set-PSRepository if params only has the 'Name' key.
                 if ($params.Keys.Count -gt 1)
                 {
-                    Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name)
+                    Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name, $this.SourceLocation)
                     Set-PSRepository @params
                 }
             }
