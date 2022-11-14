@@ -180,6 +180,11 @@ class PSResourceRepository : ResourceBase
                     $propertiesToModify += @{'Name' = $this.Name}
                 }
 
+                foreach ($key in $propertiesToModify.Keys)
+                {
+                    Write-Verbose "param to modify key: $key, value: $propertiesToModify.$key"
+                }
+
                 Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
                 Register-PSRepository @propertiesToModify
             }
