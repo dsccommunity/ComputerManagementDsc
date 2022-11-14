@@ -110,61 +110,52 @@ class PSResourceRepository : ResourceBase
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        Write-Verbose "In Modify"
-
         # TODO: Add logic to function. Comment to avoid HQRM test to throw on empty function.
-        if ($properties.Keys -contains 'Ensure')
+        if (($properties.Keys -contains 'Ensure') -and ($properties.Ensure -eq 'Absent'))
         {
-            Write-Verbose "key contains Ensure"
-            switch ($properties.Ensure)
+            Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
+            Unregister-PSRepository -Name $this.Name
+            return
+        }
+
+        <#
+            Update any properties not in desired state if the PSResourceRepository
+            should be present. At this point it is assumed the PSResourceRepository
+            exist since Ensure property was in desired state.
+            If the desired state happens to be Absent then ignore any properties not
+            in desired state (user have in that case wrongly added properties to an
+            "absent configuration").
+        #>
+        if ($this.Ensure -eq [Ensure]::Present)
+        {
+            $params = @{
+                Name = $this.Name
+            }
+
+            Write-Verbose "this.reg'd equals $($this.registered)"
+
+            foreach ($property in $properties)
             {
-                'Absent' {
-                    Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
-                    Unregister-PSRepository -Name $this.Name
+                #? Registered & Trusted are both hidden, does Compare() return them?
+                if (! $property.Property -in @('Ensure','Registered','Trusted'))
+                {
+                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $property.Property, $property.ActualValue, $property.ExpectedValue)
+                    $params[$property.Property] = $property.ExpectedValue
                 }
             }
-        }
-        else
-        {
-            <#
-                Update any properties not in desired state if the PSResourceRepository
-                should be present. At this point it is assumed the PSResourceRepository
-                exist since Ensure property was in desired state.
-                If the desired state happens to be Absent then ignore any properties not
-                in desired state (user have in that case wrongly added properties to an
-                "absent configuration").
-            #>
-            if ($this.Ensure -eq [Ensure]::Present)
+            if (-not $this.Registered)
             {
-                $params = @{
-                    Name = $this.Name
-                }
-
-                Write-Verbose "this.reg'd equals $($this.registered)"
-
-                foreach ($property in $properties)
+                write-verbose "we should be about to register-psrepository"
+                Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name)
+                Register-PSRepository @params
+            }
+            else
+            {
+                #* Dont waste time running Set-PSRepository if params only has the 'Name' key.
+                if ($params.Keys.Count -gt 1)
                 {
-                    #? Registered & Trusted are both hidden, does Compare() return them?
-                    if (! $property.Property -in @('Ensure','Registered','Trusted'))
-                    {
-                        Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $property.Property, $property.ActualValue, $property.ExpectedValue)
-                        $params[$property.Property] = $property.ExpectedValue
-                    }
-                }
-                if (-not $this.Registered)
-                {
-                    write-verbose "we should be about to register-psrepository"
-                    Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name)
-                    Register-PSRepository @params
-                }
-                else
-                {
-                    #* Dont waste time running Set-PSRepository if params only has the 'Name' key.
-                    if ($params.Keys.Count -gt 1)
-                    {
-                        Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name)
-                        Set-PSRepository @params
-                    }
+                    Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name)
+                    Set-PSRepository @params
                 }
             }
         }
