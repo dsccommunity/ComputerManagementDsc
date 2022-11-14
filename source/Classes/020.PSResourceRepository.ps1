@@ -93,11 +93,6 @@ class PSResourceRepository : ResourceBase
     [DscProperty(NotConfigurable)]
     [System.Boolean] $Registered;
 
-    PSResourceRepository()
-    {
-        $this.GetHiddenProperties()
-    }
-
     [PSResourceRepository] Get()
     {
         return ([ResourceBase]$this).Get()
@@ -149,6 +144,8 @@ class PSResourceRepository : ResourceBase
             $params = @{
                 Name = $this.Name
             }
+
+            $this.GetHiddenProperties()
 
             foreach ($property in $properties)
             {
