@@ -93,6 +93,11 @@ class PSResourceRepository : ResourceBase
     [DscProperty(NotConfigurable)]
     [System.Boolean] $Registered;
 
+    PSResourceRepository()
+    {
+        $this.GetHiddenProperties()
+    }
+
     [PSResourceRepository] Get()
     {
         return ([ResourceBase]$this).Get()
@@ -106,6 +111,19 @@ class PSResourceRepository : ResourceBase
     [Boolean] Test()
     {
         return ([ResourceBase] $this).Test()
+    }
+
+    <#
+        Get hidden Registered and Trusted properties
+    #>
+    hidden [void] GetHiddenProperties()
+    {
+        $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
+
+        if ($repository) {
+            $this.Registered = $repository.Registered
+            $this.Trusted    = $repository.Trusted
+        }
     }
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
