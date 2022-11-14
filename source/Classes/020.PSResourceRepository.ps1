@@ -132,8 +132,6 @@ class PSResourceRepository : ResourceBase
                 Name = $this.Name
             }
 
-            Write-Verbose "this.reg'd equals $($this.registered)"
-
             foreach ($property in $properties)
             {
                 #? Registered & Trusted are both hidden, does Compare() return them?
@@ -145,9 +143,18 @@ class PSResourceRepository : ResourceBase
             }
             if (-not $this.Registered)
             {
-                write-verbose "we should be about to register-psrepository"
+                Write-Verbose "IN NOT REGSITERED"
+                $propertiesNotInDesiredState = $this.Compare($this.GetCurrentState($($this | Get-DscProperty -Type 'Key')), $this.ExcludedProperties)
+
+                $propertiesToModify = $propertiesNotInDesiredState | ConvertFrom-CompareResult
+
+                $propertiesToModify.Keys |
+                    ForEach-Object -Process {
+                        Write-Verbose -Message ($this.localizedData.SetProperty -f $_, $propertiesToModify.$_)
+                    }
+
                 Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name)
-                Register-PSRepository @params
+                Register-PSRepository @propertiesToModify
             }
             else
             {
