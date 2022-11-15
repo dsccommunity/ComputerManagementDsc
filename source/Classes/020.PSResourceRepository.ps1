@@ -109,13 +109,14 @@ class PSResourceRepository : ResourceBase
     }
 
     <#
-        Get hidden Registered and Trusted properties
+        Set hidden Registered and Trusted properties on PSRepositoryObject
     #>
-    hidden [void] GetHiddenProperties()
+    hidden [void] SetHiddenProperties()
     {
         $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
 
-        if ($repository) {
+        if ($repository)
+        {
             $this.Registered = $repository.Registered
             $this.Trusted    = $repository.Trusted
         }
@@ -145,7 +146,7 @@ class PSResourceRepository : ResourceBase
                 Name = $this.Name
             }
 
-            $this.GetHiddenProperties()
+            $this.SetHiddenProperties()
 
             foreach ($key in $properties.Keys)
             {
