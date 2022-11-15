@@ -158,7 +158,6 @@ class PSResourceRepository : ResourceBase
             }
             if (-not $this.Registered)
             {
-                Write-Verbose "IN NOT REGSITERED"
                 $propertiesNotInDesiredState = $this.Compare($this.GetCurrentState($($this | Get-DscProperty -Type 'Key')), $this.ExcludedProperties + 'Ensure')
 
                 $propertiesToModify = $propertiesNotInDesiredState | ConvertFrom-CompareResult
@@ -168,21 +167,14 @@ class PSResourceRepository : ResourceBase
                         Write-Verbose -Message ($this.localizedData.SetProperty -f $_, $propertiesToModify.$_)
                     }
 
-                # if (-not $propertiesToModify.Keys -contains 'SourceLocation')
-                # {
-                    Write-Verbose "Appending SourceLocation to propertiesToModify"
-                    $propertiesToModify['SourceLocation'] = $this.SourceLocation
-                # }
-
-                # if (-not $propertiesToModify.Keys -contains 'Name')
-                # {
-                    Write-Verbose "Appending Name to propertiesToModify"
-                    $propertiesToModify['Name'] = $this.Name
-                # }
-
-                foreach ($key in $propertiesToModify.Keys)
+                if (-not ($propertiesToModify.Keys -contains 'SourceLocation'))
                 {
-                    Write-Verbose "param to modify key: $key, value: $propertiesToModify.$key"
+                    $propertiesToModify['SourceLocation'] = $this.SourceLocation
+                }
+
+                if (-not ($propertiesToModify.Keys -contains 'Name'))
+                {
+                    $propertiesToModify['Name'] = $this.Name
                 }
 
                 Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
