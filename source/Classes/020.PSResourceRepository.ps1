@@ -147,13 +147,13 @@ class PSResourceRepository : ResourceBase
 
             $this.GetHiddenProperties()
 
-            foreach ($property in $properties)
+            foreach ($key in $properties.Keys)
             {
                 #? Registered & Trusted are both hidden, does Compare() return them?
-                if (! $property.Property -in @('Ensure','Registered','Trusted'))
+                if (-not ($key -in @('Ensure','Registered','Trusted')))
                 {
-                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $property.Property, $property.ActualValue, $property.ExpectedValue)
-                    $params[$property.Property] = $property.ExpectedValue
+                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($properties.$key), $($this.$key))
+                    $params[$key] = $properties.$key
                 }
             }
             if (-not $this.Registered)
