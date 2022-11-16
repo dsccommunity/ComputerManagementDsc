@@ -829,6 +829,36 @@ try
         }
     }
 
+
+    Describe 'PSResourceRepository\SetHiddenProperties()' -Tag 'SetHiddenProperties' {
+        Context 'Retrieving Registered and Trusted properties of the repository' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+                        Name           = 'FakePSGallery'
+                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
+                        Ensure         = 'Present'
+                    }
+
+                    Mock -CommandName Get-PSRepository -ScriptBlock {
+                        return @{
+                            Trusted    = $true
+                            Registered = $true
+                        }
+                    }
+                }
+            }
+
+            It 'Should set Hidden and Registered properties correctly' {
+                $script:mockPSResourceRepositoryInstance.SetHiddenProperties()
+                $script:mockPSResourceRepositoryInstance.Registered | Should -BeTrue
+                $script:mockPSResourceRepositoryInstance.Trusted    | Should -BeTrue
+
+                Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
+            }
+        }
+    }
+
     # Describe 'PSResourceRepository\CheckProxyConfiguration()' -Tag 'CheckProxyConfiguration' {
     #     Context 'When ProxyCredential is passed with Proxy' {
     #         BeforeAll {
