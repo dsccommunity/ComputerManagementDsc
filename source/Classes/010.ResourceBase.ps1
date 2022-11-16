@@ -123,7 +123,7 @@ class ResourceBase
 
         if ($propertiesNotInDesiredState)
         {
-            $propertiesToModify = $propertiesNotInDesiredState | CortFrom-CompareResult
+            $propertiesToModify = $propertiesNotInDesiredState | ConvertFrom-CompareResult
 
             $propertiesToModify.Keys |
                 ForEach-Object -Process {
