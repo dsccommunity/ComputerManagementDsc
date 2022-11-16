@@ -770,10 +770,12 @@ try
 
             It 'Should call the correct mock' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance.Modify(@{
+                    {
+                        $script:mockPSResourceRepositoryInstance.Modify(@{
                             SourceLocation = 'https://www.fakepsgallery.com/api/v2'
-                        }
-                    )
+                            }
+                        )
+                    } | Should -Not -Throw
 
                     Assert-MockCalled -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
                 }
