@@ -783,7 +783,7 @@ try
                     $script:mockPSResourceRepositoryInstance.Modify(@{
                             SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                         }
-                    ) | Should -NotThrow
+                    ) | Should -Not -Throw
 
                     Assert-MockCalled -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
                 }
@@ -818,7 +818,7 @@ try
                         $script:mockPSResourceRepositoryInstance.Modify(@{
                                 Ensure = 'Absent'
                             }
-                        ) | Should -NotThrow
+                        ) | Should -Not -Throw
 
                         Assert-MockCalled -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
                     }
@@ -853,7 +853,7 @@ try
                         $script:mockPSResourceRepositoryInstance.Modify(@{
                                 SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                             }
-                        ) | Should -NotThrow
+                        ) | Should -Not -Throw
 
                         Assert-MockCalled -CommandName Set-PSRepository -Exactly -Times 1 -Scope It
                     }
