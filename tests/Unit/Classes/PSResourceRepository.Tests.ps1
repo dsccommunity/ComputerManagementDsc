@@ -797,11 +797,14 @@ try
                 }
 
                 It 'Should call the correct mock' {
+
                     InModuleScope -ScriptBlock {
-                        $script:mockPSResourceRepositoryInstance.Modify(@{
+                        {
+                            $script:mockPSResourceRepositoryInstance.Modify(@{
                                 Ensure = 'Absent'
-                            }
-                        )
+                                }
+                            )
+                        } | Should -Not -Throw
 
                         Assert-MockCalled -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
                     }
@@ -824,10 +827,12 @@ try
 
                 It 'Should call the correct mock' {
                     InModuleScope -ScriptBlock {
-                        $script:mockPSResourceRepositoryInstance.Modify(@{
+                        {
+                            $script:mockPSResourceRepositoryInstance.Modify(@{
                                 SourceLocation = 'https://www.fakepsgallery.com/api/v2'
-                            }
-                        )
+                                }
+                            )
+                        } | Should -Not -Throw
 
                         Assert-MockCalled -CommandName Set-PSRepository -Exactly -Times 1 -Scope It
                     }
