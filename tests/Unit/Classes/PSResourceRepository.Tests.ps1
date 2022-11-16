@@ -777,6 +777,17 @@ try
                     Should -Invoke -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
                 }
             }
+
+            It 'Should call the correct mock x2' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Modify(@{
+                            SourceLocation = 'https://www.fakepsgallery.com/api/v2'
+                        }
+                    ) | Should -NotThrow
+
+                    Assert-MockCalled -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
+                }
+            }
         }
 
         Context 'When the system is not in the desired state and the repository is registered' {
@@ -801,6 +812,17 @@ try
                         Should -Invoke -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
                     }
                 }
+
+                It 'Should call the correct mock x2' {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceRepositoryInstance.Modify(@{
+                                Ensure = 'Absent'
+                            }
+                        ) | Should -NotThrow
+
+                        Assert-MockCalled -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
+                    }
+                }
             }
 
             Context 'When the repository is present but not in desired state' {
@@ -823,6 +845,17 @@ try
                                 SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                             }
                         ) | Should -Invoke -CommandName Set-PSRepository -Times 1 -Exactly -Scope It
+                    }
+                }
+
+                It 'Should call the correct mock x2' {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceRepositoryInstance.Modify(@{
+                                SourceLocation = 'https://www.fakepsgallery.com/api/v2'
+                            }
+                        ) | Should -NotThrow
+
+                        Assert-MockCalled -CommandName Set-PSRepository -Exactly -Times 1 -Scope It
                     }
                 }
             }
