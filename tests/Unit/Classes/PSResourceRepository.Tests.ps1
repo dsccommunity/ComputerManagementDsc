@@ -774,16 +774,6 @@ try
                             SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                         }
                     )
-                    Should -Invoke -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
-                }
-            }
-
-            It 'Should call the correct mock x2' {
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance.Modify(@{
-                            SourceLocation = 'https://www.fakepsgallery.com/api/v2'
-                        }
-                    ) # | Should -Not -Throw
 
                     Assert-MockCalled -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
                 }
@@ -803,22 +793,13 @@ try
 
                     Mock -CommandName Unregister-PSRepository
                 }
+
                 It 'Should call the correct mock' {
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance.Modify(@{
                                 Ensure = 'Absent'
                             }
                         )
-                        Should -Invoke -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
-                    }
-                }
-
-                It 'Should call the correct mock x2' {
-                    InModuleScope -ScriptBlock {
-                        $script:mockPSResourceRepositoryInstance.Modify(@{
-                                Ensure = 'Absent'
-                            }
-                        ) | Should -Not -Throw
 
                         Assert-MockCalled -CommandName Unregister-PSRepository -Exactly -Times 1 -Scope It
                     }
@@ -844,16 +825,7 @@ try
                         $script:mockPSResourceRepositoryInstance.Modify(@{
                                 SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                             }
-                        ) | Should -Invoke -CommandName Set-PSRepository -Times 1 -Exactly -Scope It
-                    }
-                }
-
-                It 'Should call the correct mock x2' {
-                    InModuleScope -ScriptBlock {
-                        $script:mockPSResourceRepositoryInstance.Modify(@{
-                                SourceLocation = 'https://www.fakepsgallery.com/api/v2'
-                            }
-                        ) | Should -Not -Throw
+                        )
 
                         Assert-MockCalled -CommandName Set-PSRepository -Exactly -Times 1 -Scope It
                     }
