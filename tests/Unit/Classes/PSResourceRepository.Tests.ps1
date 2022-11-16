@@ -850,11 +850,13 @@ try
             }
 
             It 'Should set Hidden and Registered properties correctly' {
-                $script:mockPSResourceRepositoryInstance.SetHiddenProperties()
-                $script:mockPSResourceRepositoryInstance.Registered | Should -BeTrue
-                $script:mockPSResourceRepositoryInstance.Trusted    | Should -BeTrue
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.SetHiddenProperties()
+                    $script:mockPSResourceRepositoryInstance.Registered | Should -BeTrue
+                    $script:mockPSResourceRepositoryInstance.Trusted    | Should -BeTrue
 
-                Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
+                    Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
+                }
             }
         }
     }

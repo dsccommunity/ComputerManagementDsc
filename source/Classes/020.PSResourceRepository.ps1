@@ -159,25 +159,6 @@ class PSResourceRepository : ResourceBase
             }
             if (-not $this.Registered)
             {
-                # $propertiesNotInDesiredState = $this.Compare($this.GetCurrentState($($this | Get-DscProperty -Type 'Key')), $this.ExcludedProperties + 'Ensure')
-
-                # $propertiesToModify = $propertiesNotInDesiredState | ConvertFrom-CompareResult
-
-                # $propertiesToModify.Keys |
-                #     ForEach-Object -Process {
-                #         Write-Verbose -Message ($this.localizedData.SetProperty -f $_, $propertiesToModify.$_)
-                #     }
-
-                # if (-not ($propertiesToModify.Keys -contains 'SourceLocation'))
-                # {
-                #     $propertiesToModify['SourceLocation'] = $this.SourceLocation
-                # }
-
-                # if (-not ($propertiesToModify.Keys -contains 'Name'))
-                # {
-                #     $propertiesToModify['Name'] = $this.Name
-                # }
-
                 if (-not ($params.Keys -contains 'SourceLocation'))
                 {
                     $params['SourceLocation'] = $this.SourceLocation
