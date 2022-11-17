@@ -11,16 +11,16 @@ configuration PSResourceRepository_Create_Config
 
     node localhost
     {
-        PSResourceRepository 'Add PSGallery PSRepository'
+        PSResourceRepository 'Repository_Present'
         {
-            Name                  = 'PSGallery'
-            Ensure                = 'Present'
-            SourceLocation        = 'https://www.powershellgallery.com/api/v2'
-            ScriptSourceLocation  = 'https://www.powershellgallery.com/api/v2/package/'
-            PublishLocation       = 'https://www.powershellgallery.com/api/v2/items/psscript'
-            ScriptPublishLocation = 'https://www.powershellgallery.com/api/v2/package/'
-            InstallationPolicy    = 'Trusted'
-            PackageProvider       = 'NuGet'
+            Name                      = 'PSGallery'
+            Ensure                    = 'Present'
+            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/package/'
+            PublishLocation           = 'https://www.powershellgallery.com/api/v2/items/psscript'
+            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+            InstallationPolicy        = 'Trusted'
+            PackageManagementProvider = 'NuGet'
         }
     }
 }

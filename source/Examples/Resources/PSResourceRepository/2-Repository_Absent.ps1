@@ -11,11 +11,11 @@ configuration PSResourceRepository_Create_Config
 
     node localhost
     {
-        PSResourceRepository 'Remove PSGallery PSRepository'
+        PSResourceRepository 'Repository_Absent'
         {
-            Name                  = 'PSGallery'
-            Ensure                = 'Absent'
-            SourceLocation        = 'https://www.powershellgallery.com/api/v2'
+            Name           = 'PSGallery'
+            Ensure         = 'Absent'
+            SourceLocation = 'https://www.powershellgallery.com/api/v2'
         }
     }
 }
