@@ -5,13 +5,13 @@
         This configuration adds the PSGallery PSRepository to a machine
 #>
 
-configuration PSResourceRepository_Create_Config
+configuration Repository_Present
 {
     Import-DscResource -ModuleName 'ComputerManagementDsc'
 
     node localhost
     {
-        PSResourceRepository 'Repository_Present'
+        PSResourceRepository 'Add PSGallery PSRepository'
         {
             Name                      = 'PSGallery'
             Ensure                    = 'Present'

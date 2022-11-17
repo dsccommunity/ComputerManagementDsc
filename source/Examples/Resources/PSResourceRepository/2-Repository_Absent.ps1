@@ -5,13 +5,13 @@
         This configuration removes the PSGallery PSRepository from a machine
 #>
 
-configuration PSResourceRepository_Create_Config
+configuration Repository_Absent
 {
     Import-DscResource -ModuleName 'ComputerManagementDsc'
 
     node localhost
     {
-        PSResourceRepository 'Repository_Absent'
+        PSResourceRepository 'Remove PSGallery PSRepository'
         {
             Name           = 'PSGallery'
             Ensure         = 'Absent'
