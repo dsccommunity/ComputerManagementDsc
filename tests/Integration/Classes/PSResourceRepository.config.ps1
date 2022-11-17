@@ -37,7 +37,7 @@ configuration PSResourceRepository_Create_Config
 
     node $AllNodes.NodeName
     {
-        PSResourceRepository "Register Repository $($ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Name)"
+        PSResourceRepository 'Integration_Test'
         {
             Name           = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Name
             Ensure         = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Ensure
@@ -56,7 +56,7 @@ configuration PSResourceRepository_Modify_Config
 
     node $AllNodes.NodeName
     {
-        PSResourceRepository "Modify PSRepository $($ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.Name)"
+        PSResourceRepository 'Integration_Test'
         {
             Name                  = $ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.Name
             Ensure                = $ConfigurationData.NonNodeData.PSResourceRepository_Modify_Config.Ensure
@@ -79,7 +79,7 @@ configuration PSResourceRepository_Remove_Config
 
     node $AllNodes.NodeName
     {
-        PSResourceRepository "Remove PSRepository $($ConfigurationData.NonNodeData.PSResourceRepository_Remove_Config.Name)"
+        PSResourceRepository 'Integration_Test'
         {
             Name           = $ConfigurationData.NonNodeData.PSResourceRepository_Remove_Config.Name
             Ensure         = $ConfigurationData.NonNodeData.PSResourceRepository_Remove_Config.Ensure
