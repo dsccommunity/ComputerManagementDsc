@@ -124,7 +124,6 @@ class PSResourceRepository : ResourceBase
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        # TODO: Add logic to function. Comment to avoid HQRM test to throw on empty function.
         if (($properties.Keys -contains 'Ensure') -and ($properties.Ensure -eq 'Absent'))
         {
             Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
