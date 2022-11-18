@@ -1,58 +1,100 @@
 <#
     .SYNOPSIS
-        Determines if the repository is in the desired state.
+        The `PSResource` Dsc resource is used to manage PowerShell resources on a server.
 
     .PARAMETER Ensure
-        If the repository should be present or absent on the server
+        If the resource should be present or absent on the server
         being configured. Default values is 'Present'.
 
     .PARAMETER Name
-        Specifies the name of the repository to manage.
+        Specifies the name of the resource to manage.
 
-    .PARAMETER SourceLocation
-        Specifies the URI for discovering and installing modules from
-        this repository. A URI can be a NuGet server feed, HTTP, HTTPS,
-        FTP or file location.
+    .PARAMETER Repository
+         Specifies the name of the PSRepository where the resource can be found.
 
-    .PARAMETER ScriptSourceLocation
-        Specifies the URI for the script source location.
+    .PARAMETER RequiredVersion
+         Specifies the version of the resource you want to install or uninstall
 
-    .PARAMETER PublishLocation
-        Specifies the URI of the publish location. For example, for
-        NuGet-based repositories, the publish location is similar
-        to http://someNuGetUrl.com/api/v2/Packages.
+    .PARAMETER MaximumVersion
+        Specifies the maximum version of the resource you want to install or uninstall.
 
-    .PARAMETER ScriptPublishLocation
-        Specifies the URI for the script publish location.
+    .PARAMETER MinimumVersion
+        Specifies the minimum version of the resource you want to install or uninstall.
 
-    .PARAMETER Proxy
-        Specifies the URI of the proxy to connect to this PSResourceRepository
+    .PARAMETER Force
+        Forces the installation of resource. If a resource of the same name and version already exists on the computer,
+        this parameter overwrites the existing resource with one of the same name that was found by the command.
 
-    .PARAMETER ProxyCredential
-        Specifies the Credential to connect to the PSResourceRepository proxy
+    .PARAMETER AllowClobber
+        Allows the installation of resource regardless of if other existing resource on the computer have cmdlets
+        of the same name.
 
-    .PARAMETER InstallationPolicy
-        Specifies the installation policy. Valid values are  'Trusted'
-        or 'Untrusted'. The default value is 'Untrusted'.
+    .PARAMETER SkipPublisherCheck
+        Allows the installation of resource that have not been catalog signed.
 
-    .PARAMETER PackageManagementProvider
-        Specifies a OneGet package provider. Default value is 'NuGet'.
+    .PARAMETER SingleInstance
+        Specifies whether only one version of the resource should installed be on the server.
+
+    .PARAMETER AllowPreRelease
+        Specifies whether to allow pre-release versions of the resource.
 
     .EXAMPLE
-        Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResourceRepository -Method Get -Property @{
-            Name                      = 'PSGallery'
-            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-            PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-            InstallationPolicy        = 'Untrusted'
-            PackageManagementProvider = 'NuGet'
+        Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResource -Method Get -Property @{
+            Name                  = 'PowerShellGet'
+            Repository            = 'PSGallery'
+            RequiredVersion       = '2.2.5'
+            Force                 = $true
+            ScriptPublishLocation = $false
+            SingleInstance        = $true
         }
         This example shows how to call the resource using Invoke-DscResource.
 #>
 [DscResource()]
 class PSResource : ResourceBase
 {
+    [DscProperty()]
+    [Ensure] $Ensure = [Ensure]::Present
+
+    [DscProperty(Key)]
+    [System.String]
+    $Name
+
+    [DscProperty()]
+    [System.String]
+    $Repository
+
+    [DscProperty()]
+    [System.String]
+    $RequiredVersion
+
+    [DscProperty()]
+    [System.String]
+    $MaximumVersion
+
+    [DscProperty()]
+    [System.String]
+    $MinimumVersion
+
+    [DscProperty()]
+    [System.Boolean]
+    $Force = $False
+
+    [DscProperty()]
+    [System.Boolean]
+    $AllowClobber = $False
+
+    [DscProperty()]
+    [System.Boolean]
+    $SkipPublisherCheck = $False
+
+    [DscProperty()]
+    [System.Boolean]
+    $SingleInstance = $False
+
+    [DscProperty()]
+    [System.Boolean]
+    $AllowPreRelease = $False
+
     [PSResource] Get()
     {
         return ([ResourceBase]$this).Get()
