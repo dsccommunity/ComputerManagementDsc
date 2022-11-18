@@ -110,4 +110,51 @@ class PSResource : ResourceBase
         return ([ResourceBase] $this).Test()
     }
 
+    <#
+        This method must be overridden by a resource. The parameter properties will
+        contain the key properties.
+    #>
+    hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
+    {
+        throw $this.localizedData.GetCurrentStateMethodNotImplemented
+    }
+
+    <#
+        Returns true if only one instance of the resource is installed on the system
+    #>
+    hidden [System.Boolean] CheckSingleInstance()
+    {
+        $count = (Get-Module -Name $this.Name -ListAvailable -ErrorAction SilentlyContinue).Count
+
+        if ($count -eq 1)
+        {
+            return $true
+        }
+        else
+        {
+            return $false
+        }
+    }
+
+    hidden [System.String] GetLatestVersion()
+    {
+        $params = @{
+            Name = $this.Name
+        }
+
+        if (-not ([System.String]::IsNullOrEmpty($this.Repository))
+        {
+            $params.Repository = $this.Repository
+        }
+
+        if ($this.AllowPrerelease)
+        {
+            $params.AllowPrerelease = $this.AllowPrerelease
+        }
+
+        $module = Find-Module @params
+
+        return $module.Version
+
+    }
 }
