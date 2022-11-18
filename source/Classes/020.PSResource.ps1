@@ -21,6 +21,9 @@
     .PARAMETER MinimumVersion
         Specifies the minimum version of the resource you want to install or uninstall.
 
+    .PARAMETER Latest
+        Specifies whether to use the latest available version of the resource.
+
     .PARAMETER Force
         Forces the installation of resource. If a resource of the same name and version already exists on the computer,
         this parameter overwrites the existing resource with one of the same name that was found by the command.
@@ -77,6 +80,10 @@ class PSResource : ResourceBase
 
     [DscProperty()]
     [System.Boolean]
+    $Latest = $False
+
+    [DscProperty()]
+    [System.Boolean]
     $Force = $False
 
     [DscProperty()]
@@ -108,6 +115,28 @@ class PSResource : ResourceBase
     [Boolean] Test()
     {
         return ([ResourceBase] $this).Test()
+    }
+
+    <#
+        This method must be overridden by a resource. The parameter properties will
+        contain the key properties.
+    #>
+    hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
+    {
+        $currentState = @{
+            Name = $this.Name
+            Ensure = [Ensure]::Absent
+            Repository = $null
+            RequiredVersion =
+            Force = $this.Force
+            SingleInstance = $this.SingleInstance
+        }
+        return $currentState
+    }
+
+    hidden [System.Boolean] CheckSingleInstance ()
+    {
+
     }
 
 }
