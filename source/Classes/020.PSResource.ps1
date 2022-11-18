@@ -136,6 +136,9 @@ class PSResource : ResourceBase
         }
     }
 
+    <#
+        Get the latest version of the resource
+    #>
     hidden [System.String] GetLatestVersion()
     {
         $params = @{
@@ -153,8 +156,14 @@ class PSResource : ResourceBase
         }
 
         $module = Find-Module @params
-
         return $module.Version
+    }
 
+    <#
+        Get all instances of installed resource on the system
+    #>
+    hidden [System.Collections.Hashtable] GetInstalledResource()
+    {
+        return $(Find-Module -Name $this.Name -ListAvailable)
     }
 }
