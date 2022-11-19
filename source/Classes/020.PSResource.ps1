@@ -230,7 +230,7 @@ class PSResource : ResourceBase
     #>
     hidden [System.String] GetFullVersion([ModuleInfoGrouping] $resource)
     {
-        $version = $resource.Version.toString()
+        $version = [System.String]$resource.Version
         $prerelease = $resource.PrivateData.PSData.Prerelease
         if (-not ([System.String]::IsNullOrEmpty($prerelease)))
         {
