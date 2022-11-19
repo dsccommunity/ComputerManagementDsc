@@ -141,7 +141,7 @@ class PSResource : ResourceBase
         {
             $currentState.Ensure = [Ensure]::Present
 
-            $version = $this.GetFullVersion($resources)
+            $version = $this.GetFullVersion($resources[0])
             $currentState.RequiredVersion = $version
             $currentState.MinimumVersion  = $version
             $currentState.MaximumVersion  = $version
@@ -228,7 +228,7 @@ class PSResource : ResourceBase
     <#
         Get all instances of installed resource on the system
     #>
-    hidden [System.Management.Automation.PSModuleInfo] GetInstalledResource()
+    hidden [System.Management.Automation.PSModuleInfo[]] GetInstalledResource()
     {
         return $(Get-Module -Name $this.Name -ListAvailable)
     }
