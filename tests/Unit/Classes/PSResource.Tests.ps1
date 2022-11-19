@@ -146,7 +146,7 @@ try
             Mock -CommandName Get-Module
 
             InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance() | Should -BeFalse
+                $script:mockPSResourceInstance.TestSingleInstance() | Should -BeFalse
             }
 
             Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
@@ -160,7 +160,7 @@ try
             }
 
             InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance() | Should -BeTrue
+                $script:mockPSResourceInstance.TestSingleInstance() | Should -BeTrue
             }
 
             Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
