@@ -150,9 +150,12 @@ class PSResource : ResourceBase
 
             $currentState.AllowPrerelease = $this.TestPrerelease($resources)
 
-            $latestVersion = $this.GetLatestVersion()
+            if ($this.latest)
+            {
+                $currentState.Latest = $this.TestLatestVersion($version)
+            }
 
-            $currentState.Latest = $this.TestLatestVersion($version)
+            $this.SetSingleInstance($currentState.SingleInstance)
         }
         elseif ($resources.count -gt 1)
         {
@@ -172,8 +175,13 @@ class PSResource : ResourceBase
             $currentState.MinimumVersion  = ($resourceInfo | Sort-Object Version)[0].Version
             $currentState.MaximumVersion  = $currentState.RequiredVersion
             $currentState.AllowPrerelease = ($resourceInfo | Sort-Object Version -Descending)[0].Prerelease
-            $currentState.Latest          = $this.TestLatestVersion($currentState.RequiredVersion)
+
+            if ($this.Latest)
+            {
+                $currentState.Latest          = $this.TestLatestVersion($currentState.RequiredVersion)
+            }
         }
+
         return $currentState
     }
 
@@ -264,5 +272,28 @@ class PSResource : ResourceBase
             return $true
         }
         return $false
+    }
+
+
+    <#
+        Sets SingleInstance property when single instance is not explicitly set to True but only a single instance of the resource is present
+    #>
+    hidden [void] SetSingleInstance ([System.Boolean] $singleInstance)
+    {
+        if ($singleInstance -and (-not $this.SingleInstance))
+        {
+            $this.SingleInstance = $True
+        }
+    }
+
+        <#
+        Sets SingleInstance property when single instance is not explicitly set to True but only a single instance of the resource is present
+    #>
+    hidden [void] SetLatest ([System.String] $currentVersion, [System.String] $latest)
+    {
+        if ($currentVersion -eq $latest)
+        {
+            $this.Latest = $True
+        }
     }
 }
