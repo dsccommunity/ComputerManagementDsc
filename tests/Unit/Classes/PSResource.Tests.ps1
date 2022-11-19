@@ -214,7 +214,6 @@ try
     }
 
     Describe 'PSResource\GetFullVersion()' -Tag 'GetFullVersion' {
-
     }
 
     Describe 'PSResource\TestPrerelease()' -Tag 'TestPrerelease' {
@@ -222,6 +221,25 @@ try
     }
 
     Describe 'PSResource\TestLatestVersion()' -Tag 'TestLatestVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name           = 'ComputerManagementDsc'
+                    SourceLocation = 'PSGallery'
+                    Ensure         = 'Present'
+                } | Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetLatestVersion' -Value {
+                    return '8.6.0'
+                }
+            }
+        }
+
+        It 'Should return true' {
+            $script:mockPSResourceInstance.TestLatestVersion('8.6.0') | Should -BeTrue
+        }
+
+        It 'Should return false' {
+            $script:mockPSResourceInstance.TestLatestVersion('8.5.0') | Should -BeFalse
+        }
 
     }
 
