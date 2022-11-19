@@ -135,9 +135,9 @@ try
         BeforeAll {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
-                    Name           = 'ComputerManagementDsc'
-                    SourceLocation = 'PSGallery'
-                    Ensure         = 'Present'
+                    Name       = 'ComputerManagementDsc'
+                    Repository = 'PSGallery'
+                    Ensure     = 'Present'
                 }
             }
         }
@@ -200,13 +200,14 @@ try
         }
 
         It 'Should return the correct version' {
-            Mock -CommandName Find-Module -MockWith {
-                return @{
-                    Version = '8.6.0'
-                }
-            }
 
             InModuleScope -ScriptBlock {
+                Mock -CommandName Find-Module -MockWith {
+                    return @{
+                        Version = '8.6.0'
+                    }
+                }
+
                 $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
             }
 
@@ -239,11 +240,15 @@ try
         }
 
         It 'Should return true' {
-            $script:mockPSResourceInstance.TestLatestVersion('8.6.0') | Should -BeTrue
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance.TestLatestVersion('8.6.0') | Should -BeTrue
+            }
         }
 
         It 'Should return false' {
-            $script:mockPSResourceInstance.TestLatestVersion('8.5.0') | Should -BeFalse
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance.TestLatestVersion('8.5.0') | Should -BeFalse
+            }
         }
 
     }
