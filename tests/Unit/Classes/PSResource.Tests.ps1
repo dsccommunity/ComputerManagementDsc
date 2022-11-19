@@ -189,9 +189,9 @@ try
         BeforeAll {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
-                    Name           = 'ComputerManagementDsc'
-                    SourceLocation = 'PSGallery'
-                    Ensure         = 'Present'
+                    Name       = 'ComputerManagementDsc'
+                    Repository = 'PSGallery'
+                    Ensure     = 'Present'
                 }
             }
         }
@@ -224,9 +224,9 @@ try
         BeforeAll {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
-                    Name           = 'ComputerManagementDsc'
-                    SourceLocation = 'PSGallery'
-                    Ensure         = 'Present'
+                    Name       = 'ComputerManagementDsc'
+                    Repository = 'PSGallery'
+                    Ensure     = 'Present'
                 } | Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetLatestVersion' -Value {
                     return '8.6.0'
                 }
