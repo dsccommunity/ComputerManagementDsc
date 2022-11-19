@@ -228,7 +228,7 @@ class PSResource : ResourceBase
     <#
         Get full version as a string checking for prerelease version
     #>
-    hidden [System.String] GetFullVersion([ModuleInfoGrouping] $resource)
+    hidden [System.String] GetFullVersion([System.Management.Automation.PSModuleInfo] $resource)
     {
         $version = [System.String]$resource.Version
         $prerelease = $resource.PrivateData.PSData.Prerelease
@@ -242,7 +242,7 @@ class PSResource : ResourceBase
     <#
         Test whether a given resource is prerelease
     #>
-    hidden [System.Boolean] TestPrerelease ([ModuleInfoGrouping] $resource)
+    hidden [System.Boolean] TestPrerelease ([System.Management.Automation.PSModuleInfo] $resource)
     {
         $prerelease = $False
         if (-not ([System.String]::IsNullOrEmpty($resource.PrivateData.PSData.Prerelease)))
@@ -257,12 +257,11 @@ class PSResource : ResourceBase
     #>
     hidden [System.Boolean] TestLatestVersion ([System.String] $version)
     {
-        $latest = $false
         $latestVersion = $this.GetLatestVersion()
         if ($latestVersion -eq $version)
         {
-            $latest = $true
+            return $true
         }
-        return $latest
+        return $false
     }
 }
