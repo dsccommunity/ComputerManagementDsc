@@ -174,6 +174,7 @@ try
                         Name    = 'ComputerManagementDsc'
                         Version = '8.6.0'
                     }
+                )
             }
 
             InModuleScope -ScriptBlock {
