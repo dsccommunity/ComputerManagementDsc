@@ -222,7 +222,7 @@ class PSResource : ResourceBase
     #>
     hidden [System.Collections.Hashtable] GetInstalledResource()
     {
-        return $(Find-Module -Name $this.Name -ListAvailable)
+        return $(Get-Module -Name $this.Name -ListAvailable)
     }
 
 
