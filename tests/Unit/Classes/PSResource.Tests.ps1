@@ -244,7 +244,21 @@ try
     }
 
     Describe 'PSResource\SetSingleInstance()' -Tag 'SetSingleInstance' {
+        InModuleScope -ScriptBlock {
+            $script:mockPSResourceInstance = [PSResource] @{
+                Name           = 'ComputerManagementDsc'
+                Repository     = 'PSGallery'
+                Ensure         = 'Present'
+                SingleInstance = $False
+            }
+        }
 
+        It 'Should not throw and set SingleInstance to True' {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance.SetSingleInstance($True)
+                $script:mockPSResourceInstance.SingleInstance | Should -BeTrue
+            }
+        }
     }
 
     Describe 'PSResource\SetLatest()' -Tag 'SetLatest' {
