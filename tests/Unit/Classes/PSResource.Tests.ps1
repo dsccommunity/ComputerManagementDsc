@@ -146,9 +146,11 @@ try
             Mock -CommandName Get-Module
 
             InModuleScope -ScriptBlock {
-                $result = $script.TestSingleInstance()
-                $result | Should -BeFalse
+                $script:mockPSResourceInstance() | Should -BeFalse
             }
+
+            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
+        }
 
         It 'Should Correctly return True when One Resource is Installed' {
             Mock -CommandName Get-Module -MockWith {
@@ -158,9 +160,10 @@ try
             }
 
             InModuleScope -ScriptBlock {
-                $result = $script.TestSingleInstance()
-                $result | Should -BeTrue
+                $script:mockPSResourceInstance() | Should -BeTrue
             }
+
+            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
         }
 
         It 'Should Correctly return False' {
@@ -178,10 +181,10 @@ try
             }
 
             InModuleScope -ScriptBlock {
-                $result = $script.TestSingleInstance()
-                $result | Should -BeFalse
+                $script:mockPSResourceInstance.TestSingleInstance() | Should -BeFalse
             }
-        }
+
+            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
         }
     }
 
@@ -206,6 +209,8 @@ try
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
             }
+
+            Assert-MockCalled Find-Module -Exactly -Times 1 -Scope It
         }
     }
 
