@@ -75,3 +75,9 @@ This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
 For a full list of resources in ComputerManagementDsc and examples on their use,
 check out the [ComputerManagementDsc wiki](https://github.com/dsccommunity/ComputerManagementDsc/wiki).
+
+## Requirements
+
+PowerShell 5.0 and above is required for this module because of class based resources.
+
+- `PSResourceRepository` requires `PowerShellGet` and `PackageManagement` modules.
