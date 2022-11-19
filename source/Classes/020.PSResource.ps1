@@ -137,7 +137,8 @@ class PSResource : ResourceBase
 
         $resources = $this.GetInstalledResource()
 
-        if ($resources.Count -eq 1) {
+        if ($resources.Count -eq 1)
+        {
             $currentState.Ensure = [Ensure]::Present
 
             $version = $this.GetFullVersion($resources)
