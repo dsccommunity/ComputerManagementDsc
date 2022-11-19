@@ -38,7 +38,7 @@
     .PARAMETER SingleInstance
         Specifies whether only one version of the resource should installed be on the server.
 
-    .PARAMETER AllowPreRelease
+    .PARAMETER AllowPrerelease
         Specifies whether to allow pre-release versions of the resource.
 
     .EXAMPLE
@@ -100,7 +100,7 @@ class PSResource : ResourceBase
 
     [DscProperty()]
     [System.Boolean]
-    $AllowPreRelease = $False
+    $AllowPrerelease = $False
 
     [PSResource] Get()
     {
@@ -124,19 +124,145 @@ class PSResource : ResourceBase
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
     {
         $currentState = @{
-            Name = $this.Name
-            Ensure = [Ensure]::Absent
-            Repository = $null
-            RequiredVersion =
-            Force = $this.Force
-            SingleInstance = $this.SingleInstance
+            Name               = $this.Name
+            Ensure             = [Ensure]::Absent
+            Repository         = $this.Repository
+            SingleInstance     = $False
+            AllowPrerelease    = $False
+            Latest             = $False
+            AllowClobber       = $this.AllowClobber
+            SkipPublisherCheck = $this.SkipPublisherCheck
+            Force              = $this.Force
+        }
+
+        $resources = $this.GetInstalledResource()
+
+        if ($resources.Count -eq 1) {
+            $currentState.Ensure = [Ensure]::Present
+
+            $version = $this.GetFullVersion($resources)
+            $currentState.RequiredVersion = $version
+            $currentState.MinimumVersion  = $version
+            $currentState.MaximumVersion  = $version
+
+            $currentState.SingleInstance  = $True
+
+            $currentState.AllowPrerelease = $this.TestPrerelease($resources)
+
+            $latestVersion = $this.GetLatestVersion()
+
+            $currentState.Latest = $this.TestLatestVersion($version)
+        }
+        elseif ($resources.count -gt 1)
+        {
+            #* multiple instances of resource found on system.
+            $resourceInfo = @()
+
+            foreach ($resource in $resources)
+            {
+                $resourceInfo += @{
+                    Version    = $this.GetFullVersion($resource)
+                    Prerelease = $this.TestPrerelease($resource)
+                }
+            }
+
+            $currentState.Ensure          = [Ensure]::Present
+            $currentState.RequiredVersion = ($resourceInfo | Sort-Object Version -Descending)[0].Version
+            $currentState.MinimumVersion  = ($resourceInfo | Sort-Object Version)[0].Version
+            $currentState.MaximumVersion  = $currentState.RequiredVersion
+            $currentState.AllowPrerelease = ($resourceInfo | Sort-Object Version -Descending)[0].Prerelease
+            $currentState.Latest          = $this.TestLatestVersion($currentState.RequiredVersion)
         }
         return $currentState
     }
 
-    hidden [System.Boolean] CheckSingleInstance ()
+    <#
+        Returns true if only one instance of the resource is installed on the system
+    #>
+    hidden [System.Boolean] TestSingleInstance()
     {
+        $count = (Get-Module -Name $this.Name -ListAvailable -ErrorAction SilentlyContinue).Count
 
+        if ($count -eq 1)
+        {
+            return $true
+        }
+        else
+        {
+            return $false
+        }
     }
 
+    <#
+        Get the latest version of the resource
+    #>
+    hidden [System.String] GetLatestVersion()
+    {
+        $params = @{
+            Name = $this.Name
+        }
+
+        if (-not ([System.String]::IsNullOrEmpty($this.Repository)))
+        {
+            $params.Repository = $this.Repository
+        }
+
+        if ($this.AllowPrerelease)
+        {
+            $params.AllowPrerelease = $this.AllowPrerelease
+        }
+
+        $module = Find-Module @params
+        return $module.Version
+    }
+
+    <#
+        Get all instances of installed resource on the system
+    #>
+    hidden [System.Collections.Hashtable] GetInstalledResource()
+    {
+        return $(Find-Module -Name $this.Name -ListAvailable)
+    }
+
+
+    <#
+        Get full version as a string checking for prerelease version
+    #>
+    hidden [System.String] GetFullVersion([ModuleInfoGrouping] $resource)
+    {
+        $version = $resource.Version.toString()
+        $prerelease = $resource.PrivateData.PSData.Prerelease
+        if (-not ([System.String]::IsNullOrEmpty($prerelease)))
+        {
+            $version = "$($version)-$($prerelease)"
+        }
+        return $version
+    }
+
+    <#
+        Test whether a given resource is prerelease
+    #>
+    hidden [System.Boolean] TestPrerelease ([ModuleInfoGrouping] $resource)
+    {
+        $prerelease = $False
+        if (-not ([System.String]::IsNullOrEmpty($resource.PrivateData.PSData.Prerelease)))
+        {
+            $prerelease = $True
+        }
+        return $prerelease
+    }
+
+    <#
+        tests whether the given resource version is the latest version available
+    #>
+    hidden [System.Boolean] TestLatestVersion ([System.String] $version)
+    {
+        $latest = $false
+        $latestVersion = $this.GetLatestVersion()
+        if ($latestVersion -eq $version)
+        {
+            $latest = $true
+        }
+        return $latest
+    }
 }
