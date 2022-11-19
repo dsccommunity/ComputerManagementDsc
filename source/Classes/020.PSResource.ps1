@@ -220,7 +220,7 @@ class PSResource : ResourceBase
     <#
         Get all instances of installed resource on the system
     #>
-    hidden [System.Collections.Hashtable] GetInstalledResource()
+    hidden [System.Management.Automation.PSModuleInfo[]] GetInstalledResource()
     {
         return $(Get-Module -Name $this.Name -ListAvailable)
     }
