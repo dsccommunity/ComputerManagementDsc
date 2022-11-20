@@ -109,6 +109,14 @@ class PSResourceRepository : ResourceBase
     [System.Boolean]
     $Registered
 
+    PSResourceRepository () : base ()
+    {
+        # These properties will not be enforced.
+        $this.ExcludeDscProperties = @(
+            'Name'
+        )
+    }
+
     [PSResourceRepository] Get()
     {
         return ([ResourceBase]$this).Get()
@@ -140,14 +148,66 @@ class PSResourceRepository : ResourceBase
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        if (($properties.Keys -contains 'Ensure') -and ($properties.Ensure -eq 'Absent'))
+        $params = @{
+            Name = $this.Name
+        }
+
+        if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Absent')
         {
+            # Ensure was not in desired state so the repository should be removed
             Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
 
-            Unregister-PSRepository -Name $this.Name
+            Unregister-PSRepository @params
 
             return
         }
+        elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Present')
+        {
+            # Ensure was not in desired state so the repository should be created
+            $register = $True
+
+        ]
+        else
+        {
+            # Repository exist but one or more properties are not in desired state
+            $register = $False
+        }
+
+        foreach ($key in $properties.Keys)
+        {
+            if (-not ($key -eq 'Ensure'))
+            {
+                Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($properties.$key), $($this.$key))
+                $params[$key] = $properties.$key
+            }
+        }
+
+        if ( $register )
+        {
+            if (-not ($params.Keys -contains 'SourceLocation'))
+            {
+                $params['SourceLocation'] = $this.SourceLocation
+            }
+
+            Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
+            Register-PSRepository @params
+        }
+        else
+        {
+            Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name, $this.SourceLocation)
+
+            Set-PSRepository @params
+        }
+
+
+        # if (($properties.Keys -contains 'Ensure') -and ($properties.Ensure -eq 'Absent'))
+        # {
+        #     Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
+
+        #     Unregister-PSRepository -Name $this.Name
+
+        #     return
+        # }
 
         <#
             Update any properties not in desired state if the PSResourceRepository
@@ -157,43 +217,43 @@ class PSResourceRepository : ResourceBase
             in desired state (user have in that case wrongly added properties to an
             "absent configuration").
         #>
-        if ($this.Ensure -eq [Ensure]::Present)
-        {
-            $params = @{
-                Name = $this.Name
-            }
+        # if ($this.Ensure -eq [Ensure]::Present)
+        # {
+        #     $params = @{
+        #         Name = $this.Name
+        #     }
 
-            $this.SetReadProperties()
+        #     $this.SetReadProperties()
 
-            foreach ($key in $properties.Keys)
-            {
-                if (-not ($key -eq 'Ensure'))
-                {
-                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($properties.$key), $($this.$key))
-                    $params[$key] = $properties.$key
-                }
-            }
-            if (-not $this.Registered)
-            {
-                if (-not ($params.Keys -contains 'SourceLocation'))
-                {
-                    $params['SourceLocation'] = $this.SourceLocation
-                }
+        #     foreach ($key in $properties.Keys)
+        #     {
+        #         if (-not ($key -eq 'Ensure'))
+        #         {
+        #             Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($properties.$key), $($this.$key))
+        #             $params[$key] = $properties.$key
+        #         }
+        #     }
+        #     if (-not $this.Registered)
+        #     {
+        #         if (-not ($params.Keys -contains 'SourceLocation'))
+        #         {
+        #             $params['SourceLocation'] = $this.SourceLocation
+        #         }
 
-                Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
-                Register-PSRepository @params
-            }
-            else
-            {
-                #* Dont waste time running Set-PSRepository if params only has the 'Name' key.
-                if ($params.Keys.Count -gt 1)
-                {
-                    Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name, $this.SourceLocation)
+        #         Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
+        #         Register-PSRepository @params
+        #     }
+        #     else
+        #     {
+        #         #* Dont waste time running Set-PSRepository if params only has the 'Name' key.
+        #         if ($params.Keys.Count -gt 1)
+        #         {
+        #             Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name, $this.SourceLocation)
 
-                    Set-PSRepository @params
-                }
-            }
-        }
+        #             Set-PSRepository @params
+        #         }
+        #     }
+        # }
     }
 
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
