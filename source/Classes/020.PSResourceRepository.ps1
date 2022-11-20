@@ -125,11 +125,11 @@ class PSResourceRepository : ResourceBase
     }
 
     <#
-        Set hidden Registered and Trusted properties on PSRepositoryObject
+        Set read-only Registered and Trusted properties on PSRepositoryObject
     #>
-    hidden [void] SetHiddenProperties()
+    hidden [void] SetReadProperties()
     {
-        $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
+        $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
 
         if ($repository)
         {
@@ -143,7 +143,9 @@ class PSResourceRepository : ResourceBase
         if (($properties.Keys -contains 'Ensure') -and ($properties.Ensure -eq 'Absent'))
         {
             Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
+
             Unregister-PSRepository -Name $this.Name
+
             return
         }
 
@@ -161,12 +163,11 @@ class PSResourceRepository : ResourceBase
                 Name = $this.Name
             }
 
-            $this.SetHiddenProperties()
+            $this.SetReadProperties()
 
             foreach ($key in $properties.Keys)
             {
-                #? Registered & Trusted are both hidden, does Compare() return them?
-                if (-not ($key -in @('Ensure','Registered','Trusted')))
+                if (-not ($key -eq 'Ensure'))
                 {
                     Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($properties.$key), $($this.$key))
                     $params[$key] = $properties.$key
@@ -188,6 +189,7 @@ class PSResourceRepository : ResourceBase
                 if ($params.Keys.Count -gt 1)
                 {
                     Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name, $this.SourceLocation)
+
                     Set-PSRepository @params
                 }
             }
@@ -203,7 +205,8 @@ class PSResourceRepository : ResourceBase
         }
 
         Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
-        $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
+
+        $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
 
         if ($repository)
         {
@@ -223,6 +226,7 @@ class PSResourceRepository : ResourceBase
         {
             Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
         }
+
         return $returnValue
     }
 
@@ -230,17 +234,16 @@ class PSResourceRepository : ResourceBase
         The parameter properties will contain the properties that was
         assigned a value.
     #>
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('AvoidEmptyNamedBlocks', '')]
     hidden [void] AssertProperties([System.Collections.Hashtable] $properties)
     {
-        Assert-Module PowerShellGet
-        Assert-Module PackageManagement
+        Assert-Module -ModuleName PowerShellGet
+        Assert-Module -ModuleName PackageManagement
 
         if ($this.ProxyCredental -and (-not $this.Proxy))
         {
             $errorMessage = $this.localizedData.ProxyCredentialPassedWithoutProxyUri
+
             New-InvalidArgumentException -ArgumentName 'ProxyCredential' -Message $errorMessage
         }
     }
-
 }
