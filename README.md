@@ -43,6 +43,7 @@ The **ComputerManagementDsc** module contains the following resources:
   predictably handle the condition.
 - **PowerPlan**: This resource allows specifying a power plan to activate.
 - **PowerShellExecutionPolicy**: Specifies the desired PowerShell execution policy.
+- **PSResource**: This resource manages PowerShell Resources, like modules. This resource requires PowerShell version 5.0 and above.
 - **PSResourceRepository**: This resource manages PowerShellGet repositories. This resource requires PowerShell version 5.0 and above.
 - **RemoteDesktopAdmin**: This resource will manage the remote desktop administration
   settings on a computer.
@@ -81,3 +82,4 @@ check out the [ComputerManagementDsc wiki](https://github.com/dsccommunity/Compu
 PowerShell 5.0 and above is required for this module because of class based resources.
 
 - `PSResourceRepository` requires `PowerShellGet` and `PackageManagement` modules.
+- `PSResource` requires `PowerShellGet` and `PackageManagement` modules.
