@@ -14,6 +14,9 @@
         this repository. A URI can be a NuGet server feed, HTTP, HTTPS,
         FTP or file location.
 
+    .PARAMETER Credential
+        Specifies credentials of an account that has rights to register a repository.
+
     .PARAMETER ScriptSourceLocation
         Specifies the URI for the script source location.
 
