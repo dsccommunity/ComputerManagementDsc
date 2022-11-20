@@ -55,43 +55,56 @@ class PSResourceRepository : ResourceBase
 {
 
     [DscProperty()]
-    [Ensure] $Ensure = [Ensure]::Present
+    [Ensure]
+    $Ensure = [Ensure]::Present
 
     [DscProperty(Key)]
-    [System.String] $Name
+    [System.String]
+    $Name
 
     [DscProperty(Mandatory)]
-    [System.String] $SourceLocation
+    [System.String]
+    $SourceLocation
 
     [DscProperty()]
-    [pscredential] $Credential
+    [PSCredential]
+    $Credential
 
     [DscProperty()]
-    [System.String] $ScriptSourceLocation
+    [System.String]
+    $ScriptSourceLocation
 
     [DscProperty()]
-    [System.String] $PublishLocation
+    [System.String]
+    $PublishLocation
 
     [DscProperty()]
-    [System.String] $ScriptPublishLocation
+    [System.String]
+    $ScriptPublishLocation
 
     [DscProperty()]
-    [System.String] $Proxy
+    [System.String]
+    $Proxy
 
     [DscProperty()]
-    [pscredential] $ProxyCredential
+    [pscredential]
+    $ProxyCredential
 
     [DscProperty()]
-    [InstallationPolicy] $InstallationPolicy = [InstallationPolicy]::Untrusted
+    [InstallationPolicy]
+    $InstallationPolicy = [InstallationPolicy]::Untrusted
 
     [DscProperty()]
-    [System.String] $PackageManagementProvider = 'NuGet'
+    [System.String]
+    $PackageManagementProvider = 'NuGet'
 
     [DscProperty(NotConfigurable)]
-    [System.Boolean] $Trusted;
+    [System.Boolean]
+    $Trusted
 
     [DscProperty(NotConfigurable)]
-    [System.Boolean] $Registered;
+    [System.Boolean]
+    $Registered
 
     [PSResourceRepository] Get()
     {
