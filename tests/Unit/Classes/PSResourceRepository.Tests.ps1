@@ -772,7 +772,7 @@ try
                 InModuleScope -ScriptBlock {
                     {
                         $script:mockPSResourceRepositoryInstance.Modify(@{
-                            Ensure         = 'Absent'
+                            Ensure         = 'Present'
                             SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                             }
                         )

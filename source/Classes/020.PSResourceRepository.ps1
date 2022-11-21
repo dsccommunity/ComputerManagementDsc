@@ -177,7 +177,7 @@ class PSResourceRepository : ResourceBase
         {
             if (-not ($key -eq 'Ensure'))
             {
-                Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($properties.$key), $($this.$key))
+                Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($this.$key))
                 $params[$key] = $properties.$key
             }
         }
