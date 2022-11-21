@@ -761,7 +761,7 @@ try
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                         Name           = 'FakePSGallery'
                         SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                        Ensure         = 'Present'
+                        Ensure         = 'Absent'
                     }
 
                     Mock -CommandName Register-PSRepository
@@ -789,7 +789,7 @@ try
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository]@{
                             Name           = 'FakePSGallery'
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                            Ensure         = 'Absent'
+                            Ensure         = 'Present'
                          }
                     }
 
@@ -819,7 +819,6 @@ try
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Present'
                          }
-                         $script:mockPSResourceRepositoryInstance.Registered = $True
                     }
 
                     Mock -CommandName Set-PSRepository
