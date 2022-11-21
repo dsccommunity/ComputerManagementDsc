@@ -135,9 +135,9 @@ try
         BeforeAll {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
-                    Name           = 'ComputerManagementDsc'
-                    SourceLocation = 'PSGallery'
-                    Ensure         = 'Present'
+                    Name       = 'ComputerManagementDsc'
+                    Repository = 'PSGallery'
+                    Ensure     = 'Present'
                 }
             }
         }
@@ -146,9 +146,11 @@ try
             Mock -CommandName Get-Module
 
             InModuleScope -ScriptBlock {
-                $result = $script.TestSingleInstance()
-                $result | Should -BeFalse
+                $script:mockPSResourceInstance.TestSingleInstance() | Should -BeFalse
             }
+
+            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
+        }
 
         It 'Should Correctly return True when One Resource is Installed' {
             Mock -CommandName Get-Module -MockWith {
@@ -158,9 +160,10 @@ try
             }
 
             InModuleScope -ScriptBlock {
-                $result = $script.TestSingleInstance()
-                $result | Should -BeTrue
+                $script:mockPSResourceInstance.TestSingleInstance() | Should -BeTrue
             }
+
+            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
         }
 
         It 'Should Correctly return False' {
@@ -178,10 +181,10 @@ try
             }
 
             InModuleScope -ScriptBlock {
-                $result = $script.TestSingleInstance()
-                $result | Should -BeFalse
+                $script:mockPSResourceInstance.TestSingleInstance() | Should -BeFalse
             }
-        }
+
+            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
         }
     }
 
@@ -197,15 +200,18 @@ try
         }
 
         It 'Should return the correct version' {
-            Mock -CommandName Find-Module -MockWith {
-                return @{
-                    Version = '8.6.0'
-                }
-            }
 
             InModuleScope -ScriptBlock {
+                Mock -CommandName Find-Module -MockWith {
+                    return @{
+                        Version = '8.6.0'
+                    }
+                }
+
                 $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
             }
+
+            Assert-MockCalled Find-Module -Exactly -Times 1 -Scope It
         }
     }
 
@@ -234,11 +240,15 @@ try
         }
 
         It 'Should return true' {
-            $script:mockPSResourceInstance.TestLatestVersion('8.6.0') | Should -BeTrue
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance.TestLatestVersion('8.6.0') | Should -BeTrue
+            }
         }
 
         It 'Should return false' {
-            $script:mockPSResourceInstance.TestLatestVersion('8.5.0') | Should -BeFalse
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance.TestLatestVersion('8.5.0') | Should -BeFalse
+            }
         }
 
     }
