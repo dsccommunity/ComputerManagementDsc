@@ -109,7 +109,7 @@ class PSResourceRepository : ResourceBase
     [System.Boolean]
     $Registered
 
-    PSResourceRepository () : ResourceBase ()
+    PSResourceRepository () : base ()
     {
         # These properties will not be enforced.
         $this.ExcludeDscProperties = @(
@@ -166,7 +166,7 @@ class PSResourceRepository : ResourceBase
             # Ensure was not in desired state so the repository should be created
             $register = $True
 
-        ]
+        }
         else
         {
             # Repository exist but one or more properties are not in desired state
