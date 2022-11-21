@@ -85,4 +85,4 @@ Management Framework 5.0 or above.
 
 ### PSResourceRepository
 
-The resource`PSResourceRepository` requires that the PowerShell modules`PowerShellGet` and `PackageManagement` is already present on the target computer.
+The resource `PSResourceRepository` requires that the PowerShell modules `PowerShellGet` and `PackageManagement` are already present on the target computer.
