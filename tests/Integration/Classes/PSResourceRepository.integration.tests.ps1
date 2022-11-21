@@ -34,7 +34,13 @@ try
         $configurationName = "$($script:dscResourceName)_Create_Config"
 
         Context ('When using configuration {0}' -f $configurationName) {
+
             It 'Should compile and apply the MOF without throwing' {
+                BeforeAll {
+                    #* Unregister the repository so we can add it.
+                    Unregister-PSRepository -Name $ConfigurationData.NonNodeData.$configurationName.Name -Force
+                }
+
                 {
                     $configurationParameters = @{
                         OutputPath        = $TestDrive

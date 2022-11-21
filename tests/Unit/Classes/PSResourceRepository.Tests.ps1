@@ -802,7 +802,7 @@ try
                     InModuleScope -ScriptBlock {
                         {
                             $script:mockPSResourceRepositoryInstance.Modify(@{
-                                Ensure = 'Present'
+                                Ensure = 'Absent'
                                 }
                             )
                         } | Should -Not -Throw
