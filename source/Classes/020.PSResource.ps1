@@ -43,12 +43,13 @@
 
     .EXAMPLE
         Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResource -Method Get -Property @{
-            Name                  = 'PowerShellGet'
-            Repository            = 'PSGallery'
-            RequiredVersion       = '2.2.5'
-            Force                 = $true
-            ScriptPublishLocation = $false
-            SingleInstance        = $true
+            Name               = 'PowerShellGet'
+            Repository         = 'PSGallery'
+            RequiredVersion    = '2.2.5'
+            Force              = $true
+            SkipPublisherCheck = $false
+            SingleInstance     = $true
+            AllowPrerelease    = $False
         }
         This example shows how to call the resource using Invoke-DscResource.
 #>
@@ -56,7 +57,8 @@
 class PSResource : ResourceBase
 {
     [DscProperty()]
-    [Ensure] $Ensure = [Ensure]::Present
+    [Ensure]
+    $Ensure = [Ensure]::Present
 
     [DscProperty(Key)]
     [System.String]
@@ -186,6 +188,24 @@ class PSResource : ResourceBase
     }
 
     <#
+        The parameter properties will contain the properties that was
+        assigned a value.
+    #>
+    hidden [void] AssertProperties([System.Collections.Hashtable] $properties)
+    {
+        Assert-Module -ModuleName PowerShellGet
+        Assert-Module -ModuleName PackageManagement
+
+        $powerShellGet = Get-Module -Name PowerShellGet
+
+        if ($powerShellGet.Version.Major -eq 1 -and $powerShellGet.Minor -lt 6 -and $this.AllowPrerelease)
+        {
+            $errorMessage = $this.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
+            New-InvalidArgumentException -ArgumentName 'AllowPrerelease' -message $errorMessage
+        }
+    }
+
+    <#
         Returns true if only one instance of the resource is installed on the system
     #>
     hidden [System.Boolean] TestSingleInstance()
@@ -207,17 +227,22 @@ class PSResource : ResourceBase
     #>
     hidden [System.String] GetLatestVersion()
     {
+        Write-Verbose -Message ($this.LocalizedData.GetLatestVersion -f $this.Name)
         $params = @{
             Name = $this.Name
         }
 
         if (-not ([System.String]::IsNullOrEmpty($this.Repository)))
         {
+            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionFromRepository -f $this.Name, $this.Repository)
+
             $params.Repository = $this.Repository
         }
 
         if ($this.AllowPrerelease)
         {
+            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionAllowPrerelease -f $this.Name)
+
             $params.AllowPrerelease = $this.AllowPrerelease
         }
 
