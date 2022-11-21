@@ -152,7 +152,7 @@ class PSResourceRepository : ResourceBase
             Name = $this.Name
         }
 
-        if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Absent')
+        if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
         {
             # Ensure was not in desired state so the repository should be removed
             Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
