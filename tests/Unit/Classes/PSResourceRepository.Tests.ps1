@@ -761,7 +761,7 @@ try
                     $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                         Name           = 'FakePSGallery'
                         SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                        Ensure         = 'Absent'
+                        Ensure         = 'Present'
                     }
 
                     Mock -CommandName Register-PSRepository
@@ -772,7 +772,7 @@ try
                 InModuleScope -ScriptBlock {
                     {
                         $script:mockPSResourceRepositoryInstance.Modify(@{
-                            Ensure         = 'Present'
+                            Ensure         = 'Absent'
                             SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                             }
                         )
