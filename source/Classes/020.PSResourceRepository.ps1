@@ -161,7 +161,7 @@ class PSResourceRepository : ResourceBase
 
             return
         }
-        elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Present')
+        elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
         {
             # Ensure was not in desired state so the repository should be created
             $register = $True
@@ -184,14 +184,23 @@ class PSResourceRepository : ResourceBase
 
         if ( $register )
         {
-            if (-not ($params.Keys -contains 'SourceLocation'))
+            if ($this.Name -eq 'PSGallery')
             {
-                $params['SourceLocation'] = $this.SourceLocation
+                Write-Verbose -Message ($this.localizedData.RegisterDefaultRepository -f $this.Name)
+
+                Register-PSRepository -Default
             }
+            else
+            {
+                if (-not ($params.Keys -contains 'SourceLocation'))
+                {
+                    $params['SourceLocation'] = $this.SourceLocation
+                }
 
-            Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
+                Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
 
-            Register-PSRepository @params
+                Register-PSRepository @params
+            }
         }
         else
         {

@@ -18,4 +18,5 @@ ConvertFrom-StringData -StringData @'
     PropertyOutOfSync                    = Repository property '{0}' is not in the desired state. Currently '{1}', should be '{2}'.
     RegisterRepository                   = Registering repository '{0}' with SourceLocation '{1}'.
     UpdateRepository                     = Updating repository '{0}' with SourceLocation '{1}'.
+    RegisterDefaultRepository            = Registering default repository '{0}' with -Default parameter.
 '@
