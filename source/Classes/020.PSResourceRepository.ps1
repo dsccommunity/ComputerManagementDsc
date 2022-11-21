@@ -280,8 +280,8 @@ class PSResourceRepository : ResourceBase
             $returnValue.ProxyCredential           = $repository.ProxyCredental
             $returnValue.InstallationPolicy        = [InstallationPolicy]::$($repository.InstallationPolicy)
             $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
-            $returnValue.Trusted                   = $repository.Trusted
-            $returnValue.Registered                = $repository.Registered
+            # $returnValue.Trusted                   = $repository.Trusted
+            # $returnValue.Registered                = $repository.Registered
         }
         else
         {
