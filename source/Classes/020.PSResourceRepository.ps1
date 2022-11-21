@@ -14,6 +14,9 @@
         this repository. A URI can be a NuGet server feed, HTTP, HTTPS,
         FTP or file location.
 
+    .PARAMETER Credential
+        Specifies credentials of an account that has rights to register a repository.
+
     .PARAMETER ScriptSourceLocation
         Specifies the URI for the script source location.
 
@@ -55,43 +58,64 @@ class PSResourceRepository : ResourceBase
 {
 
     [DscProperty()]
-    [Ensure] $Ensure = [Ensure]::Present
+    [Ensure]
+    $Ensure = [Ensure]::Present
 
     [DscProperty(Key)]
-    [System.String] $Name
+    [System.String]
+    $Name
 
     [DscProperty(Mandatory)]
-    [System.String] $SourceLocation
+    [System.String]
+    $SourceLocation
 
     [DscProperty()]
-    [pscredential] $Credential
+    [PSCredential]
+    $Credential
 
     [DscProperty()]
-    [System.String] $ScriptSourceLocation
+    [System.String]
+    $ScriptSourceLocation
 
     [DscProperty()]
-    [System.String] $PublishLocation
+    [System.String]
+    $PublishLocation
 
     [DscProperty()]
-    [System.String] $ScriptPublishLocation
+    [System.String]
+    $ScriptPublishLocation
 
     [DscProperty()]
-    [System.String] $Proxy
+    [System.String]
+    $Proxy
 
     [DscProperty()]
-    [pscredential] $ProxyCredential
+    [pscredential]
+    $ProxyCredential
 
     [DscProperty()]
-    [InstallationPolicy] $InstallationPolicy = [InstallationPolicy]::Untrusted
+    [InstallationPolicy]
+    $InstallationPolicy = [InstallationPolicy]::Untrusted
 
     [DscProperty()]
-    [System.String] $PackageManagementProvider = 'NuGet'
+    [System.String]
+    $PackageManagementProvider = 'NuGet'
 
-    [DscProperty(NotConfigurable)]
-    [System.Boolean] $Trusted;
+    # [DscProperty(NotConfigurable)]
+    # [System.Boolean]
+    # $Trusted
 
-    [DscProperty(NotConfigurable)]
-    [System.Boolean] $Registered;
+    # [DscProperty(NotConfigurable)]
+    # [System.Boolean]
+    # $Registered
+
+    PSResourceRepository () : base ()
+    {
+        # These properties will not be enforced.
+        $this.ExcludeDscProperties = @(
+            'Name'
+        )
+    }
 
     [PSResourceRepository] Get()
     {
@@ -108,28 +132,92 @@ class PSResourceRepository : ResourceBase
         return ([ResourceBase] $this).Test()
     }
 
-    <#
-        Set hidden Registered and Trusted properties on PSRepositoryObject
-    #>
-    hidden [void] SetHiddenProperties()
-    {
-        $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
+    # <#
+    #     Set read-only Registered and Trusted properties on PSRepositoryObject
+    # #>
+    # hidden [void] SetReadProperties()
+    # {
+    #     $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
 
-        if ($repository)
-        {
-            $this.Registered = $repository.Registered
-            $this.Trusted    = $repository.Trusted
-        }
-    }
+    #     if ($repository)
+    #     {
+    #         $this.Registered = $repository.Registered
+    #         $this.Trusted    = $repository.Trusted
+    #     }
+    # }
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        if (($properties.Keys -contains 'Ensure') -and ($properties.Ensure -eq 'Absent'))
+        $params = @{
+            Name = $this.Name
+        }
+
+        if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
         {
+            # Ensure was not in desired state so the repository should be removed
             Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
-            Unregister-PSRepository -Name $this.Name
+
+            Unregister-PSRepository @params
+
             return
         }
+        elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
+        {
+            # Ensure was not in desired state so the repository should be created
+            $register = $True
+
+        }
+        else
+        {
+            # Repository exist but one or more properties are not in desired state
+            $register = $False
+        }
+
+        foreach ($key in $properties.Keys)
+        {
+            if (-not ($key -eq 'Ensure'))
+            {
+                Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($this.$key))
+                $params[$key] = $properties.$key
+            }
+        }
+
+        if ( $register )
+        {
+            if ($this.Name -eq 'PSGallery')
+            {
+                Write-Verbose -Message ($this.localizedData.RegisterDefaultRepository -f $this.Name)
+
+                Register-PSRepository -Default
+            }
+            else
+            {
+                if (-not ($params.Keys -contains 'SourceLocation'))
+                {
+                    $params['SourceLocation'] = $this.SourceLocation
+                }
+
+                Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
+
+                Register-PSRepository @params
+            }
+        }
+        else
+        {
+            Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name, $this.SourceLocation)
+
+            Set-PSRepository @params
+        }
+
+
+        # if (($properties.Keys -contains 'Ensure') -and ($properties.Ensure -eq 'Absent'))
+        # {
+        #     Write-Verbose -Message ($this.localizedData.RemoveExistingRepository -f $this.Name)
+
+        #     Unregister-PSRepository -Name $this.Name
+
+        #     return
+        # }
 
         <#
             Update any properties not in desired state if the PSResourceRepository
@@ -139,46 +227,46 @@ class PSResourceRepository : ResourceBase
             in desired state (user have in that case wrongly added properties to an
             "absent configuration").
         #>
-        if ($this.Ensure -eq [Ensure]::Present)
-        {
-            $params = @{
-                Name = $this.Name
-            }
+        # if ($this.Ensure -eq [Ensure]::Present)
+        # {
+        #     $params = @{
+        #         Name = $this.Name
+        #     }
 
-            $this.SetHiddenProperties()
+        #     $this.SetReadProperties()
 
-            foreach ($key in $properties.Keys)
-            {
-                #? Registered & Trusted are both hidden, does Compare() return them?
-                if (-not ($key -in @('Ensure','Registered','Trusted')))
-                {
-                    Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($properties.$key), $($this.$key))
-                    $params[$key] = $properties.$key
-                }
-            }
-            if (-not $this.Registered)
-            {
-                if (-not ($params.Keys -contains 'SourceLocation'))
-                {
-                    $params['SourceLocation'] = $this.SourceLocation
-                }
+        #     foreach ($key in $properties.Keys)
+        #     {
+        #         if (-not ($key -eq 'Ensure'))
+        #         {
+        #             Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($properties.$key), $($this.$key))
+        #             $params[$key] = $properties.$key
+        #         }
+        #     }
+        #     if (-not $this.Registered)
+        #     {
+        #         if (-not ($params.Keys -contains 'SourceLocation'))
+        #         {
+        #             $params['SourceLocation'] = $this.SourceLocation
+        #         }
 
-                Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
-                Register-PSRepository @params
-            }
-            else
-            {
-                #* Dont waste time running Set-PSRepository if params only has the 'Name' key.
-                if ($params.Keys.Count -gt 1)
-                {
-                    Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name, $this.SourceLocation)
-                    Set-PSRepository @params
-                }
-            }
-        }
+        #         Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
+        #         Register-PSRepository @params
+        #     }
+        #     else
+        #     {
+        #         #* Dont waste time running Set-PSRepository if params only has the 'Name' key.
+        #         if ($params.Keys.Count -gt 1)
+        #         {
+        #             Write-Verbose -Message ($this.localizedData.UpdateRepository -f $this.Name, $this.SourceLocation)
+
+        #             Set-PSRepository @params
+        #         }
+        #     }
+        # }
     }
 
-    hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
+    hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
     {
         $returnValue = @{
             Ensure                    = [Ensure]::Absent
@@ -187,7 +275,8 @@ class PSResourceRepository : ResourceBase
         }
 
         Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
-        $repository = Get-PSRepository -Name $this.name -ErrorAction SilentlyContinue
+
+        $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
 
         if ($repository)
         {
@@ -200,13 +289,14 @@ class PSResourceRepository : ResourceBase
             $returnValue.ProxyCredential           = $repository.ProxyCredental
             $returnValue.InstallationPolicy        = [InstallationPolicy]::$($repository.InstallationPolicy)
             $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
-            $returnValue.Trusted                   = $repository.Trusted
-            $returnValue.Registered                = $repository.Registered
+            # $returnValue.Trusted                   = $repository.Trusted
+            # $returnValue.Registered                = $repository.Registered
         }
         else
         {
             Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
         }
+
         return $returnValue
     }
 
@@ -214,17 +304,16 @@ class PSResourceRepository : ResourceBase
         The parameter properties will contain the properties that was
         assigned a value.
     #>
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('AvoidEmptyNamedBlocks', '')]
     hidden [void] AssertProperties([System.Collections.Hashtable] $properties)
     {
-        Assert-Module PowerShellGet
-        Assert-Module PackageManagement
+        Assert-Module -ModuleName PowerShellGet
+        Assert-Module -ModuleName PackageManagement
 
         if ($this.ProxyCredental -and (-not $this.Proxy))
         {
             $errorMessage = $this.localizedData.ProxyCredentialPassedWithoutProxyUri
+
             New-InvalidArgumentException -ArgumentName 'ProxyCredential' -Message $errorMessage
         }
     }
-
 }

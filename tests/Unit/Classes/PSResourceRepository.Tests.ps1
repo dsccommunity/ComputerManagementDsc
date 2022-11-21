@@ -772,6 +772,7 @@ try
                 InModuleScope -ScriptBlock {
                     {
                         $script:mockPSResourceRepositoryInstance.Modify(@{
+                            Ensure         = 'Present'
                             SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                             }
                         )
@@ -819,7 +820,6 @@ try
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Present'
                          }
-                         $script:mockPSResourceRepositoryInstance.Registered = $True
                     }
 
                     Mock -CommandName Set-PSRepository
@@ -842,36 +842,36 @@ try
     }
 
 
-    Describe 'PSResourceRepository\SetHiddenProperties()' -Tag 'SetHiddenProperties' {
-        Context 'Retrieving Registered and Trusted properties of the repository' {
-            BeforeAll {
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name           = 'FakePSGallery'
-                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                        Ensure         = 'Present'
-                    }
+    # Describe 'PSResourceRepository\SetHiddenProperties()' -Tag 'SetHiddenProperties' {
+    #     Context 'Retrieving Registered and Trusted properties of the repository' {
+    #         BeforeAll {
+    #             InModuleScope -ScriptBlock {
+    #                 $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
+    #                     Name           = 'FakePSGallery'
+    #                     SourceLocation = 'https://www.powershellgallery.com/api/v2'
+    #                     Ensure         = 'Present'
+    #                 }
 
-                    Mock -CommandName Get-PSRepository -MockWith {
-                        return @{
-                            Trusted    = $true
-                            Registered = $true
-                        }
-                    }
-                }
-            }
+    #                 Mock -CommandName Get-PSRepository -MockWith {
+    #                     return @{
+    #                         Trusted    = $true
+    #                         Registered = $true
+    #                     }
+    #                 }
+    #             }
+    #         }
 
-            It 'Should set Hidden and Registered properties correctly' {
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance.SetHiddenProperties()
-                    $script:mockPSResourceRepositoryInstance.Registered | Should -BeTrue
-                    $script:mockPSResourceRepositoryInstance.Trusted    | Should -BeTrue
+    #         It 'Should set Hidden and Registered properties correctly' {
+    #             InModuleScope -ScriptBlock {
+    #                 $script:mockPSResourceRepositoryInstance.SetHiddenProperties()
+    #                 $script:mockPSResourceRepositoryInstance.Registered | Should -BeTrue
+    #                 $script:mockPSResourceRepositoryInstance.Trusted    | Should -BeTrue
 
-                    Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
-                }
-            }
-        }
-    }
+    #                 Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
+    #             }
+    #         }
+    #     }
+    # }
 
     Describe 'PSResourceRepository\AssertProperties()' -Tag 'AssertProperties' {
         BeforeAll {

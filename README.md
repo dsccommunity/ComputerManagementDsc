@@ -75,3 +75,14 @@ This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
 For a full list of resources in ComputerManagementDsc and examples on their use,
 check out the [ComputerManagementDsc wiki](https://github.com/dsccommunity/ComputerManagementDsc/wiki).
+
+## Requirements
+### Windows Management Framework 5.0
+
+Required because this module now implements class-based resources.
+Class-based resources can only work on computers with Windows
+Management Framework 5.0 or above.
+
+### PSResourceRepository
+
+The resource`PSResourceRepository` requires that the PowerShell modules`PowerShellGet` and `PackageManagement` is already present on the target computer.
