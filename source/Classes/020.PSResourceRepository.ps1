@@ -256,7 +256,7 @@ class PSResourceRepository : ResourceBase
         # }
     }
 
-    hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
+    hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
     {
         $returnValue = @{
             Ensure                    = [Ensure]::Absent
