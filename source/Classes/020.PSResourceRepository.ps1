@@ -109,7 +109,7 @@ class PSResourceRepository : ResourceBase
     [System.Boolean]
     $Registered
 
-    PSResourceRepository () : base ()
+    PSResourceRepository () : ResourceBase ()
     {
         # These properties will not be enforced.
         $this.ExcludeDscProperties = @(
@@ -190,6 +190,7 @@ class PSResourceRepository : ResourceBase
             }
 
             Write-Verbose -Message ($this.localizedData.RegisterRepository -f $this.Name, $this.SourceLocation)
+
             Register-PSRepository @params
         }
         else
