@@ -101,13 +101,13 @@ class PSResourceRepository : ResourceBase
     [System.String]
     $PackageManagementProvider = 'NuGet'
 
-    [DscProperty(NotConfigurable)]
-    [System.Boolean]
-    $Trusted
+    # [DscProperty(NotConfigurable)]
+    # [System.Boolean]
+    # $Trusted
 
-    [DscProperty(NotConfigurable)]
-    [System.Boolean]
-    $Registered
+    # [DscProperty(NotConfigurable)]
+    # [System.Boolean]
+    # $Registered
 
     PSResourceRepository () : base ()
     {
@@ -132,19 +132,19 @@ class PSResourceRepository : ResourceBase
         return ([ResourceBase] $this).Test()
     }
 
-    <#
-        Set read-only Registered and Trusted properties on PSRepositoryObject
-    #>
-    hidden [void] SetReadProperties()
-    {
-        $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
+    # <#
+    #     Set read-only Registered and Trusted properties on PSRepositoryObject
+    # #>
+    # hidden [void] SetReadProperties()
+    # {
+    #     $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
 
-        if ($repository)
-        {
-            $this.Registered = $repository.Registered
-            $this.Trusted    = $repository.Trusted
-        }
-    }
+    #     if ($repository)
+    #     {
+    #         $this.Registered = $repository.Registered
+    #         $this.Trusted    = $repository.Trusted
+    #     }
+    # }
 
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
