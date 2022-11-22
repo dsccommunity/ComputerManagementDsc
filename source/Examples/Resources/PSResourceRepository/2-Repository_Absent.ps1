@@ -15,7 +15,6 @@ configuration Repository_Absent
         {
             Name           = 'PSGallery'
             Ensure         = 'Absent'
-            SourceLocation = 'https://www.powershellgallery.com/api/v2'
         }
     }
 }
