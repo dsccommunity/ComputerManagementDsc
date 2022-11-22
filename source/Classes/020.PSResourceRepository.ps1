@@ -168,11 +168,6 @@ class PSResourceRepository : ResourceBase
             }
             else
             {
-                if ([System.String]::IsNullOrEmpty($this.SourceLocation))
-                {
-                    New-InvalidArgumentException -Message $this.LocalizedData.SourceLocationRequiredForRegistration
-                }
-
                 if ($params.Keys -notcontains 'SourceLocation')
                 {
                     $params['SourceLocation'] = $this.SourceLocation
