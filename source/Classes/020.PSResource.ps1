@@ -247,6 +247,9 @@ class PSResource : ResourceBase
         }
 
         $module = Find-Module @params
+
+        Write-Verbose -Message ($this.LocalizedData.FoundLatestVersion -f $this.Name, $module.Version)
+
         return $module.Version
     }
 
