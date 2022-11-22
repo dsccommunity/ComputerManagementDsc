@@ -1771,7 +1771,6 @@ try
             }
 
             Context 'When a scheduled task is created using a Built In Service Account' {
-                #
                 $testParameters = $getTargetResourceParameters + @{
                     ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     ScheduleType        = 'Once'
@@ -1806,7 +1805,7 @@ try
                         $Inputobject.Principal.LogonType -ieq 'ServiceAccount'
                     }
                 }
-                #
+
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
                         Description = '+'
