@@ -65,7 +65,7 @@ class PSResourceRepository : ResourceBase
     [System.String]
     $Name
 
-    [DscProperty(Mandatory)]
+    [DscProperty()]
     [System.String]
     $SourceLocation
 
