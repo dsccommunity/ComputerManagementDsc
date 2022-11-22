@@ -790,7 +790,7 @@ try
                             Ensure         = 'Present'
                             }
                         )
-                    } | Should -Throw
+                    } | Should -Throw -ExpectedMessage 'SourceLocation is a required parameter to register a PSRepository.'
                 }
             }
         }
