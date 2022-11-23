@@ -13,7 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - PSResourceRepository
-  - New class-based resource to manage PowerShell Resource Repositories - Fixes [Issue #393](https://github.com/dsccommunity/ComputerManagementDsc/issues/393)
+  - New class-based resource to manage PowerShell Resource Repositories - Fixes [Issue #393](https://github.com/dsccommunity/ComputerManagementDsc/issues/393),[Issue #399](https://github.com/dsccommunity/ComputerManagementDsc/issues/399)
+
+- PSResource
+  - New class-based resource to manage PowerShell resources. - Fixes [Issue #393](https://github.com/dsccommunity/ComputerManagementDsc/issues/393), [Issue #398](https://github.com/dsccommunity/ComputerManagementDsc/issues/398)
 
 - Computer
   - Support Options Parameter for domain join - Fixes [Issue #234](https://github.com/dsccommunity/ComputerManagementDsc/issues/234).
