@@ -175,7 +175,6 @@ try
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
                     }
                 }
             }
