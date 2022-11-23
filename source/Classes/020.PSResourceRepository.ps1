@@ -105,7 +105,7 @@ class PSResourceRepository : ResourceBase
     $PackageManagementProvider = 'NuGet'
 
     [DscProperty()]
-    [Nullable[System.Boolean]
+    [Nullable[System.Boolean]]
     $Default = $False
 
     PSResourceRepository () : base ()
