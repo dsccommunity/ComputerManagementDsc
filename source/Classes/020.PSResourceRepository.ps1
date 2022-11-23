@@ -207,9 +207,10 @@ class PSResourceRepository : ResourceBase
     hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
     {
         $returnValue = @{
-            Ensure                    = [Ensure]::Absent
-            Name                      = $this.Name
-            SourceLocation            = $this.SourceLocation
+            Ensure         = [Ensure]::Absent
+            Name           = $this.Name
+            SourceLocation = $this.SourceLocation
+            Default        = $this.Default
         }
 
         Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)

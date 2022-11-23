@@ -133,13 +133,17 @@ try
 
                 # Key properties
                 $resourceCurrentState.Name           | Should -Be $shouldBeData.Name
-                $resourceCurrentState.SourceLocation | Should -Be $shouldBeData.SourceLocation
 
                 # Optional properties
-                $resourceCurrentState.ScriptSourceLocation  | Should -Be $shouldBeData.ScriptSourceLocation
-                $resourceCurrentState.PublishLocation       | Should -Be $shouldBeData.PublishLocation
-                $resourceCurrentState.ScriptPublishLocation | Should -Be $shouldBeData.ScriptPublishLocation
-                $resourceCurrentState.InstallationPolicy    | Should -Be $shouldBeData.InstallationPolicy
+                $resourceCurrentState.SourceLocation            | Should -Be $shouldBeData.SourceLocation
+                $resourceCurrentState.ScriptSourceLocation      | Should -Be $shouldBeData.ScriptSourceLocation
+                $resourceCurrentState.PublishLocation           | Should -Be $shouldBeData.PublishLocation
+                $resourceCurrentState.ScriptPublishLocation     | Should -Be $shouldBeData.ScriptPublishLocation
+                $resourceCurrentState.InstallationPolicy        | Should -Be $shouldBeData.InstallationPolicy
+                $resourceCurrentState.Credential                | Should -BeNullOrEmpty
+                $resourceCurrentState.Default                   | Should -BeNullOrEmpty
+                $resourceCurrentState.Proxy                     | Should -BeNullOrEmpty
+                $resourceCurrentState.ProxyCredential           | Should -BeNullOrEmpty
 
                 # Defaulted properties
                 $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
@@ -193,11 +197,20 @@ try
 
                 # Key properties
                 $resourceCurrentState.Name           | Should -Be $shouldBeData.Name
-                $resourceCurrentState.SourceLocation | Should -Be $shouldBeData.SourceLocation
 
                 # Defaulted properties
                 $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
+                $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
                 $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
+                $resourceCurrentState.Credential                | Should -BeNullOrEmpty
+                $resourceCurrentState.Default                   | Should -BeNullOrEmpty
+                $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
+                $resourceCurrentState.Proxy                     | Should -BeNullOrEmpty
+                $resourceCurrentState.ProxyCredential           | Should -BeNullOrEmpty
+                $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
+                $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+                $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
+                $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
 
                 # Ensure will be Absent
                 $resourceCurrentState.Ensure | Should -Be 'Absent'
