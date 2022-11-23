@@ -1788,6 +1788,15 @@ try
                     }
                 }
 
+                $testParameters.Add('User', 'WrongUser')
+
+                It 'Should Disregard User and Set User to the BuiltInAccount' {
+                    Set-TargetResource @testParameters
+                    Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                        $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
+                    }
+                }
+
                 $testParameters.Add('LogonType', 'Password')
 
                 It 'Should overwrite LogonType to "ServiceAccount"' {
@@ -1799,14 +1808,16 @@ try
 
                 Mock -CommandName Get-ScheduledTask -MockWith {
                     @{
-                        TaskName  = $testParameters.TaskName
-                        TaskPath  = $testParameters.TaskPath
-                        Actions   = @(
+                        Description = '+'
+                        TaskName    = $testParameters.TaskName
+                        TaskPath    = $testParameters.TaskPath
+                        Actions     = @(
                             [pscustomobject] @{
                                 Execute = $testParameters.ActionExecutable
                             }
                         )
-                        Triggers  = @(
+                        ActionArguments = '-File "C:\something\right.ps1"'
+                        Triggers    = @(
                             [pscustomobject] @{
                                 Repetition = @{
                                     Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
@@ -1817,12 +1828,12 @@ try
                                 }
                             }
                         )
-                        Settings = [pscustomobject] @{
+                        Settings    = [pscustomobject] @{
                             Enabled = $true
                             MultipleInstances = 'IgnoreNew'
                         }
-                        Principal = [pscustomobject] @{
-                            UserId    = 'NT AUTHORITY\' + $testParameters.BuiltInAccount
+                        Principal   = [pscustomobject] @{
+                            UserId    = $testParameters.BuiltInAccount
                             LogonType = 'ServiceAccount'
                         }
                     }
