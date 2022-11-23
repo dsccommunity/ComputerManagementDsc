@@ -106,7 +106,7 @@ class PSResourceRepository : ResourceBase
 
     [DscProperty()]
     [Nullable[System.Boolean]]
-    $Default = $False
+    $Default
 
     PSResourceRepository () : base ()
     {
