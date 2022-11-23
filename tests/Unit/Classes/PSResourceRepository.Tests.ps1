@@ -911,7 +911,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.SourceLocation = 'https://notaurl.com/'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
                         }
                     }
                 }
@@ -922,7 +922,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.Credential = $credential
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
                         }
                     }
                 }
@@ -933,7 +933,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.ScriptSourceLocation = 'https://notaurl.com/'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
                         }
                     }
                 }
@@ -944,7 +944,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.PublishLocation = 'https://notaurl.com/'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
                         }
                     }
                 }
@@ -955,7 +955,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.ScriptPublishLocation = 'https://notaurl.com/'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
                         }
                     }
                 }
@@ -966,7 +966,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.PackageManagementProvider = 'Package'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'i just want to see the message'
                         }
                     }
                 }

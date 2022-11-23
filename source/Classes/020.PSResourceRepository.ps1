@@ -254,18 +254,22 @@ class PSResourceRepository : ResourceBase
                 New-InvalidArgumentException -ArgumentName 'Default' -Message $errorMessage
             }
 
-            if ( $this.SourceLocation -or
-                 $this.PackageSourceLocation -or
-                 $this.ScriptPublishLocation -or
-                 $this.ScriptSourceLocation -or
-                 $this.Credential -or
-                 $this.PackageManagementProvider -ne 'NuGet'
-            )
-            {
-                $errorMessage = $this.localizedData.DefaultUsedWithOtherParameters
-
-                New-InvalidArgumentException -ArgumentName 'Default' -Message $errorMessage
+            $assertBoundParameterParameters = @{
+                BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+                MutuallyExclusiveList1 = @(
+                    'Default'
+                )
+                MutuallyExclusiveList2 = @(
+                    'SourceLocation'
+                    'PackageSourceLocation'
+                    'ScriptPublishLocation'
+                    'ScriptSourceLocation'
+                    'Credential'
+                    'PackageManagementProvider'
+                )
             }
+
+            Assert-BoundParameter @assertBoundParameterParameters
         }
         else
         {
