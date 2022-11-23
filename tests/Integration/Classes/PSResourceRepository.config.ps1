@@ -5,23 +5,22 @@ $ConfigurationData = @{
     }
     NonNodeData = @{
         PSResourceRepository_Create_Config = @{
-            Name           = 'PSGallery'
-            Ensure         = 'Present'
-            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+            Name    = 'PSGallery'
+            Ensure  = 'Present'
+            Default = $true
         }
         PSResourceRepository_Modify_Config = @{
-            Name                  = 'PSGallery'
+            Name                  = 'MyPSRepository'
             Ensure                = 'Present'
-            SourceLocation        = 'https://www.powershellgallery.com/api/v2'
-            PublishLocation       = 'https://www.powershellgallery.com/api/v2/package/'
-            ScriptSourceLocation  = 'https://www.powershellgallery.com/api/v2/items/psscript'
-            ScriptPublishLocation = 'https://www.powershellgallery.com/api/v2/package/'
+            SourceLocation        = 'https://www.mypowershellgallery.com/api/v2'
+            PublishLocation       = 'https://www.mypowershellgallery.com/api/v2/package/'
+            ScriptSourceLocation  = 'https://www.mypowershellgallery.com/api/v2/items/psscript'
+            ScriptPublishLocation = 'https://www.mypowershellgallery.com/api/v2/package/'
             InstallationPolicy    = 'Trusted'
         }
         PSResourceRepository_Remove_Config = @{
             Name           = 'PSGallery'
             Ensure         = 'Absent'
-            SourceLocation = 'https://www.powershellgallery.com/api/v2'
         }
 
     }
@@ -39,9 +38,9 @@ configuration PSResourceRepository_Create_Config
     {
         PSResourceRepository 'Integration_Test'
         {
-            Name           = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Name
-            Ensure         = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Ensure
-            SourceLocation = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.SourceLocation
+            Name    = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Name
+            Ensure  = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Ensure
+            Default = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Default
         }
     }
 }
@@ -83,7 +82,6 @@ configuration PSResourceRepository_Remove_Config
         {
             Name           = $ConfigurationData.NonNodeData.PSResourceRepository_Remove_Config.Name
             Ensure         = $ConfigurationData.NonNodeData.PSResourceRepository_Remove_Config.Ensure
-            SourceLocation = $ConfigurationData.NonNodeData.PSResourceRepository_Remove_Config.SourceLocation
         }
     }
 }
