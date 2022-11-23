@@ -20,4 +20,5 @@ ConvertFrom-StringData -StringData @'
     UpdateRepository                      = Updating repository '{0}' with SourceLocation '{1}'.
     RegisterDefaultRepository             = Registering default repository '{0}' with -Default parameter.
     SourceLocationRequiredForRegistration = SourceLocation is a required parameter to register a PSRepository.
+    NoDefaultSettingsPSGallery            = The parameter Default must be set to True for PSRepositories named PSGallery.
 '@

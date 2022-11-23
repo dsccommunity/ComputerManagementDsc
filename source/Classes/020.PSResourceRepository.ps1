@@ -32,7 +32,7 @@
         Specifies the URI of the proxy to connect to this PSResourceRepository
 
     .PARAMETER ProxyCredential
-        Specifies the Credential to connect to the PSResourceRepository proxy
+        Specifies the Credential to connect to the PSResourceRepository proxy.
 
     .PARAMETER InstallationPolicy
         Specifies the installation policy. Valid values are  'Trusted'
@@ -40,6 +40,9 @@
 
     .PARAMETER PackageManagementProvider
         Specifies a OneGet package provider. Default value is 'NuGet'.
+
+    .PARAMETER Default
+        Specifies whether to set the default properties for the default PSGallery PSRepository. Default value is 'False'.
 
     .EXAMPLE
         Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResourceRepository -Method Get -Property @{
@@ -100,6 +103,10 @@ class PSResourceRepository : ResourceBase
     [DscProperty()]
     [System.String]
     $PackageManagementProvider = 'NuGet'
+
+    [DscProperty()]
+    [System.Boolean]
+    $Default = $False
 
     PSResourceRepository () : base ()
     {
@@ -165,6 +172,9 @@ class PSResourceRepository : ResourceBase
                 Write-Verbose -Message ($this.localizedData.RegisterDefaultRepository -f $this.Name)
 
                 Register-PSRepository -Default
+
+                #* The user may have specified Proxy & Proxy Credential, or InstallationPolicy params
+                Set-PSRepository @params
             }
             else
             {
@@ -233,6 +243,29 @@ class PSResourceRepository : ResourceBase
     {
         Assert-Module -ModuleName PowerShellGet
         Assert-Module -ModuleName PackageManagement
+
+        if ($this.Name -eq 'PSGallery')
+        {
+            if (-not $this.Default)
+            {
+                $errorMessage = $this.localizedData.NoDefaultSettingsPSGallery
+
+                New-InvalidArgumentException -ArgumentName 'Default' -Message $errorMessage
+            }
+
+            if ( $this.SourceLocation -or
+                 $this.PackageSourceLocation -or
+                 $this.ScriptPublishLocation -or
+                 $this.ScriptSourceLocation -or
+                 $this.Credential -or
+                 $this.PackageManagementProvider -ne 'NuGet'
+            )
+            {
+                $errorMessage = $this.localizedData.DefaultUsedWithOtherParameters
+
+                New-InvalidArgumentException -ArgumentName 'Default' -Message $errorMessage
+            }
+        }
 
         if ($this.ProxyCredental -and (-not $this.Proxy))
         {
