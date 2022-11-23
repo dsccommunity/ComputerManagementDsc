@@ -76,21 +76,22 @@ try
                 $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
 
                 # Key properties
-                $resourceCurrentState.Name | Should -Be $shouldBeData.Name
+                $resourceCurrentState.Name   | Should -Be $shouldBeData.Name
+                $resourceCurrentState.Ensure | Should -Be $shouldBeData.Ensure
 
                 # Optional Properties
-                $resourceCurrentState.SourceLocation            | Should -Be $shouldBeData.SourceLocation
-                $resourceCurrentState.Default                   | Should -BeTrue
-                $resourceCurrentState.SourceInfo                | Should -BeNullOrEmpty
-                $resourceCurrentState.Credential                | Should -BeNullOrEmpty
-                $resourceCurrentState.Proxy                     | Should -BeNullOrEmpty
-                $resourceCurrentState.ProxyCredential           | Should -BeNullOrEmpty
-
+                $resourceCurrentState.Credential      | Should -BeNullOrEmpty
+                $resourceCurrentState.Proxy           | Should -BeNullOrEmpty
+                $resourceCurrentState.ProxyCredential | Should -BeNullOrEmpty
+                $resourceCurrentState.Default         | Should -BeTrue
 
                 # Defaulted properties
-                $resourceCurrentState.Ensure                    | Should -Be $shouldBeData.Ensure
-                $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
+                $resourceCurrentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                $resourceCurrentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                $resourceCurrentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
+                $resourceCurrentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
                 $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
+                $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
 
             }
 

@@ -13,10 +13,10 @@ $ConfigurationData = @{
         PSResourceRepository_Modify_Config = @{
             Name                  = 'MyPSRepository'
             Ensure                = 'Present'
-            SourceLocation        = 'https://www.microsoft.com/en-us/'
-            PublishLocation       = 'https://www.microsoft.com/en-us/'
-            ScriptSourceLocation  = 'https://www.microsoft.com/en-us/'
-            ScriptPublishLocation = 'https://www.microsoft.com/en-us/'
+            SourceLocation        = 'https://www.google.com/'
+            PublishLocation       = 'https://www.google.com/'
+            ScriptSourceLocation  = 'https://www.google.com/'
+            ScriptPublishLocation = 'https://www.google.com/'
             InstallationPolicy    = 'Trusted'
         }
         PSResourceRepository_Remove_Config = @{
