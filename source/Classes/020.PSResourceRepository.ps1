@@ -266,6 +266,15 @@ class PSResourceRepository : ResourceBase
                 New-InvalidArgumentException -ArgumentName 'Default' -Message $errorMessage
             }
         }
+        else
+        {
+            if ($this.Default)
+            {
+                $errorMessage = $this.localizedData.DefaultSettingsNoPSGallery
+
+                New-InvalidArgumentException -ArgumentName 'Default' -Message $errorMessage
+            }
+        }
 
         if ($this.ProxyCredental -and (-not $this.Proxy))
         {

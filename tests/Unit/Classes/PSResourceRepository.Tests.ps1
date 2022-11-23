@@ -854,7 +854,7 @@ try
     }
 
     Describe 'PSResourceRepository\AssertProperties()' -Tag 'AssertProperties' {
-        BeforeAll {
+        BeforeEach {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{}
             }
@@ -870,6 +870,76 @@ try
                             $mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'Proxy Credential passed without Proxy Uri.'
                         }
                     }
+                }
+            }
+
+            It 'Should throw the correct error when Default true is not passed with name PSGallery' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
+                    $script:mockPSResourceRepositoryInstance.Default = $false
+                    $script.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default must be set to True for a repository named PSGallery.'
+                }
+            }
+
+            It 'Should throw the correct error when Default true is passed without the name PSGallery' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Name = 'NotTheDefaultPSGallery'
+                    $script:mockPSResourceRepositoryInstance.Default = $true
+                    $script.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may only be used with repositories named PSGallery'
+                }
+            }
+
+            It 'Should throw the correct error when Default true is passed with SourceLocation' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
+                    $script:mockPSResourceRepositoryInstance.Default = $true
+                    $script:mockPSResourceRepositoryInstance.SourceLocation = 'https://notaurl.com/'
+                    $script.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                }
+            }
+
+            It 'Should throw the correct error when Default true is passed with Credential' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
+                    $script:mockPSResourceRepositoryInstance.Default = $true
+                    $script:mockPSResourceRepositoryInstance.Credential = $credential
+                    $script.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                }
+            }
+
+            It 'Should throw the correct error when Default true is passed with ScriptSourceLocation' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
+                    $script:mockPSResourceRepositoryInstance.Default = $true
+                    $script:mockPSResourceRepositoryInstance.ScriptSourceLocation = 'https://notaurl.com/'
+                    $script.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                }
+            }
+
+            It 'Should throw the correct error when Default true is passed with PublishLocation' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
+                    $script:mockPSResourceRepositoryInstance.Default = $true
+                    $script:mockPSResourceRepositoryInstance.PublishLocation = 'https://notaurl.com/'
+                    $script.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                }
+            }
+
+            It 'Should throw the correct error when Default true is passed with ScriptPublishLocation' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
+                    $script:mockPSResourceRepositoryInstance.Default = $true
+                    $script:mockPSResourceRepositoryInstance.ScriptPublishLocation = 'https://notaurl.com/'
+                    $script.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
+                }
+            }
+
+            It 'Should throw the correct error when Default true is passed with PackageManagementProvider' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
+                    $script:mockPSResourceRepositoryInstance.Default = $true
+                    $script:mockPSResourceRepositoryInstance.PackageManagementProvider = 'Package'
+                    $script.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.'
                 }
             }
         }
