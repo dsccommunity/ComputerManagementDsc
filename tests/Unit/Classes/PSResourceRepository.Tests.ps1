@@ -772,12 +772,25 @@ try
                 InModuleScope -ScriptBlock {
                     {
                         $script:mockPSResourceRepositoryInstance.Modify(@{
+                            Ensure         = 'Present'
                             SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                             }
                         )
                     } | Should -Not -Throw
 
                     Assert-MockCalled -CommandName Register-PSRepository -Exactly -Times 1 -Scope It
+                }
+            }
+
+            It 'Should call throw the correct InvalidArgumentException when SourceLocation is not set' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceRepositoryInstance.SourceLocation = $null
+                        $script:mockPSResourceRepositoryInstance.Modify(@{
+                            Ensure         = 'Present'
+                            }
+                        )
+                    } | Should -Throw -ExpectedMessage 'SourceLocation is a required parameter to register a PSRepository.'
                 }
             }
         }
@@ -819,7 +832,6 @@ try
                             SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Present'
                          }
-                         $script:mockPSResourceRepositoryInstance.Registered = $True
                     }
 
                     Mock -CommandName Set-PSRepository
@@ -836,38 +848,6 @@ try
 
                         Assert-MockCalled -CommandName Set-PSRepository -Exactly -Times 1 -Scope It
                     }
-                }
-            }
-        }
-    }
-
-
-    Describe 'PSResourceRepository\SetHiddenProperties()' -Tag 'SetHiddenProperties' {
-        Context 'Retrieving Registered and Trusted properties of the repository' {
-            BeforeAll {
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
-                        Name           = 'FakePSGallery'
-                        SourceLocation = 'https://www.powershellgallery.com/api/v2'
-                        Ensure         = 'Present'
-                    }
-
-                    Mock -CommandName Get-PSRepository -MockWith {
-                        return @{
-                            Trusted    = $true
-                            Registered = $true
-                        }
-                    }
-                }
-            }
-
-            It 'Should set Hidden and Registered properties correctly' {
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceRepositoryInstance.SetHiddenProperties()
-                    $script:mockPSResourceRepositoryInstance.Registered | Should -BeTrue
-                    $script:mockPSResourceRepositoryInstance.Trusted    | Should -BeTrue
-
-                    Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                 }
             }
         }
