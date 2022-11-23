@@ -246,7 +246,7 @@ class PSResourceRepository : ResourceBase
 
         if ($this.Name -eq 'PSGallery')
         {
-            if (-not $this.Default)
+            if (-not $this.Default -and $this.Ensure -eq 'Present')
             {
                 $errorMessage = $this.localizedData.NoDefaultSettingsPSGallery
 

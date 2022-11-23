@@ -881,6 +881,15 @@ try
                 }
             }
 
+            It 'Should not throw when Default is not true and name is PSGallery but ensure is absent' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
+                    $script:mockPSResourceRepositoryInstance.Ensure = 'Absent'
+                    $script:mockPSResourceRepositoryInstance.Default = $false
+                    $script.AssertProperties() | Should -Not -Throw
+                }
+            }
+
             It 'Should throw the correct error when Default true is passed without the name PSGallery' {
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance.Name = 'NotTheDefaultPSGallery'
