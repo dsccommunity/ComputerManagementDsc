@@ -76,11 +76,19 @@ try
                 $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
 
                 # Key properties
-                $resourceCurrentState.Name           | Should -Be $shouldBeData.Name
-                $resourceCurrentState.SourceLocation | Should -Be $shouldBeData.SourceLocation
-                $resourceCurrentState.Ensure         | Should -Be $shouldBeData.Ensure
+                $resourceCurrentState.Name | Should -Be $shouldBeData.Name
+
+                # Optional Properties
+                $resourceCurrentState.SourceLocation            | Should -Be $shouldBeData.SourceLocation
+                $resourceCurrentState.Default                   | Should -BeTrue
+                $resourceCurrentState.SourceInfo                | Should -BeNullOrEmpty
+                $resourceCurrentState.Credential                | Should -BeNullOrEmpty
+                $resourceCurrentState.Proxy                     | Should -BeNullOrEmpty
+                $resourceCurrentState.ProxyCredential           | Should -BeNullOrEmpty
+
 
                 # Defaulted properties
+                $resourceCurrentState.Ensure                    | Should -Be $shouldBeData.Ensure
                 $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
                 $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
 
