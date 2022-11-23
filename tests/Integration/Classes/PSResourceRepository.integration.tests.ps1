@@ -210,7 +210,7 @@ try
                 # Defaulted properties
                 $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
                 $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
-                $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
+                $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
                 $resourceCurrentState.Credential                | Should -BeNullOrEmpty
                 $resourceCurrentState.Default                   | Should -BeNullOrEmpty
                 $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
