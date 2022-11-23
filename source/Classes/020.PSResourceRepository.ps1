@@ -101,7 +101,7 @@ class PSResourceRepository : ResourceBase
     $InstallationPolicy = [InstallationPolicy]::Untrusted
 
     [DscProperty()]
-    [Nullable[System.String]]
+    [System.String]
     $PackageManagementProvider
 
     [DscProperty()]
