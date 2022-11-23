@@ -792,7 +792,7 @@ function Set-TargetResource
                 non-null value to be 'LOCAL SERVICE', 'NETWORK SERVICE' or
                 'SYSTEM'
             #>
-            $username = 'NT AUTHORITY\' + $BuiltInAccount
+            $username = Set-DomainNameInAccountName -AccountName $BuiltInAccount -DomainName 'NT AUTHORITY'
             $registerArguments.Add('User', $username)
             $LogonType = 'ServiceAccount'
         }
@@ -804,7 +804,6 @@ function Set-TargetResource
         elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
         {
             $username = $ExecuteAsCredential.UserName
-
             # If the LogonType is not specified then set it to password
             if ([System.String]::IsNullOrEmpty($LogonType))
             {
@@ -829,7 +828,7 @@ function Set-TargetResource
                 privileges, should we default to 'NT AUTHORITY\LOCAL SERVICE'
                 instead?
             #>
-            $username = 'NT AUTHORITY\SYSTEM'
+            $username = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
             $registerArguments.Add('User', $username)
             $LogonType = 'ServiceAccount'
         }
@@ -1423,8 +1422,9 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
     {
-        $PSBoundParameters.User = $BuiltInAccount
-        $currentValues.User = $BuiltInAccount
+        $user = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
+        $PSBoundParameters.User = $user
+        $currentValues.User = $user
 
         $PSBoundParameters.ExecuteAsCredential = $BuiltInAccount
         $currentValues.ExecuteAsCredential = $BuiltInAccount
@@ -1432,7 +1432,7 @@ function Test-TargetResource
         $PSBoundParameters['LogonType'] = 'ServiceAccount'
         $currentValues['LogonType'] = 'ServiceAccount'
 
-        $PSBoundParameters['BuiltInAccount'] = 'NT AUTHORITY\' + $BuiltInAccount
+        $PSBoundParameters['BuiltInAccount'] = $BuiltInAccount
     }
     elseif ($PSBoundParameters.ContainsKey('ExecuteAsCredential'))
     {
@@ -1464,6 +1464,16 @@ function Test-TargetResource
     }
     else
     {
+        $user = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
+        $PSBoundParameters.User = $user
+        $currentValues.User = $user
+
+        $PSBoundParameters.ExecuteAsCredential = 'SYSTEM'
+        $currentValues.ExecuteAsCredential = 'SYSTEM'
+
+        $PSBoundParameters.Add('BuiltInAccount', $BuiltInAccount)
+        $currentValues.BuiltInAccount = $BuiltInAccount
+
         # Must be running as System, login type is ServiceAccount
         $PSBoundParameters['LogonType'] = 'ServiceAccount'
         $currentValues['LogonType'] = 'ServiceAccount'
@@ -1915,9 +1925,15 @@ function Get-CurrentResource
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
         }
 
-        if (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount'))
+        if (
+            (($result.ContainsKey('LogonType')) -and ($result['LogonType'] -ieq 'ServiceAccount')) -or
+            $result.Principal.UserID -in @('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')
+            )
         {
-            $builtInAccount = Set-DomainNameInAccountName -AccountName $task.Principal.UserId -DomainName 'NT AUTHORITY'
+            $result.User = Set-DomainNameInAccountName `
+                -AccountName $task.Principal.UserId `
+                -DomainName 'NT AUTHORITY'
+            $builtInAccount = $task.Principal.UserId
             $result.Add('BuiltInAccount', $builtInAccount)
         }
     }
