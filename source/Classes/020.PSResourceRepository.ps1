@@ -245,6 +245,23 @@ class PSResourceRepository : ResourceBase
         Assert-Module -ModuleName PowerShellGet
         Assert-Module -ModuleName PackageManagement
 
+        $assertBoundParameterParameters = @{
+            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            MutuallyExclusiveList1 = @(
+                'Default'
+            )
+            MutuallyExclusiveList2 = @(
+                'SourceLocation'
+                'PackageSourceLocation'
+                'ScriptPublishLocation'
+                'ScriptSourceLocation'
+                'Credential'
+                'PackageManagementProvider'
+            )
+        }
+
+        Assert-BoundParameter @assertBoundParameterParameters
+
         if ($this.Name -eq 'PSGallery')
         {
             if (-not $this.Default -and $this.Ensure -eq 'Present')
@@ -253,23 +270,6 @@ class PSResourceRepository : ResourceBase
 
                 New-InvalidArgumentException -ArgumentName 'Default' -Message $errorMessage
             }
-
-            $assertBoundParameterParameters = @{
-                BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
-                MutuallyExclusiveList1 = @(
-                    'Default'
-                )
-                MutuallyExclusiveList2 = @(
-                    'SourceLocation'
-                    'PackageSourceLocation'
-                    'ScriptPublishLocation'
-                    'ScriptSourceLocation'
-                    'Credential'
-                    'PackageManagementProvider'
-                )
-            }
-
-            Assert-BoundParameter @assertBoundParameterParameters
         }
         else
         {
