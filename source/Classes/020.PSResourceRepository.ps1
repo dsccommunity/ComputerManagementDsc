@@ -97,12 +97,12 @@ class PSResourceRepository : ResourceBase
     $ProxyCredential
 
     [DscProperty()]
-    [InstallationPolicy]
+    [Nullable[InstallationPolicy]]
     $InstallationPolicy = [InstallationPolicy]::Untrusted
 
     [DscProperty()]
-    [System.String]
-    $PackageManagementProvider = 'NuGet'
+    [Nullable[System.String]]
+    $PackageManagementProvider
 
     [DscProperty()]
     [Nullable[System.Boolean]]
