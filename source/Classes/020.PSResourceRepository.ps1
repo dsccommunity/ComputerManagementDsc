@@ -112,7 +112,8 @@ class PSResourceRepository : ResourceBase
     {
         # These properties will not be enforced.
         $this.ExcludeDscProperties = @(
-            'Name'
+            'Name',
+            'Default'
         )
     }
 
