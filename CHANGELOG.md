@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- ScheduledTask
+  - No longer conflates resource parameter `BuiltInAccount` and `*-ScheduledTask` parameter `user` - Fixes [Issue #385](https://github.com/dsccommunity/ComputerManagementDsc/issues/385)
+
 ### Added
 
 - Computer
