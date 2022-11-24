@@ -339,15 +339,4 @@ class PSResource : ResourceBase
             $this.SingleInstance = $True
         }
     }
-
-        <#
-        Sets SingleInstance property when single instance is not explicitly set to True but only a single instance of the resource is present
-    #>
-    hidden [void] SetLatest ([System.String] $currentVersion, [System.String] $latest)
-    {
-        if ($currentVersion -eq $latest)
-        {
-            $this.Latest = $True
-        }
-    }
 }
