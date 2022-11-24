@@ -81,28 +81,28 @@ class PSResource : ResourceBase
     $MinimumVersion
 
     [DscProperty()]
-    [System.Boolean]
-    $Latest = $False
+    [Nullable[System.Boolean]]
+    $Latest
 
     [DscProperty()]
-    [System.Boolean]
-    $Force = $False
+    [Nullable[System.Boolean]]
+    $Force
 
     [DscProperty()]
-    [System.Boolean]
-    $AllowClobber = $False
+    [Nullable[System.Boolean]]
+    $AllowClobber
 
     [DscProperty()]
-    [System.Boolean]
-    $SkipPublisherCheck = $False
+    [Nullable[System.Boolean]]
+    $SkipPublisherCheck
 
     [DscProperty()]
-    [System.Boolean]
-    $SingleInstance = $False
+    [Nullable[System.Boolean]]
+    $SingleInstance
 
     [DscProperty()]
-    [System.Boolean]
-    $AllowPrerelease = $False
+    [Nullable[System.Boolean]]
+    $AllowPrerelease
 
     [PSResource] Get()
     {
@@ -203,6 +203,20 @@ class PSResource : ResourceBase
             $errorMessage = $this.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
             New-InvalidArgumentException -ArgumentName 'AllowPrerelease' -message $errorMessage
         }
+
+        $assertBoundParameterParameters = @{
+            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            MutuallyExclusiveList1 = @(
+                'Latest'
+            )
+            MutuallyExclusiveList2 = @(
+                'MinimumVersion'
+                'RequiredVersion'
+                'MaximumVersion'
+            )
+        }
+
+        Assert-BoundParameter @assertBoundParameterParameters
     }
 
     <#
