@@ -152,16 +152,17 @@ class PSResource : ResourceBase
 
         if ($resources.Count -eq 1)
         {
+            $resource = $resources[0]
             $currentState.Ensure = [Ensure]::Present
 
-            $version = $this.GetFullVersion($resources[0])
+            $version = $this.GetFullVersion($resource)
             $currentState.RequiredVersion = $version
             $currentState.MinimumVersion  = $version
             $currentState.MaximumVersion  = $version
 
             $currentState.SingleInstance  = $True
 
-            $currentState.AllowPrerelease = $this.TestPrerelease($resources)
+            $currentState.AllowPrerelease = $this.TestPrerelease($resource)
 
             if ($this.latest)
             {
