@@ -364,6 +364,23 @@ class PSResource : ResourceBase
             $params.AllowPrerelease = $this.AllowPrerelease
         }
 
+        if ($this.Credential)
+        {
+            $params.Credential = $this.Credential
+        }
+
+        if ($this.Proxy)
+        {
+            Write-Verbose -Message ($this.LocalizedData.UsingProxyToGetResource -f $this.Proxy, $this.Name)
+
+            $params.Proxy = $this.Proxy
+        }
+
+        if ($this.ProxyCredential)
+        {
+            $params.ProxyCredential = $this.ProxyCredential
+        }
+
         $module = Find-Module @params
 
         Write-Verbose -Message ($this.LocalizedData.FoundLatestVersion -f $this.Name, $module.Version)
