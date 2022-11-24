@@ -104,6 +104,17 @@ class PSResource : ResourceBase
     [Nullable[System.Boolean]]
     $AllowPrerelease
 
+    PSResource () : base ()
+    {
+        # These properties will not be enforced.
+        $this.ExcludeDscProperties = @(
+            'AllowPrerelease'
+            'SkipPublisherCheck'
+            'AllowClobber'
+            'Force'
+            'Repository'
+        )
+    }
     [PSResource] Get()
     {
         return ([ResourceBase]$this).Get()
