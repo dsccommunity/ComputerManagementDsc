@@ -5,7 +5,7 @@
 #>
 
 ConvertFrom-StringData -StringData @'
-    PowerShellGetVersionTooLowForAllowPrerelease = The installed version of PowerShellGet does not support AllowPrerelease.
+    PowerShellGetVersionTooLowForAllowPrerelease = The PowerShellGet '{0}' does not support AllowPrerelease. Version 1.6.6 and higher is required.
     GetLatestVersion = 'Getting latest version of resource '{0}'.
     GetLatestVersionFromRepository = 'Getting latest version of resource '{0}' from repository '{1}'.
     GetLatestVersionAllowPrerelease = 'Getting latest version of resource '{0}', including prerelease versions.

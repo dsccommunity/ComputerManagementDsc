@@ -212,7 +212,7 @@ class PSResource : ResourceBase
         if ($powerShellGet.Version.Major -eq 1 -and $powerShellGet.Minor -lt 6 -and $this.AllowPrerelease)
         {
             $errorMessage = $this.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
-            New-InvalidArgumentException -ArgumentName 'AllowPrerelease' -message $errorMessage
+            New-InvalidArgumentException -ArgumentName 'AllowPrerelease' -message ($errorMessage -f $powerShellGet.Version)
         }
 
         $assertBoundParameterParameters = @{
