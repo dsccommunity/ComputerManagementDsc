@@ -131,8 +131,19 @@ class PSResource : ResourceBase
     }
 
     <#
-        This method must be overridden by a resource. The parameter properties will
-        contain the key properties.
+        The parameter properties will contain the properties that should be enforced and that are not in desired
+        state.
+    #>
+    hidden [void] Modify([System.Collections.Hashtable] $properties)
+    {
+        if ($this.Ensure -eq 'Absent')
+        {
+
+        }
+    }
+
+    <#
+        The parameter properties will contain the key properties.
     #>
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
     {
@@ -229,6 +240,20 @@ class PSResource : ResourceBase
         }
 
         Assert-BoundParameter @assertBoundParameterParameters
+
+        if ($this.Ensure -eq 'Absent' -and $this.MinimumVersion)
+        {
+            $errorMessage = $this.localizedData.EnsureAbsentPassedWithMinimumVersion
+
+            New-InvalidARgumentException -ArgumentName 'MinimumVersion' -Message $errorMessage
+        }
+
+        if ($this.Ensure -eq 'Absent' -and $this.MaximumVersion)
+        {
+            $errorMessage = $this.localizedData.EnsureAbsentPassedWithMaximumVersion
+
+            New-InvalidARgumentException -ArgumentName 'MaximumVersion' -Message $errorMessage
+        }
     }
 
     <#
