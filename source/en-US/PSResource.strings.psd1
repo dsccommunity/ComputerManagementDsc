@@ -10,6 +10,5 @@ ConvertFrom-StringData -StringData @'
     GetLatestVersionFromRepository = Getting latest version of resource '{0}' from repository '{1}'.
     GetLatestVersionAllowPrerelease = Getting latest version of resource '{0}', including prerelease versions.
     FoundLatestVersion = Latest version of resource '{0}' found is '{1}'.
-    EnsureAbsentPassedWithMinimumVersion = The property MinimumVersion may not be passed when Ensure is Absent.
-    EnsureAbsentPassedWithMaximumVersion = The property MaximumVersion may not be passed when Ensure is Absent.
+    ProxyCredentialPassedWithoutProxyUri = Proxy Credential passed without Proxy Uri.
 '@

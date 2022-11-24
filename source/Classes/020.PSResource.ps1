@@ -104,15 +104,31 @@ class PSResource : ResourceBase
     [Nullable[System.Boolean]]
     $AllowPrerelease
 
+    [DscProperty()]
+    [PSCredential]
+    $Credential
+
+    [DscProperty()]
+    [PSCredential]
+    $ProxyCredential
+
+    [DscProperty()]
+    [System.String]
+    $Proxy
+
     PSResource () : base ()
     {
         # These properties will not be enforced.
         $this.ExcludeDscProperties = @(
+            'Name'
             'AllowPrerelease'
             'SkipPublisherCheck'
             'AllowClobber'
             'Force'
             'Repository'
+            'Credential'
+            'Proxy'
+            'ProxyCredential'
         )
     }
     [PSResource] Get()
@@ -136,9 +152,27 @@ class PSResource : ResourceBase
     #>
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        if ($this.Ensure -eq 'Absent')
-        {
+        $params = @{
+            Name = $this.Name
+        }
 
+        if ($this.Force)
+        {
+            $params.Force = $this.Force
+        }
+        if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
+        {
+            if ($this.RequiredVersion -or $this.MaximumVersion -or $this.MinimumVersion)
+            {
+                $params.RequiredVersion = $this.RequiredVersion
+                $params.MinimumVersion  = $this.MinimumVersion
+                $params.MaximumVersion  = $this.MaximumVersion
+            }
+            else
+            {
+
+                $params.AllVersions = $true
+            }
         }
     }
 
@@ -241,18 +275,51 @@ class PSResource : ResourceBase
 
         Assert-BoundParameter @assertBoundParameterParameters
 
-        if ($this.Ensure -eq 'Absent' -and $this.MinimumVersion)
-        {
-            $errorMessage = $this.localizedData.EnsureAbsentPassedWithMinimumVersion
-
-            New-InvalidARgumentException -ArgumentName 'MinimumVersion' -Message $errorMessage
+        $assertBoundParameterParameters = @{
+            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            MutuallyExclusiveList1 = @(
+                'MinimumVersion'
+            )
+            MutuallyExclusiveList2 = @(
+                'RequiredVersion'
+                'MaximumVersion'
+            )
         }
 
-        if ($this.Ensure -eq 'Absent' -and $this.MaximumVersion)
-        {
-            $errorMessage = $this.localizedData.EnsureAbsentPassedWithMaximumVersion
+        Assert-BoundParameter @assertBoundParameterParameters
 
-            New-InvalidARgumentException -ArgumentName 'MaximumVersion' -Message $errorMessage
+        $assertBoundParameterParameters = @{
+            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            MutuallyExclusiveList1 = @(
+                'MaximumVersion'
+            )
+            MutuallyExclusiveList2 = @(
+                'RequiredVersion'
+                'MinimumVersion'
+            )
+        }
+
+        Assert-BoundParameter @assertBoundParameterParameters
+
+        $assertBoundParameterParameters = @{
+            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            MutuallyExclusiveList1 = @(
+                'RequiredVersion'
+            )
+            MutuallyExclusiveList2 = @(
+                'MaximumVersion'
+                'MinimumVersion'
+                'AllVersions'
+            )
+        }
+
+        Assert-BoundParameter @assertBoundParameterParameters
+
+        if ($this.ProxyCredental -and (-not $this.Proxy))
+        {
+            $errorMessage = $this.localizedData.ProxyCredentialPassedWithoutProxyUri
+
+            New-InvalidArgumentException -ArgumentName 'ProxyCredential' -Message $errorMessage
         }
     }
 
