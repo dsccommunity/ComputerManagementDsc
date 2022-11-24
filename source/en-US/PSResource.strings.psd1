@@ -12,4 +12,5 @@ ConvertFrom-StringData -StringData @'
     FoundLatestVersion                           = Latest version of resource '{0}' found is '{1}'.
     ProxyCredentialPassedWithoutProxyUri         = Proxy Credential passed without Proxy Uri.
     UsingProxyToGetResource                      = Using proxy '{0}' to get resource '{1}'.
+    ProxyorCredentialWithoutRepository           = Parameters Credential and Proxy may not be used without Repository.
 '@

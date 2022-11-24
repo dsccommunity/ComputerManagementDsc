@@ -321,6 +321,13 @@ class PSResource : ResourceBase
 
             New-InvalidArgumentException -ArgumentName 'ProxyCredential' -Message $errorMessage
         }
+
+        if ($this.Proxy -or $this.Credential -and (-not $this.Repository))
+        {
+            $errorMessage = $this.localizedData.ProxyorCredentialWithoutRepository
+
+            New-InvalidArgumentException -ArgumentName 'Repository' -message $errorMessage
+        }
     }
 
     <#
@@ -395,7 +402,6 @@ class PSResource : ResourceBase
     {
         return $(Get-Module -Name $this.Name -ListAvailable)
     }
-
 
     <#
         Get full version as a string checking for prerelease version
