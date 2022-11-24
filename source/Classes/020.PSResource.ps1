@@ -209,7 +209,7 @@ class PSResource : ResourceBase
 
         $powerShellGet = Get-Module -Name PowerShellGet
 
-        if ($powerShellGet.Version.Major -eq 1 -and $powerShellGet.Minor -lt 6 -and $this.AllowPrerelease)
+        if ($powerShellGet.Version -lt [version]'1.6.0' -and $this.AllowPrerelease)
         {
             $errorMessage = $this.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
             New-InvalidArgumentException -ArgumentName 'AllowPrerelease' -message ($errorMessage -f $powerShellGet.Version)
