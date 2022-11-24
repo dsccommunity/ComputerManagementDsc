@@ -42,7 +42,10 @@
         Specifies a OneGet package provider. Default value is 'NuGet'.
 
     .PARAMETER Default
-        Specifies whether to set the default properties for the default PSGallery PSRepository. Default value is 'False'.
+        Specifies whether to set the default properties for the default PSGallery PSRepository.
+        Default may only be used in conjunction with a PSRepositoryResource named PSGallery.
+        The properties SourceLocation, ScriptSourceLocation, PublishLocation, ScriptPublishLocation, Credential,
+        and PackageManagementProvider may not be used in conjunction with Default.
 
     .EXAMPLE
         Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResourceRepository -Method Get -Property @{
