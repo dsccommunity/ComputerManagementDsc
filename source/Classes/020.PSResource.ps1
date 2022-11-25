@@ -199,11 +199,11 @@ class PSResource : ResourceBase
                 'ProxyCredential'
             )
 
-            $excludedProperties | ForEach-Object -Process
+            foreach ($property in $excludedProperties)
             {
-                if ($_)
+                if (-not [System.String]::IsNullOrEmpty($property))
                 {
-                    $params.$_ = $_
+                    $params.$property = $this.$property
                 }
             }
 
@@ -615,6 +615,26 @@ class PSResource : ResourceBase
         if ($singleInstance -and (-not $this.SingleInstance))
         {
             $this.SingleInstance = $True
+        }
+    }
+
+    <#
+        Tests whether the repository the resource will install from is trusted and if not if Force is set
+    #>
+    hidden [void] TestRepository ()
+    {
+        if (-not $this.Force)
+        {
+            $resource = Find-Module -Name $this.Name
+
+            $resourceRepository = Get-PSRepository -Name $resource.Repository
+
+            if ($resourceRepository.InstallationPolicy -eq  'Untrusted')
+            {
+                $errorMessage = $this.localizedData.UntrustedRepositoryWithoutForce
+
+                New-InvalidArgumentException -Message ($errorMessage -f ($resourceRepository.Name)) -ArgumentName 'Force'
+            }
         }
     }
 }

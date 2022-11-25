@@ -16,4 +16,5 @@ ConvertFrom-StringData -StringData @'
     UninstallResource                            = Uninstalling resource '{0}'.
     ShouldBeSingleInstance                       = Resource '{0}' should be SingleInstance but is not.
     InstallResource                              = Installing version '{0}' of resource '{1}'.
+    UntrustedRepositoryWithoutForce              = Untrusted repository '{0}' requires the Force parameter to be true.
 '@
