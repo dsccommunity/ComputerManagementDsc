@@ -520,46 +520,11 @@ class PSResource : ResourceBase
     hidden [Version] GetLatestVersion()
     {
         Write-Verbose -Message ($this.LocalizedData.GetLatestVersion -f $this.Name)
-        $params = @{
-            Name = $this.Name
-        }
+        $resource = $this.FindResource()
 
-        if (-not ([System.String]::IsNullOrEmpty($this.Repository)))
-        {
-            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionFromRepository -f $this.Name, $this.Repository)
+        Write-Verbose -Message ($this.LocalizedData.FoundLatestVersion -f $this.Name, $resource.Version)
 
-            $params.Repository = $this.Repository
-        }
-
-        if ($this.AllowPrerelease)
-        {
-            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionAllowPrerelease -f $this.Name)
-
-            $params.AllowPrerelease = $this.AllowPrerelease
-        }
-
-        if ($this.Credential)
-        {
-            $params.Credential = $this.Credential
-        }
-
-        if ($this.Proxy)
-        {
-            Write-Verbose -Message ($this.LocalizedData.UsingProxyToGetResource -f $this.Proxy, $this.Name)
-
-            $params.Proxy = $this.Proxy
-        }
-
-        if ($this.ProxyCredential)
-        {
-            $params.ProxyCredential = $this.ProxyCredential
-        }
-
-        $module = Find-Module @params
-
-        Write-Verbose -Message ($this.LocalizedData.FoundLatestVersion -f $this.Name, $module.Version)
-
-        return $module.Version
+        return $resource.Version
     }
 
     <#
@@ -640,5 +605,14 @@ class PSResource : ResourceBase
                 New-InvalidArgumentException -Message ($errorMessage -f ($resourceRepository.Name)) -ArgumentName 'Force'
             }
         }
+    }
+
+    <#
+        Find the latest resource on a PSRepository
+    #>
+    hidden [PSCustomObject] FindResource()
+    {
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck') -Type Key,Optional -HasValue
+        return Find-Module @params
     }
 }
