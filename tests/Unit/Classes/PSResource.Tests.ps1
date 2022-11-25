@@ -141,45 +141,56 @@ try
                 }
             }
         }
-
-        It 'Should Correctly return False when Zero Resources are Installed' {
-            Mock -CommandName Get-Module
-
-            InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance.TestSingleInstance() | Should -BeFalse
+        Context 'When there are zero resources installed' {
+            BeforeAll {
+                Mock -CommandName Get-Module
             }
 
-            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
+            It 'Should Correctly return False when Zero Resources are Installed' {
+
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.TestSingleInstance() | Should -BeFalse
+                }
+
+                Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
+            }
         }
 
-        It 'Should Correctly return True when One Resource is Installed' {
-            Mock -CommandName Get-Module -MockWith {
-                return @{
-                    Name = 'ComputerManagementDsc'
+        Context 'When there is one resource installed' {
+            BeforeAll {
+                Mock -CommandName Get-Module -MockWith {
+                    return @{
+                        Name = 'ComputerManagementDsc'
+                    }
                 }
             }
 
-            InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance.TestSingleInstance() | Should -BeTrue
-            }
+            It 'Should Correctly return True when One Resource is Installed' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.TestSingleInstance() | Should -BeTrue
+                }
 
-            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
+                Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
+            }
         }
 
-        It 'Should Correctly return False' {
-            Mock -CommandName Get-Module -MockWith {
-                return @(
-                    @{
-                        Name    = 'ComputerManagementDsc'
-                        Version = '8.5.0'
-                    },
-                    @{
-                        Name    = 'ComputerManagementDsc'
-                        Version = '8.6.0'
-                    }
-                )
+        Context 'When there are multiple resources installed' {
+            BeforeAll {
+                Mock -CommandName Get-Module -MockWith {
+                    return @(
+                        @{
+                            Name    = 'ComputerManagementDsc'
+                            Version = '8.5.0'
+                        },
+                        @{
+                            Name    = 'ComputerManagementDsc'
+                            Version = '8.6.0'
+                        }
+                    )
+                }
             }
-
+        }
+        It 'Should Correctly return False' {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance.TestSingleInstance() | Should -BeFalse
             }
@@ -199,19 +210,47 @@ try
             }
         }
 
-        It 'Should return the correct version' {
-
-            InModuleScope -ScriptBlock {
+        Context 'When there is one resource on the repository' {
+            BeforeAll {
                 Mock -CommandName Find-Module -MockWith {
                     return @{
                         Version = '8.6.0'
                     }
                 }
-
-                $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
             }
 
-            Assert-MockCalled Find-Module -Exactly -Times 1 -Scope It
+            It 'Should return the correct version' {
+
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
+                }
+
+                Assert-MockCalled Find-Module -Exactly -Times 1 -Scope It
+            }
+        }
+
+        Context 'When there are multiple resources on the repository' {
+            BeforeAll {
+                Mock -CommandName Find-Module -MockWith {
+                    return @(
+                        @{
+                            Version = '8.6.0'
+                        },
+                        @{
+                            Version = '8.5.0'
+                        }
+                    )
+                }
+            }
+
+            It 'Should return the correct version' {
+
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
+                }
+
+                Assert-MockCalled Find-Module -Exactly -Times 1 -Scope It
+            }
         }
     }
 
@@ -250,7 +289,6 @@ try
                 $script:mockPSResourceInstance.TestLatestVersion('8.5.0') | Should -BeFalse
             }
         }
-
     }
 
     Describe 'PSResource\SetSingleInstance()' -Tag 'SetSingleInstance' {
