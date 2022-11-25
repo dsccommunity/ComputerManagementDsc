@@ -160,6 +160,7 @@ class PSResource : ResourceBase
         {
             $params.Force = $this.Force
         }
+
         if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
         {
             if ($this.RequiredVersion -or $this.MaximumVersion -or $this.MinimumVersion)
@@ -219,8 +220,72 @@ class PSResource : ResourceBase
                 Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name)
                 #* Too many versions
                 $installedResources = $this.GetInstalledResource()
+
+                $findParams = $params
+                $findProperties = @(
+                    'AllowPrerelease'
+                    'Repository'
+                    'Credential'
+                    'Proxy'
+                    'ProxyCredential'
+                )
+
+                $findProperties | ForEach-Object -Process
+                {
+                    if ($_)
+                    {
+                        $findParams.$_ = $_
+                    }
+                }
+
+                if ($this.Latest)
+                {
+                    $findParams.RequiredVersion = $this.GetLatestVersion()
+
+                    $requiredResource = Find-Module @findParams
+
+                    $modulesToUninstall = $installedResources | Where-Object {$_.Version -ne $latestVersion}
+
+                    $modulesToUninstall | Uninstall-Module @params
+                }
+                else
+                {
+                    if ($this.RequiredVersion -or $this.MaximumVersion -or $this.MinimumVersion -or $this.Latest)
+                    {
+                        $findParams.RequiredVersion = $this.RequiredVersion
+                        $findParams.MinimumVersion  = $this.MinimumVersion
+                        $findParams.MaximumVersion  = $this.MaximumVersion
+                    }
+
+                    $requiredResource = Find_module @findParams
+                }
+
+                $resourcesToUninstall = $installedResources | Where-Object {$_.Version -ne $requiredResource.Version}
+
+                $resourcesToUninstall | Uninstall-Module @params
+
+                return
+            }
+
+            if ($properties.ContainsKey('Latest'))
+            {
+                $params.AllVersions = $true
+                Uninstall-Module @params
+
+                $latestVersion = $this.GetLatestVersion()
+
+                $this.InstallResource($latestVersion)
             }
         }
+    }
+
+    <#
+        Install the given version of the resource
+    #>
+
+    hidden [void] InstallResource([Version] $version)
+    {
+
     }
 
     <#
@@ -397,7 +462,7 @@ class PSResource : ResourceBase
     <#
         Get the latest version of the resource
     #>
-    hidden [System.String] GetLatestVersion()
+    hidden [Version] GetLatestVersion()
     {
         Write-Verbose -Message ($this.LocalizedData.GetLatestVersion -f $this.Name)
         $params = @{
