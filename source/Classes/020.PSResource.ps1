@@ -170,9 +170,42 @@ class PSResource : ResourceBase
             }
             else
             {
-
                 $params.AllVersions = $true
             }
+
+            Write-Verbose -Message ($this.localizedData.UninstallResource -f $this.Name)
+
+            Uninstall-Module @params
+        }
+        elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
+        {
+            $excludedProperties = @(
+                'AllowPrerelease'
+                'SkipPublisherCheck'
+                'AllowClobber'
+                'Repository'
+                'Credential'
+                'Proxy'
+                'ProxyCredential'
+            )
+
+            $excludedProperties | ForEach-Object -Process
+            {
+                if ($_)
+                {
+                    $params.$_ = $_
+                }
+            }
+
+            if ($this.RequiredVersion -or $this.MaximumVersion -or $this.MinimumVersion -or $this.Latest)
+            {
+                $params.RequiredVersion = $this.RequiredVersion
+                $params.MinimumVersion  = $this.MinimumVersion
+                $params.MaximumVersion  = $this.MaximumVersion
+                $params.Latest          = $this.Latest
+            }
+
+            Install-Module @params
         }
     }
 

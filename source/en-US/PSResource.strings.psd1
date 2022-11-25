@@ -13,4 +13,5 @@ ConvertFrom-StringData -StringData @'
     ProxyCredentialPassedWithoutProxyUri         = Proxy Credential passed without Proxy Uri.
     UsingProxyToGetResource                      = Using proxy '{0}' to get resource '{1}'.
     ProxyorCredentialWithoutRepository           = Parameters Credential and Proxy may not be used without Repository.
+    UninstallResource                            = Uninstalling resource '{0}'.
 '@
