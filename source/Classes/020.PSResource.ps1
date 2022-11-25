@@ -189,6 +189,8 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
         {
+            $this.TestRepository()
+
             $excludedProperties = @(
                 'AllowPrerelease'
                 'SkipPublisherCheck'
@@ -223,6 +225,8 @@ class PSResource : ResourceBase
             #* Either too many
             #* Wrong version
             #* Not latest
+
+            $this.TestRepository()
 
             if ($properties.ContainsKey('SingleInstance'))
             {
