@@ -266,7 +266,7 @@ class PSResource : ResourceBase
                         $findParams.MaximumVersion  = $this.MaximumVersion
                     }
 
-                    $requiredResource = Find_module @findParams
+                    $requiredResource = Find-Module @findParams
                 }
 
                 $resourcesToUninstall = $installedResources | Where-Object {$_.Version -ne $requiredResource.Version}
@@ -284,6 +284,8 @@ class PSResource : ResourceBase
                 $latestVersion = $this.GetLatestVersion()
 
                 $this.InstallResource($latestVersion)
+
+                return
             }
         }
     }
