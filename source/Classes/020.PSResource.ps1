@@ -285,7 +285,47 @@ class PSResource : ResourceBase
 
     hidden [void] InstallResource([Version] $version)
     {
+        Write-Verbose -Message ($this.LocalizedData.GetLatestVersion -f $this.Name)
+        $params = @{
+            Name            = $this.Name
+            AllowClobber    = $this.AllowClobber
+            Force           = $this.Force
+            RequiredVersion = $version
+        }
 
+        if (-not ([System.String]::IsNullOrEmpty($this.Repository)))
+        {
+            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionFromRepository -f $this.Name, $this.Repository)
+
+            $params.Repository = $this.Repository
+        }
+
+        if ($this.AllowPrerelease)
+        {
+            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionAllowPrerelease -f $this.Name)
+
+            $params.AllowPrerelease = $this.AllowPrerelease
+        }
+
+        if ($this.Credential)
+        {
+            $params.Credential = $this.Credential
+        }
+
+        if ($this.Proxy)
+        {
+            Write-Verbose -Message ($this.LocalizedData.UsingProxyToGetResource -f $this.Proxy, $this.Name)
+
+            $params.Proxy = $this.Proxy
+        }
+
+        if ($this.ProxyCredential)
+        {
+            $params.ProxyCredential = $this.ProxyCredential
+        }
+        Write-Verbose -Message ($this.localizedData.InstallResource -f $version, $this.name)
+
+        Install-Module @params
     }
 
     <#

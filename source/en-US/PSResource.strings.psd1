@@ -15,4 +15,5 @@ ConvertFrom-StringData -StringData @'
     ProxyorCredentialWithoutRepository           = Parameters Credential and Proxy may not be used without Repository.
     UninstallResource                            = Uninstalling resource '{0}'.
     ShouldBeSingleInstance                       = Resource '{0}' should be SingleInstance but is not.
+    InstallResource                              = Installing version '{0}' of resource '{1}'.
 '@
