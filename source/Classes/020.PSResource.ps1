@@ -41,6 +41,15 @@
     .PARAMETER AllowPrerelease
         Specifies whether to allow pre-release versions of the resource.
 
+    .PARAMETER Credential
+        Specifies credentials of an account that has rights to the repository.
+
+    .PARAMETER Proxy
+        Specifies the URI of the proxy to connect to the repository.
+
+    .PARAMETER ProxyCredential
+        Specifies the Credential to connect to the repository proxy.
+
     .EXAMPLE
         Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResource -Method Get -Property @{
             Name               = 'PowerShellGet'
@@ -109,12 +118,12 @@ class PSResource : ResourceBase
     $Credential
 
     [DscProperty()]
-    [PSCredential]
-    $ProxyCredential
-
-    [DscProperty()]
     [System.String]
     $Proxy
+
+    [DscProperty()]
+    [PSCredential]
+    $ProxyCredential
 
     PSResource () : base ()
     {
