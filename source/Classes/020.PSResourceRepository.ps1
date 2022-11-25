@@ -29,7 +29,7 @@
         Specifies the URI for the script publish location.
 
     .PARAMETER Proxy
-        Specifies the URI of the proxy to connect to this PSResourceRepository
+        Specifies the URI of the proxy to connect to this PSResourceRepository.
 
     .PARAMETER ProxyCredential
         Specifies the Credential to connect to the PSResourceRepository proxy.
