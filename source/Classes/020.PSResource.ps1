@@ -207,6 +207,20 @@ class PSResource : ResourceBase
 
             Install-Module @params
         }
+        else
+        {
+            #* Module is installed but not necessarily in correct state
+            #* Either too many
+            #* Wrong version
+            #* Not latest
+
+            if ($properties.ContainsKey('SingleInstance'))
+            {
+                Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name)
+                #* Too many versions
+                $installedResources = $this.GetInstalledResource()
+            }
+        }
     }
 
     <#
