@@ -191,33 +191,7 @@ class PSResource : ResourceBase
         {
             $this.TestRepository()
 
-            $excludedProperties = @(
-                'AllowPrerelease'
-                'SkipPublisherCheck'
-                'AllowClobber'
-                'Repository'
-                'Credential'
-                'Proxy'
-                'ProxyCredential'
-            )
-
-            foreach ($property in $excludedProperties)
-            {
-                if (-not [System.String]::IsNullOrEmpty($property))
-                {
-                    $params.$property = $this.$property
-                }
-            }
-
-            if ($this.RequiredVersion -or $this.MaximumVersion -or $this.MinimumVersion -or $this.Latest)
-            {
-                $params.RequiredVersion = $this.RequiredVersion
-                $params.MinimumVersion  = $this.MinimumVersion
-                $params.MaximumVersion  = $this.MaximumVersion
-                $params.Latest          = $this.Latest
-            }
-
-            Install-Module @params
+            $this.InstallResource()
         }
         else
         {
@@ -258,56 +232,58 @@ class PSResource : ResourceBase
 
                 return
             }
+
+            $this.InstallResource()
         }
     }
 
-    <#
-        Install the given version of the resource
-    #>
-    hidden [void] InstallResource([Version] $version)
-    {
-        Write-Verbose -Message ($this.LocalizedData.GetLatestVersion -f $this.Name)
-        $params = @{
-            Name            = $this.Name
-            AllowClobber    = $this.AllowClobber
-            Force           = $this.Force
-            RequiredVersion = $version
-        }
+    # <#
+    #     Install the given version of the resource
+    # #>
+    # hidden [void] InstallResource([Version] $version)
+    # {
+    #     Write-Verbose -Message ($this.LocalizedData.GetLatestVersion -f $this.Name)
+    #     $params = @{
+    #         Name            = $this.Name
+    #         AllowClobber    = $this.AllowClobber
+    #         Force           = $this.Force
+    #         RequiredVersion = $version
+    #     }
 
-        if (-not ([System.String]::IsNullOrEmpty($this.Repository)))
-        {
-            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionFromRepository -f $this.Name, $this.Repository)
+    #     if (-not ([System.String]::IsNullOrEmpty($this.Repository)))
+    #     {
+    #         Write-Verbose -Message ($this.LocalizedData.GetLatestVersionFromRepository -f $this.Name, $this.Repository)
 
-            $params.Repository = $this.Repository
-        }
+    #         $params.Repository = $this.Repository
+    #     }
 
-        if ($this.AllowPrerelease)
-        {
-            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionAllowPrerelease -f $this.Name)
+    #     if ($this.AllowPrerelease)
+    #     {
+    #         Write-Verbose -Message ($this.LocalizedData.GetLatestVersionAllowPrerelease -f $this.Name)
 
-            $params.AllowPrerelease = $this.AllowPrerelease
-        }
+    #         $params.AllowPrerelease = $this.AllowPrerelease
+    #     }
 
-        if ($this.Credential)
-        {
-            $params.Credential = $this.Credential
-        }
+    #     if ($this.Credential)
+    #     {
+    #         $params.Credential = $this.Credential
+    #     }
 
-        if ($this.Proxy)
-        {
-            Write-Verbose -Message ($this.LocalizedData.UsingProxyToGetResource -f $this.Proxy, $this.Name)
+    #     if ($this.Proxy)
+    #     {
+    #         Write-Verbose -Message ($this.LocalizedData.UsingProxyToGetResource -f $this.Proxy, $this.Name)
 
-            $params.Proxy = $this.Proxy
-        }
+    #         $params.Proxy = $this.Proxy
+    #     }
 
-        if ($this.ProxyCredential)
-        {
-            $params.ProxyCredential = $this.ProxyCredential
-        }
-        Write-Verbose -Message ($this.localizedData.InstallResource -f $version, $this.name)
+    #     if ($this.ProxyCredential)
+    #     {
+    #         $params.ProxyCredential = $this.ProxyCredential
+    #     }
+    #     Write-Verbose -Message ($this.localizedData.InstallResource -f $version, $this.name)
 
-        Install-Module @params
-    }
+    #     Install-Module @params
+    # }
 
     <#
         The parameter properties will contain the key properties.
@@ -580,5 +556,11 @@ class PSResource : ResourceBase
     {
         $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck') -Type Key,Optional -HasValue
         return Find-Module @params
+    }
+
+    hidden [void] InstallResource()
+    {
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure') -Type Key,Optional -HasValue
+        Install-Module @params
     }
 }
