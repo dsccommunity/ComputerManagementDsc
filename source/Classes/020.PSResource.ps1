@@ -172,6 +172,7 @@ class PSResource : ResourceBase
 
         if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
         {
+            #! This is broken, if any of the version req's are valid, need to correctly identify the resources to remove.
             if ($this.RequiredVersion -or $this.MaximumVersion -or $this.MinimumVersion)
             {
                 $params.RequiredVersion = $this.RequiredVersion
@@ -183,8 +184,7 @@ class PSResource : ResourceBase
                 $params.AllVersions = $true
             }
 
-            Write-Verbose -Message ($this.localizedData.UninstallResource -f $this.Name)
-
+            $resourcesToUninstall = $this.GetInstalledResource()
             Uninstall-Module @params
         }
         elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
@@ -211,7 +211,7 @@ class PSResource : ResourceBase
 
                 $resourceToKeep = $this.FindResource()
 
-                if ($resourceToKeep -in $installedResources)
+                if ($resourceToKeep.Version -in $installedResources.Version)
                 {
                     $resourcesToUninstall = $installedResources | Where-Object {$_.Version -ne $resourceToKeep.Version}
                 }
@@ -221,7 +221,10 @@ class PSResource : ResourceBase
                     $this.InstallResource()
                 }
 
-                $resourcesToUninstall | Uninstall-Module @params
+                foreach ($resource in $resourcesToUninstall)
+                {
+                    $this.UninstallResource($resource)
+                }
 
                 return
             }
@@ -554,7 +557,7 @@ class PSResource : ResourceBase
     #>
     hidden [PSCustomObject] FindResource()
     {
-        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck') -Type Key,Optional -HasValue
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'Force') -Type Key,Optional -HasValue
         return Find-Module @params
     }
 
@@ -562,5 +565,18 @@ class PSResource : ResourceBase
     {
         $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure') -Type Key,Optional -HasValue
         Install-Module @params
+    }
+
+    <#
+        Uninstall the given resource
+    #>
+    hidden [void] UninstallResource ([System.Management.Automation.PSModuleInfo]$resource)
+    {
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck') -Type Optional -HasValue
+
+        Write-Verbose -Message ($this.localizedData.UninstallModule -f $resource.Name,$resource.Version)
+
+        $resource | Uninstall-Module @params
+
     }
 }
