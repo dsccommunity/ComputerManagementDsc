@@ -231,49 +231,21 @@ class PSResource : ResourceBase
             if ($properties.ContainsKey('SingleInstance'))
             {
                 Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name)
+
                 #* Too many versions
                 $installedResources = $this.GetInstalledResource()
 
-                $findParams = $params
-                $findProperties = @(
-                    'AllowPrerelease'
-                    'Repository'
-                    'Credential'
-                    'Proxy'
-                    'ProxyCredential'
-                )
+                $resourceToKeep = $this.FindResource()
 
-                $findProperties | ForEach-Object -Process
+                if ($resourceToKeep -in $installedResources)
                 {
-                    if ($_)
-                    {
-                        $findParams.$_ = $_
-                    }
-                }
-
-                if ($this.Latest)
-                {
-                    $findParams.RequiredVersion = $this.GetLatestVersion()
-
-                    $requiredResource = Find-Module @findParams
-
-                    $modulesToUninstall = $installedResources | Where-Object {$_.Version -ne $latestVersion}
-
-                    $modulesToUninstall | Uninstall-Module @params
+                    $resourcesToUninstall = $installedResources | Where-Object {$_.Version -ne $resourceToKeep.Version}
                 }
                 else
                 {
-                    if ($this.RequiredVersion -or $this.MaximumVersion -or $this.MinimumVersion -or $this.Latest)
-                    {
-                        $findParams.RequiredVersion = $this.RequiredVersion
-                        $findParams.MinimumVersion  = $this.MinimumVersion
-                        $findParams.MaximumVersion  = $this.MaximumVersion
-                    }
-
-                    $requiredResource = Find-Module @findParams
+                    $resourcesToUninstall = $installedResources
+                    $this.InstallResource()
                 }
-
-                $resourcesToUninstall = $installedResources | Where-Object {$_.Version -ne $requiredResource.Version}
 
                 $resourcesToUninstall | Uninstall-Module @params
 
@@ -282,12 +254,7 @@ class PSResource : ResourceBase
 
             if ($properties.ContainsKey('Latest'))
             {
-                $params.AllVersions = $true
-                Uninstall-Module @params
-
-                $latestVersion = $this.GetLatestVersion()
-
-                $this.InstallResource($latestVersion)
+                $this.InstallResource()
 
                 return
             }
@@ -519,46 +486,11 @@ class PSResource : ResourceBase
     hidden [Version] GetLatestVersion()
     {
         Write-Verbose -Message ($this.LocalizedData.GetLatestVersion -f $this.Name)
-        $params = @{
-            Name = $this.Name
-        }
+        $resource = $this.FindResource()
 
-        if (-not ([System.String]::IsNullOrEmpty($this.Repository)))
-        {
-            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionFromRepository -f $this.Name, $this.Repository)
+        Write-Verbose -Message ($this.LocalizedData.FoundLatestVersion -f $this.Name, $resource.Version)
 
-            $params.Repository = $this.Repository
-        }
-
-        if ($this.AllowPrerelease)
-        {
-            Write-Verbose -Message ($this.LocalizedData.GetLatestVersionAllowPrerelease -f $this.Name)
-
-            $params.AllowPrerelease = $this.AllowPrerelease
-        }
-
-        if ($this.Credential)
-        {
-            $params.Credential = $this.Credential
-        }
-
-        if ($this.Proxy)
-        {
-            Write-Verbose -Message ($this.LocalizedData.UsingProxyToGetResource -f $this.Proxy, $this.Name)
-
-            $params.Proxy = $this.Proxy
-        }
-
-        if ($this.ProxyCredential)
-        {
-            $params.ProxyCredential = $this.ProxyCredential
-        }
-
-        $module = Find-Module @params
-
-        Write-Verbose -Message ($this.LocalizedData.FoundLatestVersion -f $this.Name, $module.Version)
-
-        return $module.Version
+        return $resource.Version
     }
 
     <#
@@ -639,5 +571,14 @@ class PSResource : ResourceBase
                 New-InvalidArgumentException -Message ($errorMessage -f ($resourceRepository.Name)) -ArgumentName 'Force'
             }
         }
+    }
+
+    <#
+        Find the latest resource on a PSRepository
+    #>
+    hidden [PSCustomObject] FindResource()
+    {
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck') -Type Key,Optional -HasValue
+        return Find-Module @params
     }
 }
