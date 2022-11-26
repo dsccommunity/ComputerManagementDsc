@@ -221,10 +221,10 @@ class PSResource : ResourceBase
         }
         else
         {
-            #* Module is installed but not necessarily in correct state
+            #* Module is installed but not in the correct state
             #* Either too many
-            #* Wrong version
             #* Not latest
+            #* Wrong version
 
             $this.TestRepository()
 
@@ -297,7 +297,6 @@ class PSResource : ResourceBase
     <#
         Install the given version of the resource
     #>
-
     hidden [void] InstallResource([Version] $version)
     {
         Write-Verbose -Message ($this.LocalizedData.GetLatestVersion -f $this.Name)
