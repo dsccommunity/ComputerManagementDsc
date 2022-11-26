@@ -293,65 +293,88 @@ class PSResource : ResourceBase
     #>
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
     {
-        $currentState = @{
-            Name               = $this.Name
-            Ensure             = [Ensure]::Absent
-            Repository         = $this.Repository
-            SingleInstance     = $False
-            AllowPrerelease    = $False
-            Latest             = $False
-            AllowClobber       = $this.AllowClobber
-            SkipPublisherCheck = $this.SkipPublisherCheck
-            Force              = $this.Force
-        }
+        $currentState = $this | Get-DscProperty -ExcludeName $this.ExcludeDscProperties -Type @('Key', 'Mandatory', 'Optional') -HasValue
 
         $resources = $this.GetInstalledResource()
 
-        if ($resources.Count -eq 1)
+        if ($properties.ContainsKey('SingleInstance') -and $this.SingleInstance -eq $true)
         {
-            $resource = $resources[0]
-            $currentState.Ensure = [Ensure]::Present
-
-            $version = $this.GetFullVersion($resource)
-            $currentState.RequiredVersion = $version
-            $currentState.MinimumVersion  = $version
-            $currentState.MaximumVersion  = $version
-
-            $currentState.SingleInstance  = $True
-
-            $currentState.AllowPrerelease = $this.TestPrerelease($resource)
-
-            if ($this.latest)
+            if ($resources.Count -ne 1)
             {
-                $currentState.Latest = $this.TestLatestVersion($version)
-            }
-
-            $this.SetSingleInstance($currentState.SingleInstance)
-        }
-        elseif ($resources.count -gt 1)
-        {
-            #* multiple instances of resource found on system.
-            $resourceInfo = @()
-
-            foreach ($resource in $resources)
-            {
-                $resourceInfo += @{
-                    Version    = $this.GetFullVersion($resource)
-                    Prerelease = $this.TestPrerelease($resource)
-                }
-            }
-
-            $currentState.Ensure          = [Ensure]::Present
-            $currentState.RequiredVersion = ($resourceInfo | Sort-Object Version -Descending)[0].Version
-            $currentState.MinimumVersion  = ($resourceInfo | Sort-Object Version)[0].Version
-            $currentState.MaximumVersion  = $currentState.RequiredVersion
-            $currentState.AllowPrerelease = ($resourceInfo | Sort-Object Version -Descending)[0].Prerelease
-
-            if ($this.Latest)
-            {
-                $currentState.Latest          = $this.TestLatestVersion($currentState.RequiredVersion)
+                $currentState.SingleInstance = $false
             }
         }
+
+        if ($properties.ContainsKey('Latest') -and $this.Latest -eq $false)
+        {
+            $latestVersion = $this.GetLatestVersion()
+
+            if ($latestVersion -ne $resources.Version)
+            {
+                $this.Latest = $false
+            }
+        }
+
+
+        # $currentState = @{
+        #     Name               = $this.Name
+        #     Ensure             = [Ensure]::Absent
+        #     Repository         = $this.Repository
+        #     SingleInstance     = $False
+        #     AllowPrerelease    = $False
+        #     Latest             = $False
+        #     AllowClobber       = $this.AllowClobber
+        #     SkipPublisherCheck = $this.SkipPublisherCheck
+        #     Force              = $this.Force
+        # }
+
+        # $resources = $this.GetInstalledResource()
+
+        # if ($resources.Count -eq 1)
+        # {
+        #     $resource = $resources[0]
+        #     $currentState.Ensure = [Ensure]::Present
+
+        #     $version = $this.GetFullVersion($resource)
+        #     $currentState.RequiredVersion = $version
+        #     $currentState.MinimumVersion  = $version
+        #     $currentState.MaximumVersion  = $version
+
+        #     $currentState.SingleInstance  = $True
+
+        #     $currentState.AllowPrerelease = $this.TestPrerelease($resource)
+
+        #     if ($this.latest)
+        #     {
+        #         $currentState.Latest = $this.TestLatestVersion($version)
+        #     }
+
+        #     $this.SetSingleInstance($currentState.SingleInstance)
+        # }
+        # elseif ($resources.count -gt 1)
+        # {
+        #     #* multiple instances of resource found on system.
+        #     $resourceInfo = @()
+
+        #     foreach ($resource in $resources)
+        #     {
+        #         $resourceInfo += @{
+        #             Version    = $this.GetFullVersion($resource)
+        #             Prerelease = $this.TestPrerelease($resource)
+        #         }
+        #     }
+
+        #     $currentState.Ensure          = [Ensure]::Present
+        #     $currentState.RequiredVersion = ($resourceInfo | Sort-Object Version -Descending)[0].Version
+        #     $currentState.MinimumVersion  = ($resourceInfo | Sort-Object Version)[0].Version
+        #     $currentState.MaximumVersion  = $currentState.RequiredVersion
+        #     $currentState.AllowPrerelease = ($resourceInfo | Sort-Object Version -Descending)[0].Prerelease
+
+        #     if ($this.Latest)
+        #     {
+        #         $currentState.Latest          = $this.TestLatestVersion($currentState.RequiredVersion)
+        #     }
+        # }
 
         return $currentState
     }
