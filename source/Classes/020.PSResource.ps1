@@ -305,17 +305,57 @@ class PSResource : ResourceBase
             }
         }
 
-        if ($properties.ContainsKey('Latest') -and $this.Latest -eq $false)
+        if ($properties.ContainsKey('Latest') -and $this.Latest -eq $true)
         {
             $latestVersion = $this.GetLatestVersion()
 
-            if ($latestVersion -ne $resources.Version)
+            if ($latestVersion -notin $resources.Version)
             {
-                $this.Latest = $false
+                $currentState.Latest = $false
             }
         }
 
+        if ($properties.ContainsKey('MinimumVersion'))
+        {
+            foreach ($resource in $resources)
+            {
+                if ($resource.version -ge [version]$this.MinimumVersion)
+                {
+                    $currentState.MinimumVersion = $this.MinimumVersion
+                }
+                break
+            }
 
+            if ([System.String]::IsNullOrEmpty($currentState.MinimumVersion))
+            {
+                $currentState.MinimumVersion =  $($resources | Sort-Object Version)[0].Version
+            }
+        }
+
+        if ($properties.ContainsKey('RequiredVersion'))
+        {
+            if ($this.RequiredVersion -in $resources.Version)
+            {
+                $currentState.RequiredVersion = $this.RequiredVersion
+            }
+        }
+
+        if ($properties.ContainsKey('MaximumVersion'))
+        {
+            foreach ($resource in $resources)
+            {
+                if ($resource.version -ge [version]$this.MinimumVersion)
+                {
+                    $currentState.MinimumVersion = $this.MinimumVersion
+                }
+                break
+            }
+
+            if ([System.String]::IsNullOrEmpty($currentState.MinimumVersion))
+            {
+                $currentState.MinimumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
+            }
+        }
         # $currentState = @{
         #     Name               = $this.Name
         #     Ensure             = [Ensure]::Absent
