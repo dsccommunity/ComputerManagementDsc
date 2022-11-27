@@ -313,11 +313,15 @@ class PSResource : ResourceBase
         {
             if ($resources.Count -ne 1)
             {
+                Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
+
                 $currentState.SingleInstance = $false
                 $currentState.Ensure = 'Absent' #! Resource may be absent, or SingleInstance may be greater than 1, is this still false?
             }
             else
             {
+                Write-Verbose -Message ($this.localizedData.IsSingleInstance -f $this.Name)
+
                 $currentState.SingleInstance = $true
                 $currentState.Ensure = 'Present'
             }
@@ -329,11 +333,15 @@ class PSResource : ResourceBase
 
             if ($latestVersion -notin $resources.Version)
             {
+                Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $latestVersion)
+
                 $currentState.Latest = $false
                 $currentState.Ensure = 'Absent'
             }
             else
             {
+                Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $latestVersion)
+
                 $currentState.Latest = $true
                 if (-not $properties.ContainsKey('SingleInstance'))
                 {
@@ -346,6 +354,8 @@ class PSResource : ResourceBase
 
         if (-not $null -eq $resources)
         {
+            Write-Verbose -Message ($this.localizedData.ResourceNotInstalled -f $this.Name)
+
             $currentState.Ensure = 'Absent'
         }
         else
@@ -362,6 +372,8 @@ class PSResource : ResourceBase
                         {
                             $currentState.Ensure = 'Present'
                         }
+
+                        Write-Verbose -Message ($this.localizedData.MinimumVersionMet -f $this.Name, $currentState.MinimumVersion)
                     }
                     break
                 }
@@ -370,6 +382,8 @@ class PSResource : ResourceBase
                 {
                     $currentState.MinimumVersion =  $($resources | Sort-Object Version)[0].Version
                     $currentState.Ensure = 'Absent'
+
+                    Write-Verbose -Message ($this.localizedData.MinimumVersionExceeded -f $this.Name, $this.MinimumVersion, $currentState.MinimumVersion)
                 }
             }
 
@@ -382,10 +396,12 @@ class PSResource : ResourceBase
                     {
                         $currentState.Ensure = 'Present'
                     }
+
+                    Write-Verbose -Message ($this.localizedData.RequiredVersionMet -f $this.Name, $currentState.RequiredVersion)
                 }
                 else
                 {
-                    $currentState.Ensure = 'Present'
+                    $currentState.Ensure = 'Absent'
                 }
             }
 
@@ -400,6 +416,8 @@ class PSResource : ResourceBase
                         {
                             $currentState.Ensure = 'Present'
                         }
+
+                        Write-Verbose -Message ($this.localizedData.MaximumVersionMet -f $this.Name, $currentState.MaximumVersion)
                     }
                     break
                 }
@@ -408,6 +426,8 @@ class PSResource : ResourceBase
                 {
                     $currentState.MinimumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
                     $currentState.Ensure = 'Absent'
+
+                    Write-Verbose -Message ($this.localizedData.MaximumVersionExceeded -f $this.Name, $this.MaximumVersion, $currentState.MaximumVersion)
                 }
             }
         }
