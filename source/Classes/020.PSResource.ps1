@@ -436,9 +436,9 @@ class PSResource : ResourceBase
                     break
                 }
 
-                if ([System.String]::IsNullOrEmpty($currentState.MinimumVersion))
+                if ([System.String]::IsNullOrEmpty($currentState.MaximumVersion))
                 {
-                    $currentState.MinimumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
+                    $currentState.MaximumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
                     $currentState.Ensure = 'Absent'
 
                     Write-Verbose -Message ($this.localizedData.MaximumVersionExceeded -f $this.Name, $this.MaximumVersion, $currentState.MaximumVersion)
