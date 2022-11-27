@@ -309,11 +309,6 @@ class PSResource : ResourceBase
 
         $resources = $this.GetInstalledResource()
 
-        if (-not $resources)
-        {
-            $currentState.Ensure = 'Absent'
-        }
-
         if ($properties.ContainsKey('SingleInstance') -and $this.SingleInstance -eq $true)
         {
             if ($resources.Count -ne 1)
@@ -347,6 +342,12 @@ class PSResource : ResourceBase
                     $currentState.Ensure = 'Present'
                 }
             }
+        }
+
+        if (-not $resources)
+        {
+            $currentState.Ensure = 'Absent'
+            break
         }
 
         if ($properties.ContainsKey('MinimumVersion'))
