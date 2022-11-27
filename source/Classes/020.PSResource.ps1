@@ -425,7 +425,7 @@ class PSResource : ResourceBase
                 {
                     if ($resource.version -le [version]$this.MaximumVersion)
                     {
-                        $currentState.MinimumVersion = $this.MaximumVersion
+                        $currentState.MaximumVersion = $this.MaximumVersion
                         if (-not $currentState.ContainsKey('SingleInstance'))
                         {
                             $currentState.Ensure = 'Present'
@@ -446,20 +446,6 @@ class PSResource : ResourceBase
             }
         }
 
-
-
-
-
-        if ($null -eq $resources)
-        {
-
-
-            $currentState.Ensure = 'Absent'
-        }
-        else
-        {
-
-        }
         # $currentState = @{
         #     Name               = $this.Name
         #     Ensure             = [Ensure]::Absent
