@@ -240,6 +240,35 @@ class PSResourceRepository : ResourceBase
         return $returnValue
     }
 
+    hidden [System.Collections.Hashtable] GetCurrentState1 ([System.Collections.Hashtable] $properties)
+    {
+        $returnValue = @{
+            Ensure         = [Ensure]::Absent
+            Name           = $this.Name
+        }
+
+        Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
+
+        $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
+
+        $currentState = $this | Get-DscProperty -ExcludeName $this.ExcludeDscProperties -Type @('Key', 'Optional', 'Required') -HasValue
+
+        if ($repository)
+        {
+            $currentState.Keys | foreach
+            {
+                Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $currentState.$_)
+                $returnValue.$_ = $currentState.$_
+            }
+        }
+        else
+        {
+            Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
+        }
+
+        return $returnValue
+    }
+
     <#
         The parameter properties will contain the properties that was
         assigned a value.

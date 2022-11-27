@@ -23,4 +23,5 @@ ConvertFrom-StringData -StringData @'
     NoDefaultSettingsPSGallery            = The parameter Default must be set to True for a repository named PSGallery.
     DefaultSettingsNoPSGallery            = The parameter Default may only be used with repositories named PSGallery.
     DefaultUsedWithOtherParameters        = The parameter Default may not be used with parameters other than InstallationPolicy, Proxy, and ProxyCredential.
+    CurrentState                          = Repository '{0}' property '{1}' current state is '{2}'.
 '@
