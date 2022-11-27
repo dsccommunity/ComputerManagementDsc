@@ -309,12 +309,12 @@ class PSResource : ResourceBase
 
         $resources = $this.GetInstalledResource()
 
-        if ($properties.ContainsKey('SingleInstance') -and $this.SingleInstance -eq $true)
+        if ($properties.ContainsKey('SingleInstance') -and $this.SingleInstance)
         {
             if ($resources.Count -ne 1)
             {
                 $currentState.SingleInstance = $false
-                $currentState.Ensure = 'Absent'
+                $currentState.Ensure = 'Absent' #! Resource may be absent, or SingleInstance may be greater than 1, is this still false?
             }
             else
             {
@@ -344,7 +344,7 @@ class PSResource : ResourceBase
             }
         }
 
-        if (-not $resources)
+        if (-not $null -eq $resources)
         {
             $currentState.Ensure = 'Absent'
         }
