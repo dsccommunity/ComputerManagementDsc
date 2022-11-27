@@ -309,7 +309,7 @@ class PSResource : ResourceBase
 
         $resources = $this.GetInstalledResource()
 
-        if ($properties.ContainsKey('SingleInstance') -and $this.SingleInstance)
+        if ($currentState.ContainsKey('SingleInstance') -and $this.SingleInstance)
         {
             if ($resources.Count -ne 1)
             {
@@ -327,7 +327,7 @@ class PSResource : ResourceBase
             }
         }
 
-        if ($properties.ContainsKey('Latest') -and $this.Latest -eq $true)
+        if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
         {
             $latestVersion = $this.GetLatestVersion()
 
@@ -352,7 +352,7 @@ class PSResource : ResourceBase
             }
         }
 
-        if (-not $null -eq $resources)
+        if ($null -eq $resources)
         {
             Write-Verbose -Message ($this.localizedData.ResourceNotInstalled -f $this.Name)
 
