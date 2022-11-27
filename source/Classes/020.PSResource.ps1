@@ -347,67 +347,68 @@ class PSResource : ResourceBase
         if (-not $resources)
         {
             $currentState.Ensure = 'Absent'
-            break
         }
-
-        if ($properties.ContainsKey('MinimumVersion'))
+        else
         {
-            foreach ($resource in $resources)
+            if ($properties.ContainsKey('MinimumVersion'))
             {
-                if ($resource.version -ge [version]$this.MinimumVersion)
+                foreach ($resource in $resources)
                 {
-                    $currentState.MinimumVersion = $this.MinimumVersion
+                    if ($resource.version -ge [version]$this.MinimumVersion)
+                    {
+                        $currentState.MinimumVersion = $this.MinimumVersion
 
+                        if (-not $properties.ContainsKey('SingleInstance'))
+                        {
+                            $currentState.Ensure = 'Present'
+                        }
+                    }
+                    break
+                }
+
+                if ([System.String]::IsNullOrEmpty($currentState.MinimumVersion))
+                {
+                    $currentState.MinimumVersion =  $($resources | Sort-Object Version)[0].Version
+                    $currentState.Ensure = 'Absent'
+                }
+            }
+
+            if ($properties.ContainsKey('RequiredVersion'))
+            {
+                if ($this.RequiredVersion -in $resources.Version)
+                {
+                    $currentState.RequiredVersion = $this.RequiredVersion
                     if (-not $properties.ContainsKey('SingleInstance'))
                     {
                         $currentState.Ensure = 'Present'
                     }
                 }
-                break
-            }
-
-            if ([System.String]::IsNullOrEmpty($currentState.MinimumVersion))
-            {
-                $currentState.MinimumVersion =  $($resources | Sort-Object Version)[0].Version
-                $currentState.Ensure = 'Absent'
-            }
-        }
-
-        if ($properties.ContainsKey('RequiredVersion'))
-        {
-            if ($this.RequiredVersion -in $resources.Version)
-            {
-                $currentState.RequiredVersion = $this.RequiredVersion
-                if (-not $properties.ContainsKey('SingleInstance'))
+                else
                 {
                     $currentState.Ensure = 'Present'
                 }
             }
-            else
-            {
-                $currentState.Ensure = 'Present'
-            }
-        }
 
-        if ($properties.ContainsKey('MaximumVersion'))
-        {
-            foreach ($resource in $resources)
+            if ($properties.ContainsKey('MaximumVersion'))
             {
-                if ($resource.version -le [version]$this.MaximumVersion)
+                foreach ($resource in $resources)
                 {
-                    $currentState.MinimumVersion = $this.MaximumVersion
-                    if (-not $properties.ContainsKey('SingleInstance'))
+                    if ($resource.version -le [version]$this.MaximumVersion)
                     {
-                        $currentState.Ensure = 'Present'
+                        $currentState.MinimumVersion = $this.MaximumVersion
+                        if (-not $properties.ContainsKey('SingleInstance'))
+                        {
+                            $currentState.Ensure = 'Present'
+                        }
                     }
+                    break
                 }
-                break
-            }
 
-            if ([System.String]::IsNullOrEmpty($currentState.MinimumVersion))
-            {
-                $currentState.MinimumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
-                $currentState.Ensure = 'Absent'
+                if ([System.String]::IsNullOrEmpty($currentState.MinimumVersion))
+                {
+                    $currentState.MinimumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
+                    $currentState.Ensure = 'Absent'
+                }
             }
         }
         # $currentState = @{
