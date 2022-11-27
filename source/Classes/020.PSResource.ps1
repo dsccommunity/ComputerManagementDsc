@@ -343,7 +343,7 @@ class PSResource : ResourceBase
                 Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $latestVersion)
 
                 $currentState.Latest = $true
-                if (-not $properties.ContainsKey('SingleInstance'))
+                if (-not $currentState.ContainsKey('SingleInstance'))
                 {
                     #latest is true
                     # single instance can be true, false, or null
@@ -360,7 +360,7 @@ class PSResource : ResourceBase
         }
         else
         {
-            if ($properties.ContainsKey('MinimumVersion'))
+            if ($currentState.ContainsKey('MinimumVersion'))
             {
                 foreach ($resource in $resources)
                 {
@@ -368,7 +368,7 @@ class PSResource : ResourceBase
                     {
                         $currentState.MinimumVersion = $this.MinimumVersion
 
-                        if (-not $properties.ContainsKey('SingleInstance'))
+                        if (-not $currentState.ContainsKey('SingleInstance'))
                         {
                             $currentState.Ensure = 'Present'
                         }
@@ -387,12 +387,12 @@ class PSResource : ResourceBase
                 }
             }
 
-            if ($properties.ContainsKey('RequiredVersion'))
+            if ($currentState.ContainsKey('RequiredVersion'))
             {
                 if ($this.RequiredVersion -in $resources.Version)
                 {
                     $currentState.RequiredVersion = $this.RequiredVersion
-                    if (-not $properties.ContainsKey('SingleInstance'))
+                    if (-not $currentState.ContainsKey('SingleInstance'))
                     {
                         $currentState.Ensure = 'Present'
                     }
@@ -405,14 +405,14 @@ class PSResource : ResourceBase
                 }
             }
 
-            if ($properties.ContainsKey('MaximumVersion'))
+            if ($currentState.ContainsKey('MaximumVersion'))
             {
                 foreach ($resource in $resources)
                 {
                     if ($resource.version -le [version]$this.MaximumVersion)
                     {
                         $currentState.MinimumVersion = $this.MaximumVersion
-                        if (-not $properties.ContainsKey('SingleInstance'))
+                        if (-not $currentState.ContainsKey('SingleInstance'))
                         {
                             $currentState.Ensure = 'Present'
                         }
