@@ -309,11 +309,22 @@ class PSResource : ResourceBase
 
         $resources = $this.GetInstalledResource()
 
+        if (-not $resources)
+        {
+            $currentState.Ensure = 'Absent'
+        }
+
         if ($properties.ContainsKey('SingleInstance') -and $this.SingleInstance -eq $true)
         {
             if ($resources.Count -ne 1)
             {
                 $currentState.SingleInstance = $false
+                $currentState.Ensure = 'Absent'
+            }
+            else
+            {
+                $currentState.SingleInstance = $true
+                $currentState.Ensure = 'Present'
             }
         }
 
@@ -324,6 +335,17 @@ class PSResource : ResourceBase
             if ($latestVersion -notin $resources.Version)
             {
                 $currentState.Latest = $false
+                $currentState.Ensure = 'Absent'
+            }
+            else
+            {
+                $currentState.Latest = $true
+                if (-not $properties.ContainsKey('SingleInstance'))
+                {
+                    #latest is true
+                    # single instance can be true, false, or null
+                    $currentState.Ensure = 'Present'
+                }
             }
         }
 
@@ -334,6 +356,11 @@ class PSResource : ResourceBase
                 if ($resource.version -ge [version]$this.MinimumVersion)
                 {
                     $currentState.MinimumVersion = $this.MinimumVersion
+
+                    if (-not $properties.ContainsKey('SingleInstance'))
+                    {
+                        $currentState.Ensure = 'Present'
+                    }
                 }
                 break
             }
@@ -341,6 +368,7 @@ class PSResource : ResourceBase
             if ([System.String]::IsNullOrEmpty($currentState.MinimumVersion))
             {
                 $currentState.MinimumVersion =  $($resources | Sort-Object Version)[0].Version
+                $currentState.Ensure = 'Absent'
             }
         }
 
@@ -349,6 +377,14 @@ class PSResource : ResourceBase
             if ($this.RequiredVersion -in $resources.Version)
             {
                 $currentState.RequiredVersion = $this.RequiredVersion
+                if (-not $properties.ContainsKey('SingleInstance'))
+                {
+                    $currentState.Ensure = 'Present'
+                }
+            }
+            else
+            {
+                $currentState.Ensure = 'Present'
             }
         }
 
@@ -359,6 +395,10 @@ class PSResource : ResourceBase
                 if ($resource.version -le [version]$this.MaximumVersion)
                 {
                     $currentState.MinimumVersion = $this.MaximumVersion
+                    if (-not $properties.ContainsKey('SingleInstance'))
+                    {
+                        $currentState.Ensure = 'Present'
+                    }
                 }
                 break
             }
@@ -366,6 +406,7 @@ class PSResource : ResourceBase
             if ([System.String]::IsNullOrEmpty($currentState.MinimumVersion))
             {
                 $currentState.MinimumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
+                $currentState.Ensure = 'Absent'
             }
         }
         # $currentState = @{
