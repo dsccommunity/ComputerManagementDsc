@@ -306,60 +306,74 @@ class PSResource : ResourceBase
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
     {
         $currentState = $this | Get-DscProperty -ExcludeName $this.ExcludeDscProperties -Type @('Key', 'Mandatory', 'Optional') -HasValue
+        $currentState.Ensure = 'Absent'
 
         $resources = $this.GetInstalledResource()
-
-        if ($currentState.ContainsKey('SingleInstance') -and $this.SingleInstance)
-        {
-            if ($resources.Count -ne 1)
-            {
-                Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
-
-                $currentState.SingleInstance = $false
-                $currentState.Ensure = 'Absent' #! Resource may be absent, or SingleInstance may be greater than 1, is this still false?
-            }
-            else
-            {
-                Write-Verbose -Message ($this.localizedData.IsSingleInstance -f $this.Name)
-
-                $currentState.SingleInstance = $true
-                $currentState.Ensure = 'Present'
-            }
-        }
-
-        if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
-        {
-            $latestVersion = $this.GetLatestVersion()
-
-            if ($latestVersion -notin $resources.Version)
-            {
-                Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $latestVersion)
-
-                $currentState.Latest = $false
-                $currentState.Ensure = 'Absent'
-            }
-            else
-            {
-                Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $latestVersion)
-
-                $currentState.Latest = $true
-                if (-not $currentState.ContainsKey('SingleInstance'))
-                {
-                    #latest is true
-                    # single instance can be true, false, or null
-                    $currentState.Ensure = 'Present'
-                }
-            }
-        }
 
         if ($null -eq $resources)
         {
             Write-Verbose -Message ($this.localizedData.ResourceNotInstalled -f $this.Name)
+            if ($currentState.ContainsKey('SingleInstance') -and $this.SingleInstance)
+            {
+                Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
 
-            $currentState.Ensure = 'Absent'
+                $currentState.SingleInstance = $false
+            }
+
+            if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
+            {
+                $latestVersion = $this.GetLatestVersion()
+
+                Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $latestVersion)
+
+                $currentState.Latest = $false
+            }
         }
         else
         {
+            if ($currentState.ContainsKey('SingleInstance') -and $this.SingleInstance)
+            {
+                if ($resources.Count -ne 1)
+                {
+                    Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
+
+                    $currentState.SingleInstance = $false
+                    $currentState.Ensure = 'Absent' #! Resource may be absent, or SingleInstance may be greater than 1, is this still false?
+                }
+                else
+                {
+                    Write-Verbose -Message ($this.localizedData.IsSingleInstance -f $this.Name)
+
+                    $currentState.SingleInstance = $true
+                    $currentState.Ensure = 'Present'
+                }
+            }
+
+            if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
+            {
+                $latestVersion = $this.GetLatestVersion()
+
+                if ($latestVersion -notin $resources.Version)
+                {
+                    Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $latestVersion)
+
+                    $currentState.Latest = $false
+                    $currentState.Ensure = 'Absent'
+                }
+                else
+                {
+                    Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $latestVersion)
+
+                    $currentState.Latest = $true
+                    if (-not $currentState.ContainsKey('SingleInstance'))
+                    {
+                        #latest is true
+                        # single instance can be true, false, or null
+                        $currentState.Ensure = 'Present'
+                    }
+                }
+            }
+
             if ($currentState.ContainsKey('MinimumVersion'))
             {
                 foreach ($resource in $resources)
@@ -430,6 +444,21 @@ class PSResource : ResourceBase
                     Write-Verbose -Message ($this.localizedData.MaximumVersionExceeded -f $this.Name, $this.MaximumVersion, $currentState.MaximumVersion)
                 }
             }
+        }
+
+
+
+
+
+        if ($null -eq $resources)
+        {
+
+
+            $currentState.Ensure = 'Absent'
+        }
+        else
+        {
+
         }
         # $currentState = @{
         #     Name               = $this.Name
