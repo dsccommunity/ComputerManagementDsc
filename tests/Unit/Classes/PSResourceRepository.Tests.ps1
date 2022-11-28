@@ -708,7 +708,7 @@ try
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
+                        $currentState.InstallationPolicy        | Should -Be 'Trusted'
                         $currentState.PackageManagementProvider | Should -BeNullOrEmpty
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
