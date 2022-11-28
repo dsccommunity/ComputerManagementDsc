@@ -4,6 +4,10 @@ $ConfigurationData = @{
         CertificateFile = $Null
     }
     NonNodeData = @{
+        PSResourceRepository_Remove_PSGallery = @{
+            Name   = 'PSGallery'
+            Ensure = 'Absent'
+        }
         PSResourceRepository_Create_Default_Config = @{
             Name           = 'PSGallery'
             Ensure         = 'Present'
@@ -28,6 +32,24 @@ $ConfigurationData = @{
         PSResourceRepository_Remove_Config = @{
             Name   = 'PSTestGallery'
             Ensure = 'Absent'
+        }
+    }
+}
+
+<#
+    .SYNOPSIS
+        Unregister PSRepository PSGallery
+#>
+configuration PSResourceRepository_Remove_PSGallery
+{
+    Import-DscResource -ModuleName 'ComputerManagementDsc'
+
+    node $AllNodes.NodeName
+    {
+        PSResourceRepository 'Integration_Test'
+        {
+            Name           = $ConfigurationData.NonNodeData.PSResourceRepository_Remove_PSGallery.Name
+            Ensure         = $ConfigurationData.NonNodeData.PSResourceRepository_Remove_PSGallery.Ensure
         }
     }
 }
