@@ -46,6 +46,7 @@
         Default may only be used in conjunction with a PSRepositoryResource named PSGallery.
         The properties SourceLocation, ScriptSourceLocation, PublishLocation, ScriptPublishLocation, Credential,
         and PackageManagementProvider may not be used in conjunction with Default.
+        When the Default parameter is used, properties are not enforced when PSGallery properties are changed outside of Dsc.
 
     .EXAMPLE
         Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResourceRepository -Method Get -Property @{
@@ -281,7 +282,7 @@ class PSResourceRepository : ResourceBase
         Assert-Module -ModuleName PackageManagement
 
         $assertBoundParameterParameters = @{
-            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            BoundParameterList = $properties
             MutuallyExclusiveList1 = @(
                 'Default'
             )

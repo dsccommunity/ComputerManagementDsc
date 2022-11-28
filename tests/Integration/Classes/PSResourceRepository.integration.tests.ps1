@@ -86,11 +86,11 @@ try
                 $resourceCurrentState.Default         | Should -BeTrue
 
                 # Defaulted properties
-                $resourceCurrentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
-                $resourceCurrentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
-                $resourceCurrentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
-                $resourceCurrentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
-                $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
+                $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
+                $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+                $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
+                $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
+                $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
                 $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
 
             }
