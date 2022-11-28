@@ -252,7 +252,7 @@ class PSResourceRepository : ResourceBase
         $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
 
         $excludeProperties = $this.ExcludeDscProperties + 'Ensure'
-        $currentState = $this | Get-DscProperty -ExcludeName $this.ExcludeDscProperties -Type @('Key', 'Optional', 'Mandatory') -HasValue
+        $currentState = $this | Get-DscProperty -ExcludeName $excludeProperties -Type @('Key', 'Optional', 'Mandatory') -HasValue
 
         if ($repository)
         {
