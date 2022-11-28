@@ -163,6 +163,11 @@ class PSResourceRepository : ResourceBase
             $register = $false
         }
 
+        foreach ($key in $properties.Keys.Where({ $_ -ne 'Ensure' }))
+        {
+            $params[$key] = $properties.$key
+        }
+
        if ( $register )
         {
             if ($this.Name -eq 'PSGallery')
