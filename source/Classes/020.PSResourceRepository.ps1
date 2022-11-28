@@ -100,7 +100,7 @@ class PSResourceRepository : ResourceBase
     $ProxyCredential
 
     [DscProperty()]
-    [Nullable[InstallationPolicy]]
+    [InstallationPolicy]
     $InstallationPolicy
 
     [DscProperty()]
@@ -162,14 +162,7 @@ class PSResourceRepository : ResourceBase
             $register = $false
         }
 
-        foreach ($key in $properties.Keys.Where({ $_ -ne 'Ensure' }))
-        {
-            Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($this.$key))
-
-            $params[$key] = $properties.$key
-        }
-
-        if ( $register )
+       if ( $register )
         {
             if ($this.Name -eq 'PSGallery')
             {
@@ -256,7 +249,7 @@ class PSResourceRepository : ResourceBase
 
         if ($repository)
         {
-            $this.Ensure = [Ensure]::Present
+            $returnValue.Ensure = [Ensure]::Present
             $currentState.Keys | ForEach-Object -Process {
                 Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $properties.$_)
                 $returnValue.$_ = $repository.$_
