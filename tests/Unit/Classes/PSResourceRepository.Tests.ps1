@@ -537,7 +537,7 @@ try
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -Be 'Trusted'
+                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -BeNullOrEmpty
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
@@ -565,7 +565,7 @@ try
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.SourceLocation            | Should -BeNullOrEmpty
                         $currentState.Ensure                    | Should -Be 'Absent'
-                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
@@ -640,7 +640,7 @@ try
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                         $currentState.PackageManagementProvider | Should -BeNullOrEmpty
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
@@ -708,7 +708,7 @@ try
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                         $currentState.PackageManagementProvider | Should -BeNullOrEmpty
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
