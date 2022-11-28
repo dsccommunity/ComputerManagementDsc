@@ -221,13 +221,13 @@ try
                 $resourceCurrentState.PublishLocation           | Should -Be $shouldBeData.PublishLocation
                 $resourceCurrentState.ScriptPublishLocation     | Should -Be $shouldBeData.ScriptPublishLocation
                 $resourceCurrentState.InstallationPolicy        | Should -Be $shouldBeData.InstallationPolicy
+                $resourceCurrentState.PackageManagementProvider | Should -Be $shouldBeData.PackageManagementProvider
                 $resourceCurrentState.Credential                | Should -BeNullOrEmpty
                 $resourceCurrentState.Default                   | Should -BeNullOrEmpty
                 $resourceCurrentState.Proxy                     | Should -BeNullOrEmpty
                 $resourceCurrentState.ProxyCredential           | Should -BeNullOrEmpty
 
                 # Defaulted properties
-                $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
                 $resourceCurrentState.Ensure                    | Should -Be $shouldBeData.Ensure
             }
 
