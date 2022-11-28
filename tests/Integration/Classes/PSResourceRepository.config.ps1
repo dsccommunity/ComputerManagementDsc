@@ -4,26 +4,50 @@ $ConfigurationData = @{
         CertificateFile = $Null
     }
     NonNodeData = @{
-        PSResourceRepository_Create_Config = @{
+        PSResourceRepository_Create_Default_Config = @{
             Name           = 'PSGallery'
             Ensure         = 'Present'
             SourceLocation = 'https://www.powershellgallery.com/api/v2'
             Default        = $true
         }
+        PSResourceRepository_Create_Config = @{
+            Name           = 'PSTestGallery'
+            Ensure         = 'Present'
+            SourceLocation = 'https://www.nuget.org/api/v2'
+        }
         PSResourceRepository_Modify_Config = @{
-            Name                  = 'MyPSRepository'
-            Ensure                = 'Present'
-            SourceLocation        = 'https://www.google.com/'
-            PublishLocation       = 'https://www.google.com/'
-            ScriptSourceLocation  = 'https://www.google.com/'
-            ScriptPublishLocation = 'https://www.google.com/'
-            InstallationPolicy    = 'Trusted'
+            Name                      = 'PSTestGallery'
+            Ensure                    = 'Present'
+            SourceLocation            = 'https://www.nuget.org/api/v2'
+            PublishLocation           = 'https://www.nuget.org/api/v2/package'
+            ScriptSourceLocation      = 'https://www.nuget.org/api/v2/items/psscript/'
+            ScriptPublishLocation     = 'https://www.google.com/'
+            InstallationPolicy        = 'https://www.nuget.org/api/v2/package'
+            PackageManagementProvider = 'NuGet'
         }
         PSResourceRepository_Remove_Config = @{
-            Name   = 'PSGallery'
+            Name   = 'PSTestGallery'
             Ensure = 'Absent'
         }
+    }
+}
 
+<#
+    .SYNOPSIS
+        Register Default PSRepository PSGallery
+#>
+configuration PSResourceRepository_Create_Default_Config
+{
+    Import-DscResource -ModuleName 'ComputerManagementDsc'
+
+    node $AllNodes.NodeName
+    {
+        PSResourceRepository 'Integration_Test'
+        {
+            Name    = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config.Name
+            Ensure  = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config.Ensure
+            Default = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config.Default
+        }
     }
 }
 
