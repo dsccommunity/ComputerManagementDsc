@@ -100,8 +100,8 @@ class PSResourceRepository : ResourceBase
     $ProxyCredential
 
     [DscProperty()]
-    [InstallationPolicy]
-    $InstallationPolicy = [InstallationPolicy]::Untrusted
+    [Nullable[InstallationPolicy]]
+    $InstallationPolicy
 
     [DscProperty()]
     [System.String]
@@ -256,6 +256,7 @@ class PSResourceRepository : ResourceBase
 
         if ($repository)
         {
+            $this.Ensure = [Ensure]::Present
             $currentState.Keys | ForEach-Object -Process {
                 Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $properties.$_)
                 $returnValue.$_ = $repository.$_
