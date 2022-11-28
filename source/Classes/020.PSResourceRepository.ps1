@@ -251,14 +251,14 @@ class PSResourceRepository : ResourceBase
 
         $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
 
+        $excludeProperties = $this.ExcludeDscProperties + 'Ensure'
         $currentState = $this | Get-DscProperty -ExcludeName $this.ExcludeDscProperties -Type @('Key', 'Optional', 'Mandatory') -HasValue
 
         if ($repository)
         {
-            $currentState.Keys | foreach
-            {
+            $currentState.Keys | ForEach-Object -Process {
                 Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $properties.$_)
-                $returnValue.$_ = $properties.$_
+                $returnValue.$_ = $repository.$_
             }
         }
         else
