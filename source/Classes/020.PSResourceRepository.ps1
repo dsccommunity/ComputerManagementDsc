@@ -251,7 +251,7 @@ class PSResourceRepository : ResourceBase
 
         $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
 
-        $currentState = $this | Get-DscProperty -ExcludeName $this.ExcludeDscProperties -Type @('Key', 'Optional', 'Required') -HasValue
+        $currentState = $this | Get-DscProperty -ExcludeName $this.ExcludeDscProperties -Type @('Key', 'Optional', 'Mandatory') -HasValue
 
         if ($repository)
         {
