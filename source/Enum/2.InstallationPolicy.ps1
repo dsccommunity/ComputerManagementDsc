@@ -4,6 +4,6 @@
 #>
 enum InstallationPolicy
 {
-    Trusted
     Untrusted
+    Trusted
 }
