@@ -207,7 +207,7 @@ class PSResourceRepository : ResourceBase
         }
     }
 
-    hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
+    hidden [System.Collections.Hashtable] GetCurrentState1 ([System.Collections.Hashtable] $properties)
     {
         $returnValue = @{
             Ensure         = [Ensure]::Absent
@@ -240,7 +240,7 @@ class PSResourceRepository : ResourceBase
         return $returnValue
     }
 
-    hidden [System.Collections.Hashtable] GetCurrentState1 ([System.Collections.Hashtable] $properties)
+    hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
     {
         $returnValue = @{
             Ensure         = [Ensure]::Absent
@@ -257,8 +257,8 @@ class PSResourceRepository : ResourceBase
         {
             $currentState.Keys | foreach
             {
-                Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $currentState.$_)
-                $returnValue.$_ = $currentState.$_
+                Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $properties.$_)
+                $returnValue.$_ = $properties.$_
             }
         }
         else
