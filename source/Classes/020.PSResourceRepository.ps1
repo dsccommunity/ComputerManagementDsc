@@ -251,8 +251,16 @@ class PSResourceRepository : ResourceBase
         {
             $returnValue.Ensure = [Ensure]::Present
             $currentState.Keys | ForEach-Object -Process {
-                Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $properties.$_)
-                $returnValue.$_ = $repository.$_
+                Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $repository.$_)
+
+                if ($_ -eq 'InstallationPolicy')
+                {
+                    $returnValue.$_ = [InstallationPolicy]::$($repository.$_)
+                }
+                else
+                {
+                    $returnValue.$_ = $repository.$_
+                }
             }
         }
         else
