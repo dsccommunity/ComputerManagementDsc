@@ -147,8 +147,9 @@ try
                 $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
 
                 # Key properties
-                $resourceCurrentState.Name   | Should -Be $shouldBeData.Name
-                $resourceCurrentState.Ensure | Should -Be $shouldBeData.Ensure
+                $resourceCurrentState.Name           | Should -Be $shouldBeData.Name
+                $resourceCurrentState.Ensure         | Should -Be $shouldBeData.Ensure
+                $resourceCurrentState.SourceLocation | Should -Be $shouldBeData.SourceLocation
 
                 # Optional Properties
                 $resourceCurrentState.Credential      | Should -BeNullOrEmpty

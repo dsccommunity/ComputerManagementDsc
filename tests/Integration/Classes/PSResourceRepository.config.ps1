@@ -19,9 +19,9 @@ $ConfigurationData = @{
             Name                      = 'PSTestGallery'
             Ensure                    = 'Present'
             SourceLocation            = 'https://www.nuget.org/api/v2'
-            PublishLocation           = 'https://www.nuget.org/api/v2/package'
+            PublishLocation           = 'https://www.nuget.org/api/v2/package/'
             ScriptSourceLocation      = 'https://www.nuget.org/api/v2/items/psscript/'
-            ScriptPublishLocation     = 'https://www.google.com/'
+            ScriptPublishLocation     = 'https://www.nuget.org/api/v2/package'
             InstallationPolicy        = 'Trusted'
             PackageManagementProvider = 'NuGet'
         }
