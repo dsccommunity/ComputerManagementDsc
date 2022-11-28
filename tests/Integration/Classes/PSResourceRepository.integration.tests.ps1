@@ -161,7 +161,6 @@ try
                 $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
                 $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                 $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
-                $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
                 $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
                 $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
 
