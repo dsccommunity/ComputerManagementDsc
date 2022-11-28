@@ -83,7 +83,7 @@ try
                 $resourceCurrentState.Credential      | Should -BeNullOrEmpty
                 $resourceCurrentState.Proxy           | Should -BeNullOrEmpty
                 $resourceCurrentState.ProxyCredential | Should -BeNullOrEmpty
-                $resourceCurrentState.Default         | Should -BeTrue
+                $resourceCurrentState.Default         | Should -BeNullOrEmpty
 
                 # Defaulted properties
                 $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
@@ -154,7 +154,7 @@ try
                 $resourceCurrentState.Credential      | Should -BeNullOrEmpty
                 $resourceCurrentState.Proxy           | Should -BeNullOrEmpty
                 $resourceCurrentState.ProxyCredential | Should -BeNullOrEmpty
-                $resourceCurrentState.Default         | Should -BeTrue
+                $resourceCurrentState.Default         | Should -BeNullOrEmpty
 
                 # Defaulted properties
                 $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty

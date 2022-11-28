@@ -22,7 +22,7 @@ $ConfigurationData = @{
             PublishLocation           = 'https://www.nuget.org/api/v2/package'
             ScriptSourceLocation      = 'https://www.nuget.org/api/v2/items/psscript/'
             ScriptPublishLocation     = 'https://www.google.com/'
-            InstallationPolicy        = 'https://www.nuget.org/api/v2/package'
+            InstallationPolicy        = 'Trusted'
             PackageManagementProvider = 'NuGet'
         }
         PSResourceRepository_Remove_Config = @{
@@ -63,9 +63,9 @@ configuration PSResourceRepository_Create_Config
     {
         PSResourceRepository 'Integration_Test'
         {
-            Name    = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Name
-            Ensure  = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Ensure
-            Default = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Default
+            Name           = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Name
+            Ensure         = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.Ensure
+            SourceLocation = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Config.SourceLocation
         }
     }
 }
