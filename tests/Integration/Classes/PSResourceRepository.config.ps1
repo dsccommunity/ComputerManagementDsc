@@ -21,7 +21,7 @@ $ConfigurationData = @{
             SourceLocation            = 'https://www.nuget.org/api/v2'
             PublishLocation           = 'https://www.nuget.org/api/v2/package/'
             ScriptSourceLocation      = 'https://www.nuget.org/api/v2/items/psscript/'
-            ScriptPublishLocation     = 'https://www.nuget.org/api/v2/package'
+            ScriptPublishLocation     = 'https://www.nuget.org/api/v2/package/'
             InstallationPolicy        = 'Trusted'
             PackageManagementProvider = 'NuGet'
         }
