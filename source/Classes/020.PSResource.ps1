@@ -494,8 +494,9 @@ class PSResource : ResourceBase
                         $returnValue.MinimumVersion = $this.MinimumVersion
 
                         Write-Verbose -Message ($this.localizedData.MinimumVersionMet -f $this.Name, $returnValue.MinimumVersion)
+
+                        break
                     }
-                    break
                 }
 
                 if ([System.String]::IsNullOrEmpty($returnValue.MinimumVersion))
@@ -535,8 +536,9 @@ class PSResource : ResourceBase
                         $returnValue.MaximumVersion = $this.MaximumVersion
 
                         Write-Verbose -Message ($this.localizedData.MaximumVersionMet -f $this.Name, $returnValue.MaximumVersion)
+
+                        break
                     }
-                    break
                 }
 
                 if ([System.String]::IsNullOrEmpty($returnValue.MaximumVersion))
