@@ -178,10 +178,8 @@ class PSResourceRepository : ResourceBase
                 Register-PSRepository -Default:$True
 
                 #* The user may have specified Proxy & Proxy Credential, or InstallationPolicy params
-                if ($params.Count -gt 1)
-                {
-                    Set-PSRepository @params
-                }
+                #Set-PSRepository @params
+
             }
             else
             {
