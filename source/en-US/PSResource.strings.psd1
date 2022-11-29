@@ -30,5 +30,6 @@ ConvertFrom-StringData -StringData @'
     InstalledResourceDoesNotMeetMinimumVersion   = Installed resource '{0}' with version '{1}' does not meet MinimumVersion requirement of '{2}'.
     InstalledResourceDoesNotMeetMaximumVersion   = Installed resource '{0}' with version '{1}' does not meet MaximumVersion requirement of '{2}'.
     InstalledResourceDoesNotMeetRequiredVersion  = Installed resource '{0}' with version '{1}' does not meet RequiredVersion requirement of '{2}'.
+    InstalledResourcesDoNotMeetLatestVersion     = '{0}' installed resources of resource '{1}' do not meet Latest requirement.
 '@
 
