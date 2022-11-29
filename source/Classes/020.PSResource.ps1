@@ -837,12 +837,12 @@ class PSResource : ResourceBase
     #>
     hidden [void] UninstallResource ([System.Management.Automation.PSModuleInfo]$resource)
     {
-        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'RemoveNonCompliantVersions') -Type Optional -HasValue
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'RemoveNonCompliantVersions','MinimumVersion', 'MaximumVersion', 'RequiredVersion') -Type Optional -HasValue
+        $params.RequiredVersion = $resource.Version
 
         Write-Verbose -Message ($this.localizedData.UninstallModule -f $resource.Name,$resource.Version)
 
         $resource | Uninstall-Module @params
-
     }
 
     <#
