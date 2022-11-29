@@ -174,7 +174,7 @@ class PSResourceRepository : ResourceBase
             {
                 Write-Verbose -Message ($this.localizedData.RegisterDefaultRepository -f $this.Name)
 
-                Register-PSRepository -Default -InstallationPolicy $this.InstallationPolicy
+                Register-PSRepository -Default
 
                 #* The user may have specified Proxy & Proxy Credential, or InstallationPolicy params
                 Set-PSRepository @params
