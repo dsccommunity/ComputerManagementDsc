@@ -66,7 +66,7 @@ try
                 $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
 
                 # Key properties
-                $resourceCurrentState.Name           | Should -Be $shouldBeData.Name
+                $resourceCurrentState.Name | Should -Be $shouldBeData.Name
 
                 # Defaulted properties
                 $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
@@ -264,7 +264,7 @@ try
                 $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
 
                 # Key properties
-                $resourceCurrentState.Name           | Should -Be $shouldBeData.Name
+                $resourceCurrentState.Name | Should -Be $shouldBeData.Name
 
                 # Optional properties
                 $resourceCurrentState.SourceLocation            | Should -Be $shouldBeData.SourceLocation
@@ -279,7 +279,7 @@ try
                 $resourceCurrentState.ProxyCredential           | Should -BeNullOrEmpty
 
                 # Defaulted properties
-                $resourceCurrentState.Ensure                    | Should -Be $shouldBeData.Ensure
+                $resourceCurrentState.Ensure | Should -Be $shouldBeData.Ensure
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {
@@ -328,7 +328,7 @@ try
                 $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
 
                 # Key properties
-                $resourceCurrentState.Name           | Should -Be $shouldBeData.Name
+                $resourceCurrentState.Name | Should -Be $shouldBeData.Name
 
                 # Defaulted properties
                 $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
