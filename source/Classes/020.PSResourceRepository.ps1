@@ -174,7 +174,6 @@ class PSResourceRepository : ResourceBase
             {
                 Write-Verbose -Message ($this.localizedData.RegisterDefaultRepository -f $this.Name)
 
-                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
                 Register-PSRepository -Default
 
                 #* The user may have specified Proxy & Proxy Credential, or InstallationPolicy params
