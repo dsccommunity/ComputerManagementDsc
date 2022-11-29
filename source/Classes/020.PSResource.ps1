@@ -191,20 +191,11 @@ class PSResource : ResourceBase
 
         if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
         {
-            #! This is broken, if any of the version req's are valid, need to correctly identify the resources to remove.
-            if ($this.RequiredVersion -or $this.MaximumVersion -or $this.MinimumVersion)
+            #! ensure = absent should only work with `requiredversion` or no versioning. present and minimumversion, maximumversion and latest should handle other cases.
+            foreach ($resource in $this.GetInstalledResource())
             {
-                $params.RequiredVersion = $this.RequiredVersion
-                $params.MinimumVersion  = $this.MinimumVersion
-                $params.MaximumVersion  = $this.MaximumVersion
+                $this.UninstallResource($resource)
             }
-            else
-            {
-                $params.AllVersions = $true
-            }
-
-            $resourcesToUninstall = $this.GetInstalledResource()
-            Uninstall-Module @params
         }
         elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
         {
