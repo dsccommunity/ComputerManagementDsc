@@ -619,7 +619,7 @@ class PSResource : ResourceBase
         }
 
         $assertBoundParameterParameters = @{
-            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            BoundParameterList = $properties
             MutuallyExclusiveList1 = @(
                 'Latest'
             )
