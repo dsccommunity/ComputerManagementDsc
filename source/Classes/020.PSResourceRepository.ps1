@@ -168,7 +168,7 @@ class PSResourceRepository : ResourceBase
             $params[$key] = $properties.$key
         }
 
-       if ( $register )
+        if ( $register )
         {
             if ($this.Name -eq 'PSGallery')
             {
@@ -178,6 +178,7 @@ class PSResourceRepository : ResourceBase
 
                 #* The user may have specified Proxy & Proxy Credential, or InstallationPolicy params
                 Set-PSRepository @params
+
             }
             else
             {
