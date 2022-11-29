@@ -27,6 +27,10 @@ try
     . $configurationFile
 
     Describe "$($script:dscResourceName)_Integration" {
+        BeforeAll {
+            $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test"
+        }
+
         $configurationName = "$($script:dscResourceName)_Remove_PSGallery"
 
         Context ('When using configuration {0}' -f $configurationName) {
