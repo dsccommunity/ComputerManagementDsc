@@ -255,7 +255,13 @@ class PSResource : ResourceBase
 
                 if ($this.MinimumVersion)
                 {
-                    #uninstall all non-compliant versions
+                    foreach ($resource in $installedResource)
+                    {
+                        if ($resource.Version -lt [Version]$this.MinimumVersion)
+                        {
+                            $this.UninstallResource($resource)
+                        }
+                    }
 
                     if ($properties.ContainsKey('MinimumVersion'))
                     {
@@ -267,7 +273,13 @@ class PSResource : ResourceBase
 
                 if ($this.MaximumVersion)
                 {
-                    #uninstall all non-compliant versions
+                    foreach ($resource in $installedResource)
+                    {
+                        if ($resource.Version -gt [Version]$this.MaximumVersion)
+                        {
+                            $this.UninstallResource($resource)
+                        }
+                    }
 
                     if ($properties.ContainsKey('MaximumVersion'))
                     {
@@ -280,7 +292,13 @@ class PSResource : ResourceBase
 
                 if ($this.RequiredVersion)
                 {
-                    #uninstall all non-compliant versions
+                    foreach ($resource in $installedResource)
+                    {
+                        if ($resource.Version -ne [Version]$this.RequiredVersion)
+                        {
+                            $this.UninstallResource($resource)
+                        }
+                    }
 
                     if ($properties.ContainsKey('RequiredVersion'))
                     {
