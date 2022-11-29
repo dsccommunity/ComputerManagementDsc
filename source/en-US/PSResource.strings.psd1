@@ -26,5 +26,9 @@ ConvertFrom-StringData -StringData @'
     MaximumVersionMet                            = Resource '{0}' meets criteria of MaximumVersion '{1}'.
     MaximumVersionExceeded                       = Resource '{0}' exceeds criteria of MaximumVersion '{1}', with version '{2}'.
     RequiredVersionMet                           = Resource '{0}' meets criteria of RequiredVersion '{1}'.
+    TestVersioning                               = Testing if installed resources meets versioning requirement of '{0}'.
+    InstalledResourceDoesNotMeetMinimumVersion   = Installed resource '{0}' with version '{1}' does not meet MinimumVersion requirement of '{2}'.
+    InstalledResourceDoesNotMeetMaximumVersion   = Installed resource '{0}' with version '{1}' does not meet MaximumVersion requirement of '{2}'.
+    InstalledResourceDoesNotMeetRequiredVersion  = Installed resource '{0}' with version '{1}' does not meet RequiredVersion requirement of '{2}'.
 '@
 

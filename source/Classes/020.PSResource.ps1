@@ -50,6 +50,9 @@
     .PARAMETER ProxyCredential
         Specifies the Credential to connect to the repository proxy.
 
+    .PARAMETER RemoveNonCompliantVersions
+        Specifies whether to remove resources that do not meet criteria of MinimumVersion, MaximumVersion, or RequiredVersion
+
     .EXAMPLE
         Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResource -Method Get -Property @{
             Name               = 'PowerShellGet'
@@ -137,6 +140,10 @@ class PSResource : ResourceBase
     [PSCredential]
     $ProxyCredential
 
+    [DscProperty()]
+    [Nullable[System.Boolean]]
+    $RemoveNonCompliantVersions
+
     PSResource () : base ()
     {
         # These properties will not be enforced.
@@ -201,6 +208,7 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
         {
+            #* Module does not exist at all
             $this.TestRepository()
 
             $this.InstallResource()
@@ -219,17 +227,17 @@ class PSResource : ResourceBase
                 Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name)
 
                 #* Too many versions
-                $installedResources = $this.GetInstalledResource()
+                $installedResource = $this.GetInstalledResource()
 
                 $resourceToKeep = $this.FindResource()
 
-                if ($resourceToKeep.Version -in $installedResources.Version)
+                if ($resourceToKeep.Version -in $installedResource.Version)
                 {
-                    $resourcesToUninstall = $installedResources | Where-Object {$_.Version -ne $resourceToKeep.Version}
+                    $resourcesToUninstall = $installedResource | Where-Object {$_.Version -ne $resourceToKeep.Version}
                 }
                 else
                 {
-                    $resourcesToUninstall = $installedResources
+                    $resourcesToUninstall = $installedResource
                     $this.InstallResource()
                 }
 
@@ -241,7 +249,69 @@ class PSResource : ResourceBase
                 return
             }
 
-            if ($properties.ContainsKey('Latest'))
+            if ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
+            {
+                $installedResource = $this.GetInstalledResource()
+
+                if ($this.MinimumVersion)
+                {
+                    #uninstall all non-compliant versions
+
+                    if ($properties.ContainsKey('MinimumVersion'))
+                    {
+                        $this.InstallResource()
+                        return
+                    }
+
+                }
+
+                if ($this.MaximumVersion)
+                {
+                    #uninstall all non-compliant versions
+
+                    if ($properties.ContainsKey('MaximumVersion'))
+                    {
+                        $this.InstallResource()
+
+                        return
+                    }
+
+                }
+
+                if ($this.RequiredVersion)
+                {
+                    #uninstall all non-compliant versions
+
+                    if ($properties.ContainsKey('RequiredVersion'))
+                    {
+                        $this.InstallResource()
+
+                        return
+                    }
+                }
+
+                if ($this.Latest)
+                {
+                    if ($properties.ContainsKey('Latest'))
+                    {
+                        #* Remove all versions because latest is not in correct state and install LatestVersion
+
+                        $this.InstallResource()
+
+                        return
+                    }
+                    else
+                    {
+                        #* get latest version and remove all others
+
+                        return
+                    }
+
+                }
+                return
+            }
+
+            if ($properties.ContainsKey('Latest') -and (-not $properties.ContainsKey('RemoveNonCompliantVersions')))
             {
                 $this.InstallResource()
 
@@ -373,6 +443,11 @@ class PSResource : ResourceBase
 
                     Write-Verbose -Message ($this.localizedData.MinimumVersionExceeded -f $this.Name, $this.MinimumVersion, $returnValue.MinimumVersion)
                 }
+
+                if ($currentState.ContainsKey('RemoveNonCompliantVersions'))
+                {
+                    $versioningMet = $this.TestVersioning($resources, 'MinimumVersion')
+                }
             }
 
             if ($currentState.ContainsKey('RequiredVersion'))
@@ -382,6 +457,11 @@ class PSResource : ResourceBase
                     $returnValue.RequiredVersion = $this.RequiredVersion
 
                     Write-Verbose -Message ($this.localizedData.RequiredVersionMet -f $this.Name, $returnValue.RequiredVersion)
+                }
+
+                if ($currentState.ContainsKey('RemoveNonCompliantVersions'))
+                {
+                    $versioningMet = $this.TestVersioning($resources, 'RequiredVersion')
                 }
             }
 
@@ -403,6 +483,13 @@ class PSResource : ResourceBase
                     $returnValue.MinimumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
 
                     Write-Verbose -Message ($this.localizedData.MaximumVersionExceeded -f $this.Name, $this.MaximumVersion, $returnValue.MaximumVersion)
+                }
+
+                if ($currentState.ContainsKey('RemoveNonCompliantVersions'))
+                {
+                    $versioningMet = $this.TestVersioning($resources, 'MaximumVersion')
+
+                    $returnValue.RemoveNonCompliantVersions = $versioningMet
                 }
             }
         }
@@ -691,5 +778,53 @@ class PSResource : ResourceBase
 
         $resource | Uninstall-Module @params
 
+    }
+
+    <#
+        Checks whether all the installed resources meet the given versioning requirements of either MinimumVersion, MaximumVersion, or RequiredVersion
+    #>
+    hidden [System.Boolean] TestVersioning ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String] $requirement)
+    {
+
+        Write-Verbose -Message ($this.localizedData.testversioning -f $requirement)
+        $return = $true
+
+        switch ($requirement) {
+            'MinimumVersion' {
+                foreach ($resource in $resources)
+                {
+                    if ($resource.Version -lt [Version]$this.MinimumVersion)
+                    {
+                        Write-Verbose -Message ($this.localizedData.InstalledResourceDoesNotMeetMinimumVersion -f ($this.Name, $resource.Version, $this.MinimumVersion))
+
+                        $return = $false
+                    }
+                }
+            }
+            'MaximumVersion' {
+                foreach ($resource in $resources)
+                {
+                    if ($resource.Version -gt [Version]$this.MaximumVersion)
+                    {
+                        Write-Verbose -Message ($this.localizedData.InstalledResourceDoesNotMeetMinimumVersion -f ($this.Name, $resource.Version, $this.MaximumVersion))
+
+                        $return = $false
+                    }
+                }
+            }
+            'RequiredVersion' {
+                foreach ($resource in $resources)
+                {
+                    if ($resource.Version -ne [Version]$this.MaximumVersion)
+                    {
+                        Write-Verbose -Message ($this.localizedData.InstalledResourceDoesNotMeetRequiredVersion -f ($this.Name, $resource.Version, $this.RequiredVersion))
+
+                        $return = $false
+                    }
+                }
+            }
+        }
+
+        return $return
     }
 }
