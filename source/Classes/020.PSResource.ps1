@@ -442,6 +442,7 @@ class PSResource : ResourceBase
         }
         else
         {
+            $returnValue.Ensure = [Ensure]::Present
             if ($currentState.ContainsKey('SingleInstance') -and $this.SingleInstance)
             {
                 if ($resources.Count -ne 1)
