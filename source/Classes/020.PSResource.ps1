@@ -510,6 +510,8 @@ class PSResource : ResourceBase
                 if ($currentState.ContainsKey('RemoveNonCompliantVersions'))
                 {
                     $versioningMet = $this.TestVersioning($resources, 'MinimumVersion')
+
+                    $returnValue.RemoveNonCompliantVersions = $versioningMet
                 }
             }
 
@@ -525,6 +527,8 @@ class PSResource : ResourceBase
                 if ($currentState.ContainsKey('RemoveNonCompliantVersions'))
                 {
                     $versioningMet = $this.TestVersioning($resources, 'RequiredVersion')
+
+                    $returnValue.RemoveNonCompliantVersions = $versioningMet
                 }
             }
 
