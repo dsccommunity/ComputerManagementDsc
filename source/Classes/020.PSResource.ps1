@@ -394,7 +394,6 @@ class PSResource : ResourceBase
     hidden [System.Collections.Hashtable] GetCurrentState([System.Collections.Hashtable] $properties)
     {
         $currentState = $this | Get-DscProperty -ExcludeName $this.ExcludeDscProperties -Type @('Key', 'Mandatory', 'Optional') -HasValue
-        $currentState.Ensure = [Ensure]::Absent
 
         $resources = $this.GetInstalledResource()
 
@@ -533,16 +532,16 @@ class PSResource : ResourceBase
                 {
                     if ($resource.version -le [version]$this.MaximumVersion)
                     {
-                        $returnValue.MinimumVersion = $this.MaximumVersion
+                        $returnValue.MaximumVersion = $this.MaximumVersion
 
                         Write-Verbose -Message ($this.localizedData.MaximumVersionMet -f $this.Name, $returnValue.MaximumVersion)
                     }
                     break
                 }
 
-                if ([System.String]::IsNullOrEmpty($returnValue.MinimumVersion))
+                if ([System.String]::IsNullOrEmpty($returnValue.MaximumVersion))
                 {
-                    $returnValue.MinimumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
+                    $returnValue.MaximumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
 
                     Write-Verbose -Message ($this.localizedData.MaximumVersionExceeded -f $this.Name, $this.MaximumVersion, $returnValue.MaximumVersion)
                 }
@@ -820,13 +819,13 @@ class PSResource : ResourceBase
     #>
     hidden [PSCustomObject] FindResource()
     {
-        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'Force') -Type Key,Optional -HasValue
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'Force', 'RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         return Find-Module @params
     }
 
     hidden [void] InstallResource()
     {
-        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure') -Type Key,Optional -HasValue
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure','RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         Install-Module @params
     }
 
@@ -835,7 +834,7 @@ class PSResource : ResourceBase
     #>
     hidden [void] UninstallResource ([System.Management.Automation.PSModuleInfo]$resource)
     {
-        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck') -Type Optional -HasValue
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'RemoveNonCompliantVersions') -Type Optional -HasValue
 
         Write-Verbose -Message ($this.localizedData.UninstallModule -f $resource.Name,$resource.Version)
 
