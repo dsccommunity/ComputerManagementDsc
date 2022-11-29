@@ -13,14 +13,6 @@ $ConfigurationData = @{
             Ensure  = 'Present'
             Default = $true
         }
-        #!Delete this
-        PSResourceRepository_Create_Default_Config_ShouldThrow = @{
-            Name           = 'PSGallery'
-            Ensure         = 'Present'
-            SourceLocation = 'https://www.powershellgallery.com/api/v2'
-            Default        = $true
-        }
-        #!Delete this
         PSResourceRepository_Create_Config = @{
             Name           = 'PSTestGallery'
             Ensure         = 'Present'
