@@ -13,6 +13,14 @@ $ConfigurationData = @{
             Ensure  = 'Present'
             Default = $true
         }
+        #!Delete this
+        PSResourceRepository_Create_Default_Config_ShouldThrow = @{
+            Name           = 'PSGallery'
+            Ensure         = 'Present'
+            SourceLocation = 'https://www.powershellgallery.com/api/v2'
+            Default        = $true
+        }
+        #!Delete this
         PSResourceRepository_Create_Config = @{
             Name           = 'PSTestGallery'
             Ensure         = 'Present'
@@ -71,6 +79,24 @@ configuration PSResourceRepository_Create_Default_Config
         }
     }
 }
+
+#!Delete this
+configuration PSResourceRepository_Create_Default_Config_ShouldThrow
+{
+    Import-DscResource -ModuleName 'ComputerManagementDsc'
+
+    node $AllNodes.NodeName
+    {
+        PSResourceRepository 'Integration_Test'
+        {
+            Name    = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config_ShouldThrow.Name
+            Ensure  = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config_ShouldThrow.Ensure
+            Default = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config_ShouldThrow.Default
+            SourceLocation = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config_ShouldThrow.SourceLocation
+        }
+    }
+}
+#!Delete this
 
 <#
     .SYNOPSIS
