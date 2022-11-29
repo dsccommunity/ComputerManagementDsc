@@ -9,7 +9,6 @@ ConvertFrom-StringData -StringData @'
     RepositoryNotFound                    = The repository '{0}' was not found.
     RemoveExistingRepository              = Removing the repository '{0}'.
     ProxyCredentialPassedWithoutProxyUri  = Proxy Credential passed without Proxy Uri.
-    PropertyOutOfSync                     = Repository property '{0}' is not in the desired state, should be '{1}'.
     RegisterRepository                    = Registering repository '{0}' with SourceLocation '{1}'.
     UpdateRepository                      = Updating repository '{0}' with SourceLocation '{1}'.
     RegisterDefaultRepository             = Registering default repository '{0}' with -Default parameter.
