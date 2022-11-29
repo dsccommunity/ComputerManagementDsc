@@ -46,6 +46,7 @@
         Default may only be used in conjunction with a PSRepositoryResource named PSGallery.
         The properties SourceLocation, ScriptSourceLocation, PublishLocation, ScriptPublishLocation, Credential,
         and PackageManagementProvider may not be used in conjunction with Default.
+        When the Default parameter is used, properties are not enforced when PSGallery properties are changed outside of Dsc.
 
     .EXAMPLE
         Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResourceRepository -Method Get -Property @{
@@ -101,7 +102,7 @@ class PSResourceRepository : ResourceBase
 
     [DscProperty()]
     [InstallationPolicy]
-    $InstallationPolicy = [InstallationPolicy]::Untrusted
+    $InstallationPolicy
 
     [DscProperty()]
     [System.String]
@@ -164,12 +165,10 @@ class PSResourceRepository : ResourceBase
 
         foreach ($key in $properties.Keys.Where({ $_ -ne 'Ensure' }))
         {
-            Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($this.$key))
-
             $params[$key] = $properties.$key
         }
 
-        if ( $register )
+       if ( $register )
         {
             if ($this.Name -eq 'PSGallery')
             {
@@ -218,7 +217,7 @@ class PSResourceRepository : ResourceBase
         $this.InstallResource($moduleToInstall.version)
     }
 
-    hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
+    hidden [System.Collections.Hashtable] GetCurrentState1 ([System.Collections.Hashtable] $properties)
     {
         $returnValue = @{
             Ensure         = [Ensure]::Absent
@@ -251,6 +250,44 @@ class PSResourceRepository : ResourceBase
         return $returnValue
     }
 
+    hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
+    {
+        $returnValue = @{
+            Ensure         = [Ensure]::Absent
+            Name           = $this.Name
+        }
+
+        Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
+
+        $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
+
+        $excludeProperties = $this.ExcludeDscProperties + 'Ensure'
+        $currentState = $this | Get-DscProperty -ExcludeName $excludeProperties -Type @('Key', 'Optional', 'Mandatory') -HasValue
+
+        if ($repository)
+        {
+            $returnValue.Ensure = [Ensure]::Present
+            $currentState.Keys | ForEach-Object -Process {
+                Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $repository.$_)
+
+                if ($_ -eq 'InstallationPolicy')
+                {
+                    $returnValue.$_ = [InstallationPolicy]::$($repository.$_)
+                }
+                else
+                {
+                    $returnValue.$_ = $repository.$_
+                }
+            }
+        }
+        else
+        {
+            Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
+        }
+
+        return $returnValue
+    }
+
     <#
         The parameter properties will contain the properties that was
         assigned a value.
@@ -261,7 +298,7 @@ class PSResourceRepository : ResourceBase
         Assert-Module -ModuleName PackageManagement
 
         $assertBoundParameterParameters = @{
-            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            BoundParameterList = $properties
             MutuallyExclusiveList1 = @(
                 'Default'
             )
