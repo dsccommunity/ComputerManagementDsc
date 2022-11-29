@@ -9,10 +9,9 @@ $ConfigurationData = @{
             Ensure = 'Absent'
         }
         PSResourceRepository_Create_Default_Config = @{
-            Name           = 'PSGallery'
-            Ensure         = 'Present'
-            SourceLocation = 'https://www.powershellgallery.com/api/v2'
-            Default        = $true
+            Name    = 'PSGallery'
+            Ensure  = 'Present'
+            Default = $true
         }
         PSResourceRepository_Create_Config = @{
             Name           = 'PSTestGallery'
