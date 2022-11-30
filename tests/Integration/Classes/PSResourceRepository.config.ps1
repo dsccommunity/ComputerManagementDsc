@@ -64,6 +64,33 @@ configuration PSResourceRepository_Create_Default_Config
     node $AllNodes.NodeName
     {
 
+        Script 'doesdefaultfailhere'
+        {
+            SetScript = {
+                # Make sure we use TLS 1.2.
+                [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
+                Register-PSRepository -Default -Verbose -Debug
+
+            }
+            TestScript = {
+                Write-Verbose "in test this doesnt matter just a way to make set happen"
+                $return = $false
+                if (get-psrepository -name psgallery)
+                {
+                    write-verbose "psgallery does exist"
+                    $return = $true
+                }
+                return $return
+            }
+            GetScript = {
+                return @{
+                    Result = 'whocares'
+                }
+            }
+        }
+
+
         Script 'ForcePowerShellGetandPackageManagement'
         {
             SetScript = {
@@ -84,7 +111,7 @@ configuration PSResourceRepository_Create_Default_Config
 
                 if (($psget | Sort-Object Version -Descending)[0].version -lt '2.2.5'){
                     Write-Verbose "installing psget 2.2.5"
-                    Install-Module PowerShellGet -RequiredVersion 2.2.5 -Force
+                    Install-Module PowerShellGet -MinimumVersion 2.2.5 -Force
                 }
 
                 Import-Module -Name 'PowerShellGet' -MinimumVersion '2.2.5' -Force
@@ -106,6 +133,9 @@ configuration PSResourceRepository_Create_Default_Config
                 }
             }
         }
+
+        Script 'ForcePowerShellGetandPackageManagement'
+
 
         PSResourceRepository 'Integration_Test'
         {
