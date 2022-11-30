@@ -111,7 +111,7 @@ configuration PSResourceRepository_Create_Default_Config
 
                 if (($psget | Sort-Object Version -Descending)[0].version -lt '2.2.5'){
                     Write-Verbose "installing psget 2.2.5"
-                    Install-Module PowerShellGet -MinimumVersion 2.2.5 -Force
+                    Install-Module PowerShellGet -MinimumVersion '2.2.5' -Force
                 }
 
                 Import-Module -Name 'PowerShellGet' -MinimumVersion '2.2.5' -Force
@@ -133,9 +133,6 @@ configuration PSResourceRepository_Create_Default_Config
                 }
             }
         }
-
-        Script 'ForcePowerShellGetandPackageManagement'
-
 
         PSResourceRepository 'Integration_Test'
         {
