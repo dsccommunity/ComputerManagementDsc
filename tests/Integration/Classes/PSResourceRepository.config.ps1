@@ -95,6 +95,7 @@ configuration PSResourceRepository_Create_Default_Config
         {
             SetScript = {
                 # Make sure we use TLS 1.2.
+
                 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
                 # Install NuGet package provider and latest version of PowerShellGet.
