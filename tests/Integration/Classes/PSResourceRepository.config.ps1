@@ -70,7 +70,16 @@ configuration PSResourceRepository_Create_Default_Config
                 # Make sure we use TLS 1.2.
                 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
-                Register-PSRepository -Default -Verbose -Debug
+                try
+                {
+                    Register-PSRepository -Default -Verbose -Debug -ErrorAction SilentlyContinue
+                }
+                catch
+                {
+                    Write-Verbose $error[0].Exception
+                }
+
+                Get-PSRepository
 
             }
             TestScript = {
