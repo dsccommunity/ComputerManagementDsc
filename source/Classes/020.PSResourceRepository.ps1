@@ -189,8 +189,8 @@ class PSResourceRepository : ResourceBase
 
                 $PowerShellGet = Get-Module -Name PowerShellGet
                 $PackageManagement = Get-Module -Name PackageManagement
-                write-Verbose "PowerShellGet version $($m.version) loaded"
-                write-Verbose "PackageManagement version $($m.version) loaded"
+                write-Verbose "PowerShellGet version $($PowerShellGet.version) loaded"
+                write-Verbose "PackageManagement version $($PackageManagement.version) loaded"
                 #! debug
 
                 Register-PSRepository -Default
