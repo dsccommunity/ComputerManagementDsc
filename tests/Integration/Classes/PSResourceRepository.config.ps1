@@ -63,6 +63,42 @@ configuration PSResourceRepository_Create_Default_Config
 
     node $AllNodes.NodeName
     {
+
+        Script 'ForcePowerShellGetandPackageManagement'
+        {
+            SetScript = {
+                # Make sure we use TLS 1.2.
+                [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
+                # Install NuGet package provider and latest version of PowerShellGet.
+                Install-PackageProvider -Name NuGet -Force
+                Install-Module PowerShellGet -AllowClobber -Force
+
+                # Remove any loaded module to hopefully get those that was installed above.
+                Get-Module -Name @('PackageManagement', 'PowerShellGet') -All | Remove-Module -Force
+
+                # Forcibly import the newly installed modules.
+                Import-Module -Name 'PackageManagement' -MinimumVersion '1.4.8.1' -Force
+                Import-Module -Name 'PowerShellGet' -MinimumVersion '2.2.5' -Force
+
+                # Forcibly import the newly installed modules.
+                Write-Verbose -Message (
+                    Get-Module -Name @('PackageManagement', 'PowerShellGet') |
+                    Select-Object -Property @('Name', 'Version') |
+                    Out-String
+                )
+            }
+            TestScript = {
+                Write-Verbose "in test this doesnt matter just a way to make set happen"
+                return $false
+            }
+            GetScript = {
+                return @{
+                    Result = 'whocares'
+                }
+            }
+        }
+
         PSResourceRepository 'Integration_Test'
         {
             Name    = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config.Name
