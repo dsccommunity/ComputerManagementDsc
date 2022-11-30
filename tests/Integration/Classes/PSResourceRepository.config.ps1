@@ -77,6 +77,9 @@ configuration PSResourceRepository_Create_Default_Config
                 catch
                 {
                     Write-Verbose $error[0].Exception
+                    Write-Verbose "powershell version $($psversiontable.PSVersion)"
+                    Write-Verbose "PowerShellGet version $((Get-Module PowerShellGet).Version)"
+                    Write-Verbose "PackageManagement version $((Get-Module PackageManagement).Version)"
                 }
 
                 Get-PSRepository
