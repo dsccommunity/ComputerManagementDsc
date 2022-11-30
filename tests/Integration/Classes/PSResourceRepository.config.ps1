@@ -72,7 +72,7 @@ configuration PSResourceRepository_Create_Default_Config
 
                 try
                 {
-                    Register-PSRepository -Default -Verbose -Debug -ErrorAction SilentlyContinue
+                    Register-PSRepository -Default -Verbose -Debug -ErrorAction Stop
                 }
                 catch
                 {
