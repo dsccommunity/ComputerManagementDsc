@@ -174,6 +174,20 @@ class PSResourceRepository : ResourceBase
             {
                 Write-Verbose -Message ($this.localizedData.RegisterDefaultRepository -f $this.Name)
 
+                #! debug
+                $PowerShellGet = Get-Module -Name PowerShellGet -ListAvailable
+                $PackageManagement = Get-Module -Name PackageManagement -ListAvailable
+
+                foreach ($m in $PowerShellGet)
+                {
+                    write-Verbose "PowerShellGet version $($m.version) installed"
+                }
+                foreach ($m in $PackageManagement)
+                {
+                    write-Verbose "PackageManagement version $($m.version) installed"
+                }
+                #! debug
+
                 Register-PSRepository -Default
 
                 #* The user may have specified Proxy & Proxy Credential, or InstallationPolicy params
