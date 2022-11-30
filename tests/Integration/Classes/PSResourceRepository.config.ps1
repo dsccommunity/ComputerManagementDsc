@@ -82,7 +82,11 @@ configuration PSResourceRepository_Create_Default_Config
                     Write-Verbose "PackageManagement version $((Get-Module PackageManagement).Version)"
                 }
 
-                Get-PSRepository
+                $repos = Get-PSRepository -Verbose
+
+                foreach ($repo in $repos) {
+                    write-verbose "repo named $($repo.name) at source location $($repo.sourcelocation)"
+                }
 
             }
             TestScript = {
