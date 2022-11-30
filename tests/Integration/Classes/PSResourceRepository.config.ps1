@@ -75,13 +75,7 @@ configuration PSResourceRepository_Create_Default_Config
             }
             TestScript = {
                 Write-Verbose "in test this doesnt matter just a way to make set happen"
-                $return = $false
-                if (get-psrepository -name psgallery)
-                {
-                    write-verbose "psgallery does exist"
-                    $return = $true
-                }
-                return $return
+                return $false
             }
             GetScript = {
                 return @{
