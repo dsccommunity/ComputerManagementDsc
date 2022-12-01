@@ -750,11 +750,12 @@ class PSResource : ResourceBase
     #>
     hidden [System.Boolean] TestVersioning ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String] $requirement)
     {
-
         Write-Verbose -Message ($this.localizedData.testversioning -f $requirement)
+
         $return = $true
 
-        switch ($requirement) {
+        switch ($requirement)
+        {
             'MinimumVersion' {
                 foreach ($resource in $resources)
                 {
