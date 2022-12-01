@@ -645,6 +645,7 @@ class PSResource : ResourceBase
     #>
     hidden [System.Management.Automation.PSModuleInfo[]] GetInstalledResource()
     {
+        Write-Verbose -Message ($this.localizedData.GetInstalledResource -f $this.Name)
         return $(Get-Module -Name $this.Name -ListAvailable)
     }
 
@@ -705,11 +706,13 @@ class PSResource : ResourceBase
     #>
     hidden [void] TestRepository ()
     {
+        Write-Verbose -message $this.localizedData.TestRepositoryInstallationPolicy
         if (-not $this.Force)
         {
-            $resource = Find-Module -Name $this.Name
+            $resource = $this.FindResource()
 
             $resourceRepository = Get-PSRepository -Name $resource.Repository
+
 
             if ($resourceRepository.InstallationPolicy -eq  'Untrusted')
             {
@@ -725,12 +728,14 @@ class PSResource : ResourceBase
     #>
     hidden [PSCustomObject] FindResource()
     {
+        Write-Verbose -Message ($this.localizedData.FindResource -f $this.Name)
         $params = $this | Get-DscProperty -ExcludeName @('Latest', 'SingleInstance', 'Ensure', 'SkipPublisherCheck', 'Force', 'RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         return Find-Module @params
     }
 
     hidden [void] InstallResource()
     {
+        Write-Verbose -Message ($this.localizedData.InstallResource -f $this.Name)
         $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure','RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         Install-Module @params
     }
@@ -753,7 +758,7 @@ class PSResource : ResourceBase
     #>
     hidden [System.Boolean] TestVersioning ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String] $requirement)
     {
-        Write-Verbose -Message ($this.localizedData.testversioning -f $requirement)
+        Write-Verbose -Message ($this.localizedData.TestVersioning -f $requirement)
 
         $return = $true
 

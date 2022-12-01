@@ -31,5 +31,12 @@ ConvertFrom-StringData -StringData @'
     InstalledResourceDoesNotMeetMaximumVersion   = Installed resource '{0}' with version '{1}' does not meet MaximumVersion requirement of '{2}'.
     InstalledResourceDoesNotMeetRequiredVersion  = Installed resource '{0}' with version '{1}' does not meet RequiredVersion requirement of '{2}'.
     InstalledResourcesDoNotMeetLatestVersion     = '{0}' installed resources of resource '{1}' do not meet Latest requirement.
+    EnsureAbsentWithVersioning                   = Parameters MinimumVersion, MaximumVersion, or Latest may not be used when Ensure is Absent.
+    TestRepositoryInstallationPolicy             = Testing repository installation policy.
+    FindResource                                 = Finding resource '{0}'.
+    InstallResource                              = Installing resource '{0}'.
+    GetInstalledResource                         = Getting all installed versions of resource '{0}'.
+    # Modify() strings
+
 '@
 
