@@ -180,9 +180,16 @@ class PSResource : ResourceBase
     #>
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
+        $installedResource = @()
+
         if ($this.Ensure -eq 'Present')
         {
             $this.TestRepository()
+
+            if ($properties.ContainsKey('SingleInstance') -or $properties.ContainsKey('RemoveNonCompliantVersions'))
+            {
+                $installedResource = $this.GetInstalledResource()
+            }
         }
 
         if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
@@ -207,10 +214,9 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('SingleInstance'))
         {
-            Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name)
+            Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $installedResource.Count)
 
             #* Too many versions
-            $installedResource = $this.GetInstalledResource()
 
             $resourceToKeep = $this.FindResource()
 
@@ -233,7 +239,6 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
         {
-            $installedResource = $this.GetInstalledResource()
 
             if ($this.MinimumVersion)
             {
