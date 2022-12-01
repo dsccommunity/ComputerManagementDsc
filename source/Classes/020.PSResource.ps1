@@ -185,11 +185,6 @@ class PSResource : ResourceBase
         if ($this.Ensure -eq 'Present')
         {
             $this.TestRepository()
-
-            if ($properties.ContainsKey('SingleInstance') -or $properties.ContainsKey('RemoveNonCompliantVersions'))
-            {
-                $installedResource = $this.GetInstalledResource()
-            }
         }
 
         if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
@@ -214,6 +209,8 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('SingleInstance'))
         {
+            $installedResource = $this.GetInstalledResource()
+
             Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $installedResource.Count)
 
             #* Too many versions
@@ -239,6 +236,7 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
         {
+            $installedResource = $this.GetInstalledResource()
 
             if ($this.MinimumVersion)
             {
@@ -727,7 +725,7 @@ class PSResource : ResourceBase
     #>
     hidden [PSCustomObject] FindResource()
     {
-        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'Force', 'RemoveNonCompliantVersions') -Type Key,Optional -HasValue
+        $params = $this | Get-DscProperty -ExcludeName @('Latest', 'SingleInstance', 'Ensure', 'SkipPublisherCheck', 'Force', 'RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         return Find-Module @params
     }
 
