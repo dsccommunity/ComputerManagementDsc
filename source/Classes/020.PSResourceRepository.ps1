@@ -168,7 +168,7 @@ class PSResourceRepository : ResourceBase
             $params[$key] = $properties.$key
         }
 
-        if ( $register )
+        if ($register)
         {
             if ($this.Name -eq 'PSGallery')
             {
