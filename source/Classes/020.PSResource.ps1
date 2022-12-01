@@ -180,19 +180,21 @@ class PSResource : ResourceBase
     #>
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        $params = @{
-            Name = $this.Name
-        }
-
-        if ($this.Force)
+        if ($this.Ensure -eq 'Present')
         {
-            $params.Force = $this.Force
+            $this.TestRepository()
         }
 
         if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
         {
-            #! ensure = absent should only work with `requiredversion` or no versioning. present and minimumversion, maximumversion and latest should handle other cases.
-            foreach ($resource in $this.GetInstalledResource())
+            $installedResource = $this.GetInstalledResource()
+
+            if ($properties.ContainsKey('RequiredVersion') -and $this.RequiredVersion)
+            {
+                $resourceToUninstall = $installedResource | Where-Object {$_.Version -eq [Version]$this.RequiredVersion}
+                $this.UninstallModule($resourceToUninstall)
+            }
+            foreach ($resource in installedResource)
             {
                 $this.UninstallResource($resource)
             }
@@ -200,144 +202,127 @@ class PSResource : ResourceBase
         elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
         {
             #* Module does not exist at all
-            $this.TestRepository()
 
             $this.InstallResource()
         }
-        else
+        elseif ($properties.ContainsKey('SingleInstance'))
         {
-            #* Module is installed but not in the correct state
-            #* Either too many
-            #* Not latest
-            #* Wrong version
+            Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name)
 
-            $this.TestRepository()
+            #* Too many versions
+            $installedResource = $this.GetInstalledResource()
 
-            if ($properties.ContainsKey('SingleInstance'))
+            $resourceToKeep = $this.FindResource()
+
+            if ($resourceToKeep.Version -in $installedResource.Version)
             {
-                Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name)
+                $resourcesToUninstall = $installedResource | Where-Object {$_.Version -ne $resourceToKeep.Version}
+            }
+            else
+            {
+                $resourcesToUninstall = $installedResource
+                $this.InstallResource()
+            }
 
-                #* Too many versions
-                $installedResource = $this.GetInstalledResource()
+            foreach ($resource in $resourcesToUninstall)
+            {
+                $this.UninstallResource($resource)
+            }
 
-                $resourceToKeep = $this.FindResource()
+            return
+        }
+        elseif ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
+        {
+            $installedResource = $this.GetInstalledResource()
 
-                if ($resourceToKeep.Version -in $installedResource.Version)
+            if ($this.MinimumVersion)
+            {
+                foreach ($resource in $installedResource)
                 {
-                    $resourcesToUninstall = $installedResource | Where-Object {$_.Version -ne $resourceToKeep.Version}
+                    if ($resource.Version -lt [Version]$this.MinimumVersion)
+                    {
+                        $this.UninstallResource($resource)
+                    }
+                }
+
+                if ($properties.ContainsKey('MinimumVersion'))
+                {
+                    $this.InstallResource()
+                    return
+                }
+
+            }
+
+            if ($this.MaximumVersion)
+            {
+                foreach ($resource in $installedResource)
+                {
+                    if ($resource.Version -gt [Version]$this.MaximumVersion)
+                    {
+                        $this.UninstallResource($resource)
+                    }
+                }
+
+                if ($properties.ContainsKey('MaximumVersion'))
+                {
+                    $this.InstallResource()
+
+                    return
+                }
+
+            }
+
+            if ($this.RequiredVersion)
+            {
+                foreach ($resource in $installedResource)
+                {
+                    if ($resource.Version -ne [Version]$this.RequiredVersion)
+                    {
+                        $this.UninstallResource($resource)
+                    }
+                }
+
+                if ($properties.ContainsKey('RequiredVersion'))
+                {
+                    $this.InstallResource()
+
+                    return
+                }
+            }
+
+            if ($this.Latest)
+            {
+                if ($properties.ContainsKey('Latest'))
+                {
+                    foreach ($resource in $installedResource)
+                    {
+                        $this.UninstallResource($resource)
+                    }
+
+                    $this.InstallResource()
+
+                    return
                 }
                 else
                 {
-                    $resourcesToUninstall = $installedResource
-                    $this.InstallResource()
-                }
-
-                foreach ($resource in $resourcesToUninstall)
-                {
-                    $this.UninstallResource($resource)
-                }
-
-                return
-            }
-
-            if ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
-            {
-                $installedResource = $this.GetInstalledResource()
-
-                if ($this.MinimumVersion)
-                {
+                    $latestVersion = $this.GetLatestVersion()
+                    #* get latest version and remove all others
                     foreach ($resource in $installedResource)
                     {
-                        if ($resource.Version -lt [Version]$this.MinimumVersion)
+                        if ($resource.Version -ne $latestVersion)
                         {
                             $this.UninstallResource($resource)
                         }
                     }
 
-                    if ($properties.ContainsKey('MinimumVersion'))
-                    {
-                        $this.InstallResource()
-                        return
-                    }
-
+                    return
                 }
 
-                if ($this.MaximumVersion)
-                {
-                    foreach ($resource in $installedResource)
-                    {
-                        if ($resource.Version -gt [Version]$this.MaximumVersion)
-                        {
-                            $this.UninstallResource($resource)
-                        }
-                    }
-
-                    if ($properties.ContainsKey('MaximumVersion'))
-                    {
-                        $this.InstallResource()
-
-                        return
-                    }
-
-                }
-
-                if ($this.RequiredVersion)
-                {
-                    foreach ($resource in $installedResource)
-                    {
-                        if ($resource.Version -ne [Version]$this.RequiredVersion)
-                        {
-                            $this.UninstallResource($resource)
-                        }
-                    }
-
-                    if ($properties.ContainsKey('RequiredVersion'))
-                    {
-                        $this.InstallResource()
-
-                        return
-                    }
-                }
-
-                if ($this.Latest)
-                {
-                    if ($properties.ContainsKey('Latest'))
-                    {
-                        foreach ($resource in $installedResource)
-                        {
-                            $this.UninstallResource($resource)
-                        }
-
-                        $this.InstallResource()
-
-                        return
-                    }
-                    else
-                    {
-                        $latestVersion = $this.GetLatestVersion()
-                        #* get latest version and remove all others
-                        foreach ($resource in $installedResource)
-                        {
-                            if ($resource.Version -ne $latestVersion)
-                            {
-                                $this.UninstallResource($resource)
-                            }
-                        }
-
-                        return
-                    }
-
-                }
-                return
             }
-
-            if ($properties.ContainsKey('Latest') -and (-not $properties.ContainsKey('RemoveNonCompliantVersions')))
-            {
-                $this.InstallResource()
-
-                return
-            }
-
+            return
+        }
+        else
+        {
             $this.InstallResource()
         }
     }
@@ -599,6 +584,13 @@ class PSResource : ResourceBase
         }
 
         Assert-BoundParameter @assertBoundParameterParameters
+
+        if ($this.Ensure -eq 'Absent' -and ($this.MinimumVersion -or $this.MaximumVersion -or $this.Latest))
+        {
+            $errorMessage = $this.localizedData.EnsureAbsentWithVersioning
+
+            New-InvalidArgumentException -ArgumentName 'Ensure' -Message $errorMessage
+        }
 
         if ($this.ProxyCredental -and (-not $this.Proxy))
         {
