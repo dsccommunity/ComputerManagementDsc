@@ -180,6 +180,8 @@ class PSResource : ResourceBase
     #>
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
+        $installedResource = @()
+
         if ($this.Ensure -eq 'Present')
         {
             $this.TestRepository()
@@ -191,15 +193,9 @@ class PSResource : ResourceBase
 
             if ($properties.ContainsKey('RequiredVersion') -and $this.RequiredVersion)
             {
-                Write-Verbose -Message ($this.localizedData.ResourceShouldBeAbsentRequiredVersion -f $this.Name, $this.RequiredVersion)
-
                 $resourceToUninstall = $installedResource | Where-Object {$_.Version -eq [Version]$this.RequiredVersion}
                 $this.UninstallModule($resourceToUninstall)
-                return
             }
-
-            Write-Verbose -Message ($this.localizedData.ResourceShouldBeAbsent -f $this.Name)
-
             foreach ($resource in installedResource)
             {
                 $this.UninstallResource($resource)
@@ -208,7 +204,7 @@ class PSResource : ResourceBase
         elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
         {
             #* Module does not exist at all
-            Write-Verbose -Message ($this.localizedData.ResourceShouldBePresent -f $this.Name)
+
             $this.InstallResource()
         }
         elseif ($properties.ContainsKey('SingleInstance'))
@@ -223,12 +219,10 @@ class PSResource : ResourceBase
 
             if ($resourceToKeep.Version -in $installedResource.Version)
             {
-                Write-Verbose -Message ($this.localizedData.SingleInstanceVersionPresent -f $this.Name, $resourceToKeep.version)
                 $resourcesToUninstall = $installedResource | Where-Object {$_.Version -ne $resourceToKeep.Version}
             }
             else
             {
-                Write-Verbose -Message ($this.localizedData.SingleInstanceVersionAbsent -f $this.Name, $resourceToKeep.version)
                 $resourcesToUninstall = $installedResource
                 $this.InstallResource()
             }
@@ -345,6 +339,8 @@ class PSResource : ResourceBase
 
         $resources = $this.GetInstalledResource()
 
+        $versioning = $null
+
         $returnValue = @{
             Name   = $this.Name
             Ensure = [Ensure]::Absent
@@ -352,36 +348,14 @@ class PSResource : ResourceBase
 
         if ($currentState.ContainsKey('SingleInstance') -and $this.SingleInstance)
         {
-            if ($resources.Count -ne 1)
-            {
-                Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
-
-                $returnValue.SingleInstance = $false
-            }
-            else
-            {
-                Write-Verbose -Message ($this.localizedData.IsSingleInstance -f $this.Name)
-
-                $returnValue.SingleInstance = $true
-            }
+            $returnValue.SingleInstance = $this.TestSingleInstance($resources, $currentState)
         }
 
         if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
         {
-            $latestVersion = $this.GetLatestVersion()
+            $versioning = 'Latest'
 
-            if ($latestVersion -notin $resources.Version)
-            {
-                Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $latestVersion)
-
-                $returnValue.Latest = $false
-            }
-            else
-            {
-                Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $latestVersion)
-
-                $returnValue.Latest = $true
-            }
+            $returnValue.Latest = $this.TestLatestVersion($resources)
         }
 
         if ($null -eq $resources)
@@ -391,121 +365,32 @@ class PSResource : ResourceBase
         else
         {
             $returnValue.Ensure = [Ensure]::Present
-            if ($currentState.ContainsKey('SingleInstance') -and $this.SingleInstance)
-            {
-                if ($resources.Count -ne 1)
-                {
-                    Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
-
-                    $returnValue.SingleInstance = $false
-                }
-                else
-                {
-                    Write-Verbose -Message ($this.localizedData.IsSingleInstance -f $this.Name)
-
-                    $returnValue.SingleInstance = $true
-                }
-            }
-
-            if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
-            {
-                $latestVersion = $this.GetLatestVersion()
-
-                if ($latestVersion -notin $resources.Version)
-                {
-                    Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $latestVersion)
-
-                    $returnValue.Latest = $false
-                }
-                else
-                {
-                    Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $latestVersion)
-
-                    $returnValue.Latest = $true
-                }
-
-                if ($currentState.ContainsKey('RemoveNonCompliantVersions'))
-                {
-                    $versioningMet = $this.TestVersioning($resources, 'Latest')
-
-                    $returnValue.RemoveNonCompliantVersions = $versioningMet
-                }
-            }
 
             if ($currentState.ContainsKey('MinimumVersion'))
             {
-                foreach ($resource in $resources)
-                {
-                    if ($resource.version -ge [version]$this.MinimumVersion)
-                    {
-                        $returnValue.MinimumVersion = $this.MinimumVersion
+                $versioning = 'MinimumVersion'
 
-                        Write-Verbose -Message ($this.localizedData.MinimumVersionMet -f $this.Name, $returnValue.MinimumVersion)
-
-                        break
-                    }
-                }
-
-                if ([System.String]::IsNullOrEmpty($returnValue.MinimumVersion))
-                {
-                    $returnValue.MinimumVersion =  $($resources | Sort-Object Version)[0].Version
-
-                    Write-Verbose -Message ($this.localizedData.MinimumVersionExceeded -f $this.Name, $this.MinimumVersion, $returnValue.MinimumVersion)
-                }
-
-                if ($currentState.ContainsKey('RemoveNonCompliantVersions'))
-                {
-                    $versioningMet = $this.TestVersioning($resources, 'MinimumVersion')
-
-                    $returnValue.RemoveNonCompliantVersions = $versioningMet
-                }
+                $returnValue.MinimumVersion = $this.GetMinimumInstalledVersion($resources)
             }
-
-            if ($currentState.ContainsKey('RequiredVersion'))
+            elseif ($currentState.ContainsKey('RequiredVersion'))
             {
-                if ($this.RequiredVersion -in $resources.Version)
-                {
-                    $returnValue.RequiredVersion = $this.RequiredVersion
+                $versioning = 'RequiredVersion'
 
-                    Write-Verbose -Message ($this.localizedData.RequiredVersionMet -f $this.Name, $returnValue.RequiredVersion)
-                }
-
-                if ($currentState.ContainsKey('RemoveNonCompliantVersions'))
-                {
-                    $versioningMet = $this.TestVersioning($resources, 'RequiredVersion')
-
-                    $returnValue.RemoveNonCompliantVersions = $versioningMet
-                }
+                $returnValue.RequiredVersion = $this.GetRequiredInstalledVersion($resources)
             }
-
-            if ($currentState.ContainsKey('MaximumVersion'))
+            elseif ($currentState.ContainsKey('MaximumVersion'))
             {
-                foreach ($resource in $resources)
-                {
-                    if ($resource.version -le [version]$this.MaximumVersion)
-                    {
-                        $returnValue.MaximumVersion = $this.MaximumVersion
+                $versioning = 'MaximumVersion'
 
-                        Write-Verbose -Message ($this.localizedData.MaximumVersionMet -f $this.Name, $returnValue.MaximumVersion)
-
-                        break
-                    }
-                }
-
-                if ([System.String]::IsNullOrEmpty($returnValue.MaximumVersion))
-                {
-                    $returnValue.MaximumVersion =  $($resources | Sort-Object Version -Descending)[0].Version
-
-                    Write-Verbose -Message ($this.localizedData.MaximumVersionExceeded -f $this.Name, $this.MaximumVersion, $returnValue.MaximumVersion)
-                }
-
-                if ($currentState.ContainsKey('RemoveNonCompliantVersions'))
-                {
-                    $versioningMet = $this.TestVersioning($resources, 'MaximumVersion')
-
-                    $returnValue.RemoveNonCompliantVersions = $versioningMet
-                }
+                $returnValue.MaximumVersion = $this.GetMaximumInstalledVersion($resources)
             }
+        }
+
+        if (-not [System.String]::IsNullOrEmpty($versioning) -and $currentState.ContainsKey('RemoveNonCompliantVersions'))
+        {
+            $versioningMet = $this.TestVersioning($resources, $versioning)
+
+            $returnValue.RemoveNonCompliantVersions = $versioningMet
         }
 
         return $returnValue
@@ -522,7 +407,7 @@ class PSResource : ResourceBase
 
         $powerShellGet = Get-Module -Name PowerShellGet
 
-        if ($powerShellGet.Version -lt [version]'1.6.0' -and $this.AllowPrerelease)
+        if ($powerShellGet.Version -lt [version]'1.6.0' -and $properties.ContainsKey('AllowPrerelease'))
         {
             $errorMessage = $this.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
             New-InvalidArgumentException -ArgumentName 'AllowPrerelease' -message ($errorMessage -f $powerShellGet.Version)
@@ -555,7 +440,7 @@ class PSResource : ResourceBase
         Assert-BoundParameter @assertBoundParameterParameters
 
         $assertBoundParameterParameters = @{
-            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            BoundParameterList = $properties
             MutuallyExclusiveList1 = @(
                 'MinimumVersion'
             )
@@ -568,7 +453,7 @@ class PSResource : ResourceBase
         Assert-BoundParameter @assertBoundParameterParameters
 
         $assertBoundParameterParameters = @{
-            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            BoundParameterList = $properties
             MutuallyExclusiveList1 = @(
                 'MaximumVersion'
             )
@@ -581,34 +466,38 @@ class PSResource : ResourceBase
         Assert-BoundParameter @assertBoundParameterParameters
 
         $assertBoundParameterParameters = @{
-            BoundParameterList = $this | Get-DscProperty -Type @('Key', 'Mandatory', 'Optional') -HasValue
+            BoundParameterList = $properties
             MutuallyExclusiveList1 = @(
                 'RequiredVersion'
             )
             MutuallyExclusiveList2 = @(
                 'MaximumVersion'
                 'MinimumVersion'
-                'AllVersions'
             )
         }
 
         Assert-BoundParameter @assertBoundParameterParameters
 
-        if ($this.Ensure -eq 'Absent' -and ($this.MinimumVersion -or $this.MaximumVersion -or $this.Latest))
+        if ($this.Ensure -eq 'Absent' -and (
+            $properties.ContainsKey('MinimumVersion') -or
+            $properties.ContainsKey('MaximumVersion') -or
+            $properties.ContainsKey('Latest')
+        )
+        )
         {
             $errorMessage = $this.localizedData.EnsureAbsentWithVersioning
 
             New-InvalidArgumentException -ArgumentName 'Ensure' -Message $errorMessage
         }
 
-        if ($this.ProxyCredental -and (-not $this.Proxy))
+        if ($properties.ContainsKey('ProxyCredental') -and (-not $properties.ContainsKey('Proxy')))
         {
             $errorMessage = $this.localizedData.ProxyCredentialPassedWithoutProxyUri
 
             New-InvalidArgumentException -ArgumentName 'ProxyCredential' -Message $errorMessage
         }
 
-        if ($this.Proxy -or $this.Credential -and (-not $this.Repository))
+        if ($properties.ContainsKey('Proxy') -or $properties.ContainsKey('Credential') -and (-not $properties.ContainsKey('Repository')))
         {
             $errorMessage = $this.localizedData.ProxyorCredentialWithoutRepository
 
@@ -617,20 +506,57 @@ class PSResource : ResourceBase
     }
 
     <#
-        Returns true if only one instance of the resource is installed on the system
+        Returns true if only the correct instance of the resource is installed on the system
     #>
-    hidden [System.Boolean] TestSingleInstance()
+    hidden [System.Boolean] TestSingleInstance([System.Management.Automation.PSModuleInfo[]]$resources, [System.Collections.Hashtable]$properties)
     {
-        $count = (Get-Module -Name $this.Name -ListAvailable -ErrorAction SilentlyContinue).Count
+        $isSingleInstance = $false #! Is this the correct default if somehow the if/else isn't triggered?
 
-        if ($count -eq 1)
+        if ($resources.Count -ne 1)
         {
-            return $true
+            Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
+
+            $isSingleInstance = $false
         }
         else
         {
-            return $false
+            if ($properties.ContainsKey('MinimumVersion'))
+            {
+                if ($resources.Version -ne [version]$this.MinimumVersion)
+                {
+                    $isSingleInstance = $false
+                }
+            }
+            elseif ($properties.ContainsKey('MaximumVersion'))
+            {
+                if ($resources.Version -ne [version]$this.MaximumVersion)
+                {
+                    $isSingleInstance = $false
+                }
+            }
+            elseif ($properties.ContainsKey('RequiredVersion'))
+            {
+                if ($resources.Version -ne [version]$this.RequiredVersion)
+                {
+                    $isSingleInstance = $false
+                }
+            }
+            elseif ($properties.ContainsKey('Latest'))
+            {
+                $latestVersion = $this.GetLatestVersion()
+                if ($resources.Version -ne [version]$latestVersion)
+                {
+                    $isSingleInstance = $false
+                }
+            }
+            else
+            {
+                Write-Verbose -Message ($this.localizedData.IsSingleInstance -f $this.Name)
+                $isSingleInstance = $true
+            }
         }
+
+        return $isSingleInstance
     }
 
     <#
@@ -651,7 +577,6 @@ class PSResource : ResourceBase
     #>
     hidden [System.Management.Automation.PSModuleInfo[]] GetInstalledResource()
     {
-        Write-Verbose -Message ($this.localizedData.GetInstalledResource -f $this.Name)
         return $(Get-Module -Name $this.Name -ListAvailable)
     }
 
@@ -683,28 +608,25 @@ class PSResource : ResourceBase
     }
 
     <#
-        tests whether the given resource version is the latest version available
+        tests whether the installed resources includes the latest version available
     #>
-    hidden [System.Boolean] TestLatestVersion ([System.String] $version)
+    hidden [System.Boolean] TestLatestVersion ([System.Management.Automation.PSModuleInfo[]] $resources)
     {
         $latestVersion = $this.GetLatestVersion()
-        if ($latestVersion -eq $version)
-        {
-            return $true
-        }
-        return $false
-    }
+        $return = $false
 
-
-    <#
-        Sets SingleInstance property when single instance is not explicitly set to True but only a single instance of the resource is present
-    #>
-    hidden [void] SetSingleInstance ([System.Boolean] $singleInstance)
-    {
-        if ($singleInstance -and (-not $this.SingleInstance))
+        if ($latestVersion -notin $resources.Version)
         {
-            $this.SingleInstance = $True
+            Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $latestVersion)
         }
+        else
+        {
+            Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $latestVersion)
+
+            $return = $true
+        }
+
+        return $return
     }
 
     <#
@@ -712,19 +634,17 @@ class PSResource : ResourceBase
     #>
     hidden [void] TestRepository ()
     {
-        Write-Verbose -message $this.localizedData.TestRepositoryInstallationPolicy
         if (-not $this.Force)
         {
             $resource = $this.FindResource()
 
             $resourceRepository = Get-PSRepository -Name $resource.Repository
 
-
             if ($resourceRepository.InstallationPolicy -eq  'Untrusted')
             {
-                $errorMessage = $this.localizedData.UntrustedRepositoryWithoutForce
+                $errorMessage = $this.localizedData.UntrustedRepositoryWithoutForc
 
-                New-InvalidArgumentException -Message ($errorMessage -f ($resourceRepository.Name)) -ArgumentName 'Force'
+                New-InvalidArgumentException -Message ($errorMessage -f $resourceRepository.Name) -ArgumentName 'Force'
             }
         }
     }
@@ -734,14 +654,12 @@ class PSResource : ResourceBase
     #>
     hidden [PSCustomObject] FindResource()
     {
-        Write-Verbose -Message ($this.localizedData.FindResource -f $this.Name)
         $params = $this | Get-DscProperty -ExcludeName @('Latest', 'SingleInstance', 'Ensure', 'SkipPublisherCheck', 'Force', 'RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         return Find-Module @params
     }
 
     hidden [void] InstallResource()
     {
-        Write-Verbose -Message ($this.localizedData.InstallResource -f $this.Name)
         $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure','RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         Install-Module @params
     }
@@ -764,7 +682,7 @@ class PSResource : ResourceBase
     #>
     hidden [System.Boolean] TestVersioning ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String] $requirement)
     {
-        Write-Verbose -Message ($this.localizedData.TestVersioning -f $requirement)
+        Write-Verbose -Message ($this.localizedData.testversioning -f $requirement)
 
         $return = $true
 
@@ -813,6 +731,87 @@ class PSResource : ResourceBase
                     $return = $false
                 }
             }
+        }
+
+        return $return
+    }
+
+    <#
+        Returns the minimum version of a resource installed on the system.
+
+        If a resource matches the exact minimum version, that version is returned.
+        If no resources matches the exact minimum version, the eldest version is returned.
+    #>
+    hidden [System.String] GetMinimumInstalledVersion([System.Management.Automation.PSModuleInfo[]] $resources)
+    {
+        $return = $null
+
+        foreach ($resource in $resources)
+        {
+            if ($resource.version -ge [version]$this.MinimumVersion)
+            {
+                $return = $this.MinimumVersion
+
+                Write-Verbose -Message ($this.localizedData.MinimumVersionMet -f $this.Name, $return)
+
+                break
+            }
+        }
+
+        if (-not [System.String]::IsNullOrEmpty($return))
+        {
+            $return = $($resources | Sort-Object Version)[0].Version
+
+            Write-Verbose -Message ($this.localizedData.MinimumVersionExceeded -f $this.Name, $this.MinimumVersion, $return)
+        }
+
+        return $return
+    }
+
+    <#
+        Returns the maximum version of a resource installed on the system.
+
+        If a resource matches the exact maximum version, that version is returned.
+        If no resources matches the exact maximum version, the youngest version is returned.
+    #>
+    hidden [System.String] GetMaximumInstalledVersion([System.Management.Automation.PSModuleInfo[]] $resources)
+    {
+        $return = $null
+
+        foreach ($resource in $resources)
+        {
+            if ($resource.version -le [version]$this.MaximumVersion)
+            {
+                $return = $this.MaximumVersion
+
+                Write-Verbose -Message ($this.localizedData.MaximumVersionMet -f $this.Name, $return)
+
+                break
+            }
+        }
+
+        if ([System.String]::IsNullOrEmpty($return))
+        {
+            $return =  $($resources | Sort-Object Version -Descending)[0].Version
+
+            Write-Verbose -Message ($this.localizedData.MaximumVersionExceeded -f $this.Name, $this.MaximumVersion, $return)
+        }
+
+        return $return
+    }
+
+    <#
+        Returns the required version of the resource if it is installed on the system.
+    #>
+    hidden [System.String] GetRequiredInstalledVersion([System.Management.Automation.PSModuleInfo[]] $resources)
+    {
+        $return = $null
+
+        if ($this.RequiredVersion -in $resources.Version)
+        {
+            $return = $this.RequiredVersion
+
+            Write-Verbose -Message ($this.localizedData.RequiredVersionMet -f $this.Name, $return)
         }
 
         return $return
