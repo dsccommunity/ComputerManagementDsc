@@ -366,23 +366,11 @@ class PSResource : ResourceBase
         {
             $returnValue.Ensure = [Ensure]::Present
 
-            if ($currentState.ContainsKey('MinimumVersion'))
-            {
-                $versioning = 'MinimumVersion'
+            $versioning = $this.GetVersionRequirement($currentState)
 
-                $returnValue.MinimumVersion = $this.GetMinimumInstalledVersion($resources)
-            }
-            elseif ($currentState.ContainsKey('RequiredVersion'))
+            if (-not [System.String]::IsNullOrEmpty($versioning))
             {
-                $versioning = 'RequiredVersion'
-
-                $returnValue.RequiredVersion = $this.GetRequiredInstalledVersion($resources)
-            }
-            elseif ($currentState.ContainsKey('MaximumVersion'))
-            {
-                $versioning = 'MaximumVersion'
-
-                $returnValue.MaximumVersion = $this.GetMaximumInstalledVersion($resources)
+                $returnValue.$versioning = $this.TestVersionRequirement($versioning, $resources)
             }
         }
 
@@ -812,6 +800,56 @@ class PSResource : ResourceBase
             $return = $this.RequiredVersion
 
             Write-Verbose -Message ($this.localizedData.RequiredVersionMet -f $this.Name, $return)
+        }
+
+        return $return
+    }
+
+    <#
+        Return the resource's version requirement
+    #>
+    hidden [System.String] GetVersionRequirement ([System.Collections.Hashtable]$properties)
+    {
+        $return = $null
+
+        $versionProperties = @('Latest', 'MinimumVersion', 'MaximumVersion', 'RequiredVersion')
+
+        $versionKeys = $properties.Key | Where-Object {$key -in $versionProperties}
+
+        foreach ($key in $versionKeys)
+        {
+            if ($null -ne $properties.$key)
+            {
+                $return = $key
+            }
+        }
+
+        return $return
+    }
+
+    hidden [System.String] TestVersionRequirement ([System.String]$versionRequirement, [System.Management.Automation.PSModuleInfo[]] $resources)
+    {
+        $return = $null
+
+        switch ($versionRequirement)
+        {
+            'MinimumVersion'
+            {
+                $return = $this.GetMinimumInstalledVersion($resources)
+            }
+            'MaximumVersion'
+            {
+                $return = $this.GetMaximumInstalledVersion($resources)
+            }
+            'RequiredVersion'
+            {
+                $return = $this.GetRequiredInstalledVersion($resources)
+            }
+            default
+            {
+                $errorMessage = ($this.localizedData.TestVersionRequirementError -f $versionRequirement)
+                New-InvalidArgumentException -Message $errorMessage -Argument 'versionRequirement'
+            }
         }
 
         return $return
