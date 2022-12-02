@@ -643,9 +643,10 @@ class PSResource : ResourceBase
 
                 break
             }
+
         }
 
-        if (-not [System.String]::IsNullOrEmpty($return))
+        if ([System.String]::IsNullOrEmpty($return))
         {
             $return = $($resources | Sort-Object Version)[0].Version
 
