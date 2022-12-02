@@ -37,6 +37,9 @@ ConvertFrom-StringData -StringData @'
     InstallResource                              = Installing resource '{0}'.
     GetInstalledResource                         = Getting all installed versions of resource '{0}'.
     # Modify() strings
+    ResourceShouldBeAbsentRequiredVersion        = Resource '{0}' version '{1}' should be Absent but is Present.
+    ResourceShouldBeAbsent                       = Resource '{0}' should be Absent but is Present.
+    ResourceShouldBePresent                      = Resource '{0}' should be Present but is Absent.
 
 '@
 

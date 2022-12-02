@@ -180,8 +180,6 @@ class PSResource : ResourceBase
     #>
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        $installedResource = @()
-
         if ($this.Ensure -eq 'Present')
         {
             $this.TestRepository()
@@ -193,9 +191,15 @@ class PSResource : ResourceBase
 
             if ($properties.ContainsKey('RequiredVersion') -and $this.RequiredVersion)
             {
+                Write-Verbose -Message ($this.localizedData.ResourceShouldBeAbsentRequiredVersion -f $this.Name, $this.RequiredVersion)
+
                 $resourceToUninstall = $installedResource | Where-Object {$_.Version -eq [Version]$this.RequiredVersion}
                 $this.UninstallModule($resourceToUninstall)
+                return
             }
+
+            Write-Verbose -Message ($this.localizedData.ResourceShouldBeAbsent -f $this.Name)
+
             foreach ($resource in installedResource)
             {
                 $this.UninstallResource($resource)
@@ -204,7 +208,7 @@ class PSResource : ResourceBase
         elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
         {
             #* Module does not exist at all
-
+            Write-Verbose -Message ($this.localizedData.ResourceShouldBePresent -f $this.Name)
             $this.InstallResource()
         }
         elseif ($properties.ContainsKey('SingleInstance'))
@@ -219,10 +223,12 @@ class PSResource : ResourceBase
 
             if ($resourceToKeep.Version -in $installedResource.Version)
             {
+                Write-Verbose -Message ($this.localizedData.SingleInstanceVersionPresent -f $this.Name, $resourceToKeep.version)
                 $resourcesToUninstall = $installedResource | Where-Object {$_.Version -ne $resourceToKeep.Version}
             }
             else
             {
+                Write-Verbose -Message ($this.localizedData.SingleInstanceVersionAbsent -f $this.Name, $resourceToKeep.version)
                 $resourcesToUninstall = $installedResource
                 $this.InstallResource()
             }
