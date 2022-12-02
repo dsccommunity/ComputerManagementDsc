@@ -180,17 +180,10 @@ class PSResource : ResourceBase
     #>
     hidden [void] Modify([System.Collections.Hashtable] $properties)
     {
-        $installedResource = @()
-
-        if ($this.Ensure -eq 'Present')
-        {
-            $this.TestRepository()
-        }
+        $installedResource = $this.GetInstalledResource()
 
         if ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Absent' -and $this.Ensure -eq 'Absent')
         {
-            $installedResource = $this.GetInstalledResource()
-
             if ($properties.ContainsKey('RequiredVersion') -and $this.RequiredVersion)
             {
                 $resourceToUninstall = $installedResource | Where-Object {$_.Version -eq [Version]$this.RequiredVersion}
@@ -209,120 +202,24 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('SingleInstance'))
         {
-            $installedResource = $this.GetInstalledResource()
-
-            Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $installedResource.Count)
-
-            #* Too many versions
-
-            $resourceToKeep = $this.FindResource()
-
-            if ($resourceToKeep.Version -in $installedResource.Version)
-            {
-                $resourcesToUninstall = $installedResource | Where-Object {$_.Version -ne $resourceToKeep.Version}
-            }
-            else
-            {
-                $resourcesToUninstall = $installedResource
-                $this.InstallResource()
-            }
-
-            foreach ($resource in $resourcesToUninstall)
-            {
-                $this.UninstallResource($resource)
-            }
+            $this.ResolveSingleInstance($installedResource)
 
             return
         }
         elseif ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
         {
-            $installedResource = $this.GetInstalledResource()
+            $versionRequirement = $this.GetVersionRequirement($properties)
+            $this.RemoveNonCompliantVersions($installedResource, $versionRequirement)
 
-            if ($this.MinimumVersion)
+            if ($properties.ContainsKey('MinimumVersion') -or
+                $properties.ContainsKey('MaximumVersion') -or
+                $properties.ContainsKey('RequiredVersion') -or
+                $properties.ContainsKey('Latest')
+                )
             {
-                foreach ($resource in $installedResource)
-                {
-                    if ($resource.Version -lt [Version]$this.MinimumVersion)
-                    {
-                        $this.UninstallResource($resource)
-                    }
-                }
-
-                if ($properties.ContainsKey('MinimumVersion'))
-                {
-                    $this.InstallResource()
-                    return
-                }
-
+                $this.InstallResource()
+                return
             }
-
-            if ($this.MaximumVersion)
-            {
-                foreach ($resource in $installedResource)
-                {
-                    if ($resource.Version -gt [Version]$this.MaximumVersion)
-                    {
-                        $this.UninstallResource($resource)
-                    }
-                }
-
-                if ($properties.ContainsKey('MaximumVersion'))
-                {
-                    $this.InstallResource()
-
-                    return
-                }
-
-            }
-
-            if ($this.RequiredVersion)
-            {
-                foreach ($resource in $installedResource)
-                {
-                    if ($resource.Version -ne [Version]$this.RequiredVersion)
-                    {
-                        $this.UninstallResource($resource)
-                    }
-                }
-
-                if ($properties.ContainsKey('RequiredVersion'))
-                {
-                    $this.InstallResource()
-
-                    return
-                }
-            }
-
-            if ($this.Latest)
-            {
-                if ($properties.ContainsKey('Latest'))
-                {
-                    foreach ($resource in $installedResource)
-                    {
-                        $this.UninstallResource($resource)
-                    }
-
-                    $this.InstallResource()
-
-                    return
-                }
-                else
-                {
-                    $latestVersion = $this.GetLatestVersion()
-                    #* get latest version and remove all others
-                    foreach ($resource in $installedResource)
-                    {
-                        if ($resource.Version -ne $latestVersion)
-                        {
-                            $this.UninstallResource($resource)
-                        }
-                    }
-
-                    return
-                }
-
-            }
-            return
         }
         else
         {
@@ -648,6 +545,8 @@ class PSResource : ResourceBase
 
     hidden [void] InstallResource()
     {
+        $this.TestRepository()
+
         $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure','RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         Install-Module @params
     }
@@ -827,6 +726,9 @@ class PSResource : ResourceBase
         return $return
     }
 
+    <#
+        Returns the version that matches the given requirement from the installed resources.
+    #>
     hidden [System.String] TestVersionRequirement ([System.String]$versionRequirement, [System.Management.Automation.PSModuleInfo[]] $resources)
     {
         $return = $null
@@ -853,5 +755,70 @@ class PSResource : ResourceBase
         }
 
         return $return
+    }
+
+    <#
+        Uninstall resources that do not match the given version requirement
+    #>
+    hidden [void] RemoveNonCompliantVersions ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String]$versionRequirement)
+    {
+        $resourcesToUninstall = $null
+
+        switch ($versionRequirement)
+        {
+            'MinimumVersion'
+            {
+                $resourcesToUninstall = $resources | Where-Object {$_.Version -lt [Version]$this.MinimumVersion}
+            }
+            'MaximumVersion'
+            {
+                $resourcesToUninstall = $resources | Where-Object {$_.Version -gt [Version]$this.MaximumVersion}
+            }
+            'RequiredVersion'
+            {
+                $resourcesToUninstall = $resources | Where-Object {$_.Version -ne $this.RequiredVersion}
+            }
+            'Latest'
+            {
+                $latestVersion = $this.GetLatestVersion()
+                #* get latest version and remove all others
+
+                $resourcesToUninstall = $resources | Where-Object {$_.Version -ne $latestVersion}
+            }
+        }
+
+        Write-Verbose -Message ($this.localizedData.NonCompliantVersionCount -f $resourcesToUninstall.Count, $this.Name)
+
+        foreach ($resource in $resourcesToUninstall)
+        {
+            $this.UninstallResource($resource)
+        }
+    }
+
+    <#
+        Resolve single instance status. Find the required version, uninstall all others. Install required version is necessary.
+    #>
+    hidden [void] ResolveSingleInstance ([System.Management.Automation.PSModuleInfo[]] $resources)
+    {
+        Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
+
+        #* Too many versions
+
+        $resourceToKeep = $this.FindResource()
+
+        if ($resourceToKeep.Version -in $resources.Version)
+        {
+            $resourcesToUninstall = $resources | Where-Object {$_.Version -ne $resourceToKeep.Version}
+        }
+        else
+        {
+            $resourcesToUninstall = $resources
+            $this.InstallResource()
+        }
+
+        foreach ($resource in $resourcesToUninstall)
+        {
+            $this.UninstallResource($resource)
+        }
     }
 }

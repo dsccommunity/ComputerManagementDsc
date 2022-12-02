@@ -36,6 +36,7 @@ ConvertFrom-StringData -StringData @'
     InstallResource                              = Installing resource '{0}'.
     GetInstalledResource                         = Getting all installed versions of resource '{0}'.
     TestVersionRequirementError                  = TestVersionRequirement should only be used with 'MinimumVersion', 'MaximumVersion, and 'RequiredVersion', not '{0}'.
+    NonCompliantVersionCount                     = Found '{0}' instances of resource '{1}' with non-compliant versions.
     # Modify() strings
     ResourceShouldBeAbsentRequiredVersion        = Resource '{0}' version '{1}' should be Absent but is Present.
     ResourceShouldBeAbsent                       = Resource '{0}' should be Absent but is Present.
