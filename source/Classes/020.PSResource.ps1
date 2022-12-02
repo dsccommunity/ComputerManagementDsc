@@ -713,7 +713,7 @@ class PSResource : ResourceBase
 
         $versionProperties = @('Latest', 'MinimumVersion', 'MaximumVersion', 'RequiredVersion')
 
-        $versionKeys = $properties.Key | Where-Object {$key -in $versionProperties}
+        $versionKeys = $properties.Keys | Where-Object {$_ -in $versionProperties}
 
         foreach ($key in $versionKeys)
         {
