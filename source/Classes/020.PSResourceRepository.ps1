@@ -101,7 +101,7 @@ class PSResourceRepository : ResourceBase
     $ProxyCredential
 
     [DscProperty()]
-    [InstallationPolicy]
+    [Nullable[InstallationPolicy]]
     $InstallationPolicy
 
     [DscProperty()]
