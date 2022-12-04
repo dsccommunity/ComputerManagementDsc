@@ -102,7 +102,7 @@ class PSResourceRepository : ResourceBase
 
     [DscProperty()]
     [ValidateSet('Untrusted', 'Trusted')]
-    [Nullable[System.String]]
+    [System.String]
     $InstallationPolicy
 
     [DscProperty()]
@@ -230,7 +230,7 @@ class PSResourceRepository : ResourceBase
             $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
             $returnValue.Proxy                     = $repository.Proxy
             $returnValue.ProxyCredential           = $repository.ProxyCredental
-            $returnValue.InstallationPolicy        = [InstallationPolicy]::$($repository.InstallationPolicy)
+            $returnValue.InstallationPolicy        = $repository.InstallationPolicy
             $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
         }
         else
@@ -263,7 +263,7 @@ class PSResourceRepository : ResourceBase
 
                 if ($_ -eq 'InstallationPolicy')
                 {
-                    $returnValue.$_ = [InstallationPolicy]::$($repository.$_)
+                    $returnValue.$_ = $repository.$_
                 }
                 else
                 {
@@ -324,7 +324,7 @@ class PSResourceRepository : ResourceBase
             }
         }
 
-        if ($this.ProxyCredental -and (-not $this.Proxy))
+        if ($this.ProxyCredential -and (-not $this.Proxy))
         {
             $errorMessage = $this.localizedData.ProxyCredentialPassedWithoutProxyUri
 
