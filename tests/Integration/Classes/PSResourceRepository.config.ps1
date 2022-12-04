@@ -61,16 +61,6 @@ configuration PSResourceRepository_Create_Default_Config
 {
     Import-DscResource -ModuleName 'ComputerManagementDsc'
 
-    # Only run for pull requests
-    if (-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { Write-Host -ForegroundColor 'Yellow' -Object 'Not a pull request, skipping.'; return }
-
-    <#
-        These two lines can also be added in one or more places somewhere in the integration tests to pause the test run. Continue
-        running the tests by deleting the file on the desktop that was created by "enable-rdp.ps1" when $blockRdp is $true.
-    #>
-    $blockRdp = $true
-    iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
     node $AllNodes.NodeName
     {
         PSResourceRepository 'Integration_Test'
@@ -81,24 +71,6 @@ configuration PSResourceRepository_Create_Default_Config
         }
     }
 }
-
-#!Delete this
-configuration PSResourceRepository_Create_Default_Config_ShouldThrow
-{
-    Import-DscResource -ModuleName 'ComputerManagementDsc'
-
-    node $AllNodes.NodeName
-    {
-        PSResourceRepository 'Integration_Test'
-        {
-            Name    = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config_ShouldThrow.Name
-            Ensure  = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config_ShouldThrow.Ensure
-            Default = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config_ShouldThrow.Default
-            SourceLocation = $ConfigurationData.NonNodeData.PSResourceRepository_Create_Default_Config_ShouldThrow.SourceLocation
-        }
-    }
-}
-#!Delete this
 
 <#
     .SYNOPSIS
