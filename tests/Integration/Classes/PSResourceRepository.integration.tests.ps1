@@ -102,7 +102,6 @@ try
         Context ('When using configuration {0}' -f $configurationName) {
 
             if (-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { Write-Host -ForegroundColor 'Yellow' -Object 'Not a pull request, skipping.'; return }
-
             <#
                 These two lines can also be added in one or more places somewhere in the integration tests to pause the test run. Continue
                 running the tests by deleting the file on the desktop that was created by "enable-rdp.ps1" when $blockRdp is $true.
