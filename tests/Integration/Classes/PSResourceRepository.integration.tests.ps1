@@ -218,7 +218,7 @@ try
                 $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                 $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                 $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
-                $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
+                $resourceCurrentState.InstallationPolicy        | Should -BeNullOrEmpty
 
             }
 
