@@ -72,15 +72,20 @@ configuration PSResourceRepository_Create_Default_Config
 
                 try
                 {
+                    Write-Verbose "PowerShell version $($psversiontable.PSVersion)" -Verbose
+                    Write-Verbose "PowerShellGet version $((Get-Module PowerShellGet).Version)" -Verbose
+                    Write-Verbose "PackageManagement version $((Get-Module PackageManagement).Version)" -Verbose
+
+                    Write-Verbose "Register the PSGallery with Script resource!" -Verbose
+
                     Register-PSRepository -Default -Verbose -Debug -ErrorAction Stop
                 }
                 catch
                 {
-
-                    Write-Verbose "powershell version $($psversiontable.PSVersion)"
-                    Write-Verbose "PowerShellGet version $((Get-Module PowerShellGet).Version)"
-                    Write-Verbose "PackageManagement version $((Get-Module PackageManagement).Version)"
+                    throw 'Script resource "doesdefaultfailhere" failed.'
                 }
+
+                Write-Verbose "PSGallery was registered with Script resource!" -Verbose
 
                 $repos = Get-PSRepository -Verbose
 
