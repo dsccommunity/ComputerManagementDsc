@@ -209,7 +209,7 @@ class PSResource : ResourceBase
         elseif ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
         {
             $versionRequirement = $this.GetVersionRequirement($properties)
-            $this.RemoveNonCompliantVersions($installedResource, $versionRequirement)
+            $this.UninstallNonCompliantVersions($installedResource, $versionRequirement)
 
             if ($properties.ContainsKey('MinimumVersion') -or
                 $properties.ContainsKey('MaximumVersion') -or
@@ -395,53 +395,55 @@ class PSResource : ResourceBase
     #>
     hidden [System.Boolean] TestSingleInstance([System.Management.Automation.PSModuleInfo[]]$resources, [System.Collections.Hashtable]$properties)
     {
-        $isSingleInstance = $false #! Is this the correct default if somehow the if/else isn't triggered?
+        $return = $false #! Is this the correct default if somehow the if/else isn't triggered?
 
         if ($resources.Count -ne 1)
         {
             Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
 
-            $isSingleInstance = $false
+            $return = $false
         }
         else
         {
-            if ($properties.ContainsKey('MinimumVersion'))
-            {
-                if ($resources.Version -ne [version]$this.MinimumVersion)
-                {
-                    $isSingleInstance = $false
-                }
-            }
-            elseif ($properties.ContainsKey('MaximumVersion'))
-            {
-                if ($resources.Version -ne [version]$this.MaximumVersion)
-                {
-                    $isSingleInstance = $false
-                }
-            }
-            elseif ($properties.ContainsKey('RequiredVersion'))
-            {
-                if ($resources.Version -ne [version]$this.RequiredVersion)
-                {
-                    $isSingleInstance = $false
-                }
-            }
-            elseif ($properties.ContainsKey('Latest'))
-            {
-                $latestVersion = $this.GetLatestVersion()
-                if ($resources.Version -ne [version]$latestVersion)
-                {
-                    $isSingleInstance = $false
-                }
-            }
-            else
-            {
-                Write-Verbose -Message ($this.localizedData.IsSingleInstance -f $this.Name)
-                $isSingleInstance = $true
-            }
+            #* SingleInstance should not rely on VersionRequirements to report correctly
+            $return = $true
+            # if ($properties.ContainsKey('MinimumVersion'))
+            # {
+            #     if ($resources.Version -ne [version]$this.MinimumVersion)
+            #     {
+            #         $isSingleInstance = $false
+            #     }
+            # }
+            # elseif ($properties.ContainsKey('MaximumVersion'))
+            # {
+            #     if ($resources.Version -ne [version]$this.MaximumVersion)
+            #     {
+            #         $isSingleInstance = $false
+            #     }
+            # }
+            # elseif ($properties.ContainsKey('RequiredVersion'))
+            # {
+            #     if ($resources.Version -ne [version]$this.RequiredVersion)
+            #     {
+            #         $isSingleInstance = $false
+            #     }
+            # }
+            # elseif ($properties.ContainsKey('Latest'))
+            # {
+            #     $latestVersion = $this.GetLatestVersion()
+            #     if ($resources.Version -ne [version]$latestVersion)
+            #     {
+            #         $isSingleInstance = $false
+            #     }
+            # }
+            # else
+            # {
+            #     Write-Verbose -Message ($this.localizedData.IsSingleInstance -f $this.Name)
+            #     $isSingleInstance = $true
+            # }
         }
 
-        return $isSingleInstance
+        return $return
     }
 
     <#
@@ -761,7 +763,7 @@ class PSResource : ResourceBase
     <#
         Uninstall resources that do not match the given version requirement
     #>
-    hidden [void] RemoveNonCompliantVersions ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String]$versionRequirement)
+    hidden [void] UninstallNonCompliantVersions ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String]$versionRequirement)
     {
         $resourcesToUninstall = $null
 
