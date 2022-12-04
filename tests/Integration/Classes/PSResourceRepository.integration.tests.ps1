@@ -73,7 +73,7 @@ try
                 $resourceCurrentState.Name | Should -Be $shouldBeData.Name
 
                 # Defaulted properties
-                $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
+                $resourceCurrentState.InstallationPolicy        | Should -BeNullOrEmpty
                 $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
                 $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
                 $resourceCurrentState.Credential                | Should -BeNullOrEmpty
@@ -144,7 +144,7 @@ try
                 $resourceCurrentState.Credential      | Should -BeNullOrEmpty
                 $resourceCurrentState.Proxy           | Should -BeNullOrEmpty
                 $resourceCurrentState.ProxyCredential | Should -BeNullOrEmpty
-                $resourceCurrentState.Default         | Should -BeNullOrEmpty
+                $resourceCurrentState.Default         | Should -BeTrue
 
                 # Defaulted properties
                 $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
@@ -218,7 +218,7 @@ try
                 $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                 $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                 $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
-                $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
+                $resourceCurrentState.InstallationPolicy        | Should -BeNullOrEmpty
 
             }
 
@@ -335,7 +335,7 @@ try
                 $resourceCurrentState.Name | Should -Be $shouldBeData.Name
 
                 # Defaulted properties
-                $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
+                $resourceCurrentState.InstallationPolicy        | Should -BeNullOrEmpty
                 $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
                 $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
                 $resourceCurrentState.Credential                | Should -BeNullOrEmpty
