@@ -107,7 +107,7 @@ try
         #     running the tests by deleting the file on the desktop that was created by "enable-rdp.ps1" when $blockRdp is $true.
         # #>
         $blockRdp = $true
-        # iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+        iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
         Context ('When using configuration {0}' -f $configurationName) {
 
