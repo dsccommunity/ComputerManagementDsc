@@ -108,8 +108,11 @@ try
         #$blockRdp = $true
         #iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
-        Remove-Module PowerShellGet
-        Import-Module PowerShellGet -RequiredVersion 1.0.0.1
+        If ((Get-Module -Name PowerShellGet).Version -eq '2.2.5')
+        {
+            Remove-Module PowerShellGet
+        }
+        Import-Module PowerShellGet -RequiredVersion 1.0.0.1 -Force
         Context ('When using configuration {0}' -f $configurationName) {
 
             It 'Should compile and apply the MOF without throwing' {
