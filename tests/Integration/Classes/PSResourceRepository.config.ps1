@@ -61,6 +61,12 @@ configuration PSResourceRepository_Create_Default_Config
 {
     Import-DscResource -ModuleName 'ComputerManagementDsc'
 
+    If ((Get-Module -Name PowerShellGet).Version -eq '2.2.5')
+    {
+        Remove-Module PowerShellGet
+    }
+    Import-Module PowerShellGet -RequiredVersion 1.0.0.1 -Force
+
     node $AllNodes.NodeName
     {
         PSResourceRepository 'Integration_Test'
