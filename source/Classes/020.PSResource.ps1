@@ -245,7 +245,7 @@ class PSResource : ResourceBase
 
         if ($currentState.ContainsKey('SingleInstance') -and $this.SingleInstance)
         {
-            $returnValue.SingleInstance = $this.TestSingleInstance($resources, $currentState)
+            $returnValue.SingleInstance = $this.TestSingleInstance($resources)
         }
 
         if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
@@ -393,7 +393,7 @@ class PSResource : ResourceBase
     <#
         Returns true if only the correct instance of the resource is installed on the system
     #>
-    hidden [System.Boolean] TestSingleInstance([System.Management.Automation.PSModuleInfo[]]$resources, [System.Collections.Hashtable]$properties)
+    hidden [System.Boolean] TestSingleInstance([System.Management.Automation.PSModuleInfo[]]$resources)
     {
         $return = $false #! Is this the correct default if somehow the if/else isn't triggered?
 

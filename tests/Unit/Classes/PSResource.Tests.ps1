@@ -211,7 +211,7 @@ try
         }
 
         Context 'When there is one resource on the repository' {
-            BeforeAll {
+            BeforeEach {
                 Mock -CommandName Find-Module -MockWith {
                     return @{
                         Version = '8.6.0'
@@ -230,7 +230,7 @@ try
         }
 
         Context 'When there are multiple resources on the repository' {
-            BeforeAll {
+            BeforeEach {
                 Mock -CommandName Find-Module -MockWith {
                     return @(
                         @{
@@ -291,20 +291,80 @@ try
         }
     }
 
-    Describe 'PSResource\SetSingleInstance()' -Tag 'SetSingleInstance' {
+    Describe 'PSResource\SetSingleInstance()' -Tag 'TestSingleInstance' {
         InModuleScope -ScriptBlock {
             $script:mockPSResourceInstance = [PSResource] @{
                 Name           = 'ComputerManagementDsc'
-                Repository     = 'PSGallery'
                 Ensure         = 'Present'
-                SingleInstance = $False
+                SingleInstance = $True
             }
         }
 
-        It 'Should not throw and set SingleInstance to True' {
+        It 'Should not throw and return True when one resource is present' {
             InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance.SetSingleInstance($True)
-                $script:mockPSResourceInstance.SingleInstance | Should -BeTrue
+                $script:mockPSResourceInstance.TestSingleInstance(
+                    @(
+                        @{
+                            Name    = 'ComputerManagementDsc'
+                            Version = '8.6.0'
+                        }
+                    )
+                ) | Should -BeTrue
+            }
+        }
+
+        It 'Should not throw and return False when zero resources are present' {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance.TestSingleInstance(
+                    @()
+                ) | Should -BeFalse
+            }
+        }
+
+        It 'Should not throw and return False when more than one resource is present' {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance.TestSingleInstance(
+                    @(
+                        @{
+                            Name    = 'ComputerManagementDsc'
+                            Version = '8.6.0'
+                        },
+                        @{
+                            Name    = 'ComputerManagementDsc'
+                            Version = '8.5.0'
+                        }
+                    )
+                ) | Should -BeFalse
+            }
+        }
+    }
+
+    Describe 'PSResource\GetLatestVersion()' -Tag 'GetLatestVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name           = 'ComputerManagementDsc'
+                    Ensure         = 'Present'
+                }
+            }
+        }
+
+        Context 'When only one resource is installed' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                        @{
+                            Name    = 'ComputerManagementDsc'
+                            Version = '8.6.0'
+                        }
+                    }
+                }
+            }
+            It 'Should return the latest version installed on the system' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
+                }
             }
         }
     }
