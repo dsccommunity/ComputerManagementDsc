@@ -105,9 +105,11 @@ try
         #     These two lines can also be added in one or more places somewhere in the integration tests to pause the test run. Continue
         #     running the tests by deleting the file on the desktop that was created by "enable-rdp.ps1" when $blockRdp is $true.
         # #>
-        $blockRdp = $true
-        iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+        #$blockRdp = $true
+        #iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
+        Remove-Module PowerShellGet
+        Import-Module PowerShellGet -RequiredVersion 1.0.0.1
         Context ('When using configuration {0}' -f $configurationName) {
 
             It 'Should compile and apply the MOF without throwing' {
