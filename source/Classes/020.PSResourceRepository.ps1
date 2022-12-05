@@ -208,39 +208,6 @@ class PSResourceRepository : ResourceBase
         }
     }
 
-    hidden [System.Collections.Hashtable] GetCurrentState1 ([System.Collections.Hashtable] $properties)
-    {
-        $returnValue = @{
-            Ensure         = [Ensure]::Absent
-            Name           = $this.Name
-            SourceLocation = $this.SourceLocation
-            Default        = $this.Default
-        }
-
-        Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
-
-        $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
-
-        if ($repository)
-        {
-            $returnValue.Ensure                    = [Ensure]::Present
-            $returnValue.SourceLocation            = $repository.SourceLocation
-            $returnValue.ScriptSourceLocation      = $repository.ScriptSourceLocation
-            $returnValue.PublishLocation           = $repository.PublishLocation
-            $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
-            $returnValue.Proxy                     = $repository.Proxy
-            $returnValue.ProxyCredential           = $repository.ProxyCredental
-            $returnValue.InstallationPolicy        = $repository.InstallationPolicy
-            $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
-        }
-        else
-        {
-            Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
-        }
-
-        return $returnValue
-    }
-
     hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
     {
         $returnValue = @{

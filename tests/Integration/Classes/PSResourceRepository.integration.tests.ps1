@@ -31,146 +31,137 @@ try
             $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test"
         }
 
-        $configurationName = "$($script:dscResourceName)_Remove_PSGallery"
+        # $configurationName = "$($script:dscResourceName)_Remove_PSGallery"
 
-        Context ('When using configuration {0}' -f $configurationName) {
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    $configurationParameters = @{
-                        OutputPath        = $TestDrive
-                        ConfigurationData = $ConfigurationData
-                    }
+        # Context ('When using configuration {0}' -f $configurationName) {
+        #     It 'Should compile and apply the MOF without throwing' {
+        #         {
+        #             $configurationParameters = @{
+        #                 OutputPath        = $TestDrive
+        #                 ConfigurationData = $ConfigurationData
+        #             }
 
-                    & $configurationName @configurationParameters
+        #             & $configurationName @configurationParameters
 
-                    $startDscConfigurationParameters = @{
-                        Path         = $TestDrive
-                        ComputerName = 'localhost'
-                        Wait         = $true
-                        Verbose      = $true
-                        Force        = $true
-                        ErrorAction  = 'Stop'
-                    }
+        #             $startDscConfigurationParameters = @{
+        #                 Path         = $TestDrive
+        #                 ComputerName = 'localhost'
+        #                 Wait         = $true
+        #                 Verbose      = $true
+        #                 Force        = $true
+        #                 ErrorAction  = 'Stop'
+        #             }
 
-                    Start-DscConfiguration @startDscConfigurationParameters
-                } | Should -Not -Throw
-            }
+        #             Start-DscConfiguration @startDscConfigurationParameters
+        #         } | Should -Not -Throw
+        #     }
 
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                {
-                    $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
-                } | Should -Not -Throw
-            }
+        #     It 'Should be able to call Get-DscConfiguration without throwing' {
+        #         {
+        #             $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+        #         } | Should -Not -Throw
+        #     }
 
-            It 'Should have set the resource and all the parameters should match' {
-                $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq $configurationName -and $_.ResourceId -eq $resourceId
-                }
+        #     It 'Should have set the resource and all the parameters should match' {
+        #         $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
+        #             $_.ConfigurationName -eq $configurationName -and $_.ResourceId -eq $resourceId
+        #         }
 
-                $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
+        #         $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
 
-                # Key properties
-                $resourceCurrentState.Name | Should -Be $shouldBeData.Name
+        #         # Key properties
+        #         $resourceCurrentState.Name | Should -Be $shouldBeData.Name
 
-                # Defaulted properties
-                $resourceCurrentState.InstallationPolicy        | Should -BeNullOrEmpty
-                $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
-                $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
-                $resourceCurrentState.Credential                | Should -BeNullOrEmpty
-                $resourceCurrentState.Default                   | Should -BeNullOrEmpty
-                $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
-                $resourceCurrentState.Proxy                     | Should -BeNullOrEmpty
-                $resourceCurrentState.ProxyCredential           | Should -BeNullOrEmpty
-                $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
-                $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
-                $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
+        #         # Defaulted properties
+        #         $resourceCurrentState.InstallationPolicy        | Should -BeNullOrEmpty
+        #         $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
+        #         $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
+        #         $resourceCurrentState.Credential                | Should -BeNullOrEmpty
+        #         $resourceCurrentState.Default                   | Should -BeNullOrEmpty
+        #         $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
+        #         $resourceCurrentState.Proxy                     | Should -BeNullOrEmpty
+        #         $resourceCurrentState.ProxyCredential           | Should -BeNullOrEmpty
+        #         $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
+        #         $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+        #         $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
+        #         $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
 
-                # Ensure will be Absent
-                $resourceCurrentState.Ensure | Should -Be 'Absent'
-            }
+        #         # Ensure will be Absent
+        #         $resourceCurrentState.Ensure | Should -Be 'Absent'
+        #     }
 
-            It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
-            }
-        }
+        #     It 'Should return $true when Test-DscConfiguration is run' {
+        #         Test-DscConfiguration -Verbose | Should -Be 'True'
+        #     }
+        # }
 
-        Wait-ForIdleLcm -Clear
+        # Wait-ForIdleLcm -Clear
 
-        $configurationName = "$($script:dscResourceName)_Create_Default_Config"
+        # $configurationName = "$($script:dscResourceName)_Create_Default_Config"
 
-        # Only run for pull requests
-        # if (-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { Write-Host -ForegroundColor 'Yellow' -Object 'Not a pull request, skipping.'; return }
-        # <#
-        #     These two lines can also be added in one or more places somewhere in the integration tests to pause the test run. Continue
-        #     running the tests by deleting the file on the desktop that was created by "enable-rdp.ps1" when $blockRdp is $true.
-        # #>
-        #$blockRdp = $true
-        #iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+        # Context ('When using configuration {0}' -f $configurationName) {
 
-        Context ('When using configuration {0}' -f $configurationName) {
+        #     It 'Should compile and apply the MOF without throwing' {
+        #         {
+        #             $configurationParameters = @{
+        #                 OutputPath        = $TestDrive
+        #                 ConfigurationData = $ConfigurationData
+        #             }
 
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    $configurationParameters = @{
-                        OutputPath        = $TestDrive
-                        ConfigurationData = $ConfigurationData
-                    }
+        #             & $configurationName @configurationParameters
 
-                    & $configurationName @configurationParameters
+        #             $startDscConfigurationParameters = @{
+        #                 Path         = $TestDrive
+        #                 ComputerName = 'localhost'
+        #                 Wait         = $true
+        #                 Verbose      = $true
+        #                 Force        = $true
+        #                 ErrorAction  = 'Stop'
+        #             }
 
-                    $startDscConfigurationParameters = @{
-                        Path         = $TestDrive
-                        ComputerName = 'localhost'
-                        Wait         = $true
-                        Verbose      = $true
-                        Force        = $true
-                        ErrorAction  = 'Stop'
-                    }
+        #             Start-DscConfiguration @startDscConfigurationParameters
+        #         } | Should -Not -Throw
+        #     }
 
-                    Start-DscConfiguration @startDscConfigurationParameters
-                } | Should -Not -Throw
-            }
+        #     It 'Should be able to call Get-DscConfiguration without throwing' {
+        #         {
+        #             $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
+        #         } | Should -Not -Throw
+        #     }
 
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                {
-                    $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop
-                } | Should -Not -Throw
-            }
+        #     It 'Should have set the resource and all the parameters should match' {
+        #         $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
+        #             $_.ConfigurationName -eq $configurationName -and $_.ResourceId -eq $resourceId
+        #         }
 
-            It 'Should have set the resource and all the parameters should match' {
-                $resourceCurrentState = $script:currentConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq $configurationName -and $_.ResourceId -eq $resourceId
-                }
+        #         $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
 
-                $shouldBeData = $ConfigurationData.NonNodeData.$configurationName
+        #         # Key properties
+        #         $resourceCurrentState.Name   | Should -Be $shouldBeData.Name
+        #         $resourceCurrentState.Ensure | Should -Be $shouldBeData.Ensure
 
-                # Key properties
-                $resourceCurrentState.Name   | Should -Be $shouldBeData.Name
-                $resourceCurrentState.Ensure | Should -Be $shouldBeData.Ensure
+        #         # Optional Properties
+        #         $resourceCurrentState.Credential      | Should -BeNullOrEmpty
+        #         $resourceCurrentState.Proxy           | Should -BeNullOrEmpty
+        #         $resourceCurrentState.ProxyCredential | Should -BeNullOrEmpty
+        #         $resourceCurrentState.Default         | Should -BeTrue
 
-                # Optional Properties
-                $resourceCurrentState.Credential      | Should -BeNullOrEmpty
-                $resourceCurrentState.Proxy           | Should -BeNullOrEmpty
-                $resourceCurrentState.ProxyCredential | Should -BeNullOrEmpty
-                $resourceCurrentState.Default         | Should -BeTrue
+        #         # Defaulted properties
+        #         $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
+        #         $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+        #         $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
+        #         $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
+        #         $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
+        #         $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
 
-                # Defaulted properties
-                $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
-                $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
-                $resourceCurrentState.SourceLocation            | Should -BeNullOrEmpty
-                $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
-                $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
+        #     }
 
-            }
+        #     It 'Should return $true when Test-DscConfiguration is run' {
+        #         Test-DscConfiguration -Verbose | Should -Be 'True'
+        #     }
+        # }
 
-            It 'Should return $true when Test-DscConfiguration is run' {
-                Test-DscConfiguration -Verbose | Should -Be 'True'
-            }
-        }
-
-        Wait-ForIdleLcm -Clear
+        # Wait-ForIdleLcm -Clear
 
         $configurationName = "$($script:dscResourceName)_Create_Config"
 
