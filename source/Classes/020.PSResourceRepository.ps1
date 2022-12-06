@@ -230,6 +230,37 @@ class PSResourceRepository : ResourceBase
 
         $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
 
+        if ($repository)
+        {
+            $returnValue.Ensure                    = [Ensure]::Present
+            $returnValue.SourceLocation            = $repository.SourceLocation
+            $returnValue.ScriptSourceLocation      = $repository.ScriptSourceLocation
+            $returnValue.PublishLocation           = $repository.PublishLocation
+            $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
+            $returnValue.Proxy                     = $repository.Proxy
+            $returnValue.ProxyCredential           = $repository.ProxyCredental
+            $returnValue.InstallationPolicy        = $repository.InstallationPolicy
+            $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
+        }
+        else
+        {
+            Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
+        }
+
+        return $returnValue
+    }
+
+    hidden [System.Collections.Hashtable] GetCurrentState1 ([System.Collections.Hashtable] $properties)
+    {
+        $returnValue = @{
+            Ensure         = [Ensure]::Absent
+            Name           = $this.Name
+        }
+
+        Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
+
+        $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
+
         $excludeProperties = $this.ExcludeDscProperties + 'Ensure'
         $currentState = $this | Get-DscProperty -ExcludeName $excludeProperties -Type @('Key', 'Optional', 'Mandatory') -HasValue
 
