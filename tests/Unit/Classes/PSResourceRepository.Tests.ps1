@@ -537,7 +537,7 @@ try
                         $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
                         $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
                         $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
-                        $currentState.InstallationPolicy        | Should -Be 'Trusted'
+                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
