@@ -533,12 +533,12 @@ try
                             })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
-                        $currentState.SourceLocation            | Should -BeNullOrEmpty
-                        $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
-                        $currentState.PublishLocation           | Should -BeNullOrEmpty
-                        $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
-                        $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                        $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
+                        $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.InstallationPolicy        | Should -Be 'Trusted'
+                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
@@ -605,12 +605,12 @@ try
                             })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
-                        $currentState.SourceLocation            | Should -BeNullOrEmpty
-                        $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
-                        $currentState.PublishLocation           | Should -BeNullOrEmpty
-                        $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
-                        $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                        $currentState.ScriptSourceLocation      | Should -Be 'https://www.powershellgallery.com/api/v2/items/psscript'
+                        $currentState.PublishLocation           | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
+                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
+                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
@@ -704,12 +704,12 @@ try
                         })
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
-                        $currentState.SourceLocation            | Should -BeNullOrEmpty
-                        $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
-                        $currentState.PublishLocation           | Should -BeNullOrEmpty
-                        $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
-                        $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+                        $currentState.SourceLocation            | Should -Be 'https://www.notcorrect.com/api/v2'
+                        $currentState.ScriptSourceLocation      | Should -Be 'https://www.notcorrect.com/api/v2/items/psscript'
+                        $currentState.PublishLocation           | Should -Be 'https://www.notcorrect.com/api/v2/package/'
+                        $currentState.ScriptPublishLocation     | Should -Be 'https://www.notcorrect.com/api/v2/package/'
+                        $currentState.InstallationPolicy        | Should -Be 'Trusted'
+                        $currentState.PackageManagementProvider | Should -Be 'Package'
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
