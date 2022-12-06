@@ -517,7 +517,7 @@ try
                                 ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
                                 PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
                                 ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-                                InstallationPolicy        = 'Trusted'
+                                InstallationPolicy        = 'Untrusted'
                                 PackageManagementProvider = 'NuGet'
                             }
                         }

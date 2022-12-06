@@ -82,11 +82,11 @@ try
                 $resourceCurrentState.Default         | Should -BeNullOrEmpty
 
                 # Defaulted properties
-                $resourceCurrentState.PublishLocation           | Should -BeNullOrEmpty
-                $resourceCurrentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+                $resourceCurrentState.PublishLocation           | Should -Be 'https://www.nuget.org/api/v2/package/'
+                $resourceCurrentState.ScriptPublishLocation     | Should -Be 'https://www.nuget.org/api/v2/package/'
                 $resourceCurrentState.ScriptSourceLocation      | Should -BeNullOrEmpty
-                $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
-                $resourceCurrentState.InstallationPolicy        | Should -BeNullOrEmpty
+                $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
+                $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
 
             }
 
