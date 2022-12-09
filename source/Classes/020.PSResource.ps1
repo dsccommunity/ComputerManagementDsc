@@ -227,6 +227,7 @@ class PSResource : ResourceBase
         }
     }
 
+
     <#
         The parameter properties will contain the key properties.
     #>
