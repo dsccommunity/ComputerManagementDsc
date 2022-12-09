@@ -63,7 +63,6 @@
 [DscResource()]
 class PSResourceRepository : ResourceBase
 {
-
     [DscProperty()]
     [Ensure]
     $Ensure = [Ensure]::Present
