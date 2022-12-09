@@ -602,7 +602,7 @@ class PSResource : ResourceBase
             'RequiredVersion' {
                 foreach ($resource in $resources)
                 {
-                    if ($resource.Version -ne [Version]$this.MaximumVersion)
+                    if ($resource.Version -ne [Version]$this.RequiredVersion)
                     {
                         Write-Verbose -Message ($this.localizedData.InstalledResourceDoesNotMeetRequiredVersion -f ($this.Name, $resource.Version, $this.RequiredVersion))
 
