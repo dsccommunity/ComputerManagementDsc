@@ -197,7 +197,6 @@ class PSResource : ResourceBase
         elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
         {
             #* Module does not exist at all
-
             $this.InstallResource()
         }
         elseif ($properties.ContainsKey('SingleInstance'))
