@@ -387,6 +387,13 @@ class PSResource : ResourceBase
 
             New-InvalidArgumentException -ArgumentName 'Repository' -message $errorMessage
         }
+
+        if ($properties.ContainsKey('RemoveNonCompliantVersions') -and (-not $properties.ContainsKey('MinimumVersion') -or $Properties.ContainsKey('MaximumVersion') -or $Properties.ContainsKey('RequiredVersion') -or $Properties.ContainsKey('Latest')))
+        {
+            $errorMessage = $this.localizedData.RemoveNonCompliantVersionsWithoutVersioning
+
+            New-InvalidArgumentException -ArgumentName 'RemoveNonCompliantVersions' -message $errorMessage
+        }
     }
 
     <#
