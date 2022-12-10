@@ -219,13 +219,11 @@ class PSResourceRepository : ResourceBase
         $this.InstallResource($moduleToInstall.version)
     }
 
-    hidden [System.Collections.Hashtable] GetCurrentState1 ([System.Collections.Hashtable] $properties)
+    hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
     {
         $returnValue = @{
             Ensure         = [Ensure]::Absent
             Name           = $this.Name
-            SourceLocation = $this.SourceLocation
-            Default        = $this.Default
         }
 
         Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
@@ -252,7 +250,7 @@ class PSResourceRepository : ResourceBase
         return $returnValue
     }
 
-    hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
+    hidden [System.Collections.Hashtable] GetCurrentState1 ([System.Collections.Hashtable] $properties)
     {
         $returnValue = @{
             Ensure         = [Ensure]::Absent
