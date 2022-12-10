@@ -264,7 +264,7 @@ class PSResource : ResourceBase
 
             $versioning = $this.GetVersionRequirement($currentState)
 
-            if (-not [System.String]::IsNullOrEmpty($versioning))
+            if (-not [System.String]::IsNullOrEmpty($versioning) -and -not $currentState.COntainsKey('Latest'))
             {
                 $returnValue.$versioning = $this.TestVersionRequirement($versioning, $resources)
             }
