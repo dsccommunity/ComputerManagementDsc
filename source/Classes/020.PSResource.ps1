@@ -528,7 +528,7 @@ class PSResource : ResourceBase
 
             if ($resourceRepository.InstallationPolicy -eq  'Untrusted')
             {
-                $errorMessage = $this.localizedData.UntrustedRepositoryWithoutForc
+                $errorMessage = $this.localizedData.UntrustedRepositoryWithoutForce
 
                 New-InvalidArgumentException -Message ($errorMessage -f $resourceRepository.Name) -ArgumentName 'Force'
             }
