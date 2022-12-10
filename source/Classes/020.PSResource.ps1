@@ -560,7 +560,7 @@ class PSResource : ResourceBase
         $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'RemoveNonCompliantVersions','MinimumVersion', 'MaximumVersion', 'RequiredVersion') -Type Optional -HasValue
         $params.RequiredVersion = $resource.Version
 
-        Write-Verbose -Message ($this.localizedData.UninstallModule -f $resource.Name,$resource.Version)
+        Write-Verbose -Message ($this.localizedData.UninstallResource -f $resource.Name,$resource.Version)
 
         $resource | Uninstall-Module @params
     }
@@ -570,7 +570,7 @@ class PSResource : ResourceBase
     #>
     hidden [System.Boolean] TestVersioning ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String] $requirement)
     {
-        Write-Verbose -Message ($this.localizedData.testversioning -f $requirement)
+        Write-Verbose -Message ($this.localizedData.TestVersioning -f $requirement)
 
         $return = $true
 
@@ -592,7 +592,7 @@ class PSResource : ResourceBase
                 {
                     if ($resource.Version -gt [Version]$this.MaximumVersion)
                     {
-                        Write-Verbose -Message ($this.localizedData.InstalledResourceDoesNotMeetMinimumVersion -f ($this.Name, $resource.Version, $this.MaximumVersion))
+                        Write-Verbose -Message ($this.localizedData.InstalledResourceDoesNotMeetMaximumVersion -f ($this.Name, $resource.Version, $this.MaximumVersion))
 
                         $return = $false
                     }
