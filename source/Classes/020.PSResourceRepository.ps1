@@ -50,12 +50,12 @@
 
     .EXAMPLE
         Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResourceRepository -Method Get -Property @{
-            Name                      = 'PSGallery'
-            SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-            ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-            PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-            ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-            InstallationPolicy        = 'Untrusted'
+            Name                      = 'PSTestRepository'
+            SourceLocation            = 'https://www.nuget.org/api/v2'
+            ScriptSourceLocation      = 'https://www.nuget.org/api/v2/package/'
+            PublishLocation           = 'https://www.nuget.org/api/v2/items/psscript/'
+            ScriptPublishLocation     = 'https://www.nuget.org/api/v2/package/'
+            InstallationPolicy        = 'Trusted'
             PackageManagementProvider = 'NuGet'
         }
         This example shows how to call the resource using Invoke-DscResource.
