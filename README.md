@@ -1,4 +1,4 @@
-s# ComputerManagementDsc
+# ComputerManagementDsc
 
 [![Build Status](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_apis/build/status/dsccommunity.ComputerManagementDsc?branchName=main)](https://dev.azure.com/dsccommunity/ComputerManagementDsc/_build/latest?definitionId=18&branchName=main)
 ![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/ComputerManagementDsc/18/main)
