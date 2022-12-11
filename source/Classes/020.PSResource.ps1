@@ -144,6 +144,14 @@ class PSResource : ResourceBase
     [Nullable[System.Boolean]]
     $RemoveNonCompliantVersions
 
+    [DscProperty(NotConfigurable)]
+    [Nullable[Version]]
+    $LatestVersion
+
+    [DscProperty(NotConfigurable)]
+    [Nullable[System.String]]
+    $VersionRequirement
+
     PSResource () : base ()
     {
         # These properties will not be enforced.
@@ -401,6 +409,24 @@ class PSResource : ResourceBase
 
             New-InvalidArgumentException -ArgumentName 'RemoveNonCompliantVersions' -message $errorMessage
         }
+
+        <#
+            Is this the correct place to set NotConfigurable properties? I want to set them once rather than multiple times as required in the code
+        #>
+        if ($properties.ContainsKey('Latest'))
+        {
+            $this.LatestVersion = $this.GetLatestVersion()
+        }
+
+        if ($properties.ContainsKey('MinimumVersion') -or
+            $Properties.ContainsKey('MaximumVersion') -or
+            $Properties.ContainsKey('RequiredVersion') -or
+            $Properties.ContainsKey('Latest')
+        )
+        {
+            $this.VersionRequirement = $this.GetVersionRequirement()
+        }
+
     }
 
     <#
