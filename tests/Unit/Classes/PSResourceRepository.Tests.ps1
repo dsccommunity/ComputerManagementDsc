@@ -62,11 +62,9 @@ try
     }
 
     Describe 'PSResourceRepository\Get()' -Tag 'Get' {
-
         Context 'When the system is in the desired state' {
             Context 'When the repository is Present with default values' {
                 It 'Should return the correct result when the Repository is present and default params are passed' {
-
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                             Name                      = 'FakePSGallery'
@@ -80,18 +78,18 @@ try
                             to get the result to return from the derived method Get().
                         #>
                         $script:mockPSResourceRepositoryInstance |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
-                            return [System.Collections.Hashtable] @{
-                                Name                      = 'FakePSGallery'
-                                SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                                Ensure                    = 'Present'
-                                InstallationPolicy        = 'Untrusted'
-                                PackageManagementProvider = 'Nuget'
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                                return [System.Collections.Hashtable] @{
+                                    Name                      = 'FakePSGallery'
+                                    SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                                    Ensure                    = 'Present'
+                                    InstallationPolicy        = 'Untrusted'
+                                    PackageManagementProvider = 'Nuget'
+                                }
+                            } -PassThru |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                                return
                             }
-                        } -PassThru |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
-                            return
-                        }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
@@ -100,6 +98,10 @@ try
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+                        $currentState.Proxy                     | Should -BeNullOrEmpty
+                        $currentState.ProxyCredential           | Should -BeNullOrEmpty
+                        $currentState.Credential                | Should -BeNullOrEmpty
+                        $currentState.Default                   | Should -BeNullOrEmpty
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
                     }
@@ -119,21 +121,21 @@ try
                         }
 
                         $script:mockPSResourceRepositoryInstance |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
-                            return [System.Collections.Hashtable] @{
-                                Name                      = 'FakePSGallery'
-                                SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                                ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-                                PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-                                ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-                                InstallationPolicy        = 'Untrusted'
-                                PackageManagementProvider = 'NuGet'
-                                Ensure                    = 'Present'
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                                return [System.Collections.Hashtable] @{
+                                    Name                      = 'FakePSGallery'
+                                    SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                                    ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                                    PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                                    ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                                    InstallationPolicy        = 'Untrusted'
+                                    PackageManagementProvider = 'NuGet'
+                                    Ensure                    = 'Present'
+                                }
+                            } -PassThru |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                                return
                             }
-                        } -PassThru |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
-                            return
-                        }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
@@ -144,6 +146,10 @@ try
                         $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
+                        $currentState.Proxy                     | Should -BeNullOrEmpty
+                        $currentState.ProxyCredential           | Should -BeNullOrEmpty
+                        $currentState.Credential                | Should -BeNullOrEmpty
+                        $currentState.Default                   | Should -BeNullOrEmpty
                     }
                 }
             }
@@ -156,15 +162,15 @@ try
                             Ensure         = 'Absent'
                         }
                         $script:mockPSResourceRepositoryInstance |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
-                            return [System.Collections.Hashtable] @{
-                                Name           = 'FakePSGallery'
-                                Ensure         = 'Absent'
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                                return [System.Collections.Hashtable] @{
+                                    Name           = 'FakePSGallery'
+                                    Ensure         = 'Absent'
+                                }
+                            } -PassThru |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                                return
                             }
-                        } -PassThru |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
-                            return
-                        }
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.SourceLocation            | Should -BeNullOrEmpty
@@ -173,6 +179,10 @@ try
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
+                        $currentState.Proxy                     | Should -BeNullOrEmpty
+                        $currentState.ProxyCredential           | Should -BeNullOrEmpty
+                        $currentState.Credential                | Should -BeNullOrEmpty
+                        $currentState.Default                   | Should -BeNullOrEmpty
                     }
                 }
             }
@@ -181,29 +191,27 @@ try
         Context 'When the system is not in the desired state' {
             Context 'When the repository is present but should be absent' {
                 It 'Should return the correct result when the Repository is present but should be absent' {
-
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                             Name           = 'FakePSGallery'
-                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Absent'
                         }
                         $script:mockPSResourceRepositoryInstance |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
-                            return [System.Collections.Hashtable] @{
-                                Name                      = 'FakePSGallery'
-                                Ensure                    = 'Present'
-                                SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                                ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
-                                PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
-                                ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
-                                InstallationPolicy        = 'Untrusted'
-                                PackageManagementProvider = 'NuGet'
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                                return [System.Collections.Hashtable] @{
+                                    Name                      = 'FakePSGallery'
+                                    Ensure                    = 'Present'
+                                    SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                                    ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
+                                    PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
+                                    ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
+                                    InstallationPolicy        = 'Untrusted'
+                                    PackageManagementProvider = 'NuGet'
+                                }
+                            } -PassThru |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                                return
                             }
-                        } -PassThru |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
-                            return
-                        }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
@@ -227,18 +235,18 @@ try
                             Ensure         = 'Present'
                         }
                         $script:mockPSResourceRepositoryInstance |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
-                            return [System.Collections.Hashtable] @{
-                                Name                      = 'FakePSGallery'
-                                Ensure                    = 'Absent'
-                                SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                                InstallationPolicy        = 'Untrusted'
-                                PackageManagementProvider = 'NuGet'
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                                return [System.Collections.Hashtable] @{
+                                    Name                      = 'FakePSGallery'
+                                    Ensure                    = 'Absent'
+                                    SourceLocation            = 'https://www.powershellgallery.com/api/v2'
+                                    InstallationPolicy        = 'Untrusted'
+                                    PackageManagementProvider = 'NuGet'
+                                }
+                            } -PassThru |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                                return
                             }
-                        } -PassThru |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
-                            return
-                        }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
@@ -267,21 +275,21 @@ try
                             Ensure                    = 'Present'
                         }
                         $script:mockPSResourceRepositoryInstance |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
-                            return [System.Collections.Hashtable] @{
-                                Name                      = 'FakePSGallery'
-                                Ensure                    = 'Present'
-                                SourceLocation            = 'https://www.notcorrect.com/api/v2'
-                                ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
-                                PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
-                                ScriptPublishLocation     = 'https://www.notcorrect.com/api/v2/package/'
-                                InstallationPolicy        = 'Trusted'
-                                PackageManagementProvider = 'Package'
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                                return [System.Collections.Hashtable] @{
+                                    Name                      = 'FakePSGallery'
+                                    Ensure                    = 'Present'
+                                    SourceLocation            = 'https://www.notcorrect.com/api/v2'
+                                    ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
+                                    PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
+                                    ScriptPublishLocation     = 'https://www.notcorrect.com/api/v2/package/'
+                                    InstallationPolicy        = 'Trusted'
+                                    PackageManagementProvider = 'Package'
+                                }
+                            } -PassThru |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                                return
                             }
-                        } -PassThru |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
-                            return
-                        }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
@@ -299,25 +307,24 @@ try
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                             Name           = 'FakePSGallery'
-                            SourceLocation = 'https://www.powershellgallery.com/api/v2'
                             Ensure         = 'Absent'
                         }
                         $script:mockPSResourceRepositoryInstance |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
-                            return [System.Collections.Hashtable] @{
-                                Name                      = 'FakePSGallery'
-                                Ensure                    = 'Present'
-                                SourceLocation            = 'https://www.notcorrect.com/api/v2'
-                                ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
-                                PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
-                                ScriptPublishLocation     = 'https://www.notcorrect.com/api/v2/package/'
-                                InstallationPolicy        = 'Trusted'
-                                PackageManagementProvider = 'Package'
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
+                                return [System.Collections.Hashtable] @{
+                                    Name                      = 'FakePSGallery'
+                                    Ensure                    = 'Present'
+                                    SourceLocation            = 'https://www.notcorrect.com/api/v2'
+                                    ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
+                                    PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
+                                    ScriptPublishLocation     = 'https://www.notcorrect.com/api/v2/package/'
+                                    InstallationPolicy        = 'Trusted'
+                                    PackageManagementProvider = 'Package'
+                                }
+                            } -PassThru |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
+                                return
                             }
-                        } -PassThru |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
-                            return
-                        }
 
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
@@ -399,6 +406,7 @@ try
             It 'Should call method Modify()' {
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceRepositoryInstance.Set()
+
                     $script:mockMethodModifyCallCount | Should -Be 1
                 }
             }
@@ -479,7 +487,6 @@ try
                 }
 
                 It 'Should return the correct result when the Repository is present and all params are passed' {
-
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
                             Name                      = 'FakePSGallery'
@@ -503,6 +510,10 @@ try
                         $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
+                        $currentState.Proxy                     | Should -BeNullOrEmpty
+                        $currentState.ProxyCredential           | Should -BeNullOrEmpty
+                        $currentState.Credential                | Should -BeNullOrEmpty
+                        $currentState.Default                   | Should -BeNullOrEmpty
 
                         Assert-MockCalled Get-PSRepository -Exactly -Times 1 -Scope It
                     }
@@ -528,9 +539,11 @@ try
                             Name           = 'FakePSGallery'
                             Ensure         = 'Absent'
                         }
-                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState(@{
+                        $currentState = $script:mockPSResourceRepositoryInstance.GetCurrentState(
+                            @{
                                 Name = 'FakePSGallery'
-                            })
+                            }
+                        )
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Present'
                         $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
@@ -735,9 +748,10 @@ try
             It 'Should call the correct mock' {
                 InModuleScope -ScriptBlock {
                     {
-                        $script:mockPSResourceRepositoryInstance.Modify(@{
-                            Ensure         = 'Present'
-                            SourceLocation = 'https://www.fakepsgallery.com/api/v2'
+                        $script:mockPSResourceRepositoryInstance.Modify(
+                            @{
+                                Ensure         = 'Present'
+                                SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                             }
                         )
                     } | Should -Not -Throw
@@ -750,11 +764,12 @@ try
                 InModuleScope -ScriptBlock {
                     {
                         $script:mockPSResourceRepositoryInstance.SourceLocation = $null
-                        $script:mockPSResourceRepositoryInstance.Modify(@{
-                            Ensure         = 'Present'
+                        $script:mockPSResourceRepositoryInstance.Modify(
+                            @{
+                                Ensure         = 'Present'
                             }
                         )
-                    } | Should -Throw -ExpectedMessage 'SourceLocation is a required parameter to register a repository.'
+                    } | Should -Throw -ExpectedMessage $script:mockPSResourceRepositoryInstance.localizedData.SourceLocationRequiredForRegistration
                 }
             }
         }
@@ -777,8 +792,9 @@ try
 
                     InModuleScope -ScriptBlock {
                         {
-                            $script:mockPSResourceRepositoryInstance.Modify(@{
-                                Ensure = 'Absent'
+                            $script:mockPSResourceRepositoryInstance.Modify(
+                                @{
+                                    Ensure = 'Absent'
                                 }
                             )
                         } | Should -Not -Throw
@@ -804,8 +820,9 @@ try
                 It 'Should call the correct mock' {
                     InModuleScope -ScriptBlock {
                         {
-                            $script:mockPSResourceRepositoryInstance.Modify(@{
-                                SourceLocation = 'https://www.fakepsgallery.com/api/v2'
+                            $script:mockPSResourceRepositoryInstance.Modify(
+                                @{
+                                    SourceLocation = 'https://www.fakepsgallery.com/api/v2'
                                 }
                             )
                         } | Should -Not -Throw
@@ -831,7 +848,7 @@ try
                             $securePassword = New-Object -Type SecureString
                             $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
                             $script:mockPSResourceRepositoryInstance.ProxyCredental = $credential
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'Proxy Credential passed without Proxy Uri.'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage $script:mockPSResourceRepositoryInstance.localizedData.ProxyCredentialPassedWithoutProxyUri
                         }
                     }
                 }
@@ -843,7 +860,7 @@ try
                         {
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $false
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default must be set to True for a repository named PSGallery.'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage $script:mockPSResourceRepositoryInstance.localizedData.NoDefaultSettingsPSGallery
                         }
                     }
                 }
@@ -864,7 +881,7 @@ try
                         {
                             $script:mockPSResourceRepositoryInstance.Name = 'NotTheDefaultPSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'The parameter Default may only be used with repositories named PSGallery'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage $script:mockPSResourceRepositoryInstance.localizedData.DefaultSettingsNoPSGallery
                         }
                     }
                 }
@@ -875,7 +892,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.SourceLocation = 'https://notaurl.com/'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'DRC0010'
                         }
                     }
                 }
@@ -886,7 +903,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.Credential = $credential
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'DRC0010'
                         }
                     }
                 }
@@ -897,7 +914,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.ScriptSourceLocation = 'https://notaurl.com/'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'DRC0010'
                         }
                     }
                 }
@@ -908,7 +925,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.PublishLocation = 'https://notaurl.com/'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'DRC0010'
                         }
                     }
                 }
@@ -919,7 +936,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.ScriptPublishLocation = 'https://notaurl.com/'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'DRC0010'
                         }
                     }
                 }
@@ -930,7 +947,7 @@ try
                             $script:mockPSResourceRepositoryInstance.Name = 'PSGallery'
                             $script:mockPSResourceRepositoryInstance.Default = $true
                             $script:mockPSResourceRepositoryInstance.PackageManagementProvider = 'Package'
-                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'i just want to see the message'
+                            $script:mockPSResourceRepositoryInstance.AssertProperties() | Should -Throw -ExpectedMessage 'DRC0010'
                         }
                     }
                 }

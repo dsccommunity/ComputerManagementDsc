@@ -15,5 +15,4 @@ ConvertFrom-StringData -StringData @'
     SourceLocationRequiredForRegistration = SourceLocation is a required parameter to register a repository.
     NoDefaultSettingsPSGallery            = The parameter Default must be set to True for a repository named PSGallery.
     DefaultSettingsNoPSGallery            = The parameter Default may only be used with repositories named PSGallery.
-    CurrentState                          = Repository '{0}' property '{1}' current state is '{2}'.
 '@
