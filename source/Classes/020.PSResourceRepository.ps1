@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Determines if the repository is in the desired state.
+        A class for configuring PowerShell Repositories.
 
     .PARAMETER Ensure
         If the repository should be present or absent on the server
