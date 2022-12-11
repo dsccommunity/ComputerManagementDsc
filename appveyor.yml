@@ -1,0 +1,69 @@
+# HOW TO DEBUG: See start of each build run's output how to connect with RDP to the build server for debugging.
+# See section on_finish last in this file on how to pause build and to keep RDP open.
+# Look for each "DEBUG:" comment below how to change
+
+version: 1.0.{build}
+
+# Do not build on full releases.
+skip_tags: true
+
+# See https://www.appveyor.com/docs/windows-images-software
+# DEBUG: for debug purpose, comment and un-comment images as needed.
+image:
+- Visual Studio 2019 # Windows Server 2019
+#- Visual Studio 2017 # Windows Server 2016
+#- Visual Studio 2013 # Windows Server 2012 R2
+
+environment:
+  Dummy: AnyValue
+  # DEBUG: Un-comment this to get the same password for the RDP session for each build
+  #APPVEYOR_RDP_PASSWORD: D5c1234!
+
+# DEBUG: If running on own AppVeyor project, comment the if-block below to run on all branches.
+init:
+- ps: |
+    # Only run for pull requests
+    if (-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { Write-Host -ForegroundColor 'Yellow' -Object 'Not a pull request, skipping.'; return }
+
+    iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+# DEBUG: If running on own AppVeyor project, comment the if-block below to run on all branches.
+install:
+- ps: |
+    # Only run for pull requests
+    if (-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { Write-Host -ForegroundColor 'Yellow' -Object 'Not a pull request, skipping.'; return }
+
+    winrm quickconfig -quiet
+
+# DEBUG: If running on own AppVeyor project, comment the if-block below to run on all branches.
+build_script:
+- pwsh: |
+    # Only run for pull requests
+    if (-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { Write-Host -ForegroundColor 'Yellow' -Object 'Not a pull request, skipping.'; return }
+
+    # Build the module
+    ./build.ps1 -ResolveDependency -tasks build
+
+# DEBUG: If running on own AppVeyor project, comment the if-block below to run on all branches.
+test_script:
+- ps: |
+    # Only run for pull requests
+    if (-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { Write-Host -ForegroundColor 'Yellow' -Object 'Not a pull request, skipping.'; return }
+
+    ./build.ps1 -Tasks test -PesterScript 'tests/Integration' -CodeCoverageThreshold 0
+
+deploy: off
+
+# DEBUG: Un-comment the line "$blockRdp = $true" so that build worker is kept up all of the 60 minutes.
+# DEBUG: If running on own AppVeyor project, comment the if-block below to run on all branches.
+on_finish:
+- ps: |
+    # Only run for pull requests
+    if (-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { Write-Host -ForegroundColor 'Yellow' -Object 'Not a pull request, skipping.'; return }
+
+    <#
+        These two lines can also be added in one or more places somewhere in the integration tests to pause the test run. Continue
+        running the tests by deleting the file on the desktop that was created by "enable-rdp.ps1" when $blockRdp is $true.
+    #>
+    #$blockRdp = $true
+    #iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
