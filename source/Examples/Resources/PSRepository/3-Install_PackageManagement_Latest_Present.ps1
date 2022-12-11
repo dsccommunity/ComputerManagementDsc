@@ -5,13 +5,13 @@
         This configuration installs the latest version of the resource PowerShellGet on a machine
 #>
 
-configuration Install_PackageManagement_RequiredVersion_Present
+configuration Install_PackageManagement_Latest_Present
 {
     Import-DscResource -ModuleName 'ComputerManagementDsc'
 
     node localhost
     {
-        PSResource 'Install_PackageManagement_RequiredVersion_Present'
+        PSResource 'Install_PackageManagement_Latest_Present'
         {
             Name   = 'PowerShellGet'
             Ensure = 'Present'
