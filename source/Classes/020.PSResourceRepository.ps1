@@ -178,7 +178,6 @@ class PSResourceRepository : ResourceBase
 
                 #* The user may have specified Proxy & Proxy Credential, or InstallationPolicy params
                 Set-PSRepository @params
-
             }
             else
             {
@@ -229,44 +228,6 @@ class PSResourceRepository : ResourceBase
             $returnValue.ProxyCredential           = $repository.ProxyCredental
             $returnValue.InstallationPolicy        = $repository.InstallationPolicy
             $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
-        }
-        else
-        {
-            Write-Verbose -Message ($this.localizedData.RepositoryNotFound -f $this.Name)
-        }
-
-        return $returnValue
-    }
-
-    hidden [System.Collections.Hashtable] GetCurrentState1 ([System.Collections.Hashtable] $properties)
-    {
-        $returnValue = @{
-            Ensure         = [Ensure]::Absent
-            Name           = $this.Name
-        }
-
-        Write-Verbose -Message ($this.localizedData.GetTargetResourceMessage -f $this.Name)
-
-        $repository = Get-PSRepository -Name $this.Name -ErrorAction SilentlyContinue
-
-        $excludeProperties = $this.ExcludeDscProperties + 'Ensure'
-        $currentState = $this | Get-DscProperty -ExcludeName $excludeProperties -Type @('Key', 'Optional', 'Mandatory') -HasValue
-
-        if ($repository)
-        {
-            $returnValue.Ensure = [Ensure]::Present
-            $currentState.Keys | ForEach-Object -Process {
-                Write-Verbose -Message ($this.localizedData.CurrentState -f $this.Name, $_, $repository.$_)
-
-                if ($_ -eq 'InstallationPolicy')
-                {
-                    $returnValue.$_ = $repository.$_
-                }
-                else
-                {
-                    $returnValue.$_ = $repository.$_
-                }
-            }
         }
         else
         {
