@@ -150,7 +150,7 @@ class PSResource : ResourceBase
 
     [DscProperty(NotConfigurable)]
     [Nullable[System.String]]
-    $VersionRequirement
+    $VersionRequirement1
 
     PSResource () : base ()
     {
@@ -215,8 +215,8 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
         {
-            $versionRequirement = $this.GetVersionRequirement()
-            $this.UninstallNonCompliantVersions($installedResource, $versionRequirement)
+            $VersionRequirement1 = $this.GetVersionRequirement()
+            $this.UninstallNonCompliantVersions($installedResource, $VersionRequirement1)
 
             if ($properties.ContainsKey('MinimumVersion') -or
                 $properties.ContainsKey('MaximumVersion') -or
@@ -504,16 +504,16 @@ class PSResource : ResourceBase
     #>
     hidden [System.Boolean] TestLatestVersion ([System.Management.Automation.PSModuleInfo[]] $resources)
     {
-        $latestVersion = $this.GetLatestVersion()
+        $latestVersion1 = $this.GetLatestVersion()
         $return = $false
 
-        if ($latestVersion -notin $resources.Version)
+        if ($latestVersion1 -notin $resources.Version)
         {
-            Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $latestVersion)
+            Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $latestVersion1)
         }
         else
         {
-            Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $latestVersion)
+            Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $latestVersion1)
 
             $return = $true
         }
@@ -616,8 +616,8 @@ class PSResource : ResourceBase
                 }
             }
             'Latest' {
-                $latestVersion = $this.GetLatestVersion()
-                $nonCompliantVersions = ($resources | Where-Object {$_.Version -ne $latestVersion}).Count
+                $latestVersion1 = $this.GetLatestVersion()
+                $nonCompliantVersions = ($resources | Where-Object {$_.Version -ne $latestVersion1}).Count
                 if ($nonCompliantVersions -gt 1)
                 {
                     Write-Verbose -Message ($this.localizedData.InstalledResourcesDoNotMeetLatestVersion -f ($nonCompliantVersions, $this.Name))
@@ -738,11 +738,11 @@ class PSResource : ResourceBase
     <#
         Returns the version that matches the given requirement from the installed resources.
     #>
-    hidden [System.String] TestVersionRequirement ([System.String]$versionRequirement, [System.Management.Automation.PSModuleInfo[]] $resources)
+    hidden [System.String] TestVersionRequirement ([System.String]$VersionRequirement1, [System.Management.Automation.PSModuleInfo[]] $resources)
     {
         $return = $null
 
-        switch ($versionRequirement)
+        switch ($VersionRequirement1)
         {
             'MinimumVersion'
             {
@@ -758,7 +758,7 @@ class PSResource : ResourceBase
             }
             default
             {
-                $errorMessage = ($this.localizedData.TestVersionRequirementError -f $versionRequirement)
+                $errorMessage = ($this.localizedData.TestVersionRequirementError -f $VersionRequirement1)
                 New-InvalidArgumentException -Message $errorMessage -Argument 'versionRequirement'
             }
         }
@@ -769,11 +769,11 @@ class PSResource : ResourceBase
     <#
         Uninstall resources that do not match the given version requirement
     #>
-    hidden [void] UninstallNonCompliantVersions ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String]$versionRequirement)
+    hidden [void] UninstallNonCompliantVersions ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String]$VersionRequirement1)
     {
         $resourcesToUninstall = $null
 
-        switch ($versionRequirement)
+        switch ($VersionRequirement1)
         {
             'MinimumVersion'
             {
@@ -789,10 +789,10 @@ class PSResource : ResourceBase
             }
             'Latest'
             {
-                $latestVersion = $this.GetLatestVersion()
+                $latestVersion1 = $this.GetLatestVersion()
                 #* get latest version and remove all others
 
-                $resourcesToUninstall = $resources | Where-Object {$_.Version -ne $latestVersion}
+                $resourcesToUninstall = $resources | Where-Object {$_.Version -ne $latestVersion1}
             }
         }
 
