@@ -23,10 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - BREAKING CHANGE: Windows Management Framework 5.0 is required.
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 - ComputerManagementDsc
   - The resource names were removed from the property `DscResourcesToExport`
     in the module manifest in the source folder as the built module is
