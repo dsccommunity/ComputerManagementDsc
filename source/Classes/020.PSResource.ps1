@@ -144,13 +144,17 @@ class PSResource : ResourceBase
     [Nullable[System.Boolean]]
     $RemoveNonCompliantVersions
 
-    [DscProperty(NotConfigurable)]
-    [Nullable[Version]]
+    <#
+        Property for holding the latest version of the resource available
+    #>
+    hidden [Nullable[Version]]
     $LatestVersion
 
-    [DscProperty(NotConfigurable)]
-    [Nullable[System.String]]
-    $oldVersionRequirement
+    <#
+        Property for holding the given version requirement (MinimumVersion, MaximumVersion, RequiredVersion or Latest) if passed
+    #>
+    hidden [Nullable[System.String]]
+    $VersionRequirement
 
     PSResource () : base ()
     {
@@ -166,6 +170,9 @@ class PSResource : ResourceBase
             'Proxy'
             'ProxyCredential'
         )
+
+        $this.VersionRequirement = $this.GetVersionRequirement()
+        $this.LatestVersion      = $this.GetLatestVersion()
     }
     [PSResource] Get()
     {
@@ -410,22 +417,23 @@ class PSResource : ResourceBase
             New-InvalidArgumentException -ArgumentName 'RemoveNonCompliantVersions' -message $errorMessage
         }
 
-        <#
-            Is this the correct place to set NotConfigurable properties? I want to set them once rather than multiple times as required in the code
-        #>
-        if ($properties.ContainsKey('Latest'))
-        {
-            $this.LatestVersion = $this.GetLatestVersion()
-        }
+        #! Moved this information to the constructor
+        # <#
+        #     Is this the correct place to set NotConfigurable properties? I want to set them once rather than multiple times as required in the code
+        # #>
+        # if ($properties.ContainsKey('Latest'))
+        # {
+        #     $this.LatestVersion = $this.GetLatestVersion()
+        # }
 
-        if ($properties.ContainsKey('MinimumVersion') -or
-            $Properties.ContainsKey('MaximumVersion') -or
-            $Properties.ContainsKey('RequiredVersion') -or
-            $Properties.ContainsKey('Latest')
-        )
-        {
-            $this.VersionRequirement = $this.GetVersionRequirement()
-        }
+        # if ($properties.ContainsKey('MinimumVersion') -or
+        #     $Properties.ContainsKey('MaximumVersion') -or
+        #     $Properties.ContainsKey('RequiredVersion') -or
+        #     $Properties.ContainsKey('Latest')
+        # )
+        # {
+        #     $this.VersionRequirement = $this.GetVersionRequirement()
+        # }
 
     }
 
