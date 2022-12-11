@@ -207,7 +207,7 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
         {
-            $versionRequirement = $this.GetVersionRequirement($properties)
+            $versionRequirement = $this.GetVersionRequirement()
             $this.UninstallNonCompliantVersions($installedResource, $versionRequirement)
 
             if ($properties.ContainsKey('MinimumVersion') -or
@@ -262,7 +262,7 @@ class PSResource : ResourceBase
         {
             $returnValue.Ensure = [Ensure]::Present
 
-            $versioning = $this.GetVersionRequirement($currentState)
+            $versioning = $this.GetVersionRequirement()
 
             if (-not [System.String]::IsNullOrEmpty($versioning) -and -not $currentState.COntainsKey('Latest'))
             {
@@ -420,40 +420,6 @@ class PSResource : ResourceBase
         {
             #* SingleInstance should not rely on VersionRequirements to report correctly
             $return = $true
-            # if ($properties.ContainsKey('MinimumVersion'))
-            # {
-            #     if ($resources.Version -ne [version]$this.MinimumVersion)
-            #     {
-            #         $isSingleInstance = $false
-            #     }
-            # }
-            # elseif ($properties.ContainsKey('MaximumVersion'))
-            # {
-            #     if ($resources.Version -ne [version]$this.MaximumVersion)
-            #     {
-            #         $isSingleInstance = $false
-            #     }
-            # }
-            # elseif ($properties.ContainsKey('RequiredVersion'))
-            # {
-            #     if ($resources.Version -ne [version]$this.RequiredVersion)
-            #     {
-            #         $isSingleInstance = $false
-            #     }
-            # }
-            # elseif ($properties.ContainsKey('Latest'))
-            # {
-            #     $latestVersion = $this.GetLatestVersion()
-            #     if ($resources.Version -ne [version]$latestVersion)
-            #     {
-            #         $isSingleInstance = $false
-            #     }
-            # }
-            # else
-            # {
-            #     Write-Verbose -Message ($this.localizedData.IsSingleInstance -f $this.Name)
-            #     $isSingleInstance = $true
-            # }
         }
 
         return $return
@@ -723,21 +689,22 @@ class PSResource : ResourceBase
     <#
         Return the resource's version requirement
     #>
-    hidden [System.String] GetVersionRequirement ([System.Collections.Hashtable]$properties)
+    hidden [System.String] GetVersionRequirement ()
     {
         $return = $null
 
         $versionProperties = @('Latest', 'MinimumVersion', 'MaximumVersion', 'RequiredVersion')
 
-        $versionKeys = $properties.Keys | Where-Object {$_ -in $versionProperties}
-
-        foreach ($key in $versionKeys)
+        foreach ($prop in $versionProperties)
         {
-            if ($null -ne $properties.$key)
+            if (-not [System.String]::IsNullOrEmpty($this.$prop))
             {
-                $return = $key
+                $return = $prop
+                break
             }
         }
+
+        Write-Verbose -Message ($this.localizedData.VersionRequirementFound -f $this.Name, $return)
 
         return $return
     }

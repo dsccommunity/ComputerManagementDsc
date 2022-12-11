@@ -38,6 +38,7 @@ ConvertFrom-StringData -StringData @'
     TestVersionRequirementError                  = TestVersionRequirement should only be used with 'MinimumVersion', 'MaximumVersion, and 'RequiredVersion', not '{0}'.
     NonCompliantVersionCount                     = Found '{0}' instances of resource '{1}' with non-compliant versions.
     RemoveNonCompliantVersionsWithoutVersioning  = Argument 'RemoveNonCompliantVersions' requires one of parameters 'MinimumVersion', 'MaximumVersion', 'RequiredVersion' or 'Latest'.
+    VersionRequirementFound                      = Version requirement for resource '{0}' is '{1}'.
     # Modify() strings
     ResourceShouldBeAbsentRequiredVersion        = Resource '{0}' version '{1}' should be Absent but is Present.
     ResourceShouldBeAbsent                       = Resource '{0}' should be Absent but is Present.
