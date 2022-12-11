@@ -204,17 +204,6 @@ class PSResourceRepository : ResourceBase
 
             Set-PSRepository @params
         }
-
-        foreach ($key in $properties.Keys.Where({ $_ -ne 'Ensure' }))
-        {
-            Write-Verbose -Message ($this.localizedData.PropertyOutOfSync -f $key, $($this.$key))
-
-            $params[$key] = $properties.$key
-        }
-
-        $moduleToInstall = Find-Module @params
-
-        $this.InstallResource($moduleToInstall.version)
     }
 
     hidden [System.Collections.Hashtable] GetCurrentState ([System.Collections.Hashtable] $properties)
