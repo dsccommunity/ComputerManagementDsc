@@ -239,9 +239,6 @@ try
                                 return [System.Collections.Hashtable] @{
                                     Name                      = 'FakePSGallery'
                                     Ensure                    = 'Absent'
-                                    SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                                    InstallationPolicy        = 'Untrusted'
-                                    PackageManagementProvider = 'NuGet'
                                 }
                             } -PassThru |
                             Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
@@ -251,12 +248,12 @@ try
                         $currentState = $script:mockPSResourceRepositoryInstance.Get()
                         $currentState.Name                      | Should -Be 'FakePSGallery'
                         $currentState.Ensure                    | Should -Be 'Absent'
-                        $currentState.SourceLocation            | Should -Be 'https://www.powershellgallery.com/api/v2'
+                        $currentState.SourceLocation            | Should -BeNullOrEmpty
                         $currentState.ScriptSourceLocation      | Should -BeNullOrEmpty
                         $currentState.PublishLocation           | Should -BeNullOrEmpty
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
-                        $currentState.InstallationPolicy        | Should -Be 'Untrusted'
-                        $currentState.PackageManagementProvider | Should -Be 'NuGet'
+                        $currentState.InstallationPolicy        | Should -BeNullOrEmpty
+                        $currentState.PackageManagementProvider | Should -BeNullOrEmpty
                     }
                 }
             }
