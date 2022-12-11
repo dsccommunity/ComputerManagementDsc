@@ -371,10 +371,10 @@ class PSResource : ResourceBase
         Assert-BoundParameter @assertBoundParameterParameters
 
         if ($this.Ensure -eq 'Absent' -and (
-            $properties.ContainsKey('MinimumVersion') -or
-            $properties.ContainsKey('MaximumVersion') -or
-            $properties.ContainsKey('Latest')
-        )
+                $properties.ContainsKey('MinimumVersion') -or
+                $properties.ContainsKey('MaximumVersion') -or
+                $properties.ContainsKey('Latest')
+            )
         )
         {
             $errorMessage = $this.localizedData.EnsureAbsentWithVersioning
