@@ -171,8 +171,8 @@ class PSResource : ResourceBase
             'ProxyCredential'
         )
 
-        $this.VersionRequirement = $this.GetVersionRequirement()
-        $this.LatestVersion      = $this.GetLatestVersion()
+        $this.VersionRequirement = $null
+        $this.LatestVersion      = $null
     }
 
     [PSResource] Get()
@@ -223,14 +223,14 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
         {
-            $oldVersionRequirement = $this.GetVersionRequirement()
-            $this.UninstallNonCompliantVersions($installedResource, $oldVersionRequirement)
+            $this.UninstallNonCompliantVersions($installedResource)
 
-            if ($properties.ContainsKey('MinimumVersion') -or
-                $properties.ContainsKey('MaximumVersion') -or
-                $properties.ContainsKey('RequiredVersion') -or
-                $properties.ContainsKey('Latest')
-                )
+            # if ($properties.ContainsKey('MinimumVersion') -or
+            #     $properties.ContainsKey('MaximumVersion') -or
+            #     $properties.ContainsKey('RequiredVersion') -or
+            #     $properties.ContainsKey('Latest')
+            #     )
+            if ($this.VersionRequirement -in $properties.Keys)
             {
                 $this.InstallResource()
                 return
@@ -418,24 +418,23 @@ class PSResource : ResourceBase
             New-InvalidArgumentException -ArgumentName 'RemoveNonCompliantVersions' -message $errorMessage
         }
 
-        #! Moved this information to the constructor
-        # <#
-        #     Is this the correct place to set NotConfigurable properties? I want to set them once rather than multiple times as required in the code
-        # #>
-        # if ($properties.ContainsKey('Latest'))
-        # {
-        #     $this.LatestVersion = $this.GetLatestVersion()
-        # }
+        <#
+            Is this the correct place to set hidden properties? I want to set them once rather than multiple times as required in the code
+            Assert() calls this before Get/Set/Test, so this ensures they're always set if necessary.
+        #>
+        if ($properties.ContainsKey('Latest'))
+        {
+            $this.LatestVersion = $this.GetLatestVersion()
+        }
 
-        # if ($properties.ContainsKey('MinimumVersion') -or
-        #     $Properties.ContainsKey('MaximumVersion') -or
-        #     $Properties.ContainsKey('RequiredVersion') -or
-        #     $Properties.ContainsKey('Latest')
-        # )
-        # {
-        #     $this.VersionRequirement = $this.GetVersionRequirement()
-        # }
-
+        if ($properties.ContainsKey('MinimumVersion') -or
+            $Properties.ContainsKey('MaximumVersion') -or
+            $Properties.ContainsKey('RequiredVersion') -or
+            $Properties.ContainsKey('Latest')
+        )
+        {
+            $this.VersionRequirement = $this.GetVersionRequirement()
+        }
     }
 
     <#
@@ -513,16 +512,15 @@ class PSResource : ResourceBase
     #>
     hidden [System.Boolean] TestLatestVersion ([System.Management.Automation.PSModuleInfo[]] $resources)
     {
-        $oldLatestVersion = $this.GetLatestVersion()
         $return = $false
 
-        if ($oldLatestVersion -notin $resources.Version)
+        if ($this.LatestVersion -notin $resources.Version)
         {
-            Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $oldLatestVersion)
+            Write-Verbose -Message ($this.localizedData.ShouldBeLatest -f $this.Name, $this.LatestVersion)
         }
         else
         {
-            Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $oldLatestVersion)
+            Write-Verbose -Message ($this.localizedData.IsLatest -f $this.Name, $this.LatestVersion)
 
             $return = $true
         }
@@ -625,8 +623,7 @@ class PSResource : ResourceBase
                 }
             }
             'Latest' {
-                $oldLatestVersion = $this.GetLatestVersion()
-                $nonCompliantVersions = ($resources | Where-Object {$_.Version -ne $oldLatestVersion}).Count
+                $nonCompliantVersions = ($resources | Where-Object {$_.Version -ne $this.LatestVersion}).Count
                 if ($nonCompliantVersions -gt 1)
                 {
                     Write-Verbose -Message ($this.localizedData.InstalledResourcesDoNotMeetLatestVersion -f ($nonCompliantVersions, $this.Name))
@@ -778,11 +775,11 @@ class PSResource : ResourceBase
     <#
         Uninstall resources that do not match the given version requirement
     #>
-    hidden [void] UninstallNonCompliantVersions ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String]$oldVersionRequirement)
+    hidden [void] UninstallNonCompliantVersions ([System.Management.Automation.PSModuleInfo[]] $resources)
     {
         $resourcesToUninstall = $null
 
-        switch ($oldVersionRequirement)
+        switch ($this.VersionRequirement)
         {
             'MinimumVersion'
             {
@@ -798,10 +795,9 @@ class PSResource : ResourceBase
             }
             'Latest'
             {
-                $oldLatestVersion = $this.GetLatestVersion()
                 #* get latest version and remove all others
 
-                $resourcesToUninstall = $resources | Where-Object {$_.Version -ne $oldLatestVersion}
+                $resourcesToUninstall = $resources | Where-Object {$_.Version -ne $this.LatestVersion}
             }
         }
 
