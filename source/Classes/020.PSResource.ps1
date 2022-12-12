@@ -147,13 +147,13 @@ class PSResource : ResourceBase
     <#
         Property for holding the latest version of the resource available
     #>
-    hidden [Nullable[Version]]
+    hidden [Version]
     $LatestVersion
 
     <#
         Property for holding the given version requirement (MinimumVersion, MaximumVersion, RequiredVersion or Latest) if passed
     #>
-    hidden [Nullable[System.String]]
+    hidden [System.String]
     $VersionRequirement
 
     PSResource () : base ()
@@ -174,6 +174,7 @@ class PSResource : ResourceBase
         $this.VersionRequirement = $this.GetVersionRequirement()
         $this.LatestVersion      = $this.GetLatestVersion()
     }
+
     [PSResource] Get()
     {
         return ([ResourceBase]$this).Get()
