@@ -225,11 +225,6 @@ class PSResource : ResourceBase
         {
             $this.UninstallNonCompliantVersions($installedResource)
 
-            # if ($properties.ContainsKey('MinimumVersion') -or
-            #     $properties.ContainsKey('MaximumVersion') -or
-            #     $properties.ContainsKey('RequiredVersion') -or
-            #     $properties.ContainsKey('Latest')
-            #     )
             if ($this.VersionRequirement -in $properties.Keys)
             {
                 $this.InstallResource()
@@ -251,8 +246,6 @@ class PSResource : ResourceBase
 
         $resources = $this.GetInstalledResource()
 
-        $versioning = $null
-
         $returnValue = @{
             Name   = $this.Name
             Ensure = [Ensure]::Absent
@@ -265,8 +258,6 @@ class PSResource : ResourceBase
 
         if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
         {
-            $versioning = 'Latest'
-
             $returnValue.Latest = $this.TestLatestVersion($resources)
         }
 
@@ -278,19 +269,15 @@ class PSResource : ResourceBase
         {
             $returnValue.Ensure = [Ensure]::Present
 
-            $versioning = $this.GetVersionRequirement()
-
-            if (-not [System.String]::IsNullOrEmpty($versioning) -and -not $currentState.COntainsKey('Latest'))
+            if (-not [System.String]::IsNullOrEmpty($this.VersionRequirement) -and -not $currentState.ContainsKey('Latest'))
             {
-                $returnValue.$versioning = $this.TestVersionRequirement($versioning, $resources)
+                $returnValue.$($this.VersionRequirement) = $this.GetRequiredVersionFromVersionRequirement($resources, $this.VersionRequirement)
             }
         }
 
-        if (-not [System.String]::IsNullOrEmpty($versioning) -and $currentState.ContainsKey('RemoveNonCompliantVersions'))
+        if (-not [System.String]::IsNullOrEmpty($this.VersionRequirement) -and $currentState.ContainsKey('RemoveNonCompliantVersions'))
         {
-            $versioningMet = $this.TestVersioning($resources, $versioning)
-
-            $returnValue.RemoveNonCompliantVersions = $versioningMet
+            $returnValue.RemoveNonCompliantVersions = $this.TestVersionRequirement($resources, $this.VersionRequirement)
         }
 
         return $returnValue
@@ -581,9 +568,9 @@ class PSResource : ResourceBase
     <#
         Checks whether all the installed resources meet the given versioning requirements of either MinimumVersion, MaximumVersion, or RequiredVersion
     #>
-    hidden [System.Boolean] TestVersioning ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String] $requirement)
+    hidden [System.Boolean] TestVersionRequirement ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String] $requirement)
     {
-        Write-Verbose -Message ($this.localizedData.TestVersioning -f $requirement)
+        Write-Verbose -Message ($this.localizedData.TestVersionRequirement -f $requirement)
 
         $return = $true
 
@@ -744,7 +731,7 @@ class PSResource : ResourceBase
     <#
         Returns the version that matches the given requirement from the installed resources.
     #>
-    hidden [System.String] TestVersionRequirement ([System.String]$requirement, [System.Management.Automation.PSModuleInfo[]] $resources)
+    hidden [System.String] GetRequiredVersionFromVersionRequirement ([System.Management.Automation.PSModuleInfo[]] $resources,[System.String]$requirement)
     {
         $return = $null
 
@@ -764,7 +751,7 @@ class PSResource : ResourceBase
             }
             default
             {
-                $errorMessage = ($this.localizedData.TestVersionRequirementError -f $requirement)
+                $errorMessage = ($this.localizedData.GetRequiredVersionFromVersionRequirementError -f $requirement)
                 New-InvalidArgumentException -Message $errorMessage -Argument 'versionRequirement'
             }
         }
