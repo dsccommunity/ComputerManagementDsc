@@ -12,3 +12,4 @@ class DSC_Computer : OMI_BaseResource
     [Write, Description("Specifies advanced options for the Add-Computer join operation"), ValueMap{"AccountCreate","Win9XUpgrade","UnsecuredJoin","PasswordPass","JoinWithNewName","JoinReadOnly","InstallInvoke"}, Values{"AccountCreate","Win9XUpgrade","UnsecuredJoin","PasswordPass","JoinWithNewName","JoinReadOnly","InstallInvoke"}] String Options[];
     [Read, Description("A read-only property that specifies the organizational unit that the computer account is currently in.")] String CurrentOU;
 };
+
