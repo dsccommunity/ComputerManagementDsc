@@ -267,7 +267,7 @@ try
         It 'Should return nothing' {
             InModuleScope -ScriptBlock {
                 Mock -CommandName Get-Module
-                { $script:mockPSResourceInstance.GetInstalledResource() } | Should -BeNullOrEmpty
+                { $script:mockPSResourceInstance.GetInstalledResource() | Should -BeNullOrEmpty }
                 Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
             }
         }
@@ -278,8 +278,8 @@ try
                     return @(New-MockObject -Type System.Management.Automation.PSModuleInfo)
                 }
                 {
-                    $script:mockPSResourceInstance.GetInstalledResource().Count
-                } | Should -Be 1
+                    $script:mockPSResourceInstance.GetInstalledResource().Count | Should -Be 1
+                }
                 Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
             }
         }
@@ -293,8 +293,8 @@ try
                     )
                 }
                 {
-                    $script:mockPSResourceInstance.GetInstalledResource().Count
-                } | Should -Be 2
+                    $script:mockPSResourceInstance.GetInstalledResource().Count | Should -Be 2
+                }
                 Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
             }
         }
