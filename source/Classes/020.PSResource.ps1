@@ -84,22 +84,10 @@ class PSResource : ResourceBase
     [System.String]
     $RequiredVersion
 
-    <#!
-        Does MaximumVersion mean any version higher than given is removed?
-        or
-        The system is in the correct state as long as a module that is the MaximumVersion
-            or lower is present?
-    #>
     [DscProperty()]
     [System.String]
     $MaximumVersion
 
-    <#!
-        Does MinimumVersion mean any version lower than given is removed?
-        or
-        The system is in the correct state as long as a module that is the MinimumVersion
-            or higher is present?
-    #>
     [DscProperty()]
     [System.String]
     $MinimumVersion
