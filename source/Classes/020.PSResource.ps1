@@ -426,8 +426,10 @@ class PSResource : ResourceBase
 
     <#
         Returns true if only the correct instance of the resource is installed on the system
+
+        hidden [System.Boolean] TestSingleInstance([System.Management.Automation.PSModuleInfo[]]$resources)
     #>
-    hidden [System.Boolean] TestSingleInstance([System.Management.Automation.PSModuleInfo[]]$resources)
+    hidden [System.Boolean] TestSingleInstance([System.Collections.Hashtable[]]$resources)
     {
         $return = $false #! Is this the correct default if somehow the if/else isn't triggered?
 
@@ -461,16 +463,20 @@ class PSResource : ResourceBase
 
     <#
         Get all instances of installed resource on the system
+
+        hidden [System.Management.Automation.PSModuleInfo[]] GetInstalledResource()
     #>
-    hidden [System.Management.Automation.PSModuleInfo[]] GetInstalledResource()
+    hidden [System.Collections.Hashtable[]] GetInstalledResource()
     {
         return $(Get-Module -Name $this.Name -ListAvailable)
     }
 
     <#
         Get full version as a string checking for prerelease version
+
+        hidden [System.String] GetFullVersion([System.Management.Automation.PSModuleInfo] $resource)
     #>
-    hidden [System.String] GetFullVersion([System.Management.Automation.PSModuleInfo] $resource)
+    hidden [System.String] GetFullVersion([System.Collections.Hashtable] $resource)
     {
         $version = [System.String]$resource.Version
         $prerelease = $resource.PrivateData.PSData.Prerelease
@@ -483,8 +489,10 @@ class PSResource : ResourceBase
 
     <#
         Test whether a given resource is prerelease
+
+        hidden [System.Boolean] TestPrerelease ([System.Management.Automation.PSModuleInfo] $resource)
     #>
-    hidden [System.Boolean] TestPrerelease ([System.Management.Automation.PSModuleInfo] $resource)
+    hidden [System.Boolean] TestPrerelease ([System.Collections.Hashtable] $resource)
     {
         $prerelease = $False
         if (-not ([System.String]::IsNullOrEmpty($resource.PrivateData.PSData.Prerelease)))
@@ -496,8 +504,10 @@ class PSResource : ResourceBase
 
     <#
         tests whether the installed resources includes the latest version available
+
+        hidden [System.Boolean] TestLatestVersion ([System.Management.Automation.PSModuleInfo[]] $resources)
     #>
-    hidden [System.Boolean] TestLatestVersion ([System.Management.Automation.PSModuleInfo[]] $resources)
+    hidden [System.Boolean] TestLatestVersion ([System.Collections.Hashtable[]] $resources)
     {
         $return = $false
 
@@ -554,8 +564,10 @@ class PSResource : ResourceBase
 
     <#
         Uninstall the given resource
+
+        hidden [void] UninstallResource ([System.Management.Automation.PSModuleInfo]$resource)
     #>
-    hidden [void] UninstallResource ([System.Management.Automation.PSModuleInfo]$resource)
+    hidden [void] UninstallResource ([System.Collections.Hashtable]$resource)
     {
         $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'RemoveNonCompliantVersions','MinimumVersion', 'MaximumVersion', 'RequiredVersion') -Type Optional -HasValue
         $params.RequiredVersion = $resource.Version
@@ -567,8 +579,10 @@ class PSResource : ResourceBase
 
     <#
         Checks whether all the installed resources meet the given versioning requirements of either MinimumVersion, MaximumVersion, or RequiredVersion
+
+        hidden [System.Boolean] TestVersionRequirement ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String] $requirement)
     #>
-    hidden [System.Boolean] TestVersionRequirement ([System.Management.Automation.PSModuleInfo[]] $resources, [System.String] $requirement)
+    hidden [System.Boolean] TestVersionRequirement ([System.Collections.Hashtable[]] $resources, [System.String] $requirement)
     {
         Write-Verbose -Message ($this.localizedData.TestVersionRequirement -f $requirement)
 
@@ -628,8 +642,10 @@ class PSResource : ResourceBase
 
         If a resource matches the exact minimum version, that version is returned.
         If no resources matches the exact minimum version, the eldest version is returned.
+
+        hidden [System.String] GetMinimumInstalledVersion([System.Management.Automation.PSModuleInfo[]] $resources)
     #>
-    hidden [System.String] GetMinimumInstalledVersion([System.Management.Automation.PSModuleInfo[]] $resources)
+    hidden [System.String] GetMinimumInstalledVersion([System.Collections.Hashtable[]] $resources)
     {
         $return = $null
 
@@ -661,8 +677,10 @@ class PSResource : ResourceBase
 
         If a resource matches the exact maximum version, that version is returned.
         If no resources matches the exact maximum version, the youngest version is returned.
+
+        hidden [System.String] GetMaximumInstalledVersion([System.Management.Automation.PSModuleInfo[]] $resources)
     #>
-    hidden [System.String] GetMaximumInstalledVersion([System.Management.Automation.PSModuleInfo[]] $resources)
+    hidden [System.String] GetMaximumInstalledVersion([System.Collections.Hashtable[]] $resources)
     {
         $return = $null
 
@@ -690,8 +708,10 @@ class PSResource : ResourceBase
 
     <#
         Returns the required version of the resource if it is installed on the system.
+
+        hidden [System.String] GetRequiredInstalledVersion([System.Management.Automation.PSModuleInfo[]] $resources)
     #>
-    hidden [System.String] GetRequiredInstalledVersion([System.Management.Automation.PSModuleInfo[]] $resources)
+    hidden [System.String] GetRequiredInstalledVersion([System.Collections.Hashtable[]] $resources)
     {
         $return = $null
 
@@ -730,8 +750,10 @@ class PSResource : ResourceBase
 
     <#
         Returns the version that matches the given requirement from the installed resources.
+
+        hidden [System.String] GetRequiredVersionFromVersionRequirement ([System.Management.Automation.PSModuleInfo[]] $resources,[System.String]$requirement)
     #>
-    hidden [System.String] GetRequiredVersionFromVersionRequirement ([System.Management.Automation.PSModuleInfo[]] $resources,[System.String]$requirement)
+    hidden [System.String] GetRequiredVersionFromVersionRequirement ([System.Collections.Hashtable[]] $resources, [System.String]$requirement)
     {
         $return = $null
 
@@ -761,8 +783,10 @@ class PSResource : ResourceBase
 
     <#
         Uninstall resources that do not match the given version requirement
+
+        hidden [void] UninstallNonCompliantVersions ([System.Management.Automation.PSModuleInfo[]] $resources)
     #>
-    hidden [void] UninstallNonCompliantVersions ([System.Management.Automation.PSModuleInfo[]] $resources)
+    hidden [void] UninstallNonCompliantVersions ([System.Collections.Hashtable[]] $resources)
     {
         $resourcesToUninstall = $null
 
@@ -798,8 +822,10 @@ class PSResource : ResourceBase
 
     <#
         Resolve single instance status. Find the required version, uninstall all others. Install required version is necessary.
+
+        hidden [void] ResolveSingleInstance ([System.Management.Automation.PSModuleInfo[]] $resources)
     #>
-    hidden [void] ResolveSingleInstance ([System.Management.Automation.PSModuleInfo[]] $resources)
+    hidden [void] ResolveSingleInstance ([System.Collections.Hashtable[]] $resources)
     {
         Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
 
