@@ -276,7 +276,7 @@ try
 
         It 'Should return one object' {
             InModuleScope -ScriptBlock {
-                Mock -CommandName Get-Module -ScriptBlock {
+                Mock -CommandName Get-Module -MockWith {
                     return @(New-MockObject -Type System.Management.Automation.PSModuleInfo)
                 }
                 {
@@ -288,7 +288,7 @@ try
 
         It 'Should return two objects' {
             InModuleScope -ScriptBlock {
-                Mock -CommandName Get-Module -ScriptBlock {
+                Mock -CommandName Get-Module -MockWith {
                     return @(
                         New-MockObject -Type System.Management.Automation.PSModuleInfo,
                         New-MockObject -Type System.Management.Automation.PSModuleInfo
