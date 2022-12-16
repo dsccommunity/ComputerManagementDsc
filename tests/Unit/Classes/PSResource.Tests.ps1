@@ -255,7 +255,42 @@ try
     }
 
     Describe 'PSResource\GetInstalledResource()' -Tag 'GetInstalledResource' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name       = 'ComputerManagementDsc'
+                    Ensure     = 'Present'
+                }
+            }
+        }
 
+        It 'Should return nothing' {
+            Mock -CommandName Get-Module
+
+            $script:mockPSResourceInstance.GetInstalledResource() | Should -BeNullOrEmpty
+            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
+        }
+
+        It 'Should return one object' {
+            Mock -CommandName Get-Module -ScritBlock {
+                return @(New-MockObject -Type System.Management.Automation.PSModuleInfo)
+            }
+
+            $script:mockPSResourceInstance.GetInstalledResource().Count | Should -Be -Exactly 1
+            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
+        }
+
+        It 'Should return two objects' {
+            Mock -CommandName Get-Module -ScritBlock {
+                return @(
+                    New-MockObject -Type System.Management.Automation.PSModuleInfo,
+                    New-MockObject -Type System.Management.Automation.PSModuleInfo
+                )
+            }
+
+            $script:mockPSResourceInstance.GetInstalledResource().Count | Should -Be -Exactly 2
+            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
+        }
     }
 
     Describe 'PSResource\GetFullVersion()' -Tag 'GetFullVersion' {
