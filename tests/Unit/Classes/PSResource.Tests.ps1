@@ -212,7 +212,7 @@ try
         Context 'When there is one resource on the repository' {
             BeforeEach {
                 Mock -CommandName Find-Module -MockWith {
-                    return New-MockObject -Type Version -Properties {Version = '8.6.0'}
+                    return New-MockObject -Type 'Version' -Properties @{Version = '8.6.0'}
                 }
             }
 
