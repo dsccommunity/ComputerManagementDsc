@@ -204,7 +204,6 @@ try
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
                     Name       = 'ComputerManagementDsc'
-                    Repository = 'PSGallery'
                     Ensure     = 'Present'
                 }
             }
@@ -213,33 +212,7 @@ try
         Context 'When there is one resource on the repository' {
             BeforeEach {
                 Mock -CommandName Find-Module -MockWith {
-                    return @{
-                        Version = '8.6.0'
-                    }
-                }
-            }
-
-            It 'Should return the correct version' {
-
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
-                }
-
-                Assert-MockCalled Find-Module -Exactly -Times 1 -Scope It
-            }
-        }
-
-        Context 'When there are multiple resources on the repository' {
-            BeforeEach {
-                Mock -CommandName Find-Module -MockWith {
-                    return @(
-                        @{
-                            Version = '8.6.0'
-                        },
-                        @{
-                            Version = '8.5.0'
-                        }
-                    )
+                    return New-MockObject -Type Version -Properties {Version = '8.6.0'}
                 }
             }
 
@@ -268,7 +241,6 @@ try
             InModuleScope -ScriptBlock {
                 Mock -CommandName Get-Module
                 { $script:mockPSResourceInstance.GetInstalledResource() | Should -BeNullOrEmpty }
-                #Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
             }
         }
 
@@ -280,7 +252,6 @@ try
                 {
                     $script:mockPSResourceInstance.GetInstalledResource().Count | Should -Be 1
                 }
-               # Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
             }
         }
 
@@ -295,7 +266,6 @@ try
                 {
                     $script:mockPSResourceInstance.GetInstalledResource().Count | Should -Be 2
                 }
-                #Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
             }
         }
     }
