@@ -206,29 +206,40 @@ try
                     Name       = 'ComputerManagementDsc'
                     Ensure     = 'Present'
                 }
-                $script:mockPSResourceInstance |
+            }
+        }
+
+        Context 'When there FindResource finds a resourse' {
+            # BeforeEach {
+            #     Mock -CommandName Find-Module -MockWith {
+            #         return $(New-MockObject -Type 'Version' | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.6.0')
+            #     }
+            # }
+
+            It 'Should return the correct version' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance |
                     Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
                         return [System.Collections.Hashtable] @{
                             Version = '8.6.0'
                         }
                     }
+
+                    $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
+                }
             }
         }
 
-        Context 'When there is one resource on the repository' {
-            BeforeEach {
-                Mock -CommandName Find-Module -MockWith {
-                    return $(New-MockObject -Type 'Version' | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.6.0')
-                }
-            }
-
-            It 'Should return the correct version' {
-
+        Context 'When there FindResource does not find a resourse' {
+            It 'Should return null or empty' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
-                }
+                    $script:mockPSResourceInstance |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                        return $null
+                    }
 
-                Assert-MockCalled Find-Module -Exactly -Times 1 -Scope It
+                    $script:mockPSResourceInstance.GetLatestVersion() | Should -BeNullOrEmpty
+                }
             }
         }
     }
