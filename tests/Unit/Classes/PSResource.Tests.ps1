@@ -298,24 +298,62 @@ try
         BeforeAll {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
-                    Name       = 'ComputerManagementDsc'
-                    Repository = 'PSGallery'
-                    Ensure     = 'Present'
-                } | Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetLatestVersion' -Value {
-                    return '8.6.0'
+                    Name          = 'ComputerManagementDsc'
+                    LatestVersion = '8.6.0'
+                    Ensure        = 'Present'
                 }
             }
         }
 
-        It 'Should return true' {
+        It 'Should return true when only one resource is installed and it is the latest version' {
             InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance.TestLatestVersion('8.6.0') | Should -BeTrue
+                $script:mockInstalledResources = New-MockObject -Type 'System.Management.Automation.PSModuleInfo'
+                $script:mockInstalledResources | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.6.0'
+                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeTrue
             }
         }
 
-        It 'Should return false' {
+        It 'Should return true when multiple resources are installed, including the latest version' {
             InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance.TestLatestVersion('8.5.0') | Should -BeFalse
+                $script:mockInstalledResources = @(
+                    New-MockObject -Type 'System.Management.Automation.PSModuleInfo',
+                    New-MockObject -Type 'System.Management.Automation.PSModuleInfo',
+                    New-MockObject -Type 'System.Management.Automation.PSModuleInfo'
+                )
+                $minorVer = 5
+                foreach ($mockObj in $script:mockInstalledResources)
+                {
+                   $mockObj | Add-Member -MemberType NoteProperty -Name 'Version' -Value "8.$($minorVer).0"
+                   $minorVer++
+                }
+
+                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeTrue
+            }
+        }
+
+        It 'Should return false when only one resource is installed and it is not the latest version' {
+            InModuleScope -ScriptBlock {
+                $script:mockInstalledResources = New-MockObject -Type 'System.Management.Automation.PSModuleInfo'
+                $script:mockInstalledResources | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.5.0'
+                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeFalse re43
+            }
+        }
+
+        It 'Should return false when multiple resources are installed, not including the latest version' {
+            InModuleScope -ScriptBlock {
+                $script:mockInstalledResources = @(
+                    New-MockObject -Type 'System.Management.Automation.PSModuleInfo',
+                    New-MockObject -Type 'System.Management.Automation.PSModuleInfo',
+                    New-MockObject -Type 'System.Management.Automation.PSModuleInfo'
+                )
+                $minorVer = 0
+                foreach ($mockObj in $script:mockInstalledResources)
+                {
+                   $mockObj | Add-Member -MemberType NoteProperty -Name 'Version' -Value "8.$($minorVer).0"
+                   $minorVer++
+                }
+
+                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeFalse
             }
         }
     }

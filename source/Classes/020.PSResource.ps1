@@ -492,10 +492,8 @@ class PSResource : ResourceBase
 
     <#
         tests whether the installed resources includes the latest version available
-
-        hidden [System.Boolean] TestLatestVersion ([System.Management.Automation.PSModuleInfo[]] $resources)
     #>
-    hidden [System.Boolean] TestLatestVersion ([System.Collections.Hashtable[]] $resources)
+    hidden [System.Boolean] TestLatestVersion ([System.Management.Automation.PSModuleInfo[]] $resources)
     {
         $return = $false
 
