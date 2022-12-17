@@ -205,9 +205,13 @@ try
                 $script:mockPSResourceInstance = [PSResource] @{
                     Name       = 'ComputerManagementDsc'
                     Ensure     = 'Present'
-                } | Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
-                    return @{version = '8.6.0'}
                 }
+                $script:mockPSResourceInstance |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                        return [System.Collections.Hashtable] @{
+                            Version = '8.6.0'
+                        }
+                    }
             }
         }
 
