@@ -205,6 +205,8 @@ try
                 $script:mockPSResourceInstance = [PSResource] @{
                     Name       = 'ComputerManagementDsc'
                     Ensure     = 'Present'
+                } | Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                    return @{version = '8.6.0'}
                 }
             }
         }
