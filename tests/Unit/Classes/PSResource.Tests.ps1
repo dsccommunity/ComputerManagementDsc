@@ -134,7 +134,7 @@ try
     Describe 'PSResource\AssertProperties()' -Tag 'AssertProperties' {
         BeforeEach {
             InModuleScope -ScriptBlock {
-                $script:mockPSResourceRepositoryInstance = [PSResource] @{}
+                $script:mockPSResourceInstance = [PSResource] @{}
             }
         }
         Context 'When PowerShellGet version is too low for AllowPrerelease' {
@@ -147,7 +147,7 @@ try
             It 'Should throw the correct error' {
                 $script:mockPSResourceInstance.AllowPrerelease = $true
                 $script:mockPSResourceInstance.AllowPrerelease.AssertProperties(
-                    @{AllowPreRelease = $True}
+                    @{AllowPrerelease = $True}
                 ) | Should -Throw
             }
         }
