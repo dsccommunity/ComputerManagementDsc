@@ -662,6 +662,90 @@ try
         }
     }
 
+    Describe 'PSResource\TestRepository()' -Tag 'TestRepository' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+            }
+        }
+
+        Context 'When the repository is untrusted' {
+            It 'Should throw when the repository is untrusted and force is not set' {
+                InModuleScope -ScriptBlock {
+                    {
+                        Mock -CommandName Get-PSRepository -MockWith {
+                            return @{
+                                Name               = 'PSGallery'
+                                InstallationPolicy = 'Untrusted'
+                            }
+                        }
+                        $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                                return @{
+                                    Name       = 'PowerShellGet'
+                                    Version    = '1.5.0'
+                                    Repository = 'PSGallery'
+                                }
+                            } -Force
+
+                        $script:mockPSResourceInstance.TestRepository() | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.UntrustedRepositoryWithoutForce
+                    }
+                }
+            }
+
+            It 'Should not throw when the repository is untrusted and force is set' {
+                InModuleScope -ScriptBlock {
+                    {
+                        Mock -CommandName Get-PSRepository -MockWith {
+                            return @{
+                                Name               = 'PSGallery'
+                                InstallationPolicy = 'Untrusted'
+                            }
+                        }
+                        $script:mockPSResourceInstance.Force = $true
+                        $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                                return @{
+                                    Name       = 'PowerShellGet'
+                                    Version    = '1.5.0'
+                                    Repository = 'PSGallery'
+                                }
+                            } -Force
+
+                        $script:mockPSResourceInstance.TestRepository() | Should -Not -Throw
+                    }
+                }
+            }
+        }
+
+        Context 'When the repository is trusted' {
+            It 'Should not throw when the repository is trusted' {
+                InModuleScope -ScriptBlock {
+                    {
+                        Mock -CommandName Get-PSRepository -MockWith {
+                            return @{
+                                Name               = 'InternalRepo'
+                                InstallationPolicy = 'Trusted'
+                            }
+                        }
+                        $script:mockPSResourceInstance.Force = $true
+                        $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                                return @{
+                                    Name       = 'PowerShellGet'
+                                    Version    = '1.5.0'
+                                    Repository = 'InternalRepo'
+                                }
+                            } -Force
+
+                        $script:mockPSResourceInstance.TestRepository() | Should -Not -Throw
+                    }
+                }
+            }
+        }
+
+    }
+
     Describe 'PSResource\SetSingleInstance()' -Tag 'TestSingleInstance' {
         InModuleScope -ScriptBlock {
             $script:mockPSResourceInstance = [PSResource] @{
