@@ -456,7 +456,18 @@ class PSResource : ResourceBase
     #>
     hidden [System.Collections.Hashtable[]] GetInstalledResource()
     {
-        return $(Get-Module -Name $this.Name -ListAvailable)
+        $return = @()
+        $modules = Get-Module -Name $this.Name -ListAvailable
+
+        foreach ($module in $modules)
+        {
+            $return += @{
+                Name    = $module.Name
+                Version = $module.Version
+            }
+        }
+
+        return $return
     }
 
     <#

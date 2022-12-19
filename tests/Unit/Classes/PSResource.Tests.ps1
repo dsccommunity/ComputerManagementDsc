@@ -264,10 +264,16 @@ try
         It 'Should return one object' {
             InModuleScope -ScriptBlock {
                 Mock -CommandName Get-Module -MockWith {
-                    return @(New-MockObject -Type System.Management.Automation.PSModuleInfo)
+                    return @{
+                        Name    = 'PowerShellGet'
+                        Version = '3.0.17'
+                    }
                 }
                 {
-                    $script:mockPSResourceInstance.GetInstalledResource().Count | Should -Be 1
+                    $resources = $script:mockPSResourceInstance.GetInstalledResource().Count
+                    $resources.Count  | Should -Be 1
+                    $resource.Name    | Should -Be 'PowerShellGet'
+                    $resource.Version | Should -Be '3.0.17'
                 }
             }
         }
@@ -276,12 +282,23 @@ try
             InModuleScope -ScriptBlock {
                 Mock -CommandName Get-Module -MockWith {
                     return @(
-                        New-MockObject -Type System.Management.Automation.PSModuleInfo,
-                        New-MockObject -Type System.Management.Automation.PSModuleInfo
+                        @{
+                            Name    = 'PowerShellGet'
+                            Version = '3.0.17'
+                        },
+                        @{
+                            Name    = 'PowerShellGet'
+                            Version = '2.2.5'
+                        }
                     )
                 }
                 {
-                    $script:mockPSResourceInstance.GetInstalledResource().Count | Should -Be 2
+                    $resources = $script:mockPSResourceInstance.GetInstalledResource().Count
+                    $resources.Count  | Should -Be 2
+                    $resource[0].Name    | Should -Be 'PowerShellGet'
+                    $resource[0].Version | Should -Be '3.0.17'
+                    $resource[1].Name    | Should -Be 'PowerShellGet'
+                    $resource[1].Version | Should -Be '2.2.5'
                 }
             }
         }
