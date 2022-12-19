@@ -148,10 +148,12 @@ try
             }
             It 'Should throw the correct error' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AllowPrerelease = $true
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{AllowPrerelease = $true}
-                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
+                    {
+                        $script:mockPSResourceInstance.AllowPrerelease = $true
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{AllowPrerelease = $true}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
+                    }
                 }
             }
         }
@@ -159,45 +161,53 @@ try
         Context 'When passing dependant parameters' {
             It 'Should throw when RemoveNonCompliantVersions and SingleInstance are passed together' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{
-                            RemoveNonCompliantVersions = $true
-                            SingleInstance             = $true
-                        }
-                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                RemoveNonCompliantVersions = $true
+                                SingleInstance             = $true
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
                 }
             }
 
             It 'Should throw when Latest and MinimumVersion are passed together' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{
-                            Latest         = $true
-                            MinimumVersion = '1.0.0'
-                        }
-                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                Latest         = $true
+                                MinimumVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
                 }
             }
 
             It 'Should throw when Latest and RequiredVersion are passed together' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{
-                            Latest         = $true
-                            RequiredVersion = '1.0.0'
-                        }
-                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                Latest         = $true
+                                RequiredVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
                 }
             }
 
             It 'Should throw when Latest and MaximumVersion are passed together' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{
-                            Latest         = $true
-                            MaximumVersion = '1.0.0'
-                        }
-                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                Latest         = $true
+                                MaximumVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
                 }
             }
 
@@ -216,23 +226,27 @@ try
 
             It 'Should throw when MinimumVersion and RequiredVersion are passed together' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{
-                            MinimumVersion  = '1.0.0'
-                            RequiredVersion = '1.0.0'
-                        }
-                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                MinimumVersion  = '1.0.0'
+                                RequiredVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
                 }
             }
 
             It 'Should throw when RequiredVersion and MaximumVersion are passed together' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{
-                            MaximumVersion  = '1.0.0'
-                            RequiredVersion = '1.0.0'
-                        }
-                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                MaximumVersion  = '1.0.0'
+                                RequiredVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
                 }
             }
         }
