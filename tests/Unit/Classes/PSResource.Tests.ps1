@@ -138,22 +138,35 @@ try
             }
         }
         Context 'When PowerShellGet version is too low for AllowPrerelease' {
-            Mock -CommandName Get-Module -MockWith {
-                return @{
-                    Name   = 'PowerShellGet'
-                    Version = '1.5.0'
+            InModuleScope -ScriptBlock {
+                Mock -CommandName Get-Module -MockWith {
+                    return @{
+                        Name   = 'PowerShellGet'
+                        Version = '1.5.0'
+                    }
                 }
             }
             It 'Should throw the correct error' {
-                $script:mockPSResourceInstance.AllowPrerelease = $true
-                $script:mockPSResourceInstance.AllowPrerelease.AssertProperties(
-                    @{AllowPrerelease = $True}
-                ) | Should -Throw
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AllowPrerelease = $true
+                    $script:mockPSResourceInstance.AllowPrerelease.AssertProperties(
+                        @{AllowPrerelease = $true}
+                    ) | Should -Throw
+                }
             }
         }
 
         Context 'When passing dependant parameters' {
-
+            It 'Should throw when RemoveNonCompliantVersions and SingleInstance are passed together' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AllowPrerelease.AssertProperties(
+                        @{
+                            RemoveNonCompliantVersions = $true
+                            SingleInstance             = $true
+                        }
+                    ) | Should -Throw
+                }
+            }
         }
     }
 
