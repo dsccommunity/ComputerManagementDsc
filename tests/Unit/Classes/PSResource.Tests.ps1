@@ -203,12 +203,14 @@ try
 
             It 'Should throw when MinimumVersion and MaximumVersion are passed together' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{
-                            MinimumVersion = '1.0.0'
-                            MaximumVersion = '1.0.0'
-                        }
-                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                MinimumVersion = '1.0.0'
+                                MaximumVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
                 }
             }
 
@@ -244,25 +246,31 @@ try
 
             It 'Should throw when ensure is Absent and MinimumVersion is passed' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{MinimumVersion = '1.0.0'}
-                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MinimumVersion = '1.0.0'}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                    }
                 }
             }
 
             It 'Should throw when ensure is Absent and MaximumVersion is passed' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{MaximumVersion = '1.0.0'}
-                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MaximumVersion = '1.0.0'}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                    }
                 }
             }
 
             It 'Should throw when ensure is Absent and Latest is passed' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{Latest = $true}
-                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Latest = $true}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                    }
                 }
             }
         }
@@ -270,12 +278,14 @@ try
         Context 'When ProxyCredential is passed without Proxy' {
             It 'Should throw when ProxyCredential is passed without Proxy' {
                 InModuleScope -ScriptBlock {
-                    $securePassword = New-Object -Type SecureString
-                    $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
+                    {
+                        $securePassword = New-Object -Type SecureString
+                        $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
 
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{ProxyCredential = $credential}
-                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.ProxyCredentialPassedWithoutProxyUri
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{ProxyCredential = $credential}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.ProxyCredentialPassedWithoutProxyUri
+                    }
                 }
             }
         }
@@ -283,20 +293,24 @@ try
         Context 'When Credential or Proxy are passed without Repository' {
             It 'Should throw when Credential is passed without Repository' {
                 InModuleScope -ScriptBlock {
-                    $securePassword = New-Object -Type SecureString
-                    $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
+                    {
+                        $securePassword = New-Object -Type SecureString
+                        $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
 
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{Credential = $credential}
-                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.ProxyorCredentialWithoutRepository
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Credential = $credential}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.ProxyorCredentialWithoutRepository
+                    }
                 }
             }
 
             It 'Should throw when Proxy is passed without Repository' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{Proxy = 'http://psgallery.com/'}
-                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.ProxyorCredentialWithoutRepository
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Proxy = 'http://psgallery.com/'}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.ProxyorCredentialWithoutRepository
+                    }
                 }
             }
         }
@@ -304,9 +318,11 @@ try
         Context 'When RemoveNonCompliantVersions is passed without a versioning parameter' {
             It 'Should throw when RemoveNonCompliantVersions is passed without a versioning parameter' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{RemoveNonCompliantVersions = $true}
-                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.RemoveNonCompliantVersionsWithoutVersioning
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{RemoveNonCompliantVersions = $true}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.RemoveNonCompliantVersionsWithoutVersioning
+                    }
                 }
             }
         }
@@ -322,10 +338,12 @@ try
             }
             It 'Should correctly set read only LatestVersion property' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{Latest = $true}
-                    )
-                    $script:mockPSResourceInstance.LatestVersion | Should -Be '1.5.0'
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Latest = $true}
+                        )
+                        $script:mockPSResourceInstance.LatestVersion | Should -Be '1.5.0'
+                    }
                 }
             }
         }
@@ -333,57 +351,65 @@ try
         Context 'When a versioning parameter is passed' {
             It 'Should correctly set read only VersionRequirement property when MinimumVersion is passed' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance |
-                        Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
-                            return 'MinimumVersion'
-                        }
+                    {
+                        $script:mockPSResourceInstance |
+                            Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
+                                return 'MinimumVersion'
+                            }
 
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{MinimumVersion = '1.1.0'}
-                    )
-                    $script:mockPSResourceInstance.VersionRequirement | Should -Be 'MinimumVersion'
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MinimumVersion = '1.1.0'}
+                        )
+                        $script:mockPSResourceInstance.VersionRequirement | Should -Be 'MinimumVersion'
+                    }
                 }
             }
 
             It 'Should correctly set read only VersionRequirement property when MaximumVersion is passed' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance |
-                        Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
-                            return 'MaximumVersion'
-                        }
+                    {
+                        $script:mockPSResourceInstance |
+                            Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
+                                return 'MaximumVersion'
+                            }
 
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{MaximumVersion = '1.1.0'}
-                    )
-                    $script:mockPSResourceInstance.VersionRequirement | Should -Be 'MaximumVersion'
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MaximumVersion = '1.1.0'}
+                        )
+                        $script:mockPSResourceInstance.VersionRequirement | Should -Be 'MaximumVersion'
+                    }
                 }
             }
 
             It 'Should correctly set read only VersionRequirement property when RequiredVersion is passed' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance |
-                        Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
-                            return 'RequiredVersion'
-                        }
+                    {
+                        $script:mockPSResourceInstance |
+                            Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
+                                return 'RequiredVersion'
+                            }
 
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{MaximumVersion = '1.1.0'}
-                    )
-                    $script:mockPSResourceInstance.VersionRequirement | Should -Be 'RequiredVersion'
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MaximumVersion = '1.1.0'}
+                        )
+                        $script:mockPSResourceInstance.VersionRequirement | Should -Be 'RequiredVersion'
+                    }
                 }
             }
 
             It 'Should correctly set read only VersionRequirement property when Latest is passed' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance |
-                        Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
-                            return 'Latest'
-                        }
+                    {
+                        $script:mockPSResourceInstance |
+                            Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
+                                return 'Latest'
+                            }
 
-                    $script:mockPSResourceInstance.AssertProperties(
-                        @{Latest = $true}
-                    )
-                    $script:mockPSResourceInstance.VersionRequirement | Should -Be 'Latest'
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Latest = $true}
+                        )
+                        $script:mockPSResourceInstance.VersionRequirement | Should -Be 'Latest'
+                    }
                 }
             }
         }
