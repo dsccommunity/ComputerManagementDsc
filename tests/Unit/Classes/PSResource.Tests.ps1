@@ -131,6 +131,32 @@ try
     Describe 'PSResource\Modify()' -Tag 'Modify' {
     }
 
+    Describe 'PSResource\AssertProperties()' -Tag 'AssertProperties' {
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceRepositoryInstance = [PSResource] @{}
+            }
+        }
+        Context 'When PowerShellGet version is too low for AllowPrerelease' {
+            Mock -CommandName Get-Module -MockWith {
+                return @{
+                    Name   = 'PowerShellGet'
+                    Version = '1.5.0'
+                }
+            }
+            It 'Should throw the correct error' {
+                $script:mockPSResourceInstance.AllowPrerelease = $true
+                $script:mockPSResourceInstance.AllowPrerelease.AssertProperties(
+                    @{AllowPreRelease = $True}
+                ) | Should -Throw
+            }
+        }
+
+        Context 'When passing dependant parameters' {
+
+        }
+    }
+
     Describe 'PSResource\TestSingleInstance()' -Tag 'TestSingleInstance' {
         BeforeAll {
             InModuleScope -ScriptBlock {
