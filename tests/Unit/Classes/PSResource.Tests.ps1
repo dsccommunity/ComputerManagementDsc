@@ -149,7 +149,7 @@ try
             It 'Should throw the correct error' {
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceInstance.AllowPrerelease = $true
-                    $script:mockPSResourceInstance.AllowPrerelease.AssertProperties(
+                    $script:mockPSResourceInstance.AssertProperties(
                         @{AllowPrerelease = $true}
                     ) | Should -Throw
                 }
@@ -159,7 +159,7 @@ try
         Context 'When passing dependant parameters' {
             It 'Should throw when RemoveNonCompliantVersions and SingleInstance are passed together' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.AllowPrerelease.AssertProperties(
+                    $script:mockPSResourceInstance.AssertProperties(
                         @{
                             RemoveNonCompliantVersions = $true
                             SingleInstance             = $true
