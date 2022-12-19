@@ -167,6 +167,104 @@ try
                     ) | Should -Throw -ExpectedMessage 'DRC0010'
                 }
             }
+
+            It 'Should throw when Latest and MinimumVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AssertProperties(
+                        @{
+                            Latest         = $true
+                            MinimumVersion = '1.0.0'
+                        }
+                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                }
+            }
+
+            It 'Should throw when Latest and RequiredVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AssertProperties(
+                        @{
+                            Latest         = $true
+                            RequiredVersion = '1.0.0'
+                        }
+                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                }
+            }
+
+            It 'Should throw when Latest and MaximumVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AssertProperties(
+                        @{
+                            Latest         = $true
+                            MaximumVersion = '1.0.0'
+                        }
+                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                }
+            }
+
+            It 'Should throw when MinimumVersion and MaximumVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AssertProperties(
+                        @{
+                            MinimumVersion = '1.0.0'
+                            MaximumVersion = '1.0.0'
+                        }
+                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                }
+            }
+
+            It 'Should throw when MinimumVersion and RequiredVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AssertProperties(
+                        @{
+                            MinimumVersion  = '1.0.0'
+                            RequiredVersion = '1.0.0'
+                        }
+                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                }
+            }
+
+            It 'Should throw when RequiredVersion and MaximumVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AssertProperties(
+                        @{
+                            MaximumVersion  = '1.0.0'
+                            RequiredVersion = '1.0.0'
+                        }
+                    ) | Should -Throw -ExpectedMessage 'DRC0010'
+                }
+            }
+        }
+
+        Context 'When ensure is Absent' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Ensure = 'Absent'
+                }
+            }
+
+            It 'Should throw when ensure is Absent and MinimumVersion is passed' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AssertProperties(
+                        @{MinimumVersion = '1.0.0'}
+                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                }
+            }
+
+            It 'Should throw when ensure is Absent and MaximumVersion is passed' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AssertProperties(
+                        @{MaximumVersion = '1.0.0'}
+                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                }
+            }
+
+            It 'Should throw when ensure is Absent and Latest is passed' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.AssertProperties(
+                        @{Latest = $true}
+                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                }
+            }
         }
     }
 
