@@ -151,7 +151,7 @@ try
                     $script:mockPSResourceInstance.AllowPrerelease = $true
                     $script:mockPSResourceInstance.AssertProperties(
                         @{AllowPrerelease = $true}
-                    ) | Should -Throw
+                    ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
                 }
             }
         }
@@ -164,7 +164,7 @@ try
                             RemoveNonCompliantVersions = $true
                             SingleInstance             = $true
                         }
-                    ) | Should -Throw
+                    ) | Should -Throw -ExpectedMessage 'DRC0010'
                 }
             }
         }
