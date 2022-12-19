@@ -308,7 +308,7 @@ try
         It 'Should return true when only one resource is installed and it is the latest version' {
             InModuleScope -ScriptBlock {
                 $script:mockInstalledResources = New-Object -TypeName Object |
-                    Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.5.0'
+                    Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.5.0' -PassThru -Force
                 $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeTrue
             }
         }
@@ -317,12 +317,9 @@ try
             InModuleScope -ScriptBlock {
 
                 $script:mockInstalledResources = @(
-                    New-Object -TypeName Object |
-                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.0.0',
-                    New-Object -TypeName Object |
-                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.1.0',
-                    New-Object -TypeName Object |
-                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.6.0'
+                    $(New-Object -TypeName Object | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.0.0' -PassThru -Force),
+                    $(New-Object -TypeName Object | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.1.0' -PassThru -Force),
+                    $(New-Object -TypeName Object | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.6.0' -PassThru -Force)
                 )
 
                 $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeTrue
@@ -332,7 +329,7 @@ try
         It 'Should return false when only one resource is installed and it is not the latest version' {
             InModuleScope -ScriptBlock {
                 $script:mockInstalledResources = New-Object -TypeName Object |
-                    Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.5.0'
+                    Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.5.0' -PassThru -Force
                 $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeFalse
             }
         }
@@ -340,12 +337,9 @@ try
         It 'Should return false when multiple resources are installed, not including the latest version' {
             InModuleScope -ScriptBlock {
                 $script:mockInstalledResources = @(
-                    New-Object -TypeName Object |
-                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.0.0',
-                    New-Object -TypeName Object |
-                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.1.0',
-                    New-Object -TypeName Object |
-                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.2.0'
+                    $(New-Object -TypeName Object | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.0.0' -PassThru -Force),
+                    $(New-Object -TypeName Object | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.1.0' -PassThru -Force),
+                    $(New-Object -TypeName Object | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.2.0' -PassThru -Force)
                 )
 
                 $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeFalse
