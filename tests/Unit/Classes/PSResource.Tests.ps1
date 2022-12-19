@@ -135,67 +135,45 @@ try
         BeforeAll {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
-                    Name       = 'ComputerManagementDsc'
-                    Repository = 'PSGallery'
-                    Ensure     = 'Present'
+                    Name           = 'ComputerManagementDsc'
+                    Ensure         = 'Present'
+                    SingleInstance = $True
                 }
             }
         }
-        Context 'When there are zero resources installed' {
-            BeforeAll {
-                Mock -CommandName Get-Module
-            }
 
+        Context 'When there are zero resources installed' {
             It 'Should Correctly return False when Zero Resources are Installed' {
 
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.TestSingleInstance() | Should -BeFalse
+                    $script:mockPSResourceInstance.TestSingleInstance($null) | Should -BeFalse
                 }
-
-                Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
             }
         }
 
         Context 'When there is one resource installed' {
-            BeforeAll {
-                Mock -CommandName Get-Module -MockWith {
-                    return @{
-                        Name = 'ComputerManagementDsc'
-                    }
-                }
-            }
-
             It 'Should Correctly return True when One Resource is Installed' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.TestSingleInstance() | Should -BeTrue
+                    $script:mockResources = @{Name = 'ComputerManagementDsc'}
+                    $script:mockPSResourceInstance.TestSingleInstance($script:mockResources) | Should -BeTrue
                 }
-
-                Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
             }
         }
 
         Context 'When there are multiple resources installed' {
-            BeforeAll {
-                Mock -CommandName Get-Module -MockWith {
-                    return @(
-                        @{
-                            Name    = 'ComputerManagementDsc'
-                            Version = '8.5.0'
-                        },
-                        @{
-                            Name    = 'ComputerManagementDsc'
-                            Version = '8.6.0'
-                        }
-                    )
+            It 'Should Correctly return False' {
+                InModuleScope -ScriptBlock {
+                    $script:mockResources = @{
+                        Name    = 'ComputerManagementDsc'
+                        Version = '8.5.0'
+                    },
+                    @{
+                        Name    = 'ComputerManagementDsc'
+                        Version = '8.6.0'
+                    }
+                    $script:mockPSResourceInstance.TestSingleInstance($script:mockResources) | Should -BeFalse
                 }
             }
-        }
-        It 'Should Correctly return False' {
-            InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance.TestSingleInstance() | Should -BeFalse
-            }
-
-            Assert-MockCalled Get-Module -Exactly -Times 1 -Scope It
         }
     }
 
