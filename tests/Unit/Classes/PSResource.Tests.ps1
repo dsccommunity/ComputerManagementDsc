@@ -347,7 +347,7 @@ try
                     $script:mockPSResourceInstance |
                         Add-Member 'ScriptMethod' -Name 'GetLatestVersion' -Value {
                             return '1.5.0'
-                        }
+                        } -Force
                 }
             }
             It 'Should correctly set read only LatestVersion property' {
