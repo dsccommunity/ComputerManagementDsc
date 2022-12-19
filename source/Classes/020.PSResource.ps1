@@ -504,7 +504,7 @@ class PSResource : ResourceBase
     <#
         tests whether the installed resources includes the latest version available
     #>
-    hidden [System.Boolean] TestLatestVersion ([System.Management.Automation.PSModuleInfo[]] $resources)
+    hidden [System.Boolean] TestLatestVersion ([System.Collections.Hashtable[]] $resources)
     {
         $return = $false
 
@@ -545,10 +545,16 @@ class PSResource : ResourceBase
     <#
         Find the latest resource on a PSRepository
     #>
-    hidden [PSCustomObject] FindResource()
+    hidden [System.Collections.Hashtable] FindResource()
     {
         $params = $this | Get-DscProperty -ExcludeName @('Latest', 'SingleInstance', 'Ensure', 'SkipPublisherCheck', 'Force', 'RemoveNonCompliantVersions') -Type Key,Optional -HasValue
-        return Find-Module @params
+        $foundModule = Find-Module @params
+
+        return @{
+            Name       = $foundModule.Name
+            Version    = $foundModule.Version
+            Repository = $foundModule.Repository
+        }
     }
 
     hidden [void] InstallResource()
