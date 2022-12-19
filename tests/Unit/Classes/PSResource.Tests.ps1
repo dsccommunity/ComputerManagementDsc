@@ -307,8 +307,8 @@ try
 
         It 'Should return true when only one resource is installed and it is the latest version' {
             InModuleScope -ScriptBlock {
-                $script:mockInstalledResources = New-MockObject -Type 'System.Management.Automation.PSModuleInfo'
-                $script:mockInstalledResources.Version = '8.6.0'
+                $script:mockInstalledResources = New-Object -TypeName Object |
+                    Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.5.0'
                 $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeTrue
             }
         }
@@ -316,22 +316,14 @@ try
         It 'Should return true when multiple resources are installed, including the latest version' {
             InModuleScope -ScriptBlock {
 
-                $script:mockInstalledResource1 = New-MockObject -Type 'System.Management.Automation.PSModuleInfo'
-                $script:mockInstalledResource2 = New-MockObject -Type 'System.Management.Automation.PSModuleInfo'
-                $script:mockInstalledResource3 = ($(New-MockObject -Type 'System.Management.Automation.PSModuleInfo').Version = 8.6.0)
-                $script:mockInstalledResource1.Version = '8.2.0'
-                $script:mockInstalledResource2.Version = '8.5.0'
                 $script:mockInstalledResources = @(
-                    $script:mockInstalledResource1,
-                    $script:mockInstalledResource2,
-                    $script:mockInstalledResource3
+                    New-Object -TypeName Object |
+                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.0.0',
+                    New-Object -TypeName Object |
+                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.1.0',
+                    New-Object -TypeName Object |
+                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.6.0'
                 )
-                $minorVer = 5
-                foreach ($mockObj in $script:mockInstalledResources)
-                {
-                   $mockObj | Add-Member -MemberType NoteProperty -Name 'Version' -Value "8.$($minorVer).0"
-                   $minorVer++
-                }
 
                 $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeTrue
             }
@@ -339,25 +331,22 @@ try
 
         It 'Should return false when only one resource is installed and it is not the latest version' {
             InModuleScope -ScriptBlock {
-                $script:mockInstalledResources = New-MockObject -Type 'System.Management.Automation.PSModuleInfo'
-                $script:mockInstalledResources.Version = '8.5.0'
-                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeFalse re43
+                $script:mockInstalledResources = New-Object -TypeName Object |
+                    Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.5.0'
+                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeFalse
             }
         }
 
         It 'Should return false when multiple resources are installed, not including the latest version' {
             InModuleScope -ScriptBlock {
                 $script:mockInstalledResources = @(
-                    New-MockObject -Type 'System.Management.Automation.PSModuleInfo',
-                    New-MockObject -Type 'System.Management.Automation.PSModuleInfo',
-                    New-MockObject -Type 'System.Management.Automation.PSModuleInfo'
+                    New-Object -TypeName Object |
+                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.0.0',
+                    New-Object -TypeName Object |
+                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.1.0',
+                    New-Object -TypeName Object |
+                        Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.2.0'
                 )
-                $minorVer = 0
-                foreach ($mockObj in $script:mockInstalledResources)
-                {
-                   $mockObj.Version = "8.$($minorVer).0"
-                   $minorVer++
-                }
 
                 $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeFalse
             }
