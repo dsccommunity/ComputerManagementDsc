@@ -1171,7 +1171,7 @@ try
     }
 
     Describe 'PSResource\GetVersionRequirement()' -Tag 'GetVersionRequirement' {
-        BeforeAll {
+        BeforeEach {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource]@{}
             }
