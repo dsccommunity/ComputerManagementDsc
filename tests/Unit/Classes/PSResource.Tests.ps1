@@ -1068,6 +1068,55 @@ try
             }
         }
     }
+
+    Describe 'PSResource\GetMaximumInstalledVersion()' -Tag 'GetMaximumInstalledVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{
+                    MaximumVersion = '7.0.0'
+                }
+            }
+        }
+
+        Context 'When calling GetMaximumInstalledVersion()' {
+            It 'Should return the correct maximum version when an installed resource matches given MaximumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetMaximumInstalledVersion(
+                            @(
+                                @{
+                                    Version = '6.0.0'
+                                },
+                                @{
+                                    Version = '7.0.0'
+                                }
+                            )
+                        ) | Should -Be '7.0.0'
+                    }
+                }
+            }
+
+            It 'Should return the correct maximum version when an installed resource does not match the given MaximumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetMaximumInstalledVersion(
+                            @(
+                                @{
+                                    Version = '6.0.0'
+                                },
+                                @{
+                                    Version = '7.0.0'
+                                },
+                                @{
+                                    Version = '4.2.0'
+                                }
+                            )
+                        ) | Should -Be '7.0.0'
+                    }
+                }
+            }
+        }
+    }
 }
 finally
 {
