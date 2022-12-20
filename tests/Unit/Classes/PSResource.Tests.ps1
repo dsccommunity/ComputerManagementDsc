@@ -1185,7 +1185,9 @@ try
             }
             It 'Should return Latest' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'Latest'
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'Latest'
+                    }
                 }
             }
         }
@@ -1198,7 +1200,9 @@ try
             }
             It 'Should return MinimumVersion' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'MinimumVersion'
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'MinimumVersion'
+                    }
                 }
             }
         }
@@ -1211,7 +1215,9 @@ try
             }
             It 'Should return MaximumVersion' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'MaximumVersion'
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'MaximumVersion'
+                    }
                 }
             }
         }
@@ -1224,7 +1230,9 @@ try
             }
             It 'Should return MaximumVersion' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'RequiredVersion'
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'RequiredVersion'
+                    }
                 }
             }
         }
@@ -1232,7 +1240,9 @@ try
         Context 'When no version requirement is set' {
             It 'Should return null' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -BeNullOrEmpty
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -BeNullOrEmpty
+                    }
                 }
             }
         }
