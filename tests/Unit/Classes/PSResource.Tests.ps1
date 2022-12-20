@@ -516,7 +516,87 @@ try
                 }
 
                 Context 'When RequiredVersion is true' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.RequiredVersion    = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement = 'RequiredVersion'
+                        }
+                    }
 
+                    It 'Should return the correct state when RequiredVersion requirement is met exactly' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name            | Should -Be 'ComputerManagement'
+                                $currentState.Ensure          | Should -Be 'Present'
+                                $currentState.RequiredVersion | Should -Be '9.0.0'
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when RequiredVersion requirement is not met and multiple resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '10.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '11.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return $null
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name            | Should -Be 'ComputerManagement'
+                                $currentState.Ensure          | Should -Be 'Present'
+                                $currentState.RequiredVersion | Should -BeNullOrEmpty
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when RequiredVersion requirement is not met and no resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return $null
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name            | Should -Be 'ComputerManagement'
+                                $currentState.Ensure          | Should -Be 'Absent'
+                                $currentState.RequiredVersion | Should -BeNullOrEmpty
+                            }
+                        }
+                    }
                 }
 
                 Context 'When RemoveNonCompliantVersions is true' {
@@ -525,20 +605,43 @@ try
             }
 
             Context 'When VersionRequirement is not set' {
+                BeforeAll {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceInstance.RequiredVersion            = '9.0.0'
+                        $script:mockPSResourceInstance.VersionRequirement         = 'RequiredVersion'
+                        $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                    }
+                }
 
+                It 'Should return the current state when RemoveNonCompliantVersions requirement is met' {
+
+                }
+
+                It 'Should return the current state when RemoveNonCompliantVersions requirement is not met and resource are installed' {
+
+                }
+
+                It 'Should return the current state when RemoveNonCompliantVersions requirement is not met and resources are not installed' {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                return $null
+                            } -PassThru |
+                            Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                return $null
+                            }
+
+                        {
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name                       | Should -Be 'ComputerManagement'
+                            $currentState.Ensure                     | Should -Be 'Absent'
+                            $currentState.RequiredVersion            | Should -BeNullOrEmpty
+                            $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                        }
+                    }
+                }
             }
 
-        }
-
-
-        Context 'When the system is not in the desired state' {
-            Context 'When SingleInstance is true' {
-
-            }
-
-            Context 'When SingleInstance is true' {
-
-            }
         }
     }
 
