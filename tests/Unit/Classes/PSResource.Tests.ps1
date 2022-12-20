@@ -1177,6 +1177,15 @@ try
             }
         }
 
+        Context 'When Latest is set' {
+            It 'Should return Latest' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Latest = $true
+                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'Latest'
+                }
+            }
+        }
+
         Context 'When MinimumVersion is set' {
             It 'Should return MinimumVersion' {
                 InModuleScope -ScriptBlock {
@@ -1191,6 +1200,23 @@ try
                 InModuleScope -ScriptBlock {
                     $script:mockPSResourceInstance.MaximumVersion = '9.0.0'
                     $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'MaximumVersion'
+                }
+            }
+        }
+
+        Context 'When RequiredVersion is set' {
+            It 'Should return MaximumVersion' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
+                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'RequiredVersion'
+                }
+            }
+        }
+
+        Context 'When no version requirement is set' {
+            It 'Should return null' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -BeNullOrEmpty
                 }
             }
         }

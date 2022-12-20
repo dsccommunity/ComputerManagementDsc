@@ -731,7 +731,7 @@ class PSResource : ResourceBase
     <#
         Return the resource's version requirement
     #>
-    hidden [System.String] GetVersionRequirement ()
+    hidden [System.String] GetVersionRequirement()
     {
         $return = $null
 
