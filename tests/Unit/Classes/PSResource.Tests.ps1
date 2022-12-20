@@ -955,7 +955,6 @@ try
                 }
             }
 
-
             It 'Should return false when RequiredVersion requirement is not met' {
                 InModuleScope -ScriptBlock {
                     {
@@ -1015,6 +1014,55 @@ try
                             ),
                             'Latest'
                         ) | Should -BeFalse
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetMinimumInstalledVersion()' -Tag 'GetMinimumInstalledVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{
+                    MinimumVersion = '7.0.0'
+                }
+            }
+        }
+
+        Context 'When calling GetMinimumInstalledVersion()' {
+            It 'Should return the correct minimum version when an installed resource matches given MinimumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetMinimumInstalledVersion(
+                            @(
+                                @{
+                                    Version = '6.0.0'
+                                },
+                                @{
+                                    Version = '7.0.0'
+                                }
+                            )
+                        ) | Should -Be '7.0.0'
+                    }
+                }
+            }
+
+            It 'Should return the correct minimum version when an installed resource does not match the given MinimumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetMinimumInstalledVersion(
+                            @(
+                                @{
+                                    Version = '6.0.0'
+                                },
+                                @{
+                                    Version = '5.0.0'
+                                },
+                                @{
+                                    Version = '4.2.0'
+                                }
+                            )
+                        ) | Should -Be '4.2.0'
                     }
                 }
             }
