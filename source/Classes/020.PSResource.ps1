@@ -767,7 +767,7 @@ class PSResource : ResourceBase
     <#
         Get all resources that are not compliant based on VersionRequirement
     #>
-    hidden [System.Collections.Hashtable[]] GetNonCompliantVersions ([System.Collections.Hashtable[]] $resources)
+    hidden [System.Collections.Hashtable[]] GetNonCompliantResources ([System.Collections.Hashtable[]] $resources)
     {
         $nonCompliantResources = $null
 
@@ -800,12 +800,10 @@ class PSResource : ResourceBase
 
     <#
         Uninstall resources that do not match the given version requirement
-
-        #! for testing, should a GetNonCompliantVersions function be written?
     #>
     hidden [void] UninstallNonCompliantVersions ([System.Collections.Hashtable[]] $resources)
     {
-        $resourcesToUninstall = $this.GetNonCompliantVersions($resources)
+        $resourcesToUninstall = $this.GetNonCompliantResources($resources)
 
         Write-Verbose -Message ($this.localizedData.NonCompliantVersionCount -f $resourcesToUninstall.Count, $this.Name)
 

@@ -1325,7 +1325,7 @@ try
         }
     }
 
-    Describe 'PSResource\GetNonCompliantVersions()' -Tag 'GetNonCompliantVersions' {
+    Describe 'PSResource\GetNonCompliantResources()' -Tag 'GetNonCompliantVersions' {
         BeforeEach {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource]@{}
@@ -1349,7 +1349,7 @@ try
             It 'Should return the correct resources' {
                 InModuleScope -ScriptBlock {
                     {
-                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantVersions($script:resources)
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantResources($script:resources)
                         $nonCompliantResources.Count | Should -Be 3
                     }
                 }
@@ -1366,7 +1366,7 @@ try
             It 'Should return the correct resources' {
                 InModuleScope -ScriptBlock {
                     {
-                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantVersions($script:resources)
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantResources($script:resources)
                         $nonCompliantResources.Count | Should -Be 0
                     }
                 }
@@ -1383,7 +1383,7 @@ try
             It 'Should return the correct resources' {
                 InModuleScope -ScriptBlock {
                     {
-                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantVersions($script:resources)
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantResources($script:resources)
                         $nonCompliantResources.Count | Should -Be 3
                     }
                 }
@@ -1401,7 +1401,7 @@ try
             It 'Should return the correct resources' {
                 InModuleScope -ScriptBlock {
                     {
-                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantVersions($script:resources)
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantResources($script:resources)
                         $nonCompliantResources.Count | Should -Be 3
                     }
                 }
