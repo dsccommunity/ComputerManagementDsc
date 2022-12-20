@@ -121,10 +121,86 @@ try
     }
 
     Describe 'PSResource\GetCurrentState()' -Tag 'GetCurrentState' {
-        Context 'When the system is in the desired state' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name       = 'ComputerManagementDsc'
+                    Repository = 'PSGallery'
+                }
+            }
+        }
+        Context 'When Ensure is present' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Ensure = 'Present'
+                }
+            }
+
+            Context 'When SingleInstance is set' {
+                BeforeAll {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceInstance.SingleInstance = $true
+                    } |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                            return @{
+                                Name = 'ComputerManagementDsc'
+                            }
+                        } -PassThru |
+                        Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                            return $true
+                        }
+                }
+
+                It 'Should return the correct current state when SingleInstance is true' {
+                    InModuleScope -ScriptBlock {
+                        {
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name           | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure         | Should -Be 'Present'
+                            $currentState.SingleInstance | Should -BeTrue
+                        }
+                    }
+                }
+            }
+
+            Context 'When VersionRequirement is set' {
+
+                Context 'When Latest is true' {
+
+                }
+
+                Context 'When MinimumVersion is true' {
+
+                }
+
+                Context 'When MaximumVersion is true' {
+
+                }
+
+                Context 'When RequiredVersion is true' {
+
+                }
+
+                Context 'When RemoveNonCompliantVersions is true' {
+
+                }
+            }
+
+            Context 'When VersionRequirement is not set' {
+
+            }
+
         }
 
+
         Context 'When the system is not in the desired state' {
+            Context 'When SingleInstance is true' {
+
+            }
+
+            Context 'When SingleInstance is true' {
+
+            }
         }
     }
 
@@ -1419,7 +1495,7 @@ try
         }
     }
 
-    Describe 'PSResource\UninstallNonCompliantVersions()' -Tag 'UninstallNonCompliantVersions' {
+    Describe 'PSResource\UninstallNonCompliantResources()' -Tag 'UninstallNonCompliantResources' {
         BeforeEach {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource]@{}
@@ -1437,7 +1513,7 @@ try
             It 'Should not throw' {
                 InModuleScope -ScriptBlock {
                     {
-                        $script:mockPSResourceInstance.UninstallNonCompliantVersions(@{Version = '9.0.0'}) | Should -Not -Throw
+                        $script:mockPSResourceInstance.UninstallNonCompliantResources(@{Version = '9.0.0'}) | Should -Not -Throw
                     }
                 }
             }

@@ -799,15 +799,13 @@ class PSResource : ResourceBase
     <#
         Uninstall resources that do not match the given version requirement
     #>
-    hidden [void] UninstallNonCompliantVersions ([System.Collections.Hashtable[]] $resources)
+    hidden [void] UninstallNonCompliantResources ([System.Collections.Hashtable[]] $resources)
     {
         $resourcesToUninstall = $this.GetNonCompliantResources($resources)
 
-        Write-Verbose -Message ($this.localizedData.NonCompliantVersionCount -f $resourcesToUninstall.Count, $this.Name)
-
         foreach ($resource in $resourcesToUninstall)
         {
-            Write-Verbose -Message ($this.localizedData.UninstallNonCompliantVersion -f $resource.Name, $resource.Version, $this.VersionRequirement )
+            Write-Verbose -Message ($this.localizedData.UninstallNonCompliantResource -f $resource.Name, $resource.Version, $this.VersionRequirement )
             $this.UninstallResource($resource)
         }
     }
