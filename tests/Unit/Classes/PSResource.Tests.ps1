@@ -140,24 +140,73 @@ try
                 BeforeAll {
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceInstance.SingleInstance = $true
-                    } |
-                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
-                            return @{
-                                Name = 'ComputerManagementDsc'
-                            }
-                        } -PassThru |
-                        Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
-                            return $true
-                        }
+                    }
                 }
 
                 It 'Should return the correct current state when SingleInstance is true' {
                     InModuleScope -ScriptBlock {
                         {
+                            $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                return @{
+                                    Name = 'ComputerManagementDsc'
+                                }
+                            } -PassThru |
+                            Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                                return $true
+                            }
+
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
                             $currentState.Ensure         | Should -Be 'Present'
                             $currentState.SingleInstance | Should -BeTrue
+                        }
+                    }
+                }
+
+                It 'Should return the correct current state when SingleInstance is false because no resources are installed' {
+                    InModuleScope -ScriptBlock {
+                        {
+                            $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                return $null
+                            } -PassThru |
+                            Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                                return $false
+                            }
+
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name           | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure         | Should -Be 'Absent'
+                            $currentState.SingleInstance | Should -BeFalse
+                        }
+                    }
+                }
+
+                It 'Should return the correct current state when SingleInstance is false because multiple resources are installed' {
+                    InModuleScope -ScriptBlock {
+                        {
+                            $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                return @(
+                                    @{
+                                        Name    = 'ComputerManagementDsc'
+                                        Version = '9.0.0'
+                                    },
+                                    @{
+                                        Name    = 'ComputerManagementDsc'
+                                        Version = '7.0.0'
+                                    }
+                                )
+                            } -PassThru |
+                            Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                                return $false
+                            }
+
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name           | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure         | Should -Be 'Absent'
+                            $currentState.SingleInstance | Should -BeFalse
                         }
                     }
                 }
