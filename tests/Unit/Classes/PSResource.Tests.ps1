@@ -1117,6 +1117,58 @@ try
             }
         }
     }
+
+    Describe 'PSResource\GetRequiredInstalledVersion()' -Tag 'GetRequiredInstalledVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{
+                    RequiredVersion = '7.0.0'
+                }
+            }
+        }
+
+        Context 'When calling GetRequiredInstalledVersion()' {
+            It 'Should return the RequiredVersion when the required version is installed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetRequiredInstalledVersion(
+                            @(
+                                @{
+                                    Version = '5.0.0'
+                                },
+                                @{
+                                    Version = '7.0.0'
+                                },
+                                @{
+                                    Version = '6.0.0'
+                                }
+                            )
+                        ) | Should -Be '7.0.0'
+                    }
+                }
+            }
+
+            It 'Should return null when the required version is not installed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetRequiredInstalledVersion(
+                            @(
+                                @{
+                                    Version = '5.0.0'
+                                },
+                                @{
+                                    Version = '8.0.0'
+                                },
+                                @{
+                                    Version = '6.0.0'
+                                }
+                            )
+                        ) | Should -BeNullOrEmpty
+                    }
+                }
+            }
+        }
+    }
 }
 finally
 {
