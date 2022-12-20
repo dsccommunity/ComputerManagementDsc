@@ -1443,6 +1443,75 @@ try
             }
         }
     }
+
+    Describe 'PSResource\ResolveSingleInstance' -Tag 'ResolveSingleInstance' {
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+                $script:mockPSResourceInstance |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                        return @{
+                            Name   = 'ComputerManagementDsc'
+                            Verson = '9.0.0'
+                        }
+                    } -PassThru |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'InstallResource' -Value {
+                        return $null
+                    } -PassThru |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'UninstallResource' -Value {
+                        return $null
+                    }
+            }
+        }
+
+        Context 'When ResolveSingeInstance() is called' {
+            It 'Should not throw when no resources are passed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.ResolveSingleInstance(@()) | Should -Not -Throw
+                    }
+                }
+            }
+
+            It 'Should not throw when resources are passed and none match the resourceToKeep' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.ResolveSingleInstance(
+                            @(
+                                @{Version = '8.0.0'},
+                                @{Version = '7.0.0'}
+                            )
+                        ) | Should -Not -Throw
+                    }
+                }
+            }
+
+            It 'Should not throw when resources are passed and one matches the resourceToKeep' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.ResolveSingleInstance(
+                            @(
+                                @{Version = '8.0.0'},
+                                @{Version = '9.0.0'}
+                            )
+                        ) | Should -Not -Throw
+                    }
+                }
+            }
+
+            It 'Should not throw when a single resource is passed that matches the resourceToKeep' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.ResolveSingleInstance(
+                            @(
+                                @{Version = '9.0.0'}
+                            )
+                        ) | Should -Not -Throw
+                    }
+                }
+            }
+        }
+    }
 }
 finally
 {
