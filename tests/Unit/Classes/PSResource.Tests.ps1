@@ -870,6 +870,157 @@ try
             }
         }
     }
+
+    Describe 'PSResource\TestVersionRequirement()' -Tag 'TestVersionRequirement' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+
+                Mock -CommandName Uninstall-Module
+            }
+        }
+
+        Context 'When versionrequirement is MinimumVersion' {
+            It 'Should return true when MinimumVersion requirement is met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.MinimumVersion = '8.6.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.6.0'
+                            },
+                            'MinimumVersion'
+                        ) | Should -BeTrue
+                    }
+                }
+            }
+
+            It 'Should return false when MinimumVersion requirement is not met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.MinimumVersion = '8.7.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.6.0'
+                            },
+                            'MinimumVersion'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+        }
+
+        Context 'When versionrequirement is MaximumVersion' {
+            It 'Should return true when MaximumVersion requirement is met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.MaximumVersion = '8.7.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.6.0'
+                            },
+                            'MaximumVersion'
+                        ) | Should -BeTrue
+                    }
+                }
+            }
+
+            It 'Should return false when MaximumVersion requirement is not met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.MaximumVersion = '8.7.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '9.0.0'
+                            },
+                            'MaximumVersion'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+        }
+
+        Context 'When versionrequirement is RequiredVersion' {
+            It 'Should return true when RequiredVersion requirement is met' {
+                It 'Should return false when RequiredVersion requirement is not met' {
+                    InModuleScope -ScriptBlock {
+                        {
+                            $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
+                            $script:mockPSResourceInstance.TestVersionRequirement(
+                                @{
+                                    Version = '9.0.0'
+                                },
+                                'RequiredVersion'
+                            ) | Should -BeTrue
+                        }
+                    }
+                }
+            }
+
+            It 'Should return false when RequiredVersion requirement is not met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.0.0'
+                            },
+                            'RequiredVersion'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+        }
+
+        Context 'When versionrequirement is Latest' {
+            It 'Should return true when Latest requirement is met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.LatestVersion = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '9.0.0'
+                            },
+                            'Latest'
+                        ) | Should -BeTrue
+                    }
+                }
+            }
+
+            It 'Should return false when Latest requirement is not met with a single resource' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.Latest = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.0.0'
+                            },
+                            'Latest'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+
+            It 'Should return false when Latest requirement is not met with a multiple resources, including latest' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.Latest = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @(
+                                @{
+                                    Version = '8.0.0'
+                                },
+                                @{
+                                    Version = '9.0.0'
+                                }
+                            ),
+                            'Latest'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+        }
+    }
 }
 finally
 {
