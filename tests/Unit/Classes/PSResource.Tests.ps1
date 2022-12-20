@@ -1169,6 +1169,32 @@ try
             }
         }
     }
+
+    Describe 'PSResource\GetVersionRequirement()' -Tag 'GetVersionRequirement' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+            }
+        }
+
+        Context 'When MinimumVersion is set' {
+            It 'Should return MinimumVersion' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.MinimumVersion = '9.0.0'
+                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'MinimumVersion'
+                }
+            }
+        }
+
+        Context 'When MaximumVersion is set' {
+            It 'Should return MaximumVersion' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.MaximumVersion = '9.0.0'
+                    $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'MaximumVersion'
+                }
+            }
+        }
+    }
 }
 finally
 {
