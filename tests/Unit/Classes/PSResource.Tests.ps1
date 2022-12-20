@@ -429,6 +429,54 @@ try
         }
     }
 
+    # Describe 'PSResource\TestSingleInstance()' -Tag 'TestSingleInstance' {
+    #     InModuleScope -ScriptBlock {
+    #         $script:mockPSResourceInstance = [PSResource] @{
+    #             Name           = 'ComputerManagementDsc'
+    #             Ensure         = 'Present'
+    #             SingleInstance = $True
+    #         }
+    #     }
+
+    #     It 'Should not throw and return True when one resource is present' {
+    #         InModuleScope -ScriptBlock {
+    #             $script:mockPSResourceInstance.TestSingleInstance(
+    #                 @(
+    #                     @{
+    #                         Name    = 'ComputerManagementDsc'
+    #                         Version = '8.6.0'
+    #                     }
+    #                 )
+    #             ) | Should -BeTrue
+    #         }
+    #     }
+
+    #     It 'Should not throw and return False when zero resources are present' {
+    #         InModuleScope -ScriptBlock {
+    #             $script:mockPSResourceInstance.TestSingleInstance(
+    #                 @()
+    #             ) | Should -BeFalse
+    #         }
+    #     }
+
+    #     It 'Should not throw and return False when more than one resource is present' {
+    #         InModuleScope -ScriptBlock {
+    #             $script:mockPSResourceInstance.TestSingleInstance(
+    #                 @(
+    #                     @{
+    #                         Name    = 'ComputerManagementDsc'
+    #                         Version = '8.6.0'
+    #                     },
+    #                     @{
+    #                         Name    = 'ComputerManagementDsc'
+    #                         Version = '8.5.0'
+    #                     }
+    #                 )
+    #             ) | Should -BeFalse
+    #         }
+    #     }
+    # }
+
     Describe 'PSResource\TestSingleInstance()' -Tag 'TestSingleInstance' {
         BeforeAll {
             InModuleScope -ScriptBlock {
@@ -746,86 +794,33 @@ try
 
     }
 
-    Describe 'PSResource\SetSingleInstance()' -Tag 'TestSingleInstance' {
-        InModuleScope -ScriptBlock {
-            $script:mockPSResourceInstance = [PSResource] @{
-                Name           = 'ComputerManagementDsc'
-                Ensure         = 'Present'
-                SingleInstance = $True
-            }
-        }
-
-        It 'Should not throw and return True when one resource is present' {
-            InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance.TestSingleInstance(
-                    @(
-                        @{
-                            Name    = 'ComputerManagementDsc'
-                            Version = '8.6.0'
-                        }
-                    )
-                ) | Should -BeTrue
-            }
-        }
-
-        It 'Should not throw and return False when zero resources are present' {
-            InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance.TestSingleInstance(
-                    @()
-                ) | Should -BeFalse
-            }
-        }
-
-        It 'Should not throw and return False when more than one resource is present' {
-            InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance.TestSingleInstance(
-                    @(
-                        @{
-                            Name    = 'ComputerManagementDsc'
-                            Version = '8.6.0'
-                        },
-                        @{
-                            Name    = 'ComputerManagementDsc'
-                            Version = '8.5.0'
-                        }
-                    )
-                ) | Should -BeFalse
-            }
-        }
-    }
-
-    Describe 'PSResource\GetLatestVersion()' -Tag 'GetLatestVersion' {
+    Describe 'PSResource\FindResource' -Tag 'FindResource' {
         BeforeAll {
             InModuleScope -ScriptBlock {
-                $script:mockPSResourceInstance = [PSResource] @{
-                    Name           = 'ComputerManagementDsc'
-                    Ensure         = 'Present'
-                }
+                $script:mockPSResourceInstance = [PSResource]@{}
             }
         }
 
-        Context 'When only one resource is installed' {
-            BeforeAll {
+        Context 'When FindResource is called' {
+            It 'Should not throw and return properties correctly' {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance |
-                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
-                        @{
-                            Name    = 'ComputerManagementDsc'
-                            Version = '8.6.0'
+                    Mock -CommandName Find-Module -MockWith {
+                        return @{
+                            Name       = 'ComputerManagementDsc'
+                            Version    = '9.0.0'
+                            Repository = 'PSGallery'
                         }
+                    }
+
+                    {
+                        $findResourceResult = $script:mockPSResourceInstance.FindResource()
+                        $findResourceResult.Name       | Should -Be 'ComputerManagementDsc'
+                        $findResourceResult.Version    | Should -Be '9.0.0'
+                        $findResourceResult.Repository | Should -Be 'PSGallery'
                     }
                 }
             }
-            It 'Should return the latest version installed on the system' {
-                InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
-                }
-            }
         }
-    }
-
-    Describe 'PSResource\SetLatest()' -Tag 'SetLatest' {
-
     }
 }
 finally
