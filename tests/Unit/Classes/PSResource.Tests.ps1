@@ -822,6 +822,54 @@ try
             }
         }
     }
+
+    Describe 'PSResource\InstallResource' -Tag 'InstallResource' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{} |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestRepository' -Value {
+                        return $null #! Do I even need a -Value {} here?
+                    }
+
+                Mock -CommandName Install-Module
+            }
+        }
+
+        Context 'When InstallResource is called' {
+            It 'Should not throw when InstallResource is called' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.InstallResource() | Should -Not -Throw
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\UninstallResource' -Tag 'UninstallResource' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+
+                Mock -CommandName Uninstall-Module
+            }
+        }
+
+        Context 'When UninstallResource is called' {
+            It 'Should not throw when UninstallResource is called' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.UninstallResource(
+                            @{
+                                Name    = 'ComputerManagementDsc'
+                                Version = '1.6.0'
+                            }
+                        ) | Should -Not -Throw
+                    }
+                }
+            }
+        }
+    }
 }
 finally
 {
