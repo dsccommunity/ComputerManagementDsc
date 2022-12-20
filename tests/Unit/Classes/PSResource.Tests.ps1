@@ -1413,6 +1413,23 @@ try
         BeforeEach {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource]@{}
+                $script:mockPSResourceInstance |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'UninstallResource' -Value {
+                        return $null
+                    } -PassThru |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetNonCompliantResources' -Value {
+                        return $null
+                    }
+            }
+        }
+
+        Context 'When UninstallNonCompliantVerisons() is called' {
+            It 'Should not throw' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.UninstallNonCompliantVersions(@{Version = '9.0.0'}) | Should -Not -Throw
+                    }
+                }
             }
         }
     }
