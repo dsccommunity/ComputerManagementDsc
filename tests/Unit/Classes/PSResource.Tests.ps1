@@ -205,7 +205,7 @@ try
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
-                            $currentState.Ensure         | Should -Be 'Absent'
+                            $currentState.Ensure         | Should -Be 'Present'
                             $currentState.SingleInstance | Should -BeFalse
                         }
                     }
