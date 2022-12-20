@@ -765,38 +765,53 @@ class PSResource : ResourceBase
     }
 
     <#
-        Uninstall resources that do not match the given version requirement
+        Get all resources that are not compliant based on VersionRequirement
     #>
-    hidden [void] UninstallNonCompliantVersions ([System.Collections.Hashtable[]] $resources)
+    hidden [System.Collections.Hashtable[]] GetNonCompliantVersions ([System.Collections.Hashtable[]] $resources)
     {
-        $resourcesToUninstall = $null
+        $nonCompliantResources = $null
 
         switch ($this.VersionRequirement)
         {
             'MinimumVersion'
             {
-                $resourcesToUninstall = $resources | Where-Object {$_.Version -lt [Version]$this.MinimumVersion}
+                $nonCompliantResources = $resources | Where-Object {$_.Version -lt [Version]$this.MinimumVersion}
             }
             'MaximumVersion'
             {
-                $resourcesToUninstall = $resources | Where-Object {$_.Version -gt [Version]$this.MaximumVersion}
+                $nonCompliantResources = $resources | Where-Object {$_.Version -gt [Version]$this.MaximumVersion}
             }
             'RequiredVersion'
             {
-                $resourcesToUninstall = $resources | Where-Object {$_.Version -ne $this.RequiredVersion}
+                $nonCompliantResources = $resources | Where-Object {$_.Version -ne $this.RequiredVersion}
             }
             'Latest'
             {
                 #* get latest version and remove all others
 
-                $resourcesToUninstall = $resources | Where-Object {$_.Version -ne $this.LatestVersion}
+                $nonCompliantResources = $resources | Where-Object {$_.Version -ne $this.LatestVersion}
             }
         }
+
+        Write-Verbose -Message ($this.localizedData.NonCompliantVersionCount -f $nonCompliantResources.Count, $this.Name)
+
+        return $nonCompliantResources
+    }
+
+    <#
+        Uninstall resources that do not match the given version requirement
+
+        #! for testing, should a GetNonCompliantVersions function be written?
+    #>
+    hidden [void] UninstallNonCompliantVersions ([System.Collections.Hashtable[]] $resources)
+    {
+        $resourcesToUninstall = $this.GetNonCompliantVersions($resources)
 
         Write-Verbose -Message ($this.localizedData.NonCompliantVersionCount -f $resourcesToUninstall.Count, $this.Name)
 
         foreach ($resource in $resourcesToUninstall)
         {
+            Write-Verbose -Message ($this.localizedData.UninstallNonCompliantVersion -f $resource.Name, $resource.Version, $this.VersionRequirement )
             $this.UninstallResource($resource)
         }
     }

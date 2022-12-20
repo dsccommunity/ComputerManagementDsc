@@ -1324,6 +1324,98 @@ try
             }
         }
     }
+
+    Describe 'PSResource\GetNonCompliantVersions()' -Tag 'GetNonCompliantVersions' {
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+
+                $script:resources = @(
+                    @{Version = '9.0.0'},
+                    @{Version = '5.0.0'},
+                    @{Version = '3.0.0'},
+                    @{Version = '6.1.0'}
+                )
+            }
+        }
+
+        Context 'When version requirement is MinimumVersion' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.MinimumVersion = '9.0.0'
+                }
+            }
+
+            It 'Should return the correct resources' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantVersions($script:resources)
+                        $nonCompliantResources.Count | Should -Be 3
+                    }
+                }
+            }
+        }
+
+        Context 'When version requirement is MaximumVersion' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.MaximumVersion = '9.0.0'
+                }
+            }
+
+            It 'Should return the correct resources' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantVersions($script:resources)
+                        $nonCompliantResources.Count | Should -Be 0
+                    }
+                }
+            }
+        }
+
+        Context 'When version requirement is RequiredVersion' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
+                }
+            }
+
+            It 'Should return the correct resources' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantVersions($script:resources)
+                        $nonCompliantResources.Count | Should -Be 3
+                    }
+                }
+            }
+        }
+
+        Context 'When version requirement is Latest' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Latest = $true
+                    $script:mockPSResourceInstance.LatestVersion = '9.0.0'
+                }
+            }
+
+            It 'Should return the correct resources' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantVersions($script:resources)
+                        $nonCompliantResources.Count | Should -Be 3
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\UninstallNonCompliantVersions()' -Tag 'UninstallNonCompliantVersions' {
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+            }
+        }
+    }
 }
 finally
 {
