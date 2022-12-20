@@ -147,14 +147,14 @@ try
                     InModuleScope -ScriptBlock {
                         {
                             $script:mockPSResourceInstance |
-                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
-                                return @{
-                                    Name = 'ComputerManagementDsc'
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @{
+                                        Name = 'ComputerManagementDsc'
+                                    }
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                                    return $true
                                 }
-                            } -PassThru |
-                            Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
-                                return $true
-                            }
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
@@ -168,12 +168,12 @@ try
                     InModuleScope -ScriptBlock {
                         {
                             $script:mockPSResourceInstance |
-                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
-                                return $null
-                            } -PassThru |
-                            Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
-                                return $false
-                            }
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                                    return $false
+                                }
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
@@ -187,21 +187,21 @@ try
                     InModuleScope -ScriptBlock {
                         {
                             $script:mockPSResourceInstance |
-                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
-                                return @(
-                                    @{
-                                        Name    = 'ComputerManagementDsc'
-                                        Version = '9.0.0'
-                                    },
-                                    @{
-                                        Name    = 'ComputerManagementDsc'
-                                        Version = '7.0.0'
-                                    }
-                                )
-                            } -PassThru |
-                            Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
-                                return $false
-                            }
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                                    return $false
+                                }
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
@@ -215,7 +215,80 @@ try
             Context 'When VersionRequirement is set' {
 
                 Context 'When Latest is true' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.Latest = $true
+                        }
+                    }
 
+                    It 'Should return the correct state when Latest is true' {
+
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestLatestVersion' -Value {
+                                    return $true
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name   | Should -Be 'ComputerManagement'
+                                $currentState.Ensure | Should -Be 'Present'
+                                $currentState.Latest | Should -BeTrue
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when Latest is false and multiple resources are installed' {
+
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestLatestVersion' -Value {
+                                    return $false
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name   | Should -Be 'ComputerManagement'
+                                $currentState.Ensure | Should -Be 'Present'
+                                $currentState.Latest | Should -BeFalse
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when Latest is false and no resources are installed' {
+
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestLatestVersion' -Value {
+                                    return $false
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name   | Should -Be 'ComputerManagement'
+                                $currentState.Ensure | Should -Be 'Absent'
+                                $currentState.Latest | Should -BeFalse
+                            }
+                        }
+                    }
                 }
 
                 Context 'When MinimumVersion is true' {
