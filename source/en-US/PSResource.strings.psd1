@@ -36,7 +36,7 @@ ConvertFrom-StringData -StringData @'
     InstallResource                               = Installing resource '{0}'.
     GetInstalledResource                          = Getting all installed versions of resource '{0}'.
     GetRequiredVersionFromVersionRequirementError = GetRequiredVersionFromVersionRequirement should only be used with 'MinimumVersion', 'MaximumVersion, and 'RequiredVersion', not '{0}'.
-    NonCompliantVersionCount                      = Found '{0}' instances of resource '{1}' with non-compliant versions.
+    NonCompliantVersionCount                      = Found '{0}' instances of resource '{1}' that do not match version requirement of '{2}'.
     RemoveNonCompliantVersionsWithoutVersioning   = Argument 'RemoveNonCompliantVersions' requires one of parameters 'MinimumVersion', 'MaximumVersion', 'RequiredVersion' or 'Latest'.
     VersionRequirementFound                       = Version requirement for resource '{0}' is '{1}'.
     UninstallNonCompliantVersion                  = Uninstalling version '{0}' of resource '{1}' because it does not match version requirement of '{2}'.

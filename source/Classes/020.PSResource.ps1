@@ -787,13 +787,11 @@ class PSResource : ResourceBase
             }
             'Latest'
             {
-                #* get latest version and remove all others
-
                 $nonCompliantResources = $resources | Where-Object {$_.Version -ne $this.LatestVersion}
             }
         }
 
-        Write-Verbose -Message ($this.localizedData.NonCompliantVersionCount -f $nonCompliantResources.Count, $this.Name)
+        Write-Verbose -Message ($this.localizedData.NonCompliantVersionCount -f $nonCompliantResources.Count, $this.Name, $this.VersionRequirement)
 
         return $nonCompliantResources
     }
