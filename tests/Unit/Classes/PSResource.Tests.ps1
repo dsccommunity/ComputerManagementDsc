@@ -942,20 +942,19 @@ try
 
         Context 'When versionrequirement is RequiredVersion' {
             It 'Should return true when RequiredVersion requirement is met' {
-                It 'Should return false when RequiredVersion requirement is not met' {
-                    InModuleScope -ScriptBlock {
-                        {
-                            $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
-                            $script:mockPSResourceInstance.TestVersionRequirement(
-                                @{
-                                    Version = '9.0.0'
-                                },
-                                'RequiredVersion'
-                            ) | Should -BeTrue
-                        }
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '9.0.0'
+                            },
+                            'RequiredVersion'
+                        ) | Should -BeTrue
                     }
                 }
             }
+
 
             It 'Should return false when RequiredVersion requirement is not met' {
                 InModuleScope -ScriptBlock {
