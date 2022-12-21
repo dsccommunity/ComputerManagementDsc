@@ -622,13 +622,14 @@ try
                                 Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
                                     return $true
                                 }
-
-                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
-                            $currentState.Name                       | Should -Be 'ComputerManagementDsc'
-                            $currentState.Ensure                     | Should -Be 'Present'
-                            $currentState.MinimumVersion             | Should -Be '9.0.0'
-                            $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
-                            $currentState.RemoveNonCompliantVersions | Should -BeTrue
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure                     | Should -Be 'Present'
+                                $currentState.MinimumVersion             | Should -Be '9.0.0'
+                                $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                                $currentState.RemoveNonCompliantVersions | Should -BeTrue
+                            }
                         }
                     }
 
@@ -652,12 +653,14 @@ try
                                     return $false
                                 }
 
-                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
-                            $currentState.Name                       | Should -Be 'ComputerManagementDsc'
-                            $currentState.Ensure                     | Should -Be 'Present'
-                            $currentState.MinimumVersion             | Should -Be '9.0.0'
-                            $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
-                            $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure                     | Should -Be 'Present'
+                                $currentState.MinimumVersion             | Should -Be '9.0.0'
+                                $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                                $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                            }
                         }
                     }
 
@@ -681,12 +684,14 @@ try
                                     return $false
                                 }
 
-                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
-                            $currentState.Name                       | Should -Be 'ComputerManagementDsc'
-                            $currentState.Ensure                     | Should -Be 'Present'
-                            $currentState.MinimumVersion             | Should -Be '7.0.0'
-                            $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
-                            $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure                     | Should -Be 'Present'
+                                $currentState.MinimumVersion             | Should -Be '7.0.0'
+                                $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                                $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                            }
                         }
                     }
 
@@ -702,13 +707,14 @@ try
                                 Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
                                     return $false
                                 }
-
-                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
-                            $currentState.Name                       | Should -Be 'ComputerManagementDsc'
-                            $currentState.Ensure                     | Should -Be 'Absent'
-                            $currentState.MinimumVersion             | Should -BeNullOrEmpty
-                            $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
-                            $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure                     | Should -Be 'Absent'
+                                $currentState.MinimumVersion             | Should -BeNullOrEmpty
+                                $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                                $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                            }
                         }
                     }
                 }
