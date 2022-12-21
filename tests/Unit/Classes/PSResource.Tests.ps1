@@ -572,7 +572,7 @@ try
 
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
-                                $currentState.Name            | Should -Be 'ComputerManagement'
+                                $currentState.Name            | Should -Be 'ComputerManagementDsc'
                                 $currentState.Ensure          | Should -Be 'Present'
                                 $currentState.RequiredVersion | Should -BeNullOrEmpty
                             }
@@ -591,7 +591,7 @@ try
 
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
-                                $currentState.Name            | Should -Be 'ComputerManagement'
+                                $currentState.Name            | Should -Be 'ComputerManagementDsc'
                                 $currentState.Ensure          | Should -Be 'Absent'
                                 $currentState.RequiredVersion | Should -BeNullOrEmpty
                             }
@@ -599,8 +599,196 @@ try
                     }
                 }
 
-                Context 'When RemoveNonCompliantVersions is true' {
+                Context 'When RemoveNonCompliantVersions is true and MinimumVersion is set' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.MinimumVersion             = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement         = 'MinimumVersion'
+                            $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                        }
+                    }
 
+                    It 'Should return the correct state when MinimumVersion and RemoveNonCompliantVersions is met' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @{
+                                        Version = '9.0.0'
+                                    }
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                } - PassThru |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
+                                    return $true
+                                }
+
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure                     | Should -Be 'Present'
+                            $currentState.MinimumVersion             | Should -Be '9.0.0'
+                            $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                            $currentState.RemoveNonCompliantVersions | Should -BeTrue
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion is met and RemoveNonCompliantVersions is not' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Version = '10.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                } - PassThru |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
+                                    return $false
+                                }
+
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure                     | Should -Be 'Present'
+                            $currentState.MinimumVersion             | Should -Be '9.0.0'
+                            $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                            $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion and RemoveNonCompliantVersions are not met and resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Version = '7.0.0'
+                                        },
+                                        @{
+                                            Version = '8.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '7.0.0'
+                                } - PassThru |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
+                                    return $false
+                                }
+
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure                     | Should -Be 'Present'
+                            $currentState.MinimumVersion             | Should -Be '7.0.0'
+                            $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                            $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion and RemoveNonCompliantVersions are not met because no resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return $null
+                                } - PassThru |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
+                                    return $false
+                                }
+
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure                     | Should -Be 'Absent'
+                            $currentState.MinimumVersion             | Should -BeNullOrEmpty
+                            $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                            $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                        }
+                    }
+                }
+
+                Context 'When RemoveNonCompliantVersions is true and MaximumVersion is set' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.MaximumVersion             = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement         = 'MaximumVersion'
+                            $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                        }
+                    }
+
+                    It 'Should return the correct state when MaximumVersion and RemoveNonCompliantVersions is met' {
+
+                    }
+
+                    It 'Should return the correct state when MaximumVersion is met and RemoveNonCompliantVersions is not' {
+
+                    }
+
+                    It 'Should return the correct state when MaximumVersion and RemoveNonCompliantVersions are not met and resources are installed' {
+
+                    }
+
+                    It 'Should return the correct state when MaximumVersion and RemoveNonCompliantVersions are not met because no resources are installed' {
+
+                    }
+                }
+
+                Context 'When RemoveNonCompliantVersions is true and RequiredVersion is set' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.RequiredVersion            = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement         = 'RequiredVersion'
+                            $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                        }
+                    }
+
+                    It 'Should return the correct state when RequiredVersion and RemoveNonCompliantVersions is met' {
+
+                    }
+
+                    It 'Should return the correct state when RequiredVersion is met and RemoveNonCompliantVersions is not' {
+
+                    }
+
+                    It 'Should return the correct state when RequiredVersion and RemoveNonCompliantVersions are not met and resources are installed' {
+
+                    }
+
+                    It 'Should return the correct state when RequiredVersion and RemoveNonCompliantVersions are not met because no resources are installed' {
+
+                    }
+                }
+
+                Context 'When RemoveNonCompliantVersions is true and Latest is set' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.Latest                     = $true
+                            $script:mockPSResourceInstance.VersionRequirement         = 'Latest'
+                            $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                        }
+                    }
+
+                    It 'Should return the correct state when Latest and RemoveNonCompliantVersions is met' {
+
+                    }
+
+                    It 'Should return the correct state when Latest is met and RemoveNonCompliantVersions is not' {
+
+                    }
+
+                    It 'Should return the correct state when Latest and RemoveNonCompliantVersions are not met and resources are installed' {
+
+                    }
+
+                    It 'Should return the correct state when Latest and RemoveNonCompliantVersions are not met because no resources are installed' {
+
+                    }
                 }
             }
 
