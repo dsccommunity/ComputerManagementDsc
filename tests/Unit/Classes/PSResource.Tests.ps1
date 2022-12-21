@@ -618,7 +618,7 @@ try
                                 } -PassThru |
                                 Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
                                     return '9.0.0'
-                                } - PassThru |
+                                } -PassThru |
                                 Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
                                     return $true
                                 }
@@ -647,7 +647,7 @@ try
                                 } -PassThru |
                                 Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
                                     return '9.0.0'
-                                } - PassThru |
+                                } -PassThru |
                                 Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
                                     return $false
                                 }
@@ -676,7 +676,7 @@ try
                                 } -PassThru |
                                 Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
                                     return '7.0.0'
-                                } - PassThru |
+                                } -PassThru |
                                 Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
                                     return $false
                                 }
@@ -698,7 +698,7 @@ try
                                 } -PassThru |
                                 Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
                                     return $null
-                                } - PassThru |
+                                } -PassThru |
                                 Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
                                     return $false
                                 }
