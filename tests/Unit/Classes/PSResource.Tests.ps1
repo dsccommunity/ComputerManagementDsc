@@ -132,7 +132,7 @@ try
         Context 'When Ensure is present' {
             BeforeAll {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.Ensure = 'Present'
+                    $script:mockPSResourceInstance.Ensure = [Ensure]::Present
                 }
             }
 
@@ -158,7 +158,7 @@ try
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
-                            $currentState.Ensure         | Should -Be 'Present'
+                            $currentState.Ensure         | Should -Be [Ensure]::Present
                             $currentState.SingleInstance | Should -BeTrue
                         }
                     }
@@ -177,7 +177,7 @@ try
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
-                            $currentState.Ensure         | Should -Be 'Absent'
+                            $currentState.Ensure         | Should -Be [Ensure]::Absent
                             $currentState.SingleInstance | Should -BeFalse
                         }
                     }
@@ -205,7 +205,7 @@ try
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
-                            $currentState.Ensure         | Should -Be 'Present'
+                            $currentState.Ensure         | Should -Be [Ensure]::Present
                             $currentState.SingleInstance | Should -BeFalse
                         }
                     }
@@ -235,7 +235,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name   | Should -Be 'ComputerManagement'
-                                $currentState.Ensure | Should -Be 'Present'
+                                $currentState.Ensure | Should -Be [Ensure]::Present
                                 $currentState.Latest | Should -BeTrue
                             }
                         }
@@ -264,7 +264,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name   | Should -Be 'ComputerManagement'
-                                $currentState.Ensure | Should -Be 'Present'
+                                $currentState.Ensure | Should -Be [Ensure]::Present
                                 $currentState.Latest | Should -BeFalse
                             }
                         }
@@ -284,7 +284,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name   | Should -Be 'ComputerManagement'
-                                $currentState.Ensure | Should -Be 'Absent'
+                                $currentState.Ensure | Should -Be [Ensure]::Absent
                                 $currentState.Latest | Should -BeFalse
                             }
                         }
@@ -321,7 +321,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name           | Should -Be 'ComputerManagement'
-                                $currentState.Ensure         | Should -Be 'Present'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
                                 $currentState.MinimumVersion | Should -Be '9.0.0'
                             }
                         }
@@ -349,7 +349,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name           | Should -Be 'ComputerManagement'
-                                $currentState.Ensure         | Should -Be 'Present'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
                                 $currentState.MinimumVersion | Should -Be '9.0.0'
                             }
                         }
@@ -377,7 +377,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name           | Should -Be 'ComputerManagement'
-                                $currentState.Ensure         | Should -Be 'Present'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
                                 $currentState.MinimumVersion | Should -Be '7.0.0'
                             }
                         }
@@ -396,7 +396,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name           | Should -Be 'ComputerManagement'
-                                $currentState.Ensure         | Should -Be 'Absent'
+                                $currentState.Ensure         | Should -Be [Ensure]::Absent
                                 $currentState.MinimumVersion | Should -BeNullOrEmpty
                             }
                         }
@@ -433,7 +433,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name           | Should -Be 'ComputerManagement'
-                                $currentState.Ensure         | Should -Be 'Present'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
                                 $currentState.MaximumVersion | Should -Be '9.0.0'
                             }
                         }
@@ -461,7 +461,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name           | Should -Be 'ComputerManagement'
-                                $currentState.Ensure         | Should -Be 'Present'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
                                 $currentState.MaximumVersion | Should -Be '9.0.0'
                             }
                         }
@@ -489,7 +489,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name           | Should -Be 'ComputerManagement'
-                                $currentState.Ensure         | Should -Be 'Present'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
                                 $currentState.MaximumVersion | Should -Be '11.0.0'
                             }
                         }
@@ -508,7 +508,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name           | Should -Be 'ComputerManagement'
-                                $currentState.Ensure         | Should -Be 'Absent'
+                                $currentState.Ensure         | Should -Be [Ensure]::Absent
                                 $currentState.MaximumVersion | Should -BeNullOrEmpty
                             }
                         }
@@ -545,7 +545,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name            | Should -Be 'ComputerManagement'
-                                $currentState.Ensure          | Should -Be 'Present'
+                                $currentState.Ensure          | Should -Be [Ensure]::Present
                                 $currentState.RequiredVersion | Should -Be '9.0.0'
                             }
                         }
@@ -573,7 +573,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name            | Should -Be 'ComputerManagementDsc'
-                                $currentState.Ensure          | Should -Be 'Present'
+                                $currentState.Ensure          | Should -Be [Ensure]::Present
                                 $currentState.RequiredVersion | Should -BeNullOrEmpty
                             }
                         }
@@ -592,7 +592,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name            | Should -Be 'ComputerManagementDsc'
-                                $currentState.Ensure          | Should -Be 'Absent'
+                                $currentState.Ensure          | Should -Be [Ensure]::Absent
                                 $currentState.RequiredVersion | Should -BeNullOrEmpty
                             }
                         }
@@ -625,7 +625,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name                       | Should -Be 'ComputerManagementDsc'
-                                $currentState.Ensure                     | Should -Be 'Present'
+                                $currentState.Ensure                     | Should -Be [Ensure]::Present
                                 $currentState.MinimumVersion             | Should -Be '9.0.0'
                                 $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
                                 $currentState.RemoveNonCompliantVersions | Should -BeTrue
@@ -656,7 +656,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name                       | Should -Be 'ComputerManagementDsc'
-                                $currentState.Ensure                     | Should -Be 'Present'
+                                $currentState.Ensure                     | Should -Be [Ensure]::Present
                                 $currentState.MinimumVersion             | Should -Be '9.0.0'
                                 $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
                                 $currentState.RemoveNonCompliantVersions | Should -BeFalse
@@ -687,7 +687,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name                       | Should -Be 'ComputerManagementDsc'
-                                $currentState.Ensure                     | Should -Be 'Present'
+                                $currentState.Ensure                     | Should -Be [Ensure]::Present
                                 $currentState.MinimumVersion             | Should -Be '7.0.0'
                                 $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
                                 $currentState.RemoveNonCompliantVersions | Should -BeFalse
@@ -710,7 +710,7 @@ try
                             {
                                 $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                                 $currentState.Name                       | Should -Be 'ComputerManagementDsc'
-                                $currentState.Ensure                     | Should -Be 'Absent'
+                                $currentState.Ensure                     | Should -Be [Ensure]::Absent
                                 $currentState.MinimumVersion             | Should -BeNullOrEmpty
                                 $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
                                 $currentState.RemoveNonCompliantVersions | Should -BeFalse
@@ -828,7 +828,7 @@ try
                         {
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name                       | Should -Be 'ComputerManagement'
-                            $currentState.Ensure                     | Should -Be 'Absent'
+                            $currentState.Ensure                     | Should -Be [Ensure]::Absent
                             $currentState.RequiredVersion            | Should -BeNullOrEmpty
                             $currentState.RemoveNonCompliantVersions | Should -BeFalse
                         }
@@ -965,7 +965,7 @@ try
         Context 'When ensure is Absent' {
             BeforeAll {
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.Ensure = 'Absent'
+                    $script:mockPSResourceInstance.Ensure = [Ensure]::Absent
                 }
             }
 
@@ -1144,7 +1144,7 @@ try
     #     InModuleScope -ScriptBlock {
     #         $script:mockPSResourceInstance = [PSResource] @{
     #             Name           = 'ComputerManagementDsc'
-    #             Ensure         = 'Present'
+    #             Ensure         = [Ensure]::Present
     #             SingleInstance = $True
     #         }
     #     }
@@ -1193,7 +1193,7 @@ try
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
                     Name           = 'ComputerManagementDsc'
-                    Ensure         = 'Present'
+                    Ensure         = [Ensure]::Present
                     SingleInstance = $True
                 }
             }
@@ -1239,7 +1239,7 @@ try
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
                     Name       = 'ComputerManagementDsc'
-                    Ensure     = 'Present'
+                    Ensure     = [Ensure]::Present
                 }
             }
         }
@@ -1284,7 +1284,7 @@ try
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
                     Name       = 'ComputerManagementDsc'
-                    Ensure     = 'Present'
+                    Ensure     = [Ensure]::Present
                 }
             }
         }
@@ -1352,7 +1352,7 @@ try
                 $script:mockPSResourceInstance = [PSResource] @{
                     Name          = 'ComputerManagementDsc'
                     LatestVersion = '8.6.0'
-                    Ensure        = 'Present'
+                    Ensure        = [Ensure]::Present
                 }
             }
         }
