@@ -268,7 +268,18 @@ try
                         $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:Ensure'
 
                         $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:SourceLocation'})
-                        $reason.Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was null'
+
+                        # Handle PowerShell and Windows PowerShell differently.
+                        if ($IsLinux -or $IsMacOS -or $IsWindows)
+                        {
+                            # PowerShell
+                            $reason.Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was null'
+                        }
+                        else
+                        {
+                            # Windows PowerShell
+                            $reason.Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was ""'
+                        }
 
                         $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:Ensure'})
                         $reason.Phrase | Should -Be 'The property Ensure should be "Present", but was "Absent"'
