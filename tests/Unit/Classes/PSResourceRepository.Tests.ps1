@@ -263,10 +263,15 @@ try
                         $currentState.PackageManagementProvider | Should -BeNullOrEmpty
 
                         $currentState.Reasons | Should -HaveCount 2
-                        $currentState.Reasons[0].Code | Should -Be 'PSResourceRepository:PSResourceRepository:SourceLocation'
-                        $currentState.Reasons[0].Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was null'
-                        $currentState.Reasons[1].Code | Should -Be 'PSResourceRepository:PSResourceRepository:Ensure'
-                        $currentState.Reasons[1].Phrase | Should -Be 'The property Ensure should be "Present", but was "Absent"'
+
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:SourceLocation'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:Ensure'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:SourceLocation'})
+                        $reason.Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was null'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:Ensure'})
+                        $reason.Phrase | Should -Be 'The property Ensure should be "Present", but was "Absent"'
                     }
                 }
             }
@@ -312,18 +317,31 @@ try
                         $currentState.PackageManagementProvider | Should -Be 'Package'
 
                         $currentState.Reasons | Should -HaveCount 6
-                        $currentState.Reasons[0].Code | Should -Be 'PSResourceRepository:PSResourceRepository:SourceLocation'
-                        $currentState.Reasons[0].Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was "https://www.notcorrect.com/api/v2"'
-                        $currentState.Reasons[1].Code | Should -Be 'PSResourceRepository:PSResourceRepository:InstallationPolicy'
-                        $currentState.Reasons[1].Phrase | Should -Be 'The property InstallationPolicy should be "Untrusted", but was "Trusted"'
-                        $currentState.Reasons[2].Code | Should -Be 'PSResourceRepository:PSResourceRepository:ScriptSourceLocation'
-                        $currentState.Reasons[2].Phrase | Should -Be 'The property ScriptSourceLocation should be "https://www.powershellgallery.com/api/v2/items/psscript", but was "https://www.notcorrect.com/api/v2/items/psscript"'
-                        $currentState.Reasons[3].Code | Should -Be 'PSResourceRepository:PSResourceRepository:ScriptPublishLocation'
-                        $currentState.Reasons[3].Phrase | Should -Be 'The property ScriptPublishLocation should be "https://www.powershellgallery.com/api/v2/package/", but was "https://www.notcorrect.com/api/v2/package/"'
-                        $currentState.Reasons[4].Code | Should -Be 'PSResourceRepository:PSResourceRepository:PackageManagementProvider'
-                        $currentState.Reasons[4].Phrase | Should -Be 'The property PackageManagementProvider should be "NuGet", but was "Package"'
-                        $currentState.Reasons[5].Code | Should -Be 'PSResourceRepository:PSResourceRepository:PublishLocation'
-                        $currentState.Reasons[5].Phrase | Should -Be 'The property PublishLocation should be "https://www.powershellgallery.com/api/v2/package/", but was "https://www.notcorrect.com/api/v2/package/"'
+
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:SourceLocation'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:InstallationPolicy'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:ScriptSourceLocation'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:ScriptPublishLocation'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:PackageManagementProvider'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:PublishLocation'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:SourceLocation'})
+                        $reason.Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was "https://www.notcorrect.com/api/v2"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:InstallationPolicy'})
+                        $reason.Phrase | Should -Be 'The property InstallationPolicy should be "Untrusted", but was "Trusted"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:ScriptSourceLocation'})
+                        $reason.Phrase | Should -Be 'The property ScriptSourceLocation should be "https://www.powershellgallery.com/api/v2/items/psscript", but was "https://www.notcorrect.com/api/v2/items/psscript"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:ScriptPublishLocation'})
+                        $reason.Phrase | Should -Be 'The property ScriptPublishLocation should be "https://www.powershellgallery.com/api/v2/package/", but was "https://www.notcorrect.com/api/v2/package/"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:PackageManagementProvider'})
+                        $reason.Phrase | Should -Be 'The property PackageManagementProvider should be "NuGet", but was "Package"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:PublishLocation'})
+                        $reason.Phrase | Should -Be 'The property PublishLocation should be "https://www.powershellgallery.com/api/v2/package/", but was "https://www.notcorrect.com/api/v2/package/"'
                     }
                 }
 

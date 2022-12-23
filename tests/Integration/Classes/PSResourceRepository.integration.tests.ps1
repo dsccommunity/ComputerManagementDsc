@@ -88,6 +88,8 @@ try
                 $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
                 $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
 
+                # Read-only properties
+                $resourceCurrentState.Reasons | Should -BeNullOrEmpty
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {
@@ -152,6 +154,9 @@ try
 
                 # Defaulted properties
                 $resourceCurrentState.Ensure | Should -Be $shouldBeData.Ensure
+
+                # Read-only properties
+                $resourceCurrentState.Reasons | Should -BeNullOrEmpty
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {
@@ -218,6 +223,9 @@ try
 
                 # Ensure will be Absent
                 $resourceCurrentState.Ensure | Should -Be 'Absent'
+
+                # Read-only properties
+                $resourceCurrentState.Reasons | Should -BeNullOrEmpty
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {

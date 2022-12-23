@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed the file `source/build.psd1` as it is no longer required for the
     build pipeline.
 - PSResourceRepository
-  - The resource now supports read-only property `Reasons` that the compliant
+  - The resource now supports the read-only property `Reasons` that the compliant
     part (audit via Azure Policy) of the Azure AutoManage Machine Configuration
     uses.
 
