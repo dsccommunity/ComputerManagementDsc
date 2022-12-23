@@ -48,6 +48,9 @@
         and PackageManagementProvider may not be used in conjunction with Default.
         When the Default parameter is used, properties are not enforced when PSGallery properties are changed outside of Dsc.
 
+    .PARAMETER Reasons
+        Returns the reason a property is not in desired state.
+
     .EXAMPLE
         Invoke-DscResource -ModuleName ComputerManagementDsc -Name PSResourceRepository -Method Get -Property @{
             Name                      = 'PSTestRepository'
@@ -96,7 +99,7 @@ class PSResourceRepository : ResourceBase
     $Proxy
 
     [DscProperty()]
-    [pscredential]
+    [PSCredential]
     $ProxyCredential
 
     [DscProperty()]
@@ -112,6 +115,10 @@ class PSResourceRepository : ResourceBase
     [Nullable[System.Boolean]]
     $Default
 
+    [DscProperty(NotConfigurable)]
+    [Reason[]]
+    $Reasons
+
     # Passing the module's base directory to the base constructor so it finds localization files.
     PSResourceRepository () : base ($PSScriptRoot)
     {
@@ -124,12 +131,12 @@ class PSResourceRepository : ResourceBase
 
     [PSResourceRepository] Get()
     {
-        return ([ResourceBase]$this).Get()
+        return ([ResourceBase] $this).Get()
     }
 
     [void] Set()
     {
-        ([ResourceBase]$this).Set()
+        ([ResourceBase] $this).Set()
     }
 
     [Boolean] Test()
@@ -226,7 +233,7 @@ class PSResourceRepository : ResourceBase
             $returnValue.PublishLocation           = $repository.PublishLocation
             $returnValue.ScriptPublishLocation     = $repository.ScriptPublishLocation
             $returnValue.Proxy                     = $repository.Proxy
-            $returnValue.ProxyCredential           = $repository.ProxyCredental
+            $returnValue.ProxyCredential           = $repository.ProxyCredential
             $returnValue.InstallationPolicy        = $repository.InstallationPolicy
             $returnValue.PackageManagementProvider = $repository.PackageManagementProvider
         }
