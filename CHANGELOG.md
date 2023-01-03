@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - ComputerManagementDsc
-  - Added missing unit tests for private functions.
+  - Added missing unit tests for private functions - Fixes [Issue #403](https://github.com/dsccommunity/ComputerManagementDsc/issues/403)
 - PSResourceRepository
   - New class-based resource to manage PowerShell Resource Repositories - Fixes [Issue #393](https://github.com/dsccommunity/ComputerManagementDsc/issues/393)
 - Computer
