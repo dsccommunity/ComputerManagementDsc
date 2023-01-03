@@ -112,7 +112,8 @@ class PSResourceRepository : ResourceBase
     [Nullable[System.Boolean]]
     $Default
 
-    PSResourceRepository () : base ()
+    # Passing the module's base directory to the base constructor so it finds localization files.
+    PSResourceRepository () : base ($PSScriptRoot)
     {
         # These properties will not be enforced.
         $this.ExcludeDscProperties = @(
