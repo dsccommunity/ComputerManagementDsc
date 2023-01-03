@@ -5,6 +5,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- ComputerManagementDsc
+  - The private function `Test-ResourceDscPropertyIsAssigned` was removed as
+    from now we should use `Test-DscProperty -Name 'MyProperty' -HasValue`, or
+    `Get-DscProperty -Name 'MyProperty' -HasValue` depending what kind of
+    return value is needed - Fixes [Issue #407](https://github.com/dsccommunity/ComputerManagementDsc/issues/407).
+
+### Changed
+
+- ComputerManagementDsc
+  - Now uses the commands `Get-DscProperty` and `Test-DscProperty` from
+    the module DscResource.Common - Fixes [Issue #407](https://github.com/dsccommunity/ComputerManagementDsc/issues/407).
+    - All uses of `Get-DscProperty` was changed to use the named parameter
+      `Attribute` instead of the parameter alias `Type`.
+    - All uses of `Test-ResourceHasDscProperty` was changed to use `Test-DscProperty`
+
 ## [9.0.0] - 2023-02-22
 
 ### Fixed
