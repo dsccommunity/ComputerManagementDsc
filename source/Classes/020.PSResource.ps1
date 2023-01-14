@@ -200,7 +200,7 @@ class PSResource : ResourceBase
         }
         elseif ($properties.ContainsKey('Ensure') -and $properties.Ensure -eq 'Present' -and $this.Ensure -eq 'Present')
         {
-            #* Module does not exist at all
+            # Module does not exist at all
             $this.InstallResource()
         }
         elseif ($properties.ContainsKey('SingleInstance'))
@@ -427,7 +427,7 @@ class PSResource : ResourceBase
         }
         else
         {
-            #* SingleInstance should not rely on VersionRequirements to report correctly
+            # SingleInstance should not rely on VersionRequirements to report correctly
             $return = $true
         }
 
@@ -817,7 +817,7 @@ class PSResource : ResourceBase
     {
         Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
 
-        #* Too many versions
+        # Too many versions
 
         $resourceToKeep = $this.FindResource()
 
