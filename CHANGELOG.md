@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     in the module manifest in the source folder as the built module is
     automatically updated with this information by the pipeline - Fixes [Issue #396](https://github.com/dsccommunity/ComputerManagementDsc/issues/396).
   - Moved the build step of the pipeline to a Windows build worker when running in Azure DevOps.
+  - The class-based resources are now re-using the module DscResource.Base - Fixes [Issue #404](https://github.com/dsccommunity/ComputerManagementDsc/issues/404).
+  - Removed the file `source/build.psd1` as it is no longer required for the
+    build pipeline.
 
 ## [8.5.0] - 2021-09-13
 
