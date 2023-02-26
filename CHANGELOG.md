@@ -5,6 +5,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- ComputerManagementDsc
+  - The class-based resources are now re-using the module DscResource.Base - Fixes [Issue #404](https://github.com/dsccommunity/ComputerManagementDsc/issues/404).
+  - Removed the file `source/build.psd1` as it is no longer required for the
+    build pipeline.
+
 ## [9.0.0] - 2023-02-22
 
 ### Fixed
