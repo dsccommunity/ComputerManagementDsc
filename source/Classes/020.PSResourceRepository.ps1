@@ -116,7 +116,7 @@ class PSResourceRepository : ResourceBase
     $Default
 
     [DscProperty(NotConfigurable)]
-    [System.Collections.Hashtable[]]
+    [CMReason[]]
     $Reasons
 
     # Passing the module's base directory to the base constructor so it finds localization files.
