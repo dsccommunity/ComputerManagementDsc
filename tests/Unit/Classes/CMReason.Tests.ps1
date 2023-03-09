@@ -51,7 +51,7 @@ try
             }
         }
 
-        Context 'When setting an reading values' {
+        Context 'When setting and reading values' {
             It 'Should be able to set value in instance' {
                 $script:mockCMReasonInstance = InModuleScope -ScriptBlock {
                     $CMReasonInstance = [CMReason]::new()
