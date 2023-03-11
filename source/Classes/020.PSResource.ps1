@@ -36,7 +36,7 @@
         Allows the installation of resource that have not been catalog signed.
 
     .PARAMETER OnlySingleVersion
-        Specifies whether only one version of the resource should installed be on the server.
+        Specifies whether only a single version of the resource should installed be on the server.
 
     .PARAMETER AllowPrerelease
         Specifies whether to allow pre-release versions of the resource.
