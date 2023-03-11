@@ -35,7 +35,7 @@
     .PARAMETER SkipPublisherCheck
         Allows the installation of resource that have not been catalog signed.
 
-    .PARAMETER SingleInstance
+    .PARAMETER OnlySingleVersion
         Specifies whether only one version of the resource should installed be on the server.
 
     .PARAMETER AllowPrerelease
@@ -60,7 +60,7 @@
             RequiredVersion    = '2.2.5'
             Force              = $true
             SkipPublisherCheck = $false
-            SingleInstance     = $true
+            OnlySingleVersion     = $true
             AllowPrerelease    = $False
         }
         This example shows how to call the resource using Invoke-DscResource.
@@ -110,7 +110,7 @@ class PSResource : ResourceBase
 
     [DscProperty()]
     [Nullable[System.Boolean]]
-    $SingleInstance
+    $OnlySingleVersion
 
     [DscProperty()]
     [Nullable[System.Boolean]]
@@ -203,9 +203,9 @@ class PSResource : ResourceBase
             # Module does not exist at all
             $this.InstallResource()
         }
-        elseif ($properties.ContainsKey('SingleInstance'))
+        elseif ($properties.ContainsKey('OnlySingleVersion'))
         {
-            $this.ResolveSingleInstance($installedResource)
+            $this.ResolveOnlySingleVersion($installedResource)
 
             return
         }
@@ -239,9 +239,9 @@ class PSResource : ResourceBase
             Ensure = [Ensure]::Absent
         }
 
-        if ($currentState.ContainsKey('SingleInstance') -and $this.SingleInstance)
+        if ($currentState.ContainsKey('OnlySingleVersion') -and $this.OnlySingleVersion)
         {
-            $returnValue.SingleInstance = $this.TestSingleInstance($resources)
+            $returnValue.OnlySingleVersion = $this.TestOnlySingleVersion($resources)
         }
 
         if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
@@ -294,7 +294,7 @@ class PSResource : ResourceBase
                 'RemoveNonCompliantVersions'
             )
             MutuallyExclusiveList2 = @(
-                'SingleInstance'
+                'OnlySingleVersion'
             )
         }
 
@@ -415,19 +415,19 @@ class PSResource : ResourceBase
     <#
         Returns true if only the correct instance of the resource is installed on the system
     #>
-    hidden [System.Boolean] TestSingleInstance([System.Collections.Hashtable[]]$resources)
+    hidden [System.Boolean] TestOnlySingleVersion([System.Collections.Hashtable[]]$resources)
     {
         $return = $false #! Is this the correct default if somehow the if/else isn't triggered?
 
         if ($resources.Count -ne 1)
         {
-            Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
+            Write-Verbose -Message ($this.localizedData.ShouldBeOnlySingleVersion -f $this.Name, $resources.Count)
 
             $return = $false
         }
         else
         {
-            # SingleInstance should not rely on VersionRequirements to report correctly
+            # OnlySingleVersion should not rely on VersionRequirements to report correctly
             $return = $true
         }
 
@@ -539,7 +539,7 @@ class PSResource : ResourceBase
     #>
     hidden [System.Collections.Hashtable] FindResource()
     {
-        $params = $this | Get-DscProperty -ExcludeName @('Latest', 'SingleInstance', 'Ensure', 'SkipPublisherCheck', 'Force', 'RemoveNonCompliantVersions') -Type Key,Optional -HasValue
+        $params = $this | Get-DscProperty -ExcludeName @('Latest', 'OnlySingleVersion', 'Ensure', 'SkipPublisherCheck', 'Force', 'RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         $foundModule = Find-Module @params
 
         return @{
@@ -553,7 +553,7 @@ class PSResource : ResourceBase
     {
         $this.TestRepository()
 
-        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure','RemoveNonCompliantVersions') -Type Key,Optional -HasValue
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','OnlySingleVersion','Ensure','RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         Install-Module @params
     }
 
@@ -562,7 +562,7 @@ class PSResource : ResourceBase
     #>
     hidden [void] UninstallResource ([System.Collections.Hashtable]$resource)
     {
-        $params = $this | Get-DscProperty -ExcludeName @('Latest','SingleInstance','Ensure', 'SkipPublisherCheck', 'RemoveNonCompliantVersions','MinimumVersion', 'MaximumVersion', 'RequiredVersion') -Type Optional -HasValue
+        $params = $this | Get-DscProperty -ExcludeName @('Latest','OnlySingleVersion','Ensure', 'SkipPublisherCheck', 'RemoveNonCompliantVersions','MinimumVersion', 'MaximumVersion', 'RequiredVersion') -Type Optional -HasValue
         $params.RequiredVersion = $resource.Version
 
         Write-Verbose -Message ($this.localizedData.UninstallResource -f $resource.Name,$resource.Version)
@@ -813,9 +813,9 @@ class PSResource : ResourceBase
     <#
         Resolve single instance status. Find the required version, uninstall all others. Install required version is necessary.
     #>
-    hidden [void] ResolveSingleInstance ([System.Collections.Hashtable[]] $resources)
+    hidden [void] ResolveOnlySingleVersion ([System.Collections.Hashtable[]] $resources)
     {
-        Write-Verbose -Message ($this.localizedData.ShouldBeSingleInstance -f $this.Name, $resources.Count)
+        Write-Verbose -Message ($this.localizedData.ShouldBeOnlySingleVersion -f $this.Name, $resources.Count)
 
         # Too many versions
 

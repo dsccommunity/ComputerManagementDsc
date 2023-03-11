@@ -136,14 +136,14 @@ try
                 }
             }
 
-            Context 'When SingleInstance is set' {
+            Context 'When OnlySingleVersion is set' {
                 BeforeAll {
                     InModuleScope -ScriptBlock {
-                        $script:mockPSResourceInstance.SingleInstance = $true
+                        $script:mockPSResourceInstance.OnlySingleVersion = $true
                     }
                 }
 
-                It 'Should return the correct current state when SingleInstance is true' {
+                It 'Should return the correct current state when OnlySingleVersion is true' {
                     InModuleScope -ScriptBlock {
                         {
                             $script:mockPSResourceInstance |
@@ -152,38 +152,38 @@ try
                                         Name = 'ComputerManagementDsc'
                                     }
                                 } -PassThru |
-                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestOnlySingleVersion' -Value {
                                     return $true
                                 }
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
                             $currentState.Ensure         | Should -Be [Ensure]::Present
-                            $currentState.SingleInstance | Should -BeTrue
+                            $currentState.OnlySingleVersion | Should -BeTrue
                         }
                     }
                 }
 
-                It 'Should return the correct current state when SingleInstance is false because no resources are installed' {
+                It 'Should return the correct current state when OnlySingleVersion is false because no resources are installed' {
                     InModuleScope -ScriptBlock {
                         {
                             $script:mockPSResourceInstance |
                                 Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
                                     return $null
                                 } -PassThru |
-                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestOnlySingleVersion' -Value {
                                     return $false
                                 }
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
                             $currentState.Ensure         | Should -Be [Ensure]::Absent
-                            $currentState.SingleInstance | Should -BeFalse
+                            $currentState.OnlySingleVersion | Should -BeFalse
                         }
                     }
                 }
 
-                It 'Should return the correct current state when SingleInstance is false because multiple resources are installed' {
+                It 'Should return the correct current state when OnlySingleVersion is false because multiple resources are installed' {
                     InModuleScope -ScriptBlock {
                         {
                             $script:mockPSResourceInstance |
@@ -199,14 +199,14 @@ try
                                         }
                                     )
                                 } -PassThru |
-                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestSingleInstance' -Value {
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestOnlySingleVersion' -Value {
                                     return $false
                                 }
 
                             $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
                             $currentState.Name           | Should -Be 'ComputerManagementDsc'
                             $currentState.Ensure         | Should -Be [Ensure]::Present
-                            $currentState.SingleInstance | Should -BeFalse
+                            $currentState.OnlySingleVersion | Should -BeFalse
                         }
                     }
                 }
@@ -870,13 +870,13 @@ try
         }
 
         Context 'When passing dependant parameters' {
-            It 'Should throw when RemoveNonCompliantVersions and SingleInstance are passed together' {
+            It 'Should throw when RemoveNonCompliantVersions and OnlySingleVersion are passed together' {
                 InModuleScope -ScriptBlock {
                     {
                         $script:mockPSResourceInstance.AssertProperties(
                             @{
                                 RemoveNonCompliantVersions = $true
-                                SingleInstance             = $true
+                                OnlySingleVersion             = $true
                             }
                         ) | Should -Throw -ExpectedMessage 'DRC0010'
                     }
@@ -1140,18 +1140,18 @@ try
         }
     }
 
-    # Describe 'PSResource\TestSingleInstance()' -Tag 'TestSingleInstance' {
+    # Describe 'PSResource\TestOnlySingleVersion()' -Tag 'TestOnlySingleVersion' {
     #     InModuleScope -ScriptBlock {
     #         $script:mockPSResourceInstance = [PSResource] @{
     #             Name           = 'ComputerManagementDsc'
     #             Ensure         = [Ensure]::Present
-    #             SingleInstance = $True
+    #             OnlySingleVersion = $True
     #         }
     #     }
 
     #     It 'Should not throw and return True when one resource is present' {
     #         InModuleScope -ScriptBlock {
-    #             $script:mockPSResourceInstance.TestSingleInstance(
+    #             $script:mockPSResourceInstance.TestOnlySingleVersion(
     #                 @(
     #                     @{
     #                         Name    = 'ComputerManagementDsc'
@@ -1164,7 +1164,7 @@ try
 
     #     It 'Should not throw and return False when zero resources are present' {
     #         InModuleScope -ScriptBlock {
-    #             $script:mockPSResourceInstance.TestSingleInstance(
+    #             $script:mockPSResourceInstance.TestOnlySingleVersion(
     #                 @()
     #             ) | Should -BeFalse
     #         }
@@ -1172,7 +1172,7 @@ try
 
     #     It 'Should not throw and return False when more than one resource is present' {
     #         InModuleScope -ScriptBlock {
-    #             $script:mockPSResourceInstance.TestSingleInstance(
+    #             $script:mockPSResourceInstance.TestOnlySingleVersion(
     #                 @(
     #                     @{
     #                         Name    = 'ComputerManagementDsc'
@@ -1188,13 +1188,13 @@ try
     #     }
     # }
 
-    Describe 'PSResource\TestSingleInstance()' -Tag 'TestSingleInstance' {
+    Describe 'PSResource\TestOnlySingleVersion()' -Tag 'TestOnlySingleVersion' {
         BeforeAll {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource] @{
                     Name           = 'ComputerManagementDsc'
                     Ensure         = [Ensure]::Present
-                    SingleInstance = $True
+                    OnlySingleVersion = $True
                 }
             }
         }
@@ -1203,7 +1203,7 @@ try
             It 'Should Correctly return False when Zero Resources are Installed' {
 
                 InModuleScope -ScriptBlock {
-                    $script:mockPSResourceInstance.TestSingleInstance($null) | Should -BeFalse
+                    $script:mockPSResourceInstance.TestOnlySingleVersion($null) | Should -BeFalse
                 }
             }
         }
@@ -1212,7 +1212,7 @@ try
             It 'Should Correctly return True when One Resource is Installed' {
                 InModuleScope -ScriptBlock {
                     $script:mockResources = @{Name = 'ComputerManagementDsc'}
-                    $script:mockPSResourceInstance.TestSingleInstance($script:mockResources) | Should -BeTrue
+                    $script:mockPSResourceInstance.TestOnlySingleVersion($script:mockResources) | Should -BeTrue
                 }
             }
         }
@@ -1228,7 +1228,7 @@ try
                         Name    = 'ComputerManagementDsc'
                         Version = '8.6.0'
                     }
-                    $script:mockPSResourceInstance.TestSingleInstance($script:mockResources) | Should -BeFalse
+                    $script:mockPSResourceInstance.TestOnlySingleVersion($script:mockResources) | Should -BeFalse
                 }
             }
         }
@@ -2155,7 +2155,7 @@ try
         }
     }
 
-    Describe 'PSResource\ResolveSingleInstance' -Tag 'ResolveSingleInstance' {
+    Describe 'PSResource\ResolveOnlySingleVersion' -Tag 'ResolveOnlySingleVersion' {
         BeforeEach {
             InModuleScope -ScriptBlock {
                 $script:mockPSResourceInstance = [PSResource]@{}
@@ -2179,7 +2179,7 @@ try
             It 'Should not throw when no resources are passed' {
                 InModuleScope -ScriptBlock {
                     {
-                        $script:mockPSResourceInstance.ResolveSingleInstance(@()) | Should -Not -Throw
+                        $script:mockPSResourceInstance.ResolveOnlySingleVersion(@()) | Should -Not -Throw
                     }
                 }
             }
@@ -2187,7 +2187,7 @@ try
             It 'Should not throw when resources are passed and none match the resourceToKeep' {
                 InModuleScope -ScriptBlock {
                     {
-                        $script:mockPSResourceInstance.ResolveSingleInstance(
+                        $script:mockPSResourceInstance.ResolveOnlySingleVersion(
                             @(
                                 @{Version = '8.0.0'},
                                 @{Version = '7.0.0'}
@@ -2200,7 +2200,7 @@ try
             It 'Should not throw when resources are passed and one matches the resourceToKeep' {
                 InModuleScope -ScriptBlock {
                     {
-                        $script:mockPSResourceInstance.ResolveSingleInstance(
+                        $script:mockPSResourceInstance.ResolveOnlySingleVersion(
                             @(
                                 @{Version = '8.0.0'},
                                 @{Version = '9.0.0'}
@@ -2213,7 +2213,7 @@ try
             It 'Should not throw when a single resource is passed that matches the resourceToKeep' {
                 InModuleScope -ScriptBlock {
                     {
-                        $script:mockPSResourceInstance.ResolveSingleInstance(
+                        $script:mockPSResourceInstance.ResolveOnlySingleVersion(
                             @(
                                 @{Version = '9.0.0'}
                             )
