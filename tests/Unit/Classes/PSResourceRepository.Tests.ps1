@@ -82,7 +82,7 @@ try
                                 return [System.Collections.Hashtable] @{
                                     Name                      = 'FakePSGallery'
                                     SourceLocation            = 'https://www.powershellgallery.com/api/v2'
-                                    Ensure                    = 'Present'
+                                    Ensure                    = [Ensure]::Present
                                     InstallationPolicy        = 'Untrusted'
                                     PackageManagementProvider = 'Nuget'
                                 }
@@ -104,6 +104,7 @@ try
                         $currentState.Default                   | Should -BeNullOrEmpty
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
+                        $currentState.Reasons                   | Should -BeNullOrEmpty
                     }
                 }
 
@@ -130,7 +131,7 @@ try
                                     ScriptPublishLocation     = 'https://www.powershellgallery.com/api/v2/package/'
                                     InstallationPolicy        = 'Untrusted'
                                     PackageManagementProvider = 'NuGet'
-                                    Ensure                    = 'Present'
+                                    Ensure                    = [Ensure]::Present
                                 }
                             } -PassThru |
                             Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
@@ -150,11 +151,12 @@ try
                         $currentState.ProxyCredential           | Should -BeNullOrEmpty
                         $currentState.Credential                | Should -BeNullOrEmpty
                         $currentState.Default                   | Should -BeNullOrEmpty
+                        $currentState.Reasons                   | Should -BeNullOrEmpty
                     }
                 }
             }
 
-            Context 'When the respository should be Absent' {
+            Context 'When the repository should be Absent' {
                 It 'Should return the correct result when the Repository is Absent' {
                     InModuleScope -ScriptBlock {
                         $script:mockPSResourceRepositoryInstance = [PSResourceRepository] @{
@@ -165,7 +167,7 @@ try
                             Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
                                 return [System.Collections.Hashtable] @{
                                     Name           = 'FakePSGallery'
-                                    Ensure         = 'Absent'
+                                    Ensure         = [Ensure]::Absent
                                 }
                             } -PassThru |
                             Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
@@ -183,6 +185,7 @@ try
                         $currentState.ProxyCredential           | Should -BeNullOrEmpty
                         $currentState.Credential                | Should -BeNullOrEmpty
                         $currentState.Default                   | Should -BeNullOrEmpty
+                        $currentState.Reasons                   | Should -BeNullOrEmpty
                     }
                 }
             }
@@ -200,7 +203,7 @@ try
                             Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
                                 return [System.Collections.Hashtable] @{
                                     Name                      = 'FakePSGallery'
-                                    Ensure                    = 'Present'
+                                    Ensure                    = [Ensure]::Present
                                     SourceLocation            = 'https://www.powershellgallery.com/api/v2'
                                     ScriptSourceLocation      = 'https://www.powershellgallery.com/api/v2/items/psscript'
                                     PublishLocation           = 'https://www.powershellgallery.com/api/v2/package/'
@@ -222,6 +225,10 @@ try
                         $currentState.ScriptPublishLocation     | Should -Be 'https://www.powershellgallery.com/api/v2/package/'
                         $currentState.InstallationPolicy        | Should -Be 'Untrusted'
                         $currentState.PackageManagementProvider | Should -Be 'NuGet'
+
+                        $currentState.Reasons | Should -HaveCount 1
+                        $currentState.Reasons[0].Code | Should -Be 'PSResourceRepository:PSResourceRepository:Ensure'
+                        $currentState.Reasons[0].Phrase | Should -Be 'The property Ensure should be "Absent", but was "Present"'
                     }
                 }
             }
@@ -238,7 +245,7 @@ try
                             Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
                                 return [System.Collections.Hashtable] @{
                                     Name                      = 'FakePSGallery'
-                                    Ensure                    = 'Absent'
+                                    Ensure                    = [Ensure]::Absent
                                 }
                             } -PassThru |
                             Add-Member -Force -MemberType 'ScriptMethod' -Name 'AssertProperties' -Value {
@@ -254,6 +261,28 @@ try
                         $currentState.ScriptPublishLocation     | Should -BeNullOrEmpty
                         $currentState.InstallationPolicy        | Should -BeNullOrEmpty
                         $currentState.PackageManagementProvider | Should -BeNullOrEmpty
+
+                        $currentState.Reasons | Should -HaveCount 2
+
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:SourceLocation'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:Ensure'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:SourceLocation'})
+
+                        # Handle PowerShell and Windows PowerShell differently.
+                        if ($IsLinux -or $IsMacOS -or $IsWindows)
+                        {
+                            # PowerShell
+                            $reason.Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was null'
+                        }
+                        else
+                        {
+                            # Windows PowerShell
+                            $reason.Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was ""'
+                        }
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:Ensure'})
+                        $reason.Phrase | Should -Be 'The property Ensure should be "Present", but was "Absent"'
                     }
                 }
             }
@@ -275,7 +304,7 @@ try
                             Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
                                 return [System.Collections.Hashtable] @{
                                     Name                      = 'FakePSGallery'
-                                    Ensure                    = 'Present'
+                                    Ensure                    = [Ensure]::Present
                                     SourceLocation            = 'https://www.notcorrect.com/api/v2'
                                     ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
                                     PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
@@ -297,6 +326,33 @@ try
                         $currentState.ScriptPublishLocation     | Should -Be 'https://www.notcorrect.com/api/v2/package/'
                         $currentState.InstallationPolicy        | Should -Be 'Trusted'
                         $currentState.PackageManagementProvider | Should -Be 'Package'
+
+                        $currentState.Reasons | Should -HaveCount 6
+
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:SourceLocation'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:InstallationPolicy'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:ScriptSourceLocation'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:ScriptPublishLocation'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:PackageManagementProvider'
+                        $currentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:PublishLocation'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:SourceLocation'})
+                        $reason.Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was "https://www.notcorrect.com/api/v2"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:InstallationPolicy'})
+                        $reason.Phrase | Should -Be 'The property InstallationPolicy should be "Untrusted", but was "Trusted"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:ScriptSourceLocation'})
+                        $reason.Phrase | Should -Be 'The property ScriptSourceLocation should be "https://www.powershellgallery.com/api/v2/items/psscript", but was "https://www.notcorrect.com/api/v2/items/psscript"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:ScriptPublishLocation'})
+                        $reason.Phrase | Should -Be 'The property ScriptPublishLocation should be "https://www.powershellgallery.com/api/v2/package/", but was "https://www.notcorrect.com/api/v2/package/"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:PackageManagementProvider'})
+                        $reason.Phrase | Should -Be 'The property PackageManagementProvider should be "NuGet", but was "Package"'
+
+                        $reason = $currentState.Reasons.Where({$_.Code -eq 'PSResourceRepository:PSResourceRepository:PublishLocation'})
+                        $reason.Phrase | Should -Be 'The property PublishLocation should be "https://www.powershellgallery.com/api/v2/package/", but was "https://www.notcorrect.com/api/v2/package/"'
                     }
                 }
 
@@ -310,7 +366,7 @@ try
                             Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetCurrentState' -Value {
                                 return [System.Collections.Hashtable] @{
                                     Name                      = 'FakePSGallery'
-                                    Ensure                    = 'Present'
+                                    Ensure                    = [Ensure]::Present
                                     SourceLocation            = 'https://www.notcorrect.com/api/v2'
                                     ScriptSourceLocation      = 'https://www.notcorrect.com/api/v2/items/psscript'
                                     PublishLocation           = 'https://www.notcorrect.com/api/v2/package/'
@@ -332,6 +388,10 @@ try
                         $currentState.ScriptPublishLocation     | Should -Be 'https://www.notcorrect.com/api/v2/package/'
                         $currentState.InstallationPolicy        | Should -Be 'Trusted'
                         $currentState.PackageManagementProvider | Should -Be 'Package'
+
+                        $currentState.Reasons | Should -HaveCount 1
+                        $currentState.Reasons[0].Code | Should -Be 'PSResourceRepository:PSResourceRepository:Ensure'
+                        $currentState.Reasons[0].Phrase | Should -Be 'The property Ensure should be "Absent", but was "Present"'
                     }
                 }
             }

@@ -21,6 +21,12 @@ NestedModule:
     AddToManifest: false
     Exclude: PSGetModuleInfo.xml
 
+  DscResource.Base:
+    CopyOnly: true
+    Path: ./output/RequiredModules/DscResource.Base
+    AddToManifest: false
+    Exclude: PSGetModuleInfo.xml
+
 ####################################################
 #       Pipeline Configuration                     #
 ####################################################
@@ -62,6 +68,7 @@ Pester:
   OutputFormat: NUnitXML
   ExcludeFromCodeCoverage:
     - Modules/DscResource.Common
+    - Modules/DscResource.Base
   Script:
     - tests/Unit
   ExcludeTag:
@@ -78,6 +85,7 @@ DscTest:
     - output
   ExcludeModuleFile:
     - Modules/DscResource.Common
+    - Modules/DscResource.Base
   MainGitBranch: main
 
 Resolve-Dependency:

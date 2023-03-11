@@ -88,6 +88,8 @@ try
                 $resourceCurrentState.PackageManagementProvider | Should -Be 'NuGet'
                 $resourceCurrentState.InstallationPolicy        | Should -Be 'Untrusted'
 
+                # Read-only properties
+                $resourceCurrentState.Reasons | Should -BeNullOrEmpty
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {
@@ -152,6 +154,9 @@ try
 
                 # Defaulted properties
                 $resourceCurrentState.Ensure | Should -Be $shouldBeData.Ensure
+
+                # Read-only properties
+                $resourceCurrentState.Reasons | Should -BeNullOrEmpty
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {
@@ -218,6 +223,9 @@ try
 
                 # Ensure will be Absent
                 $resourceCurrentState.Ensure | Should -Be 'Absent'
+
+                # Read-only properties
+                $resourceCurrentState.Reasons | Should -BeNullOrEmpty
             }
 
             It 'Should return $true when Test-DscConfiguration is run' {
@@ -226,7 +234,72 @@ try
         }
 
         Wait-ForIdleLcm -Clear
+    }
 
+    Context 'When using Invoke-DscResource' {
+        BeforeAll {
+            $script:mockInvokeDscResourceParameters = @{
+                ModuleName = $script:dscModuleName
+                Name       = $script:dscResourceFriendlyName
+                Verbose    = $true
+            }
+        }
+
+        BeforeEach {
+            Wait-ForIdleLcm -Clear
+        }
+
+        Context 'When the configuration is not in desired state' {
+            Context 'When calling method Get()' {
+                It 'Should not throw and return the correct values for each property' {
+                    {
+                        $script:resourceCurrentState = Invoke-DscResource @mockInvokeDscResourceParameters -Method 'Get' -Property @{
+                            Name                      = 'PSTestGallery'
+                            Ensure                    = 'Present'
+                            SourceLocation            = 'https://www.nuget.org/api/v2'
+                            PublishLocation           = 'https://www.nuget.org/api/v2/package/'
+                            ScriptSourceLocation      = 'https://www.nuget.org/api/v2/items/psscript/'
+                            ScriptPublishLocation     = 'https://www.nuget.org/api/v2/package/'
+                            InstallationPolicy        = 'Trusted'
+                            PackageManagementProvider = 'NuGet'
+                        }
+                    } | Should -Not -Throw
+
+                    $resourceCurrentState.Name | Should -Be 'PSTestGallery'
+                    $resourceCurrentState.Ensure | Should -Be 'Absent'
+                    $resourceCurrentState.PackageManagementProvider | Should -BeNullOrEmpty
+                    $resourceCurrentState.Proxy | Should -BeNullOrEmpty
+                    $resourceCurrentState.ProxyCredential | Should -BeNullOrEmpty
+                    $resourceCurrentState.PublishLocation | Should -BeNullOrEmpty
+                    $resourceCurrentState.ScriptPublishLocation | Should -BeNullOrEmpty
+                    $resourceCurrentState.ScriptSourceLocation | Should -BeNullOrEmpty
+                    $resourceCurrentState.SourceLocation | Should -BeNullOrEmpty
+
+                    $resourceCurrentState.Reasons | Should -HaveCount 7
+
+                    $resourceCurrentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:ScriptPublishLocation'
+                    $resourceCurrentState.Reasons.Phrase | Should -Contain 'The property ScriptPublishLocation should be "https://www.nuget.org/api/v2/package/", but was ""'
+
+                    $resourceCurrentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:InstallationPolicy'
+                    $resourceCurrentState.Reasons.Phrase | Should -Contain 'The property InstallationPolicy should be "Trusted", but was ""'
+
+                    $resourceCurrentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:Ensure'
+                    $resourceCurrentState.Reasons.Phrase | Should -Contain 'The property Ensure should be "Present", but was "Absent"'
+
+                    $resourceCurrentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:PackageManagementProvider'
+                    $resourceCurrentState.Reasons.Phrase | Should -Contain 'The property PackageManagementProvider should be "NuGet", but was ""'
+
+                    $resourceCurrentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:ScriptSourceLocation'
+                    $resourceCurrentState.Reasons.Phrase | Should -Contain 'The property ScriptSourceLocation should be "https://www.nuget.org/api/v2/items/psscript/", but was ""'
+
+                    $resourceCurrentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:PublishLocation'
+                    $resourceCurrentState.Reasons.Phrase | Should -Contain 'The property PublishLocation should be "https://www.nuget.org/api/v2/package/", but was ""'
+
+                    $resourceCurrentState.Reasons.Code | Should -Contain 'PSResourceRepository:PSResourceRepository:SourceLocation'
+                    $resourceCurrentState.Reasons.Phrase | Should -Contain 'The property SourceLocation should be "https://www.nuget.org/api/v2", but was ""'
+                }
+            }
+        }
     }
     #endregion
 }
