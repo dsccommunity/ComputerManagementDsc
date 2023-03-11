@@ -206,8 +206,6 @@ class PSResource : ResourceBase
         elseif ($properties.ContainsKey('OnlySingleVersion'))
         {
             $this.ResolveOnlySingleVersion($installedResource)
-
-            return
         }
         elseif ($properties.ContainsKey('RemoveNonCompliantVersions') -and $this.RemoveNonCompliantVersions)
         {
@@ -216,7 +214,6 @@ class PSResource : ResourceBase
             if ($this.VersionRequirement -in $properties.Keys)
             {
                 $this.InstallResource()
-                return
             }
         }
         else
