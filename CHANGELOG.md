@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     compliance part (audit via Azure Policy) of Azure AutoManage Machine
     Configuration uses.
 
+### Fixed
+
+- ComputerManagementDsc
+  - AppVeyor build now sets the correct module version to be able to run tests.
+
 ## [9.0.0] - 2023-02-22
 
 ### Fixed
