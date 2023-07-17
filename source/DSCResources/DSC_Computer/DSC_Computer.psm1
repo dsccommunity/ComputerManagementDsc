@@ -773,8 +773,8 @@ function Delete-ADSIObject
     $params = @{
         TypeName     = 'System.DirectoryServices.DirectoryEntry'
         ArgumentList = @(
-            $DomainName,
-            $Credential.UserName
+            $Path,
+            $Credential.UserName,
             $Credential.GetNetworkCredential().password
         )
         ErrorAction  = 'Stop'
