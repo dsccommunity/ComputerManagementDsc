@@ -168,7 +168,7 @@ Configuration ScheduledTaskLogonAdd
             TaskName           = 'Test task Logon'
             TaskPath           = '\ComputerManagementDsc\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType       = 'AtLogOn'
+            ScheduleType       = 'AtLogon'
             RepeatInterval     = '00:15:00'
             RepetitionDuration = '08:00:00'
         }
@@ -208,7 +208,7 @@ Configuration ScheduledTaskExecuteAsAdd
             TaskName            = 'Test task Logon'
             TaskPath            = '\ComputerManagementDsc\'
             ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType        = 'AtLogOn'
+            ScheduleType        = 'AtLogon'
             ExecuteAsCredential = $executeAsCredential
             LogonType           = 'Interactive'
             RunLevel            = 'Highest'
@@ -233,7 +233,7 @@ Configuration ScheduledTaskExecuteAsGroupAdd
             ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             LogonType           = 'Group'
             ExecuteAsCredential = $executeAsCredential
-            ScheduleType        = 'AtLogOn'
+            ScheduleType        = 'AtLogon'
             RunLevel            = 'Limited'
         }
     }
@@ -390,7 +390,7 @@ Configuration ScheduledTaskStartupMod
             TaskName           = 'Test task Startup'
             TaskPath           = '\ComputerManagementDsc\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType       = 'AtLogOn'
+            ScheduleType       = 'AtLogon'
             RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
         }
@@ -412,7 +412,7 @@ Configuration ScheduledTaskExecuteAsMod
             TaskName            = 'Test task Logon'
             TaskPath            = '\ComputerManagementDsc\'
             ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType        = 'AtLogOn'
+            ScheduleType        = 'AtLogon'
             ExecuteAsCredential = $executeAsCredential
             LogonType           = 'Interactive'
             RunLevel            = 'Highest'
@@ -437,7 +437,7 @@ Configuration ScheduledTaskExecuteAsGroupMod
             ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             LogonType           = 'Group'
             ExecuteAsCredential = $executeAsCredential
-            ScheduleType        = 'AtLogOn'
+            ScheduleType        = 'AtLogon'
             RunLevel            = 'Limited'
         }
     }
@@ -598,7 +598,7 @@ Configuration ScheduledTaskStartupDel
             TaskName           = 'Test task Startup'
             TaskPath           = '\ComputerManagementDsc\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType       = 'AtLogOn'
+            ScheduleType       = 'AtLogon'
             RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
             Ensure             = 'Absent'
@@ -617,7 +617,7 @@ Configuration ScheduledTaskExecuteAsDel
             TaskName         = 'Test task Logon'
             TaskPath         = '\ComputerManagementDsc\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType     = 'AtLogOn'
+            ScheduleType     = 'AtLogon'
             Ensure           = 'Absent'
         }
     }
@@ -634,7 +634,7 @@ Configuration ScheduledTaskExecuteAsGroupDel
             TaskName         = 'Test task Logon with BuiltIn Group'
             TaskPath         = '\ComputerManagementDsc\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType     = 'AtLogOn'
+            ScheduleType     = 'AtLogon'
             Ensure           = 'Absent'
         }
     }

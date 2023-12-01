@@ -5,6 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- ScheduledTask
+  - Allowed values for ScheduleType updated to accept AtLogon over AtLogOn - Fixes [Issue #420](https://github.com/dsccommunity/ComputerManagementDsc/issues/420)
+
 ### Changed
 
 - ComputerManagementDsc
