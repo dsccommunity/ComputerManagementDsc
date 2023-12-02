@@ -2203,7 +2203,7 @@ try
                     $result.Enable | Should -Be $testParameters.Enable
                     $result.Ensure | Should -Be 'Present'
                     $result.StartTime | Should -Be (Get-Date -Date $startTimeString)
-                    $result.ScheduleType | Should -Be 'AtLogon'
+                    $result.ScheduleType | Should -BeExactly 'AtLogon'
                     $result.Delay | Should -Be $testParameters.Delay
                 }
 
@@ -2211,6 +2211,60 @@ try
                     Test-TargetResource @testParameters | Should -BeTrue
                 }
             }
+
+            Context "When scheduling a task to trigger at user logon" {
+                BeforeAll {
+                    Mock -CommandName New-ScheduledTaskTrigger -MockWith {
+                        $cimInstance = New-CIMInstance -ClassName 'MSFT_TaskLogonTrigger' -Namespace 'root\Microsoft\Windows\TaskScheduler' -Property @{
+                            # Fill the CIM instance with the properties we expect to be used by the resource.
+                            UserId = $testParameters.User
+                            Delay  = ''
+                        } -ClientOnly
+
+                        <#
+                            Must add the TypeName property to the CIM instance for the array .PSObject.PSTypeNames
+                            to have the correct name for it to be recognized by the New-ScheduledTask command.
+                        #>
+                        $cimInstance | Add-Member -TypeName 'Microsoft.Management.Infrastructure.CimInstance#MSFT_TaskTrigger'
+
+                        return $cimInstance
+                    }
+
+                    Mock -CommandName New-ScheduledTask -MockWith {
+                        <#
+                            Mock an object with properties that are used by the resource
+                            for the newly created scheduled task.
+                        #>
+                        return [PSCustomObject] @{
+                            Triggers = @(
+                                @{
+                                    StartBoundary = '2018-09-27T18:45:08+02:00'
+                                }
+                            )
+                        }
+                    }
+
+                    Mock -CommandName Register-ScheduledTask
+                }
+
+                It "Should correctly configure the task with 'AtLogon' ScheduleType and the specified user" {
+                    $testParameters = $getTargetResourceParameters + @{
+                        ScheduleType      = 'AtLogon'
+                        User              = 'MockedUser'
+                        ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                        LogonType         = 'Password'
+                    }
+
+                    Set-TargetResource @testParameters
+
+                    Assert-MockCalled -CommandName New-ScheduledTaskTrigger -ParameterFilter {
+                        $AtLogon -eq $true -and $User -eq 'MockedUser'
+                    } -Exactly -Times 1 -Scope It
+
+                    Assert-MockCalled -CommandName New-ScheduledTask -Exactly -Times 1 -Scope It
+                }
+            }
+
 
             Context 'When a scheduled task is configured with the ScheduleType AtStartup and is in desired state' {
                 $testParameters = $getTargetResourceParameters + @{
