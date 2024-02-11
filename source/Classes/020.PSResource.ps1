@@ -544,11 +544,18 @@ class PSResource : ResourceBase
         $params = $this | Get-DscProperty -ExcludeName @('Latest', 'OnlySingleVersion', 'Ensure', 'SkipPublisherCheck', 'Force', 'RemoveNonCompliantVersions') -Type Key,Optional -HasValue
         $foundModule = Find-Module @params
 
-        return @{
+        $return = @{
             Name       = $foundModule.Name
             Version    = $foundModule.Version
             Repository = $foundModule.Repository
         }
+
+        if ($this.AllowPrerelease -and $foundModule.AdditionalMetdata.IsPrerelease)
+        {
+            $return.Prerelease = $foundModule.Version.Split('-')[-1]
+        }
+
+        return $return
     }
 
     hidden [void] InstallResource()
