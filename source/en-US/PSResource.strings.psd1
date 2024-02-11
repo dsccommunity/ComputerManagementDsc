@@ -40,6 +40,8 @@ ConvertFrom-StringData -StringData @'
     RemoveNonCompliantVersionsWithoutVersioning   = Argument 'RemoveNonCompliantVersions' requires one of parameters 'MinimumVersion', 'MaximumVersion', 'RequiredVersion' or 'Latest'.
     VersionRequirementFound                       = Version requirement for resource '{0}' is '{1}'.
     UninstallNonCompliantResource                 = Uninstalling version '{0}' of resource '{1}' because it does not match version requirement of '{2}'.
+    # GetMinimumAndMaximumInstalledVersion strings
+    MinimumAndMaximumVersionMet                   = Installed resource '{0}' version '{1}' meets MinimumVersion and MaximumVersion requirements.
     # Modify() strings
     ResourceShouldBeAbsentRequiredVersion         = Resource '{0}' version '{1}' should be Absent but is Present.
     ResourceShouldBeAbsent                        = Resource '{0}' should be Absent but is Present.

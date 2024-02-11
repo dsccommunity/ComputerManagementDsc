@@ -236,9 +236,14 @@ class PSResource : ResourceBase
             Ensure = [Ensure]::Absent
         }
 
-        if ($currentState.ContainsKey('OnlySingleVersion') -and $this.OnlySingleVersion)
+        if ($currentState.ContainsKey('OnlySingleVersion') -and $currentState.OnlySingleVersion -and $this.OnlySingleVersion)
         {
             $returnValue.OnlySingleVersion = $this.TestOnlySingleVersion($resources)
+        }
+        else
+        {
+            # OnlySingleVersion has been passed as $False. Whether it is the OnlySingleVersion or not doesn't matter
+            $returnValue.OnlySingleVersion = $currentState.OnlySingleVersion
         }
 
         if ($currentState.ContainsKey('Latest') -and $this.Latest -eq $true)
@@ -318,7 +323,7 @@ class PSResource : ResourceBase
             )
             MutuallyExclusiveList2 = @(
                 'RequiredVersion'
-                'MaximumVersion'
+                'Latest'
             )
         }
 
@@ -331,7 +336,7 @@ class PSResource : ResourceBase
             )
             MutuallyExclusiveList2 = @(
                 'RequiredVersion'
-                'MinimumVersion'
+                'Latest'
             )
         }
 
@@ -707,10 +712,27 @@ class PSResource : ResourceBase
         return $return
     }
 
+    hidden [System.String[]] GetMinimumAndMaximumInstalledVersion([System.Collections.Hashtable[]] $resources)
+    {
+        $return = $null
+        foreach ($resource in $resources)
+        {
+            if ($resource.Version -ge $this.MinimumVersion -and
+                $resource.Version -le $this.MaximumVersion
+            )
+            {
+                Write-Verbose -Message ($this.LocalizedData.MinimumAndMaximumVersionMet -f $this.Name, $resource.Version)
+                $return += $resource.Version
+            }
+        }
+
+        return $return
+    }
+
     <#
         Return the resource's version requirement
     #>
-    hidden [System.String] GetVersionRequirement()
+    hidden [System.String[]] GetVersionRequirement()
     {
         $return = $null
 
@@ -720,7 +742,16 @@ class PSResource : ResourceBase
         {
             if (-not [System.String]::IsNullOrEmpty($this.$prop))
             {
-                $return = $prop
+                if ($prop -eq 'MinimumVersion' -and [System.String]::IsNullOrEmpty($this.MaximumVersion) -or
+                    $prop -eq 'MaximumVersion' -and [System.String]::IsNullOrEmpty($this.MinimumVerison)
+                )
+                {
+                    $return = 'MinimumAndMaximumVersion'
+                }
+                else
+                {
+                    $return = $prop
+                }
                 break
             }
         }
@@ -750,6 +781,10 @@ class PSResource : ResourceBase
             'RequiredVersion'
             {
                 $return = $this.GetRequiredInstalledVersion($resources)
+            }
+            'MinimumAndMaximum'
+            {
+                $return = $this.GetMinimumAndMaximumInstalledVersion($resources)
             }
             default
             {
@@ -785,6 +820,13 @@ class PSResource : ResourceBase
             'Latest'
             {
                 $nonCompliantResources = $resources | Where-Object {$_.Version -ne $this.LatestVersion}
+            }
+            'MinimumAndMaximum'
+            {
+                $nonCompliantResources = $resources | Where-Object {
+                    $_.Version -lt [Version]$this.MinimumVersion -or
+                    $_Version -gt [Version]$this.MaximumVersion
+                }
             }
         }
 
