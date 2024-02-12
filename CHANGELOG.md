@@ -11,10 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The class-based resources are now re-using the module DscResource.Base - Fixes [Issue #404](https://github.com/dsccommunity/ComputerManagementDsc/issues/404).
   - Removed the file `source/build.psd1` as it is no longer required for the
     build pipeline.
+  - Fixed Delete-ADSIObject so that existing AD Computer objects will be deleted. Fixes [Issue #414](https://github.com/dsccommunity/ComputerManagementDsc/issues/414).
 - PSResourceRepository
   - The resource now supports the read-only property `Reasons` that the
     compliance part (audit via Azure Policy) of Azure AutoManage Machine
     Configuration uses.
+
+### Fixed
+
+- ComputerManagementDsc
+  - AppVeyor build now sets the correct module version to be able to run tests.
+- ScheduledTask
+  - Allowed values for ScheduleType updated to accept AtLogon over AtLogOn - Fixes [Issue #420](https://github.com/dsccommunity/ComputerManagementDsc/issues/420)
 
 ## [9.0.0] - 2023-02-22
 

@@ -263,7 +263,7 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn', 'OnEvent')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogon', 'OnEvent')]
         $ScheduleType,
 
         [Parameter()]
@@ -669,9 +669,9 @@ function Set-TargetResource
                 break
             }
 
-            'AtLogOn'
+            'AtLogon'
             {
-                $triggerParameters.Add('AtLogOn', $true)
+                $triggerParameters.Add('AtLogon', $true)
 
                 if (-not [System.String]::IsNullOrWhiteSpace($User) -and $LogonType -ne 'Group')
                 {
@@ -1156,7 +1156,7 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogOn', 'OnEvent')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogon', 'OnEvent')]
         $ScheduleType,
 
         [Parameter()]
