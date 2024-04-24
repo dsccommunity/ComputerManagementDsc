@@ -225,6 +225,7 @@ function Set-TargetResource
                         Path = $script:registryKey
                         Name = $parameterName
                         Value = $PSBoundParameters.$parameterName
+                        Type = 'DWord'
                         ErrorAction = 'Stop'
                     }
 
@@ -533,6 +534,7 @@ function Set-UserAccountControlToNotificationLevel
     {
         $defaultSetItemPropertyParameters = @{
             Path = $script:registryKey
+            Type = 'DWord'
             ErrorAction = 'Stop'
         }
 
