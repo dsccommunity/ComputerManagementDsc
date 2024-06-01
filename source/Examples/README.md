@@ -16,7 +16,6 @@ These are the links to the examples for each individual resource.
 - [PowerShellExecutionPolicy](Resources/PowerShellExecutionPolicy)
 - [PSResourceRepository](Resources/PSResourceRepository)
 - [RemoteDesktopAdmin](Resources/RemoteDesktopAdmin)
-- [Running-Gulp-based-tests](Resources/Running-Gulp-based-tests)
 - [ScheduledTask](Resources/ScheduledTask)
 - [SmbServerConfiguration](Resources/SmbServerConfiguration)
 - [SmbShare](Resources/SmbShare)
