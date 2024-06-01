@@ -113,6 +113,12 @@ NestedModule:
     AddToManifest: false
     Exclude: PSGetModuleInfo.xml
 
+  DscResource.Base:
+    CopyOnly: true
+    Path: ./output/RequiredModules/DscResource.Base
+    AddToManifest: false
+    Exclude: PSGetModuleInfo.xml
+
 ####################################################
 #          Pester Configuration (Sampler)          #
 ####################################################
@@ -135,6 +141,7 @@ Pester:
       OutputEncoding: ascii
   ExcludeFromCodeCoverage:
     - Modules/DscResource.Common
+    - Modules/DscResource.Base
 
 ####################################################
 #      Pester Configuration (DscResource.Test)     #
@@ -147,6 +154,7 @@ DscTest:
     - output
   ExcludeModuleFile:
     - Modules/DscResource.Common
+    - Modules/DscResource.Base
   MainGitBranch: main
 
 ####################################################
