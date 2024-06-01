@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- CI Pipeline
+  - Updated pipeline files to match current DSC Community patterns - fixes [Issue #427](https://github.com/dsccommunity/ComputerManagementDsc/issues/427).
+  - Updated HQRM step to use windows-latest image.
+
 ## [9.1.0] - 2024-04-30
 
 ### Changed

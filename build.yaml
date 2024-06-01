@@ -1,33 +1,5 @@
 ---
 ####################################################
-#          ModuleBuilder Configuration             #
-####################################################
-CopyPaths:
-  - en-US
-  - DSCResources
-  - Modules
-Prefix: prefix.ps1
-Encoding: UTF8
-VersionedOutputDirectory: true
-
-####################################################
-#   ModuleBuilder Dependent Modules Configuration  #
-####################################################
-
-NestedModule:
-  DscResource.Common:
-    CopyOnly: true
-    Path: ./output/RequiredModules/DscResource.Common
-    AddToManifest: false
-    Exclude: PSGetModuleInfo.xml
-
-  DscResource.Base:
-    CopyOnly: true
-    Path: ./output/RequiredModules/DscResource.Base
-    AddToManifest: false
-    Exclude: PSGetModuleInfo.xml
-
-####################################################
 #       Pipeline Configuration                     #
 ####################################################
 BuildWorkflow:
@@ -40,8 +12,16 @@ BuildWorkflow:
     - Build_Module_ModuleBuilder
     - Build_NestedModules_ModuleBuilder
     - Create_Changelog_Release_Output
+
+  docs:
     - Generate_Conceptual_Help
     - Generate_Wiki_Content
+    - Generate_Markdown_For_Public_Commands
+    - Generate_External_Help_File_For_Public_Commands
+    - Clean_Markdown_Of_Public_Commands
+    - Generate_Wiki_Sidebar
+    - Clean_Markdown_Metadata
+    - Package_WikContent
 
   pack:
     - build
@@ -60,38 +40,47 @@ BuildWorkflow:
     - Publish_GitHub_Wiki_Content
     - Create_ChangeLog_GitHub_PR
 
+  Package_WikContent: |
+    {
+        param
+        (
+            $OutputDirectory = (property OutputDirectory (Join-Path $BuildRoot 'output')),
+            $ProjectName = (property ProjectName $(Get-SamplerProjectName -BuildRoot $BuildRoot)),
+            $BuildInfo = (property BuildInfo @{ })
+        )
+
+        "`tProject Name             = {0}" -f $ProjectName
+        "`tOutput Directory         = {0}" -f $OutputDirectory
+
+        $wikiOutputPath = Join-Path -Path $OutputDirectory -ChildPath 'WikiContent'
+        $wikiArchiveSourcePath = Join-Path -Path $wikiOutputPath -ChildPath '*'
+        $wikiPackagePath = Join-Path -Path $OutputDirectory -ChildPath 'WikiContent.zip'
+
+        "`tWiki Output Path         = $wikiOutputPath"
+        "`tWiki Archive Source Path = $wikiArchiveSourcePath"
+        "`tWiki Package Path        = $wikiPackagePath"
+
+        if (-not (Test-Path -Path $wikiOutputPath))
+        {
+            throw 'The Wiki Output Path does not exist. Please run the task Generate_Wiki_Content prior to running this task.'
+        }
+
+        # Overwrites any existing archive.
+        Compress-Archive -Path $wikiArchiveSourcePath -DestinationPath $wikiPackagePath -CompressionLevel 'Optimal' -Force -ErrorAction 'Stop'
+    }
+
 ####################################################
-#       PESTER Configuration                       #
+#          ModuleBuilder Configuration             #
 ####################################################
-
-Pester:
-  OutputFormat: NUnitXML
-  ExcludeFromCodeCoverage:
-    - Modules/DscResource.Common
-    - Modules/DscResource.Base
-  Script:
-    - tests/Unit
-  ExcludeTag:
-  Tag:
-  CodeCoverageOutputFile: JaCoCo_coverage.xml
-  CodeCoverageOutputFileEncoding: ascii
-  CodeCoverageThreshold: 80
-
-DscTest:
-  OutputFormat: NUnitXML
-  ExcludeTag:
-    - 'Common Tests - New Error-Level Script Analyzer Rules'
-  ExcludeSourceFile:
-    - output
-  ExcludeModuleFile:
-    - Modules/DscResource.Common
-    - Modules/DscResource.Base
-  MainGitBranch: main
-
-Resolve-Dependency:
-  Gallery: 'PSGallery'
-  AllowPrerelease: false
-  Verbose: false
+CopyPaths:
+  - en-US
+  - DSCResources
+  - Modules
+Prefix: prefix.ps1
+Suffix: suffix.ps1
+Encoding: UTF8
+VersionedOutputDirectory: true
+BuiltModuleSubdirectory: builtModule
 
 ModuleBuildTasks:
   Sampler:
@@ -99,6 +88,8 @@ ModuleBuildTasks:
   Sampler.GitHubTasks:
     - '*.ib.tasks'
   DscResource.DocGenerator:
+    - 'Task.*'
+  DscResource.Test:
     - 'Task.*'
 
 TaskHeader: |
@@ -112,10 +103,69 @@ TaskHeader: |
   Write-Build DarkGray "  $($Task.InvocationInfo.ScriptName):$($Task.InvocationInfo.ScriptLineNumber)"
   ""
 
+####################################################
+#     Dependent Modules Configuration (Sampler)    #
+####################################################
+NestedModule:
+  DscResource.Common:
+    CopyOnly: true
+    Path: ./output/RequiredModules/DscResource.Common
+    AddToManifest: false
+    Exclude: PSGetModuleInfo.xml
+
+####################################################
+#          Pester Configuration (Sampler)          #
+####################################################
+Pester:
+  Configuration:
+    Run:
+      Path:
+        - tests/Unit
+    Output:
+      Verbosity: Detailed
+      StackTraceVerbosity: Full
+      CIFormat: Auto
+    CodeCoverage:
+      CoveragePercentTarget: 80
+      OutputPath: JaCoCo_coverage.xml
+      OutputEncoding: ascii
+      UseBreakpoints: false
+    TestResult:
+      OutputFormat: NUnitXML
+      OutputEncoding: ascii
+  ExcludeFromCodeCoverage:
+    - Modules/DscResource.Common
+
+####################################################
+#      Pester Configuration (DscResource.Test)     #
+####################################################
+DscTest:
+  OutputFormat: NUnitXML
+  ExcludeTag:
+    - 'Common Tests - New Error-Level Script Analyzer Rules'
+  ExcludeSourceFile:
+    - output
+  ExcludeModuleFile:
+    - Modules/DscResource.Common
+  MainGitBranch: main
+
+####################################################
+#              PSDepend Configuration              #
+####################################################
+Resolve-Dependency:
+  Gallery: 'PSGallery'
+  AllowPrerelease: false
+  Verbose: false
+
+####################################################
+#               GitHub Configuration               #
+####################################################
 GitHubConfig:
   GitHubFilesToAdd:
     - 'CHANGELOG.md'
-  GitHubConfigUserName: dscbot
+  ReleaseAssets:
+    - output/WikiContent.zip
+  GitHubConfigUserName: dscbot # cSpell: disable-line
   GitHubConfigUserEmail: dsccommunity@outlook.com
   UpdateChangelogOnPrerelease: false
 
@@ -131,3 +181,18 @@ DscResource.DocGenerator:
       - '_(.+?)_' # Match Italic (underscore)
       - '\*\*(.+?)\*\*' # Match bold
       - '\*(.+?)\*' # Match Italic (asterisk)
+  Publish_GitHub_Wiki_Content:
+    Debug: false
+  Generate_Wiki_Content:
+    MofResourceMetadata:
+      Type: MofResource
+      Category: Resources
+    ClassResourceMetadata:
+      Type: ClassResource
+      Category: Resources
+    CompositeResourceMetadata:
+      Type: CompositeResource
+      Category: Resources
+  Generate_Wiki_Sidebar:
+     Debug: false
+     AlwaysOverwrite: true
