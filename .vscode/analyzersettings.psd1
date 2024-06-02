@@ -1,7 +1,6 @@
 @{
     CustomRulePath      = @(
         './output/RequiredModules/DscResource.AnalyzerRules'
-        './tests/QA/AnalyzerRules/SqlServerDsc.AnalyzerRules.psm1'
         './output/RequiredModules/Indented.ScriptAnalyzerRules'
     )
     IncludeDefaultRules = $true

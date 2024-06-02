@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI Pipeline
   - Updated pipeline files to match current DSC Community patterns - fixes [Issue #427](https://github.com/dsccommunity/ComputerManagementDsc/issues/427).
   - Updated HQRM step to use windows-latest image.
-  - Update pipeline to use `PublishCodeCoverageResults@2` task to publish code coverage results.
 
 ## [9.1.0] - 2024-04-30
 
