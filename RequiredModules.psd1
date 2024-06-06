@@ -21,7 +21,7 @@
     LoopbackAdapter             = 'latest'
 
     # Build dependencies needed for using the module
-    'DscResource.Common'           = 'latest'
+    'DscResource.Common'        = 'latest'
     'DscResource.Base'          = 'latest'
 
     # Analyzer rules
