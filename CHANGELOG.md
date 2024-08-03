@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- CI Pipeline
+  - Updated pipeline files to match current DSC Community patterns - fixes [Issue #427](https://github.com/dsccommunity/ComputerManagementDsc/issues/427).
+  - Updated HQRM step to use windows-latest image.
+
+## [9.1.0] - 2024-04-30
+
+### Changed
+
 - ComputerManagementDsc
   - The class-based resources are now re-using the module DscResource.Base - Fixes [Issue #404](https://github.com/dsccommunity/ComputerManagementDsc/issues/404).
   - Removed the file `source/build.psd1` as it is no longer required for the
@@ -23,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - AppVeyor build now sets the correct module version to be able to run tests.
 - ScheduledTask
   - Allowed values for ScheduleType updated to accept AtLogon over AtLogOn - Fixes [Issue #420](https://github.com/dsccommunity/ComputerManagementDsc/issues/420)
+- SmbShare
+  - Allow Test-TargetResource to succeed when access entries use different order - Fixes [Issue #247](https://github.com/dsccommunity/ComputerManagementDsc/issues/247), [Issue #423](https://github.com/dsccommunity/ComputerManagementDsc/issues/423)
+- UserAccountControl
+  - Ensure registry keys are created as REG_DWORD rather than REG_SZ - Fixes [Issue #412](https://github.com/dsccommunity/ComputerManagementDsc/issues/412)
 
 ## [9.0.0] - 2023-02-22
 

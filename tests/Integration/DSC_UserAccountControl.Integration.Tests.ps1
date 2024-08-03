@@ -25,7 +25,7 @@ try
     . $configFile
 
     # Used to reuse helper functions from the actual resource.
-    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\..\output\ComputerManagementDsc\*\DSCResources\DSC_UserAccountControl\DSC_UserAccountControl.psm1')
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\..\output\builtModule\ComputerManagementDsc\*\DSCResources\DSC_UserAccountControl\DSC_UserAccountControl.psm1')
 
     $script:currentUserAccountControlSettings = Get-UserAccountControl
 
