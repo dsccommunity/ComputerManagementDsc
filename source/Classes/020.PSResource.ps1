@@ -284,10 +284,16 @@ class PSResource : ResourceBase
 
         $powerShellGet = Get-Module -Name PowerShellGet
 
-        if ($powerShellGet.Version -lt [version]'1.6.0' -and $properties.ContainsKey('AllowPrerelease'))
+        if ($properties.ContainsKey('AllowPrerelease'))
         {
-            $errorMessage = $this.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
-            New-InvalidArgumentException -ArgumentName 'AllowPrerelease' -message ($errorMessage -f $powerShellGet.Version)
+            Try
+            {
+                Import-Module -Name PowerShelllGet -MinimumVersion '1.6.0' -ErrorAction Stop
+            }
+            Catch
+            {
+                New-InvalidArgumentException -ArgumentName 'AllowPrerelease' -Message $this.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
+            }
         }
 
         $assertBoundParameterParameters = @{
