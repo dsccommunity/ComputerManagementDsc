@@ -259,7 +259,7 @@ class PSResource : ResourceBase
         {
             $returnValue.Ensure = [Ensure]::Present
 
-            if (-not [System.String]::IsNullOrEmpty($this.VersionRequirement) -and -not $currentState.ContainsKey('Latest'))
+            if ($this | Get-DscProperty -Name @('RequiredVersion', 'MaximumVersion', 'MinimumVersion') -HasValue)
             {
                 $returnValue.$($this.VersionRequirement) = $this.GetRequiredVersionFromVersionRequirement($resources, $this.VersionRequirement)
             }
@@ -281,8 +281,6 @@ class PSResource : ResourceBase
     {
         Assert-Module -ModuleName PowerShellGet
         Assert-Module -ModuleName PackageManagement
-
-        $powerShellGet = Get-Module -Name PowerShellGet
 
         if ($properties.ContainsKey('AllowPrerelease'))
         {
@@ -577,12 +575,8 @@ class PSResource : ResourceBase
     #>
     hidden [void] UninstallResource ([System.Collections.Hashtable]$resource)
     {
-        $params = $this | Get-DscProperty -ExcludeName @('Latest','OnlySingleVersion','Ensure', 'SkipPublisherCheck', 'RemoveNonCompliantVersions','MinimumVersion', 'MaximumVersion', 'RequiredVersion') -Type Optional -HasValue
-        $params.RequiredVersion = $resource.Version
-
         Write-Verbose -Message ($this.localizedData.UninstallResource -f $resource.Name,$resource.Version)
-
-        $resource | Uninstall-Module @params
+        Uninstall-Module -Name $resource.Name -RequiredVersion $resource.RequiredVersion -Force -AllowPreRelease
     }
 
     <#
