@@ -228,6 +228,12 @@ function Get-TargetResource
         valid in combination with the OnEvent Schedule Type. For the query schema please check:
         https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema
 
+    .PARAMETER EventValueQueries
+        Specifies event value queries. This parameter is only valid in combination with the OnEvent
+        Schedule Type. Receives a hashtable where the key is a property value for an event and
+        the value is an XPath event query. For more detailed syntax check:
+        https://learn.microsoft.com/en-us/windows/win32/taskschd/eventtrigger-valuequeries.
+
     .PARAMETER Delay
         The time to wait after an event based trigger was triggered. This parameter is only
         valid in combination with the OnEvent Schedule Type.
@@ -423,6 +429,10 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         $EventSubscription,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $EventValueQueries,
 
         [Parameter()]
         [System.String]
@@ -689,6 +699,7 @@ function Set-TargetResource
                 $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
                 $trigger.Enabled = $true
                 $trigger.Subscription = $EventSubscription
+                $trigger.ValueQueries = Convert-KeyValuePairArrayToTaskNamedValuePairCollection -Array $EventValueQueries
             }
         }
 
@@ -1120,6 +1131,12 @@ function Set-TargetResource
         valid in combination with the OnEvent Schedule Type. For the query schema please check:
         https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema
 
+    .PARAMETER EventValueQueries
+        Specifies event value queries. This parameter is only valid in combination with the OnEvent
+        Schedule Type. Receives a hashtable where the key is a property value for an event and
+        the value is an XPath event query. For more detailed syntax check:
+        https://learn.microsoft.com/en-us/windows/win32/taskschd/eventtrigger-valuequeries.
+
     .PARAMETER Delay
         The time to wait after an event based trigger was triggered. This parameter is only
         valid in combination with the OnEvent Schedule Type.
@@ -1316,6 +1333,10 @@ function Test-TargetResource
         [Parameter()]
         [System.String]
         $EventSubscription,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $EventValueQueries,
 
         [Parameter()]
         [System.String]
@@ -1535,6 +1556,7 @@ function Test-TargetResource
     return Test-DscParameterState `
         -CurrentValues $currentValues `
         -DesiredValues $desiredValues `
+        -SortArrayValues `
         -Verbose:$VerbosePreference
 }
 
@@ -1922,6 +1944,7 @@ function Get-CurrentResource
             RunLevel                        = [System.String] $task.Principal.RunLevel
             LogonType                       = [System.String] $task.Principal.LogonType
             EventSubscription               = $trigger.Subscription
+            EventValueQueries               = Convert-TaskNamedValuePairCollectionToHashtable -Array $trigger.ValueQueries
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
         }
 
@@ -1941,6 +1964,67 @@ function Get-CurrentResource
     Write-Verbose -Message ($script:localizedData.CurrentTaskValuesRetrievedMessage -f $TaskName, $TaskPath)
 
     return $result
+}
+
+<#
+    .SYNOPSIS
+        Converts CimInstance array of type MSFT_TaskNamedValue to hashtable
+
+    .PARAMETER Array
+        The array of MSFT_TaskNamedValue to convert to a hashtable.
+#>
+function Convert-TaskNamedValuePairCollectionToHashtable
+{
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param
+    (
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $Array
+    )
+
+    $hashtable = @{ }
+
+    foreach ($item in $Array)
+    {
+        $hashtable += @{
+            $item.Name = $item.Value
+        }
+    }
+
+    return $hashtable
+}
+
+<#
+    .SYNOPSIS
+        Converts CimInstance array of type MSFT_KeyValuePair to array of type MSFT_TaskNamedValue
+
+    .PARAMETER Array
+        The array of MSFT_KeyValuePair to convert to an array of type MSFT_TaskNamedValue.
+#>
+function Convert-KeyValuePairArrayToTaskNamedValuePairCollection
+{
+    [CmdletBinding()]
+    [OutputType([Microsoft.Management.Infrastructure.CimInstance[]])]
+    param
+    (
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $Array
+    )
+
+    $cimNamedValueClass = Get-CimClass -ClassName MSFT_TaskNamedValue -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue
+
+    $namedValueArray = [Microsoft.Management.Infrastructure.CimInstance[]]@()
+
+    foreach ($item in $Array)
+    {
+        $namedValue = New-CimInstance -CimClass $cimNamedValueClass -Property @{Name = $item.key; Value = $item.Value} -ClientOnly
+        $namedValueArray += $namedValue
+    }
+
+    return $namedValueArray
 }
 
 <#
