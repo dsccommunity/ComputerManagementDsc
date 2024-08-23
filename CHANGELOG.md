@@ -5,6 +5,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- ScheduledTask
+  - Added support for configuring Event ValueQueries, allowing the triggering event to be
+    parsed for values which are sent to the scheduled task script.
+    Fixes [Issue #392](https://github.com/dsccommunity/ComputerManagementDsc/issues/392).
+
+### Fixed
+
+- ScheduledTask
+  - Resolved an issue where DaysOfWeek array ordering can cause configuration drift.
+    Fixes [Issue #354](https://github.com/dsccommunity/ComputerManagementDsc/issues/354).
+
 ### Changed
 
 - CI Pipeline
