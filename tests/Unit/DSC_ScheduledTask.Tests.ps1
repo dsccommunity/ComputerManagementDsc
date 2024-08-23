@@ -1599,6 +1599,11 @@ try
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
+                    EventValueQueries = @{
+                        "Service" = "Event/EventData/Data[@Name='param1']"
+                        "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                        "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+                    }
                     Delay             = '00:01:00'
                     Enable            = $true
                     Verbose           = $true
@@ -1614,6 +1619,7 @@ try
                         Triggers = [pscustomobject] @{
                             Delay        = 'PT1M'
                             Subscription = $testParameters.EventSubscription
+                            ValueQueries = @($testParameters.EventValueQueries.GetEnumerator())
                             CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
                             }
@@ -1631,6 +1637,7 @@ try
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -Be 'OnEvent'
                     $result.EventSubscription | Should -Be $testParameters.EventSubscription
+                    $result.EventValueQueries | Should -Be $testParameters.EventValueQueries
                     $result.Delay | Should -Be $testParameters.Delay
                 }
 
@@ -1644,6 +1651,11 @@ try
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
+                    EventValueQueries = @{
+                        "Service" = "Event/EventData/Data[@Name='param1']"
+                        "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                        "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+                    }
                     Delay             = '00:01:00'
                     Enable            = $true
                     Verbose           = $true
@@ -1671,6 +1683,11 @@ try
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
+                    EventValueQueries = @{
+                        "Service" = "Event/EventData/Data[@Name='param1']"
+                        "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                        "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+                    }
                     Delay             = '00:05:00'
                     Enable            = $true
                     Verbose           = $true
@@ -1686,6 +1703,11 @@ try
                         Triggers = [pscustomobject] @{
                             Delay        = 'PT1M'
                             Subscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1601]]</Select></Query></QueryList>'
+                            ValueQueries = @(@{
+                                "Service" = "Event/EventData/Data[@Name='param1']"
+                                "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                                "ErrorCode1" = "Event/EventData/Data[@Name='param4']"
+                            }.GetEnumerator())
                             CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
                             }
@@ -1724,6 +1746,11 @@ try
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
+                    EventValueQueries = @{
+                        "Service" = "Event/EventData/Data[@Name='param1']"
+                        "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                        "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+                    }
                     RandomDelay       = '01:00:00'
                     Delay             = '00:01:00'
                     Enable            = $true
@@ -1740,6 +1767,7 @@ try
                         Triggers = [pscustomobject] @{
                             Delay        = 'PT1M'
                             Subscription = $testParameters.EventSubscription
+                            ValueQueries = @($testParameters.EventValueQueries.GetEnumerator())
                             CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
                             }
