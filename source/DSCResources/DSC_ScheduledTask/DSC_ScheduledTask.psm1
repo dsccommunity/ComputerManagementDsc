@@ -1984,7 +1984,7 @@ function Convert-TaskNamedValuePairCollectionToHashtable
         $Array
     )
 
-    $hashtable = @{ }
+    $hashtable = @{}
 
     foreach ($item in $Array)
     {
