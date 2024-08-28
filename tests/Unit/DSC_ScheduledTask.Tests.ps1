@@ -1647,7 +1647,7 @@ try
                     $result.Ensure | Should -Be 'Present'
                     $result.ScheduleType | Should -Be 'OnEvent'
                     $result.EventSubscription | Should -Be $testParameters.EventSubscription
-                    $result.EventValueQueries | Should -Be $testParameters.EventValueQueries
+                    Test-DscParameterState -CurrentValues $result.EventValueQueries -DesiredValues $testParameters.EventValueQueries | Should -BeTrue
                     $result.Delay | Should -Be $testParameters.Delay
                 }
 
