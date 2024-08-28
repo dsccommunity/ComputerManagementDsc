@@ -2020,11 +2020,12 @@ function Convert-KeyValuePairArrayToTaskNamedValuePairCollection
 
     foreach ($item in $Array)
     {
-        $namedValueProperties = @{
-            Name = $item.key
-            Value = $item.Value
-        }
-        $namedValue = New-CimInstance -CimClass $cimNamedValueClass -Property $namedValueProperties -ClientOnly
+        $namedValue = New-CimInstance -CimClass $cimNamedValueClass `
+            -Property @{
+                Name = $item.key
+                Value = $item.Value
+            } `
+            -ClientOnly
         $namedValueArray += $namedValue
     }
 

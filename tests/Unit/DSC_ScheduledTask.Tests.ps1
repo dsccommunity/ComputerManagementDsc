@@ -1622,14 +1622,14 @@ try
                             ValueQueries = @(
                                 $testParameters.EventValueQueries.GetEnumerator() |
                                     ForEach-Object {
-                                        [pscustomobject] @{
-                                            Name = $_.Name
-                                            Value = $_.Value
-                                            CimClass = @{
-                                                CimClassName = 'MSFT_TaskNamedValue'
+                                        New-CimInstance -ClassName MSFT_TaskNamedValue `
+                                            -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue `
+                                            -Property @{
+                                                Name = $_.Name
+                                                Value = $_.Value
+                                            } `
+                                            -ClientOnly
                                         }
-                                    }
-                                }
                             )
                             CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
@@ -1717,14 +1717,14 @@ try
                             ValueQueries = @(
                                 $testParameters.EventValueQueries.GetEnumerator() | Select-Object -SkipLast 1 |
                                     ForEach-Object {
-                                        [pscustomobject] @{
-                                            Name = $_.Name
-                                            Value = $_.Value
-                                            CimClass = @{
-                                                CimClassName = 'MSFT_TaskNamedValue'
+                                        New-CimInstance -ClassName MSFT_TaskNamedValue `
+                                            -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue `
+                                            -Property @{
+                                                Name = $_.Name
+                                                Value = $_.Value
+                                            } `
+                                            -ClientOnly
                                         }
-                                    }
-                                }
                             )
                             CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
