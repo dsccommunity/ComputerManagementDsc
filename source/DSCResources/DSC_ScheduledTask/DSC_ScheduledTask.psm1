@@ -1507,8 +1507,8 @@ function Test-TargetResource
             The WeeksInterval parameter of this function defaults to 1,
             even though the value of the WeeksInterval property maybe
             unset/undefined in the object $currentValues returned from
-            Get-TargetResouce. To avoid Test-TargetResouce returning false
-            and generating spurious calls to Set-TargetResouce, default
+            Get-TargetResource. To avoid Test-TargetResource returning false
+            and generating spurious calls to Set-TargetResource, default
             an undefined $currentValues.WeeksInterval to the value of
             $WeeksInterval.
         #>
@@ -1546,7 +1546,7 @@ function Test-TargetResource
     {
         <#
             Initialise a missing or null Verbose to avoid spurious
-            calls to Set-TargetResouce
+            calls to Set-TargetResource
         #>
         $currentValues.Add('Verbose', $desiredValues['Verbose'])
     }
