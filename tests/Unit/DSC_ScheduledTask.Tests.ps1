@@ -1599,7 +1599,7 @@ try
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
-                    EventValueQueries = [pscustomobject] @{
+                    EventValueQueries = ConvertTo-CimInstance -Hashtable @{
                         "Service" = "Event/EventData/Data[@Name='param1']"
                         "DependsOnService" = "Event/EventData/Data[@Name='param2']"
                         "ErrorCode" = "Event/EventData/Data[@Name='param3']"
@@ -1624,7 +1624,7 @@ try
                                     New-CimInstance -CimClass (Get-CimClass -ClassName MSFT_TaskNamedValue `
                                             -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue) `
                                         -Property @{
-                                            Name = $_.Name
+                                            Name = $_.Key
                                             Value = $_.Value
                                         } `
                                         -ClientOnly
@@ -1661,7 +1661,7 @@ try
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
-                    EventValueQueries = [pscustomobject] @{
+                    EventValueQueries = ConvertTo-CimInstance -Hashtable @{
                         "Service" = "Event/EventData/Data[@Name='param1']"
                         "DependsOnService" = "Event/EventData/Data[@Name='param2']"
                         "ErrorCode" = "Event/EventData/Data[@Name='param3']"
@@ -1693,7 +1693,7 @@ try
                     ScheduleType      = 'OnEvent'
                     ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                     EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1600]]</Select></Query></QueryList>'
-                    EventValueQueries = [pscustomobject] @{
+                    EventValueQueries = ConvertTo-CimInstance -Hashtable @{
                         "Service" = "Event/EventData/Data[@Name='param1']"
                         "DependsOnService" = "Event/EventData/Data[@Name='param2']"
                         "ErrorCode" = "Event/EventData/Data[@Name='param3']"
@@ -1718,7 +1718,7 @@ try
                                     New-CimInstance -CimClass (Get-CimClass -ClassName MSFT_TaskNamedValue `
                                             -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue) `
                                         -Property @{
-                                            Name = $_.Name
+                                            Name = $_.Key
                                             Value = $_.Value
                                         } `
                                         -ClientOnly
