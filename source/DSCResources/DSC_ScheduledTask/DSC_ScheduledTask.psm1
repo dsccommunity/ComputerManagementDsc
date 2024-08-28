@@ -699,7 +699,7 @@ function Set-TargetResource
                 $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
                 $trigger.Enabled = $true
                 $trigger.Subscription = $EventSubscription
-                $trigger.ValueQueries = Convert-KeyValuePairArrayToTaskNamedValuePairCollection -Array $EventValueQueries
+                $trigger.ValueQueries = ConvertTo-TaskNamedValuePairCollectionFromKeyValuePairArray -Array $EventValueQueries
             }
         }
 
@@ -1944,7 +1944,7 @@ function Get-CurrentResource
             RunLevel                        = [System.String] $task.Principal.RunLevel
             LogonType                       = [System.String] $task.Principal.LogonType
             EventSubscription               = $trigger.Subscription
-            EventValueQueries               = Convert-TaskNamedValuePairCollectionToHashtable -Array $trigger.ValueQueries
+            EventValueQueries               = ConvertTo-HashtableFromTaskNamedValuePairCollection -Array $trigger.ValueQueries
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
         }
 
@@ -1973,7 +1973,7 @@ function Get-CurrentResource
     .PARAMETER Array
         The array of MSFT_TaskNamedValue to convert to a hashtable.
 #>
-function Convert-TaskNamedValuePairCollectionToHashtable
+function ConvertTo-HashtableFromTaskNamedValuePairCollection
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
@@ -2003,7 +2003,7 @@ function Convert-TaskNamedValuePairCollectionToHashtable
     .PARAMETER Array
         The array of MSFT_KeyValuePair to convert to an array of type MSFT_TaskNamedValue.
 #>
-function Convert-KeyValuePairArrayToTaskNamedValuePairCollection
+function ConvertTo-TaskNamedValuePairCollectionFromKeyValuePairArray
 {
     [CmdletBinding()]
     [OutputType([Microsoft.Management.Infrastructure.CimInstance[]])]
