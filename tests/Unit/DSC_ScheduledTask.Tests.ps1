@@ -1622,8 +1622,8 @@ try
                             ValueQueries = @(
                                 $testParameters.EventValueQueries.GetEnumerator() |
                                     ForEach-Object {
-                                        New-CimInstance -ClassName MSFT_TaskNamedValue `
-                                            -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue `
+                                        New-CimInstance -CimClass (Get-CimClass -ClassName MSFT_TaskNamedValue `
+                                                -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue) `
                                             -Property @{
                                                 Name = $_.Name
                                                 Value = $_.Value
@@ -1717,8 +1717,8 @@ try
                             ValueQueries = @(
                                 $testParameters.EventValueQueries.GetEnumerator() | Select-Object -SkipLast 1 |
                                     ForEach-Object {
-                                        New-CimInstance -ClassName MSFT_TaskNamedValue `
-                                            -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue `
+                                        New-CimInstance -CimClass (Get-CimClass -ClassName MSFT_TaskNamedValue `
+                                                -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue) `
                                             -Property @{
                                                 Name = $_.Name
                                                 Value = $_.Value
