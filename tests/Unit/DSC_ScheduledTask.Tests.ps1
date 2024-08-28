@@ -1630,7 +1630,7 @@ try
                                             Value = $_.Value
                                         } `
                                         -ClientOnly
-                                    }
+                                }
                             )
                             CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
@@ -1728,7 +1728,7 @@ try
                                             Value = $_.Value
                                         } `
                                         -ClientOnly
-                                    }
+                                }
                             )
                             CimClass     = @{
                                 CimClassName = 'MSFT_TaskEventTrigger'
