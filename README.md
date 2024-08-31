@@ -58,7 +58,7 @@ The **ComputerManagementDsc** module contains the following resources:
   settings on the local machine.
 - **SmbShare**: This resource is used to manage SMB shares on a machine.
 - **SystemLocale**: This resource is used to set the system locale on a
-  Windows machine
+  Windows machine.
 - **TimeZone**: This resource is used for setting the time zone on a machine.
 - **UserAccountControl**: This resource allows you to configure the notification
   level or granularly configure the User Account Control for the computer.

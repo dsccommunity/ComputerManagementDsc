@@ -228,6 +228,12 @@ function Get-TargetResource
         valid in combination with the OnEvent Schedule Type. For the query schema please check:
         https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema
 
+    .PARAMETER EventValueQueries
+        Specifies event value queries. This parameter is only valid in combination with the OnEvent
+        Schedule Type. Receives a hashtable where the key is a property value for an event and
+        the value is an XPath event query. For more detailed syntax check:
+        https://learn.microsoft.com/en-us/windows/win32/taskschd/eventtrigger-valuequeries.
+
     .PARAMETER Delay
         The time to wait after an event based trigger was triggered. This parameter is only
         valid in combination with the OnEvent Schedule Type.
@@ -423,6 +429,10 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         $EventSubscription,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $EventValueQueries,
 
         [Parameter()]
         [System.String]
@@ -689,6 +699,7 @@ function Set-TargetResource
                 $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
                 $trigger.Enabled = $true
                 $trigger.Subscription = $EventSubscription
+                $trigger.ValueQueries = ConvertTo-TaskNamedValuePairCollectionFromKeyValuePairArray -Array $EventValueQueries
             }
         }
 
@@ -1120,6 +1131,12 @@ function Set-TargetResource
         valid in combination with the OnEvent Schedule Type. For the query schema please check:
         https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema
 
+    .PARAMETER EventValueQueries
+        Specifies event value queries. This parameter is only valid in combination with the OnEvent
+        Schedule Type. Receives a hashtable where the key is a property value for an event and
+        the value is an XPath event query. For more detailed syntax check:
+        https://learn.microsoft.com/en-us/windows/win32/taskschd/eventtrigger-valuequeries.
+
     .PARAMETER Delay
         The time to wait after an event based trigger was triggered. This parameter is only
         valid in combination with the OnEvent Schedule Type.
@@ -1318,6 +1335,10 @@ function Test-TargetResource
         $EventSubscription,
 
         [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $EventValueQueries,
+
+        [Parameter()]
         [System.String]
         $Delay = '00:00:00'
     )
@@ -1486,8 +1507,8 @@ function Test-TargetResource
             The WeeksInterval parameter of this function defaults to 1,
             even though the value of the WeeksInterval property maybe
             unset/undefined in the object $currentValues returned from
-            Get-TargetResouce. To avoid Test-TargetResouce returning false
-            and generating spurious calls to Set-TargetResouce, default
+            Get-TargetResource. To avoid Test-TargetResource returning false
+            and generating spurious calls to Set-TargetResource, default
             an undefined $currentValues.WeeksInterval to the value of
             $WeeksInterval.
         #>
@@ -1525,7 +1546,7 @@ function Test-TargetResource
     {
         <#
             Initialise a missing or null Verbose to avoid spurious
-            calls to Set-TargetResouce
+            calls to Set-TargetResource
         #>
         $currentValues.Add('Verbose', $desiredValues['Verbose'])
     }
@@ -1535,6 +1556,7 @@ function Test-TargetResource
     return Test-DscParameterState `
         -CurrentValues $currentValues `
         -DesiredValues $desiredValues `
+        -SortArrayValues `
         -Verbose:$VerbosePreference
 }
 
@@ -1922,6 +1944,7 @@ function Get-CurrentResource
             RunLevel                        = [System.String] $task.Principal.RunLevel
             LogonType                       = [System.String] $task.Principal.LogonType
             EventSubscription               = $trigger.Subscription
+            EventValueQueries               = ConvertTo-HashtableFromTaskNamedValuePairCollection -Array $trigger.ValueQueries
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
         }
 
@@ -1941,6 +1964,72 @@ function Get-CurrentResource
     Write-Verbose -Message ($script:localizedData.CurrentTaskValuesRetrievedMessage -f $TaskName, $TaskPath)
 
     return $result
+}
+
+<#
+    .SYNOPSIS
+        Converts CimInstance array of type MSFT_TaskNamedValue to hashtable
+
+    .PARAMETER Array
+        The array of MSFT_TaskNamedValue to convert to a hashtable.
+#>
+function ConvertTo-HashtableFromTaskNamedValuePairCollection
+{
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param
+    (
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $Array
+    )
+
+    $hashtable = @{}
+
+    foreach ($item in $Array)
+    {
+        $hashtable += @{
+            $item.Name = $item.Value
+        }
+    }
+
+    return $hashtable
+}
+
+<#
+    .SYNOPSIS
+        Converts CimInstance array of type MSFT_KeyValuePair to array of type MSFT_TaskNamedValue
+
+    .PARAMETER Array
+        The array of MSFT_KeyValuePair to convert to an array of type MSFT_TaskNamedValue.
+#>
+function ConvertTo-TaskNamedValuePairCollectionFromKeyValuePairArray
+{
+    [CmdletBinding()]
+    [OutputType([Microsoft.Management.Infrastructure.CimInstance[]])]
+    param
+    (
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $Array
+    )
+
+    $cimNamedValueClass = Get-CimClass -ClassName MSFT_TaskNamedValue -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskNamedValue
+
+    $namedValueArray = [Microsoft.Management.Infrastructure.CimInstance[]]@()
+
+    foreach ($item in $Array)
+    {
+        $namedValue = New-CimInstance -CimClass $cimNamedValueClass `
+            -Property @{
+                Name = $item.key
+                Value = $item.Value
+            } `
+            -ClientOnly
+        $namedValueArray += $namedValue
+    }
+
+    return $namedValueArray
 }
 
 <#

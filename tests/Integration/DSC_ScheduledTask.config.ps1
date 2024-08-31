@@ -252,8 +252,13 @@ Configuration ScheduledTaskOnEventAdd
             Ensure            = 'Present'
             ScheduleType      = 'OnEvent'
             ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
+            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
             EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
+            EventValueQueries = @{
+                "Service" = "Event/EventData/Data[@Name='param1']"
+                "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+            }
             Delay             = '00:00:30'
         }
     }
@@ -456,8 +461,13 @@ Configuration ScheduledTaskOnEventMod
             Ensure            = 'Present'
             ScheduleType      = 'OnEvent'
             ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
+            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
             EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7002)]]</Select></Query></QueryList>'
+            EventValueQueries = @{
+                "Service" = "Event/EventData/Data[@Name='param1']"
+                "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+            }
             Delay             = '00:00:45'
         }
     }
@@ -653,8 +663,13 @@ Configuration ScheduledTaskOnEventDel
             Ensure            = 'Absent'
             ScheduleType      = 'OnEvent'
             ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
+            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
             EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
+            EventValueQueries = @{
+                "Service" = "Event/EventData/Data[@Name='param1']"
+                "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+            }
             Delay             = '00:00:30'
         }
     }
