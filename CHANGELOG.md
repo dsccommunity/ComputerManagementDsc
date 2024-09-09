@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update build process to pin GitVersion to 5.* to resolve errors
   (https://github.com/gaelcolas/Sampler/issues/477).
 - `VirtualMemory` fix incorrect variable name
+- `SmbServerConfiguration` remove errant argument
 
 ### Changed
 
