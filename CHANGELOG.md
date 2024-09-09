@@ -19,12 +19,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     Fixes [Issue #354](https://github.com/dsccommunity/ComputerManagementDsc/issues/354).
 - Update build process to pin GitVersion to 5.* to resolve errors
   (https://github.com/gaelcolas/Sampler/issues/477).
+- `VirtualMemory` fix incorrect variable name
 
 ### Changed
 
 - CI Pipeline
   - Updated pipeline files to match current DSC Community patterns - fixes [Issue #427](https://github.com/dsccommunity/ComputerManagementDsc/issues/427).
   - Updated HQRM step to use windows-latest image.
+  - Converted tests to Pester 5
+
+### Removed
+
+- Removed `Get-InvalidOperationRecord` to use version provided by `DscResource.Test`
 
 ## [9.1.0] - 2024-04-30
 
