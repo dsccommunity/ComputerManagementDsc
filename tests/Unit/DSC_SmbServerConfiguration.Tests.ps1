@@ -700,7 +700,7 @@ Describe 'DSC_SmbServerConfiguration\Set-TargetResource' -Tag 'Set' {
                 Set-TargetResource @caseParams
             }
 
-            Assert-MockCalled -CommandName Set-SmbServerConfiguration -Times 1
+            Should -Invoke -CommandName Set-SmbServerConfiguration -Times 1 -Scope It
         }
     }
 }
