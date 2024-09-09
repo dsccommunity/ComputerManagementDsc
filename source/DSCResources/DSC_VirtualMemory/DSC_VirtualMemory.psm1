@@ -484,7 +484,7 @@ function New-PageFile
         $PageFileName
     )
 
-    Write-Verbose -Message ($script:localizedData.NewPageFileMessage -f $State)
+    Write-Verbose -Message ($script:localizedData.NewPageFileMessage -f $PageFileName)
 
     $null = New-CimInstance `
         -Namespace 'root\cimv2' `
