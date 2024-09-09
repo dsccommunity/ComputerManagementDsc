@@ -35,56 +35,6 @@ function Get-InvalidArgumentRecord
 
 <#
     .SYNOPSIS
-        Returns an invalid operation exception object
-
-    .PARAMETER Message
-        The message explaining why this error is being thrown
-
-    .PARAMETER ErrorRecord
-        The error record containing the exception that is causing this terminating error
-#>
-function Get-InvalidOperationRecord
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter()]
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $Message,
-
-        [Parameter()]
-        [ValidateNotNull()]
-        [System.Management.Automation.ErrorRecord]
-        $ErrorRecord
-    )
-
-    if ($null -eq $Message)
-    {
-        $invalidOperationException = New-Object -TypeName 'InvalidOperationException'
-    }
-    elseif ($null -eq $ErrorRecord)
-    {
-        $invalidOperationException =
-        New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message )
-    }
-    else
-    {
-        $invalidOperationException =
-        New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message,
-            $ErrorRecord.Exception )
-    }
-
-    $newObjectParams = @{
-        TypeName = 'System.Management.Automation.ErrorRecord'
-        ArgumentList = @( $invalidOperationException.ToString(), 'MachineStateIncorrect',
-            'InvalidOperation', $null )
-    }
-    return New-Object @newObjectParams
-}
-
-<#
-    .SYNOPSIS
         Test if the source files are available for Windows Capability.
         If the source files are not available Get-WindowsCapability
         will throw an exception.
@@ -144,6 +94,5 @@ function Reset-DscLcm
 
 Export-ModuleMember -Function `
     Get-InvalidArgumentRecord, `
-    Get-InvalidOperationRecord, `
     Test-WindowsCapabilitySourceAvailable, `
     Reset-DscLcm
