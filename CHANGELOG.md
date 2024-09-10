@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated pipeline files to match current DSC Community patterns - fixes [Issue #427](https://github.com/dsccommunity/ComputerManagementDsc/issues/427).
   - Updated HQRM step to use windows-latest image.
   - Converted tests to Pester 5
+  - Rename Delete-ADSIObject to Delete-ADSIObject to satisfy HQRM
 
 ### Removed
 

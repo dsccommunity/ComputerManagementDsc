@@ -762,7 +762,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
         Mock -CommandName Rename-Computer
         Mock -CommandName Set-CimInstance
         Mock -CommandName Get-ADSIComputer
-        Mock -CommandName Delete-ADSIObject
+        Mock -CommandName Remove-ADSIObject
     }
 
     Context 'When both DomainName and WorkGroupName are specified' {
@@ -858,7 +858,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 1 -Scope It
         }
     }
 
@@ -904,7 +904,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 1 -Scope It
         }
     }
 
@@ -984,7 +984,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1029,7 +1029,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName -and $Server }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1074,7 +1074,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1163,7 +1163,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 0 -Scope It
         }
     }
 
@@ -1254,7 +1254,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 1 -Scope It -ParameterFilter { $DomainName -and $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 0 -Scope It
         }
     }
 
@@ -1329,7 +1329,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 0 -Scope It
         }
     }
 
@@ -1369,7 +1369,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 0 -Scope It
         }
     }
 
@@ -1410,7 +1410,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 0 -Scope It
         }
     }
 
@@ -1451,7 +1451,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $NewName }
             Should -Invoke -CommandName Add-Computer -Exactly -Times 0 -Scope It -ParameterFilter { $WorkGroupName }
             Should -Invoke -CommandName Get-ADSIComputer -Exactly -Times 1 -Scope It
-            Should -Invoke -CommandName Delete-ADSIObject -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Remove-ADSIObject -Exactly -Times 0 -Scope It
         }
     }
 
@@ -1926,7 +1926,7 @@ Describe 'DSC_Computer\Get-LogonServer' {
 #     }
 # }
 
-Describe 'DSC_Computer\Delete-ADSIObject' {
+Describe 'DSC_Computer\Remove-ADSIObject' {
     # Context 'When the path is correct' {
     #     BeforeAll {
     #         class fake_adsi_directoryentry
@@ -1958,7 +1958,7 @@ Describe 'DSC_Computer\Delete-ADSIObject' {
     #                 Credential = $credential
     #             }
 
-    #             { Delete-ADSIObject @mockParams } | Should -Not -Throw
+    #             { Remove-ADSIObject @mockParams } | Should -Not -Throw
     #         }
 
     #         Should -Invoke -CommandName New-Object -Exactly -Times 1 -Scope It
@@ -1977,7 +1977,7 @@ Describe 'DSC_Computer\Delete-ADSIObject' {
                     Credential = $credential
                 }
 
-                { Delete-ADSIObject @deleteADSIObjectParams } | Should -Throw -ExpectedMessage $errorMessage
+                { Remove-ADSIObject @deleteADSIObjectParams } | Should -Throw -ExpectedMessage $errorMessage
             }
         }
     }
@@ -2001,7 +2001,7 @@ Describe 'DSC_Computer\Delete-ADSIObject' {
                     Credential = $credential
                 }
 
-                { Delete-ADSIObject @deleteADSIObjectParams } | Should -Throw 'Invalid Credential'
+                { Remove-ADSIObject @deleteADSIObjectParams } | Should -Throw 'Invalid Credential'
             }
 
             Should -Invoke -CommandName New-Object -Exactly -Times 1 -Scope It
