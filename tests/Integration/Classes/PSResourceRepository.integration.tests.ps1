@@ -203,8 +203,6 @@ Describe "$($script:dscResourceName)_Integration" {
         }
     }
 
-    $configurationName =
-
     Context ('When using configuration <_>') -ForEach @(
         "$($script:dscResourceName)_Remove_Config"
     ) {
