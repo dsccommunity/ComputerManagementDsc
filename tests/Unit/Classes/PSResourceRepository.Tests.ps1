@@ -310,7 +310,7 @@ Describe 'PSResourceRepository\Get()' -Tag 'Get' {
                     $reason = $currentState.Reasons.Where({ $_.Code -eq 'PSResourceRepository:PSResourceRepository:SourceLocation' })
 
                     # Handle PowerShell and Windows PowerShell differently.
-                    if ($IsLinux -or $IsMacOS -or $IsWindows)
+                    if ($PSVersionTable.PSEdition -eq 'Core')
                     {
                         # PowerShell
                         $reason.Phrase | Should -Be 'The property SourceLocation should be "https://www.powershellgallery.com/api/v2", but was null'
