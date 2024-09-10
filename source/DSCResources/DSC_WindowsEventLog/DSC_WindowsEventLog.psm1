@@ -829,7 +829,7 @@ function Register-WindowsEventLogSource
     }
     catch
     {
-        $message = $script:localizedData.RegisterWindowsEventLogSourceFailure -f $LogName, $RegisteredSource
+        $message = $script:localizedData.RegisterWindowsEventLogSourceFailure -f $LogName, $SourceName
         New-InvalidOperationException -Message $message -ErrorRecord $_
     }
 }
