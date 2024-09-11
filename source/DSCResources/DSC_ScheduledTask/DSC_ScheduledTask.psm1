@@ -545,7 +545,7 @@ function Set-TargetResource
 
         $action = New-ScheduledTaskAction @actionParameters
 
-        $scheduledTaskArguments += @{
+        $scheduledTaskArguments = @{
             Action = $action
         }
 
