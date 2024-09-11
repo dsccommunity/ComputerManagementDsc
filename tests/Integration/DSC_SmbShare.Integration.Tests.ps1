@@ -52,13 +52,15 @@ AfterAll {
 }
 
 Describe 'SmbShare Integration Tests' {
+    BeforeAll {
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile
+    }
+
     Context ('When using configuration <_>') -ForEach @(
         "$($script:dscResourceName)_Prerequisites_Config"
     ) {
         BeforeAll {
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-            . $configFile
-
             $configurationName = $_
         }
 
