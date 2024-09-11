@@ -107,7 +107,7 @@ Describe 'ComputerManagementDsc.Common\Set-TimeZoneId' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-            Get-TimeZoneId | Should -Be 'Eastern Standard Time'
+                Get-TimeZoneId | Should -Be 'Eastern Standard Time'
             }
         }
 
