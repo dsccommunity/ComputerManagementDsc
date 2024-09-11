@@ -128,6 +128,10 @@ Describe "$($script:dscResourceName)_Integration" {
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
 
+        AfterAll {
+            Wait-ForIdleLcm -Clear
+        }
+
         It 'Should compile the MOF without throwing' {
             {
                 . $currentConfig `
@@ -138,8 +142,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
         It 'Should apply the MOF correctly' {
             {
-                Reset-DscLcm
-
                 Start-DscConfiguration `
                     -Path $configDir `
                     -Wait `
@@ -161,6 +163,10 @@ Describe "$($script:dscResourceName)_Integration" {
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
 
+        AfterAll {
+            Wait-ForIdleLcm -Clear
+        }
+
         It 'Should compile the MOF without throwing' {
             {
                 . $currentConfig `
@@ -171,8 +177,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
         It 'Should apply the MOF correctly' {
             {
-                Reset-DscLcm
-
                 Start-DscConfiguration `
                     -Path $configDir `
                     -Wait `
@@ -204,8 +208,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
         It 'Should apply the MOF correctly' {
             {
-                Reset-DscLcm
-
                 Start-DscConfiguration `
                     -Path $configDir `
                     -Wait `
@@ -229,9 +231,12 @@ Describe "$($script:dscResourceName)_Integration" {
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
 
+        AfterAll {
+            Wait-ForIdleLcm -Clear
+        }
+
         It 'Should compile the MOF without throwing in W. Australia Standard Time Timezone' {
             {
-
                 Set-TimeZoneId -TimeZoneId 'W. Australia Standard Time'
                 . $currentConfig `
                     -OutputPath $configDir
@@ -241,8 +246,6 @@ Describe "$($script:dscResourceName)_Integration" {
         It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
             {
                 Set-TimeZoneId -TimeZoneId 'New Zealand Standard Time'
-
-                Reset-DscLcm
 
                 Start-DscConfiguration `
                     -Path $configDir `
@@ -289,6 +292,10 @@ Describe "$($script:dscResourceName)_Integration" {
             $expectedStartTime = '2018-10-01T01:00:00'
         }
 
+        AfterAll {
+            Wait-ForIdleLcm -Clear
+        }
+
         It 'Should compile the MOF without throwing' {
             {
                 . $currentConfig `
@@ -298,8 +305,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
         It 'Should apply the MOF correctly' {
             {
-                Reset-DscLcm
-
                 Start-DscConfiguration `
                     -Path $configDir `
                     -Wait `
@@ -310,7 +315,7 @@ Describe "$($script:dscResourceName)_Integration" {
         }
 
         It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+            (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
         }
 
         It 'Should have set the resource and all the parameters should match' {
@@ -340,6 +345,10 @@ Describe "$($script:dscResourceName)_Integration" {
             $expectedStartTime = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
         }
 
+        AfterAll {
+            Wait-ForIdleLcm -Clear
+        }
+
         It 'Should compile the MOF without throwing' {
             {
                 . $currentConfig `
@@ -349,8 +358,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
         It 'Should apply the MOF correctly' {
             {
-                Reset-DscLcm
-
                 Start-DscConfiguration `
                     -Path $configDir `
                     -Wait `
@@ -376,7 +383,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Enable | Should -BeTrue
         }
 
-        It 'Should have the trigger startBoundary set to 2018-10-01T01:00:00' {
+        It 'Should have the trigger startBoundary set to ''2018-10-01T01:HH:MM''' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone enabled')
             $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
@@ -395,6 +402,10 @@ Describe "$($script:dscResourceName)_Integration" {
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
 
+        AfterAll {
+            Wait-ForIdleLcm -Clear
+        }
+
         It 'Should compile the MOF without throwing' {
             {
                 . $currentConfig `
@@ -405,8 +416,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
         It 'Should apply the MOF correctly' {
             {
-                Reset-DscLcm
-
                 Start-DscConfiguration `
                     -Path $configDir `
                     -Wait `
@@ -417,7 +426,7 @@ Describe "$($script:dscResourceName)_Integration" {
         }
 
         It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+            (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
         }
 
         It 'Should have set the resource and all the parameters should match' {
@@ -437,6 +446,10 @@ Describe "$($script:dscResourceName)_Integration" {
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
 
+        AfterAll {
+            Wait-ForIdleLcm -Clear
+        }
+
         It 'Should compile the MOF without throwing' {
             {
                 . $currentConfig `
@@ -447,8 +460,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
         It 'Should apply the MOF correctly' {
             {
-                Reset-DscLcm
-
                 Start-DscConfiguration `
                     -Path $configDir `
                     -Wait `
