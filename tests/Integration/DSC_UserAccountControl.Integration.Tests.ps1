@@ -52,7 +52,8 @@ AfterAll {
 }
 
 Describe "$($script:dscResourceName)_Integration" {
-    BeforeAll { $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).Config.ps1"
+    BeforeAll {
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).Config.ps1"
         . $configFile
 
         # Used to reuse helper functions from the actual resource.
@@ -95,6 +96,54 @@ Describe "$($script:dscResourceName)_Integration" {
         }
     }
 
+    Context 'When ConsentPromptBehaviorUser and EnableInstallerDetection are 0' {
+        It 'Should compile the MOF without throwing' {
+            {
+                & "$($script:dscResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                $startDscConfigurationParameters = @{
+                    Path         = $TestDrive
+                    ComputerName = 'localhost'
+                    Wait         = $true
+                    Verbose      = $true
+                    Force        = $true
+                    ErrorAction  = 'Stop'
+                }
+
+                Start-DscConfiguration @startDscConfigurationParameters
+            } | Should -Not -Throw
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            {
+                Get-DscConfiguration -Verbose -ErrorAction Stop
+            } | Should -Not -Throw
+        }
+
+        It 'Should have set the resource and all the parameters should match' {
+            $current = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+            }
+
+            $current.IsSingleInstance | Should -Be 'Yes'
+            $current.ConsentPromptBehaviorUser | Should -Be 0
+            $current.EnableInstallerDetection | Should -Be 0
+            $current.SuppressRestart | Should -BeTrue
+        }
+
+        It 'Should return $true when Test-DscConfiguration is run' {
+            Test-DscConfiguration -Verbose | Should -Be 'True'
+        }
+    }
+
     Context 'When ConsentPromptBehaviorUser and EnableInstallerDetection are 1' {
         It 'Should compile the MOF without throwing' {
             {
@@ -133,40 +182,13 @@ Describe "$($script:dscResourceName)_Integration" {
             }
 
             $current.IsSingleInstance | Should -Be 'Yes'
-            $current.ConsentPromptBehaviorUser | Should -Be $configData.AllNodes.ConsentPromptBehaviorUser
-            $current.EnableInstallerDetection | Should -Be $configData.AllNodes.EnableInstallerDetection
+            $current.ConsentPromptBehaviorUser | Should -Be 1
+            $current.EnableInstallerDetection | Should -Be 1
             $current.SuppressRestart | Should -BeTrue
         }
 
         It 'Should return $true when Test-DscConfiguration is run' {
             Test-DscConfiguration -Verbose | Should -Be 'True'
-        }
-    }
-
-    Context 'When ConsentPromptBehaviorUser and EnableInstallerDetection are 0' {
-        It 'Should compile the MOF without throwing' {
-            {
-                & "$($script:dscResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configData
-            } | Should -Not -Throw
-        }
-
-        It 'Should apply the MOF without throwing' {
-            {
-                Reset-DscLcm
-
-                $startDscConfigurationParameters = @{
-                    Path         = $TestDrive
-                    ComputerName = 'localhost'
-                    Wait         = $true
-                    Verbose      = $true
-                    Force        = $true
-                    ErrorAction  = 'Stop'
-                }
-
-                Start-DscConfiguration @startDscConfigurationParameters
-            } | Should -Not -Throw
         }
     }
 }

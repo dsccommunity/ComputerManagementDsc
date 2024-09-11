@@ -52,11 +52,12 @@ AfterAll {
 }
 
 Describe "$($script:dscResourceName)_Integration" {
+    BeforeAll {
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile
+    }
     Context 'When setting the page file to automatically managed' {
         BeforeAll {
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-            . $configFile
-
             $currentConfig = 'setToAuto'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
