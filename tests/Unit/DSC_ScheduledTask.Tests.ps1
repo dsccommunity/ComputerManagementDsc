@@ -50,7 +50,7 @@ BeforeAll {
 
     InModuleScope -ScriptBlock {
         # Function to allow mocking pipeline input
-        function Register-ScheduledTask
+        function script:Register-ScheduledTask
         {
             param
             (
@@ -80,7 +80,7 @@ BeforeAll {
         }
 
         # Function to allow mocking pipeline input
-        function Set-ScheduledTask
+        function script:Set-ScheduledTask
         {
             param
             (
@@ -2817,6 +2817,13 @@ Describe 'DSC_ScheduledTask' {
 
     Context 'When scheduling a task to trigger at user logon' {
         BeforeAll {
+            $testParameters = $getTargetResourceParameters + @{
+                ScheduleType     = 'AtLogon'
+                User             = 'MockedUser'
+                ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                LogonType        = 'Password'
+            }
+
             Mock -CommandName New-ScheduledTaskTrigger -MockWith {
                 $cimInstance = New-CIMInstance -ClassName 'MSFT_TaskLogonTrigger' -Namespace 'root\Microsoft\Windows\TaskScheduler' -Property @{
                     # Fill the CIM instance with the properties we expect to be used by the resource.
@@ -2852,13 +2859,6 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $testParameters = $getTargetResourceParameters + @{
-                    ScheduleType     = 'AtLogon'
-                    User             = 'MockedUser'
-                    ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                    LogonType        = 'Password'
-                }
-
                 Set-TargetResource @testParameters
             }
 
@@ -2869,7 +2869,6 @@ Describe 'DSC_ScheduledTask' {
             Assert-MockCalled -CommandName New-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
-
 
     Context 'When a scheduled task is configured with the ScheduleType AtStartup and is in desired state' {
         BeforeAll {
