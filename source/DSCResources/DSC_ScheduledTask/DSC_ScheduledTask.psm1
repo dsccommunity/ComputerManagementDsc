@@ -715,6 +715,9 @@ function Set-TargetResource
                 -ErrorRecord $_
         }
 
+        # Add to please strict mode
+        $repetition = $null
+
         if ($RepeatInterval -gt [System.TimeSpan]::Parse('0:0:0'))
         {
             # A repetition pattern is required so create it and attach it to the trigger object
