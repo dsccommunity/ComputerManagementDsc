@@ -49,7 +49,7 @@ BeforeAll {
 
 AfterAll {
     # Restore the test machine system locale
-    Set-WinSystemLocale -SystemLocale $currentSystemLocale
+    Set-WinSystemLocale -SystemLocale $script:currentSystemLocale
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
@@ -59,7 +59,7 @@ AfterAll {
 Describe "$($script:DSCResourceName)_Integration" {
     BeforeAll {
         # Store the test machine system locale
-        $currentSystemLocale = (Get-WinSystemLocale).Name
+        $script:currentSystemLocale = (Get-WinSystemLocale).Name
 
         # Change the current system locale so that a complete test occurs.
         Set-WinSystemLocale -SystemLocale 'kl-GL'

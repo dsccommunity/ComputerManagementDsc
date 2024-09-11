@@ -49,7 +49,7 @@ BeforeAll {
 
 AfterAll {
     # Restore the test machine timezone
-    & tzutil.exe /s $CurrentTimeZone
+    & tzutil.exe /s $script:CurrentTimeZone
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
@@ -57,7 +57,7 @@ AfterAll {
 Describe "$($script:dscResourceName)_Integration" {
     BeforeAll {
         # Store the test machine timezone
-        $currentTimeZone = & tzutil.exe /g
+        $script:currentTimeZone = & tzutil.exe /g
 
         # Change the current timezone so that a complete test occurs.
         tzutil.exe /s 'Eastern Standard Time'
