@@ -1363,7 +1363,6 @@ Describe 'DSC_SmbShare\Remove-SmbShareAccessPermission' -Tag 'Private' {
                     $removeSmbShareAccessPermissionParameters = @{
                         Name     = 'TestShare'
                         NoAccess = @()
-                        Verbose  = $true
                     }
 
                     { Remove-SmbShareAccessPermission @removeSmbShareAccessPermissionParameters } | Should -Not -Throw
