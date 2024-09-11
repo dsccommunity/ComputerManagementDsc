@@ -51,401 +51,398 @@ AfterAll {
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-Describe 'WindowsEventLog Integration Tests' {
+Describe "$($script:dscResourceName)_Integration" {
     BeforeAll {
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile
     }
-
-    Describe "$($script:dscResourceName)_Integration" {
-        Context 'When setting the Application log to LogMode Retain' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_RetainSize'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
-
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+    Context 'When setting the Application log to LogMode Retain' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_RetainSize'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
 
-        Context 'When setting the Application log to LogMode AutoBackup and 30 day retention' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_AutoBackupLogRetention'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
-
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
         }
 
-        Context 'When setting the Application log to LogMode Circular, MaximumSizeInBytes 20971520, LogFilePath C:\temp\Application.evtx' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_CircularLogPath'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
 
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
         }
 
-        Context 'When setting the Application log back to default' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_Default'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
-
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
+        It 'Should return a compliant state after being applied' {
                     (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
         }
 
-        Context 'When enabling the Microsoft-Windows-CAPI2 Operational channel' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_EnableLog'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
 
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+    Context 'When setting the Application log to LogMode AutoBackup and 30 day retention' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_AutoBackupLogRetention'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
 
-        Context 'When disabling the Microsoft-Windows-CAPI2 Operational channel' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_DisableLog'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
-
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
         }
 
-        Context 'When setting the Application log to LogMode Circular with a SecurityDescriptor' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_CircularSecurityDescriptor'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
 
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
         }
 
-        Context 'When enabling the Microsoft-Windows-Backup channel with LogMode AutoBackup and 30 day retention' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_EnableBackupLog'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
-
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
+        It 'Should return a compliant state after being applied' {
                     (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
         }
 
-        Context 'When disabling the Microsoft-Windows-Backup channel' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_DisableBackupLog'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
 
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+    Context 'When setting the Application log to LogMode Circular, MaximumSizeInBytes 20971520, LogFilePath C:\temp\Application.evtx' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_CircularLogPath'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
 
-        Context 'When creating an event source in the Application log' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_CreateCustomResource'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
-
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
         }
 
-        Context 'When allowing guests to have access to the Application log' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_AppLogGuestsAllowed'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
 
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
-                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
         }
 
-        Context 'When prohibiting guests to have access to the Application log' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_AppLogGuestsProhibited'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
-
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
-
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
-
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should return a compliant state after being applied' {
+        It 'Should return a compliant state after being applied' {
                     (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
         }
 
-        Context 'When setting Windows Event Log back to the default configuration' {
-            BeforeAll {
-                $currentConfig = 'DSC_WindowsEventLog_Default'
-                $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
-                $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
-            }
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
 
-            It 'Should compile the MOF without throwing' {
-                {
-                    . $currentConfig -OutputPath $configDir
-                } | Should -Not -Throw
-            }
+    Context 'When setting the Application log back to default' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_Default'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
 
-            It 'Should apply the MOF without throwing' {
-                {
-                    Reset-DscLcm
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
 
-                    Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
 
-            It 'Should return a compliant state after being applied' {
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
                     (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
-            }
+        }
 
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
+
+    Context 'When enabling the Microsoft-Windows-CAPI2 Operational channel' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_EnableLog'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
+
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
+
+    Context 'When disabling the Microsoft-Windows-CAPI2 Operational channel' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_DisableLog'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
+
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
+
+    Context 'When setting the Application log to LogMode Circular with a SecurityDescriptor' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_CircularSecurityDescriptor'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
+
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
+
+    Context 'When enabling the Microsoft-Windows-Backup channel with LogMode AutoBackup and 30 day retention' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_EnableBackupLog'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
+
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
+
+    Context 'When disabling the Microsoft-Windows-Backup channel' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_DisableBackupLog'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
+
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
+
+    Context 'When creating an event source in the Application log' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_CreateCustomResource'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
+
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
+
+    Context 'When allowing guests to have access to the Application log' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_AppLogGuestsAllowed'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
+
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
+
+    Context 'When prohibiting guests to have access to the Application log' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_AppLogGuestsProhibited'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
+
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+    }
+
+    Context 'When setting Windows Event Log back to the default configuration' {
+        BeforeAll {
+            $currentConfig = 'DSC_WindowsEventLog_Default'
+            $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
+            $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+        }
+
+        It 'Should compile the MOF without throwing' {
+            {
+                . $currentConfig -OutputPath $configDir
+            } | Should -Not -Throw
+        }
+
+        It 'Should apply the MOF without throwing' {
+            {
+                Reset-DscLcm
+
+                Start-DscConfiguration -Path $configDir -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+
+        It 'Should return a compliant state after being applied' {
+                    (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
     }
 }
