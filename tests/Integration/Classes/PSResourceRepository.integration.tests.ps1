@@ -39,10 +39,10 @@ BeforeAll {
     $script:dscResourceName = 'PSResourceRepository'
 
     $script:testEnvironment = Initialize-TestEnvironment `
-        -DSCModuleName  $script:dscModuleName `
-        -DSCResourceName  $script:dscResourceName `
-        -ResourceType     'Class' `
-        -TestType       'Integration'
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Class' `
+        -TestType 'Integration'
 }
 
 AfterAll {
@@ -287,7 +287,7 @@ Describe "$($script:dscResourceName)_Integration" {
             }
         }
 
-        AfterEach {
+        AfterAll {
             Wait-ForIdleLcm -Clear
         }
 
