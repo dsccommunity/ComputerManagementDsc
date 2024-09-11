@@ -50,53 +50,53 @@ BeforeAll {
 }
 
 AfterAll {
-    # $setSmbServerConfigurationParameters = @{
-    #     AnnounceComment                 = $script:CurrentSmbServerConfigBackup.AnnounceComment
-    #     AnnounceServer                  = $script:CurrentSmbServerConfigBackup.AnnounceServer
-    #     AsynchronousCredits             = $script:CurrentSmbServerConfigBackup.AsynchronousCredits
-    #     AuditSmb1Access                 = $script:CurrentSmbServerConfigBackup.AuditSmb1Access
-    #     AutoDisconnectTimeout           = $script:CurrentSmbServerConfigBackup.AutoDisconnectTimeout
-    #     AutoShareServer                 = $script:CurrentSmbServerConfigBackup.AutoShareServer
-    #     AutoShareWorkstation            = $script:CurrentSmbServerConfigBackup.AutoShareWorkstation
-    #     CachedOpenLimit                 = $script:CurrentSmbServerConfigBackup.CachedOpenLimit
-    #     DurableHandleV2TimeoutInSeconds = $script:CurrentSmbServerConfigBackup.DurableHandleV2TimeoutInSeconds
-    #     EnableAuthenticateUserSharing   = $script:CurrentSmbServerConfigBackup.EnableAuthenticateUserSharing
-    #     EnableDownlevelTimewarp         = $script:CurrentSmbServerConfigBackup.EnableDownlevelTimewarp
-    #     EnableForcedLogoff              = $script:CurrentSmbServerConfigBackup.EnableForcedLogoff
-    #     EnableLeasing                   = $script:CurrentSmbServerConfigBackup.EnableLeasing
-    #     EnableMultiChannel              = $script:CurrentSmbServerConfigBackup.EnableMultiChannel
-    #     EnableOplocks                   = $script:CurrentSmbServerConfigBackup.EnableOplocks
-    #     EnableSecuritySignature         = $script:CurrentSmbServerConfigBackup.EnableSecuritySignature
-    #     EnableSMB1Protocol              = $script:CurrentSmbServerConfigBackup.EnableSMB1Protocol
-    #     EnableSMB2Protocol              = $script:CurrentSmbServerConfigBackup.EnableSMB2Protocol
-    #     EnableStrictNameChecking        = $script:CurrentSmbServerConfigBackup.EnableStrictNameChecking
-    #     EncryptData                     = $script:CurrentSmbServerConfigBackup.EncryptData
-    #     IrpStackSize                    = $script:CurrentSmbServerConfigBackup.IrpStackSize
-    #     KeepAliveTime                   = $script:CurrentSmbServerConfigBackup.KeepAliveTime
-    #     MaxChannelPerSession            = $script:CurrentSmbServerConfigBackup.MaxChannelPerSession
-    #     MaxMpxCount                     = $script:CurrentSmbServerConfigBackup.MaxMpxCount
-    #     MaxSessionPerConnection         = $script:CurrentSmbServerConfigBackup.MaxSessionPerConnection
-    #     MaxThreadsPerQueue              = $script:CurrentSmbServerConfigBackup.MaxThreadsPerQueue
-    #     MaxWorkItems                    = $script:CurrentSmbServerConfigBackup.MaxWorkItems
-    #     NullSessionPipes                = $script:CurrentSmbServerConfigBackup.NullSessionPipes
-    #     NullSessionShares               = $script:CurrentSmbServerConfigBackup.NullSessionShares
-    #     OplockBreakWait                 = $script:CurrentSmbServerConfigBackup.OplockBreakWait
-    #     PendingClientTimeoutInSeconds   = $script:CurrentSmbServerConfigBackup.PendingClientTimeoutInSeconds
-    #     RejectUnencryptedAccess         = $script:CurrentSmbServerConfigBackup.RejectUnencryptedAccess
-    #     RequireSecuritySignature        = $script:CurrentSmbServerConfigBackup.RequireSecuritySignature
-    #     ServerHidden                    = $script:CurrentSmbServerConfigBackup.ServerHidden
-    #     Smb2CreditsMax                  = $script:CurrentSmbServerConfigBackup.Smb2CreditsMax
-    #     Smb2CreditsMin                  = $script:CurrentSmbServerConfigBackup.Smb2CreditsMin
-    #     SmbServerNameHardeningLevel     = $script:CurrentSmbServerConfigBackup.SmbServerNameHardeningLevel
-    #     TreatHostAsStableStorage        = $script:CurrentSmbServerConfigBackup.TreatHostAsStableStorage
-    #     ValidateAliasNotCircular        = $script:CurrentSmbServerConfigBackup.ValidateAliasNotCircular
-    #     ValidateShareScope              = $script:CurrentSmbServerConfigBackup.ValidateShareScope
-    #     ValidateShareScopeNotAliased    = $script:CurrentSmbServerConfigBackup.ValidateShareScopeNotAliased
-    #     ValidateTargetName              = $script:CurrentSmbServerConfigBackup.ValidateTargetName
-    #     Confirm                         = $false
-    # }
+    $setSmbServerConfigurationParameters = @{
+        AnnounceComment                 = $script:CurrentSmbServerConfigBackup.AnnounceComment
+        AnnounceServer                  = $script:CurrentSmbServerConfigBackup.AnnounceServer
+        AsynchronousCredits             = $script:CurrentSmbServerConfigBackup.AsynchronousCredits
+        AuditSmb1Access                 = $script:CurrentSmbServerConfigBackup.AuditSmb1Access
+        AutoDisconnectTimeout           = $script:CurrentSmbServerConfigBackup.AutoDisconnectTimeout
+        AutoShareServer                 = $script:CurrentSmbServerConfigBackup.AutoShareServer
+        AutoShareWorkstation            = $script:CurrentSmbServerConfigBackup.AutoShareWorkstation
+        CachedOpenLimit                 = $script:CurrentSmbServerConfigBackup.CachedOpenLimit
+        DurableHandleV2TimeoutInSeconds = $script:CurrentSmbServerConfigBackup.DurableHandleV2TimeoutInSeconds
+        EnableAuthenticateUserSharing   = $script:CurrentSmbServerConfigBackup.EnableAuthenticateUserSharing
+        EnableDownlevelTimewarp         = $script:CurrentSmbServerConfigBackup.EnableDownlevelTimewarp
+        EnableForcedLogoff              = $script:CurrentSmbServerConfigBackup.EnableForcedLogoff
+        EnableLeasing                   = $script:CurrentSmbServerConfigBackup.EnableLeasing
+        EnableMultiChannel              = $script:CurrentSmbServerConfigBackup.EnableMultiChannel
+        EnableOplocks                   = $script:CurrentSmbServerConfigBackup.EnableOplocks
+        EnableSecuritySignature         = $script:CurrentSmbServerConfigBackup.EnableSecuritySignature
+        EnableSMB1Protocol              = $script:CurrentSmbServerConfigBackup.EnableSMB1Protocol
+        EnableSMB2Protocol              = $script:CurrentSmbServerConfigBackup.EnableSMB2Protocol
+        EnableStrictNameChecking        = $script:CurrentSmbServerConfigBackup.EnableStrictNameChecking
+        EncryptData                     = $script:CurrentSmbServerConfigBackup.EncryptData
+        IrpStackSize                    = $script:CurrentSmbServerConfigBackup.IrpStackSize
+        KeepAliveTime                   = $script:CurrentSmbServerConfigBackup.KeepAliveTime
+        MaxChannelPerSession            = $script:CurrentSmbServerConfigBackup.MaxChannelPerSession
+        MaxMpxCount                     = $script:CurrentSmbServerConfigBackup.MaxMpxCount
+        MaxSessionPerConnection         = $script:CurrentSmbServerConfigBackup.MaxSessionPerConnection
+        MaxThreadsPerQueue              = $script:CurrentSmbServerConfigBackup.MaxThreadsPerQueue
+        MaxWorkItems                    = $script:CurrentSmbServerConfigBackup.MaxWorkItems
+        NullSessionPipes                = $script:CurrentSmbServerConfigBackup.NullSessionPipes
+        NullSessionShares               = $script:CurrentSmbServerConfigBackup.NullSessionShares
+        OplockBreakWait                 = $script:CurrentSmbServerConfigBackup.OplockBreakWait
+        PendingClientTimeoutInSeconds   = $script:CurrentSmbServerConfigBackup.PendingClientTimeoutInSeconds
+        RejectUnencryptedAccess         = $script:CurrentSmbServerConfigBackup.RejectUnencryptedAccess
+        RequireSecuritySignature        = $script:CurrentSmbServerConfigBackup.RequireSecuritySignature
+        ServerHidden                    = $script:CurrentSmbServerConfigBackup.ServerHidden
+        Smb2CreditsMax                  = $script:CurrentSmbServerConfigBackup.Smb2CreditsMax
+        Smb2CreditsMin                  = $script:CurrentSmbServerConfigBackup.Smb2CreditsMin
+        SmbServerNameHardeningLevel     = $script:CurrentSmbServerConfigBackup.SmbServerNameHardeningLevel
+        TreatHostAsStableStorage        = $script:CurrentSmbServerConfigBackup.TreatHostAsStableStorage
+        ValidateAliasNotCircular        = $script:CurrentSmbServerConfigBackup.ValidateAliasNotCircular
+        ValidateShareScope              = $script:CurrentSmbServerConfigBackup.ValidateShareScope
+        ValidateShareScopeNotAliased    = $script:CurrentSmbServerConfigBackup.ValidateShareScopeNotAliased
+        ValidateTargetName              = $script:CurrentSmbServerConfigBackup.ValidateTargetName
+        Confirm                         = $false
+    }
 
-    Set-SmbServerConfiguration @script:CurrentSmbServerConfigBackup -Confirm:$false
+    Set-SmbServerConfiguration @setSmbServerConfigurationParameters
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
