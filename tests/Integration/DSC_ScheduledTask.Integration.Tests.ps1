@@ -285,6 +285,8 @@ Describe "$($script:dscResourceName)_Integration" {
             $currentConfig = 'ScheduledTaskOnceSynchronizeAcrossTimeZoneDisabled'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+
+            $expectedStartTime = '2018-10-01T01:00:00'
         }
 
         It 'Should compile the MOF without throwing' {
@@ -317,7 +319,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.TaskPath | Should -Be '\ComputerManagementDsc\'
             $current.ActionExecutable | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             $current.ScheduleType | Should -Be 'Once'
-            $current.StartTime | Should -Be (Get-Date -Date '2018-10-01T01:00:00')
+            $current.StartTime | Should -Be (Get-Date -Date $expectedStartTime)
             $current.SynchronizeAcrossTimeZone | Should -BeFalse
             $current.ActionWorkingPath | Should -Be (Get-Location).Path
             $current.Enable | Should -BeTrue
@@ -325,7 +327,7 @@ Describe "$($script:dscResourceName)_Integration" {
 
         It 'Should have the trigger startBoundary set to ''2018-10-01T01:00:00''' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone disabled')
-            $task.Triggers[0].StartBoundary | Should -Be '2018-10-01T01:00:00'
+            $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
     }
 
@@ -334,6 +336,8 @@ Describe "$($script:dscResourceName)_Integration" {
             $currentConfig = 'ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
+
+            $expectedStartTime = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
         }
 
         It 'Should compile the MOF without throwing' {
@@ -360,8 +364,6 @@ Describe "$($script:dscResourceName)_Integration" {
             (Test-DscConfiguration -ReferenceConfiguration $configMof -Verbose).InDesiredState | Should -BeTrue
         }
 
-        $expectedStartTime = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
-
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq $currentConfig }
             $current.TaskName | Should -Be 'Test task sync across time zone enabled'
@@ -374,7 +376,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Enable | Should -BeTrue
         }
 
-        It "Should have the trigger startBoundary set to $expectedStartTime" {
+        It 'Should have the trigger startBoundary set to 2018-10-01T01:00:00' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone enabled')
             $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
