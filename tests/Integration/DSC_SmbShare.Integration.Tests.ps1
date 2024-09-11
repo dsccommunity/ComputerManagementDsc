@@ -57,7 +57,7 @@ Describe 'SmbShare Integration Tests' {
         . $configFile
     }
 
-    Context ('When using configuration <_>') -ForEach @(
+    Context 'When using configuration <_>' -ForEach @(
         "$($script:dscResourceName)_Prerequisites_Config"
     ) {
         BeforeAll {
