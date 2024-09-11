@@ -91,7 +91,7 @@ Describe 'SmbShare Integration Tests' {
         }
     }
 
-    Context ('When using configuration <_>') -ForEach @(
+    Context 'When using configuration <_>' -ForEach @(
         "$($script:dscResourceName)_CreateShare1_Config"
     ) {
         BeforeAll {
@@ -169,7 +169,7 @@ Describe 'SmbShare Integration Tests' {
         }
     }
 
-    Context ('When using configuration <_>') -ForEach @(
+    Context 'When using configuration <_>' -ForEach @(
         "$($script:dscResourceName)_CreateShare2_Config"
     ) {
         BeforeAll {
@@ -246,7 +246,7 @@ Describe 'SmbShare Integration Tests' {
         }
     }
 
-    Context ('When using configuration <_>') -ForEach @(
+    Context 'When using configuration <_>' -ForEach @(
         "$($script:dscResourceName)_UpdateProperties_Config"
     ) {
         BeforeAll {
@@ -321,7 +321,7 @@ Describe 'SmbShare Integration Tests' {
         }
     }
 
-    Context ('When using configuration <_>') -ForEach @(
+    Context 'When using configuration <_>' -ForEach @(
         "$($script:dscResourceName)_RemovePermission_Config"
     ) {
         BeforeAll {
@@ -383,7 +383,7 @@ Describe 'SmbShare Integration Tests' {
         }
     }
 
-    Context ('When using configuration <_>') -ForEach @(
+    Context 'When using configuration <_>' -ForEach @(
         "$($script:dscResourceName)_RecreateShare1_Config"
     ) {
         BeforeAll {
@@ -440,10 +440,13 @@ Describe 'SmbShare Integration Tests' {
         }
     }
 
+    Context 'When using configuration <_>' -ForEach @(
+        "$($script:dscResourceName)_RemoveShare1_Config"
+    ) {
+        BeforeAll {
+            $configurationName = $_
+        }
 
-    $configurationName = "$($script:dscResourceName)_RemoveShare1_Config"
-
-    Context ('When using configuration {0}' -f $configurationName) {
         It 'Should compile the MOF without throwing' {
             {
                 $configurationParameters = @{
@@ -493,7 +496,7 @@ Describe 'SmbShare Integration Tests' {
         }
     }
 
-    Context ('When using configuration <_>') -ForEach @(
+    Context 'When using configuration <_>' -ForEach @(
         "$($script:dscResourceName)_RemoveShare2_Config"
     ) {
         BeforeAll {
@@ -549,7 +552,7 @@ Describe 'SmbShare Integration Tests' {
         }
     }
 
-    Context ('When using configuration <_>') -ForEach @(
+    Context 'When using configuration <_>' -ForEach @(
         "$($script:dscResourceName)_Cleanup_Config"
     ) {
         BeforeAll {
