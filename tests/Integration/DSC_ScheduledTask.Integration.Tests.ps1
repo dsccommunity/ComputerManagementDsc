@@ -63,18 +63,48 @@ AfterAll {
 
 Describe "$($script:dscResourceName)_Integration" {
     BeforeDiscovery {
-        $contexts = @{
-            Once              = 'ScheduledTaskOnce'
-            Daily             = 'ScheduledTaskDaily'
-            DailyIndefinitely = 'ScheduledTaskDailyIndefinitely'
-            Weekly            = 'ScheduledTaskWeekly'
-            AtLogon           = 'ScheduledTaskLogon'
-            AtStartup         = 'ScheduledTaskStartup'
-            ExecuteAs         = 'ScheduledTaskExecuteAs'
-            ExecuteAsGroup    = 'ScheduledTaskExecuteAsGroup'
-            OnEvent           = 'ScheduledTaskOnEvent'
-            BuiltInAccount    = 'ScheduledTaskServiceAccount'
-        }
+        $contexts = @(
+            @{
+                Name  = 'Once'
+                Value = 'ScheduledTaskOnce'
+            }
+            @{
+                Name  = 'Daily'
+                Value = 'ScheduledTaskDaily'
+            }
+            @{
+                Name  = 'DailyIndefinitely'
+                Value = 'ScheduledTaskDailyIndefinitely'
+            }
+            @{
+                Name  = 'Weekly'
+                Value = 'ScheduledTaskWeekly'
+            }
+            @{
+                Name  = 'AtLogon'
+                Value = 'ScheduledTaskLogon'
+            }
+            @{
+                Name  = 'AtStartup'
+                Value = 'ScheduledTaskStartup'
+            }
+            @{
+                Name  = 'ExecuteAs'
+                Value = 'ScheduledTaskExecuteAs'
+            }
+            @{
+                Name  = 'ExecuteAsGroup'
+                Value = 'ScheduledTaskExecuteAsGroup'
+            }
+            @{
+                Name  = 'OnEvent'
+                Value = 'ScheduledTaskOnEvent'
+            }
+            @{
+                Name  = 'BuiltInAccount'
+                Value = 'ScheduledTaskServiceAccount'
+            }
+        )
     }
 
     BeforeAll {
@@ -91,9 +121,9 @@ Describe "$($script:dscResourceName)_Integration" {
         }
     }
 
-    Context '<_.Key> No scheduled task exists but it should' -ForEach $contexts {
+    Context '<Name> No scheduled task exists but it should' -ForEach $contexts {
         BeforeAll {
-            $currentConfig = '{0}Add' -f $_.Value
+            $currentConfig = '{0}Add' -f $Value
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
@@ -124,9 +154,9 @@ Describe "$($script:dscResourceName)_Integration" {
         }
     }
 
-    Context '<$_.Key> A scheduled task exists with the wrong settings' -ForEach $contexts {
+    Context '<Name> A scheduled task exists with the wrong settings' -ForEach $contexts {
         BeforeAll {
-            $currentConfig = '{0}Mod' -f $contextInfo.Value
+            $currentConfig = '{0}Mod' -f $Value
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
@@ -157,9 +187,9 @@ Describe "$($script:dscResourceName)_Integration" {
         }
     }
 
-    Context '<_.Key> A scheduled tasks exists but it should not' -ForEach $contexts {
+    Context '<Name> A scheduled tasks exists but it should not' -ForEach $contexts {
         BeforeAll {
-            $currentConfig = '{0}Del' -f $_.Value
+            $currentConfig = '{0}Del' -f $Value
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
         }
