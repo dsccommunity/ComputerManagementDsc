@@ -1,5 +1,3 @@
-#Requires -Version 5.0
-
 # Suppressing this rule because Script Analyzer does not understand Pester's syntax.
 [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 param ()
@@ -224,7 +222,7 @@ Describe "$($script:dscResourceName)_Integration" {
 
     Context 'MOF is created in a different timezone to node MOF being applied to' {
         BeforeAll {
-            $currentTimeZoneId = Get-TimeZoneId
+            $currentTimeZoneId = (Get-TimeZone).Id
 
             $currentConfig = 'ScheduledTaskOnceCrossTimezone'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
@@ -232,12 +230,13 @@ Describe "$($script:dscResourceName)_Integration" {
         }
 
         AfterAll {
+            Set-TimeZone -Id $currentTimeZoneId
             Wait-ForIdleLcm -Clear
         }
 
         It 'Should compile the MOF without throwing in W. Australia Standard Time Timezone' {
             {
-                Set-TimeZoneId -TimeZoneId 'W. Australia Standard Time'
+                Set-TimeZone -Id 'W. Australia Standard Time'
                 . $currentConfig `
                     -OutputPath $configDir
             } | Should -Not -Throw
@@ -245,7 +244,7 @@ Describe "$($script:dscResourceName)_Integration" {
 
         It 'Should apply the MOF correctly in New Zealand Standard Time Timezone' {
             {
-                Set-TimeZoneId -TimeZoneId 'New Zealand Standard Time'
+                Set-TimeZone -Id 'New Zealand Standard Time'
 
                 Start-DscConfiguration `
                     -Path $configDir `
@@ -276,10 +275,6 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Priority | Should -Be 9
             $current.RunLevel | Should -Be 'Limited'
             $current.ExecutionTimeLimit | Should -Be '00:00:00'
-        }
-
-        AfterAll {
-            Set-TimeZoneId -TimeZoneId $currentTimeZoneId
         }
     }
 
