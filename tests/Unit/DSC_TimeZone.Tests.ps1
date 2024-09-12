@@ -62,23 +62,23 @@ AfterAll {
     Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 }
 
-# Describe 'DSC_TimeZone MOF single instance schema' {
-#     It 'Should have mandatory IsSingleInstance parameter and one other parameter' {
-#     #    InModuleScope -ScriptBlock {
-#         #    Set-StrictMode -Version 1.0
+Describe 'DSC_TimeZone MOF single instance schema' {
+    It 'Should have mandatory IsSingleInstance parameter and one other parameter' {
+        InModuleScope -ScriptBlock {
+            Set-StrictMode -Version 1.0
 
-#             $timeZoneResource = Get-DscResource -Name TimeZone
+            $timeZoneResource = Get-DscResource -Name TimeZone
 
-#             $timeZoneResource.Properties.Where{
-#                 $_.Name -eq 'IsSingleInstance'
-#             }.IsMandatory | Should -BeTrue
+            $timeZoneResource.Properties.Where{
+                $_.Name -eq 'IsSingleInstance'
+            }.IsMandatory | Should -BeTrue
 
-#             $timeZoneResource.Properties.Where{
-#                 $_.Name -eq 'IsSingleInstance'
-#             }.Values | Should -Be 'Yes'
-#        # }
-#     }
-# }
+            $timeZoneResource.Properties.Where{
+                $_.Name -eq 'IsSingleInstance'
+            }.Values[0] | Should -Be 'Yes'
+        }
+    }
+}
 
 Describe 'DSC_TimeZone\Get-TargetResource' -Tag 'Get' {
     Context 'When the system is in the desired state' {
