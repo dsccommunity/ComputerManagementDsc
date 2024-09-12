@@ -1926,16 +1926,14 @@ Describe 'DSC_Computer\Get-LogonServer' {
 #     }
 # }
 
-Describe 'DSC_Computer\Remove-ADSIObject' {
+Describe 'DSC_Computer\Remove-ADSIObject' -Tag 'Private' {
     Context 'When the path is correct' {
         BeforeAll {
-            Mock New-Object -ParameterFilter {
-                $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-            } -MockWith {
+            Mock New-Object -MockWith {
                 return $mockObject
             }
 
-            $mockObject = New-MockObject -Type 'System.DirectoryServices.DirectoryEntry' -Methods @{
+            $mockObject = New-MockObject -Type Object -Methods @{
                 DeleteTree = { }
             }
         }
