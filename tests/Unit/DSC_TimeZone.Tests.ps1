@@ -75,7 +75,7 @@ Describe 'DSC_TimeZone MOF single instance schema' {
 
             $timeZoneResource.Properties.Where{
                 $_.Name -eq 'IsSingleInstance'
-            }.Values[0] | Should -Be 'Yes'
+            }.Values | Should -Be 'Yes'
         }
     }
 }
