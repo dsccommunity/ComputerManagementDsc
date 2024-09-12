@@ -1697,7 +1697,7 @@ Describe 'DSC_Computer\Set-TargetResource' {
     }
 }
 
-Describe 'DSC_Computer\Get-ComputerDomain' {
+Describe 'DSC_Computer\Get-ComputerDomain' -Tag 'Private' {
     Context 'When computer is a domain member' {
         BeforeAll {
             Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_ComputerSystem' } -MockWith {
@@ -1808,7 +1808,7 @@ Describe 'DSC_Computer\Get-ComputerDomain' {
     }
 }
 
-Describe 'DSC_Computer\Get-LogonServer' {
+Describe 'DSC_Computer\Get-LogonServer' -Tag 'Private' {
     It 'Should return a non-empty string' {
         InModuleScope -ScriptBlock {
             Set-StrictMode -Version 1.0
@@ -1818,113 +1818,143 @@ Describe 'DSC_Computer\Get-LogonServer' {
     }
 }
 
-# Describe 'DSC_Computer\Get-ADSIComputer' {
-#     class fake_adsi_directoryentry
-#     {
-#         [string] $Domain
-#         [string] $Username
-#         [string] $password
-#     }
+Describe 'DSC_Computer\Get-ADSIComputer' -Tag 'Private' {
+    BeforeAll {
+        $mockDirectoryEntry = New-MockObject -Type Object -Properties @{
+            Domain   = ''
+            UserName = ''
+            Password = ''
+        }
+        $mockSearcher = New-MockObject -Type Object -Methods @{
+            FindOne = {
+                return @{
+                    path = 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
+                }
+            }
+        } -Properties @{
+            SearchRoot = ''
+            Filter     = ''
+        }
+    }
 
-#     class fake_adsi_searcher
-#     {
-#         [string] $SearchRoot
-#         [string] $Filter
-#         [hashtable] FindOne( )
-#         {
-#             return @{
-#                 path = 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
-#             }
-#         }
-#     }
+    Context 'When the name is too long' {
+        It 'Should throw the expected exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#     Mock -CommandName New-Object -MockWith {
-#         New-Object -TypeName 'fake_adsi_searcher'
-#     } `
-#         -ParameterFilter {
-#         $TypeName -and
-#         $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
-#     }
+                $message = "Cannot validate argument on parameter 'Name'. The character length of the 17 argument is too long. Shorten the character length of the argument so it is fewer than or equal to `"15`" characters, and then try the command again."
 
-#     $message = "Cannot validate argument on parameter 'Name'. The character length of the 17 argument is too long. Shorten the character length of the argument so it is fewer than or equal to `"15`" characters, and then try the command again."
-#     It 'Should throw the expected exception if the name is too long' {
-#         {
-#             $error = Get-ADSIComputer `
-#                 -Name 'ThisNameIsTooLong' `
-#                 -Domain 'Contoso.com' `
-#                 -Credential $credential `
-#                 -Verbose
-#             $error
-#         } | Should -Throw $message
-#     }
+                $mockParams = @{
+                    Name       = 'ThisNameIsTooLong'
+                    Domain     = 'Contoso.com'
+                    Credential = $credential
+                }
 
-#     $message = "Cannot validate argument on parameter 'Name'. The `" `$_ -inotmatch '[\/\\:*?`"<>|]' `" validation script for the argument with value `"IllegalName[<`" did not return a result of True. Determine why the validation script failed, and then try the command again."
-#     It 'Should throws if the expected exception if the name contains illegal characters' {
-#         {
-#             Get-ADSIComputer `
-#                 -Name 'IllegalName[<' `
-#                 -Domain 'Contoso.com' `
-#                 -Credential $credential `
-#                 -Verbose
-#         } | Should -Throw $message
-#     }
+                { Get-ADSIComputer @mockParams } | Should -Throw $message
+            }
+        }
+    }
 
-#     It 'Returns ADSI object with ADSI path ' {
-#         Mock -CommandName New-Object -MockWith {
-#             New-Object -TypeName 'fake_adsi_directoryentry'
-#         } `
-#             -ParameterFilter {
-#             $TypeName -and
-#             $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-#         }
+    Context 'When the name contains illegal characters' {
+        It 'Should throws the expected exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#         $obj = Get-ADSIComputer `
-#             -Name 'LegalName' `
-#             -Domain 'LDAP://Contoso.com' `
-#             -Credential $credential `
-#             -Verbose
-#         $obj.path | Should -Be 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
-#         Should -Invoke -CommandName New-Object -Exactly -Times 2 -Scope It
-#     }
+                #$message = "Cannot validate argument on parameter 'Name'. The `" `$_ -inotmatch '[\/\\:*?`"<>|]' `" validation script for the argument with value `"IllegalName[<`" did not return a result of True. Determine why the validation script failed, and then try the command again."
 
-#     It 'Returns ADSI object with domain name' {
+                $mockParams = @{
+                    Name       = 'IllegalName[<'
+                    Domain     = 'Contoso.com'
+                    Credential = $credential
+                }
 
-#         Mock -CommandName New-Object -MockWith {
-#             New-Object -TypeName 'fake_adsi_searcher'
-#         } `
-#             -ParameterFilter {
-#             $TypeName -and
-#             $TypeName -eq 'System.DirectoryServices.DirectorySearcher'
-#         }
+                { Get-ADSIComputer @mockParams } | Should -Throw
+            }
+        }
+    }
 
-#         $obj = Get-ADSIComputer `
-#             -Name 'LegalName' `
-#             -Domain 'Contoso.com' `
-#             -Credential $credential `
-#             -Verbose
-#         $obj.Path | Should -Be 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
-#         Should -Invoke -CommandName New-Object -Exactly -Times 2 -Scope It
-#     }
+    Context 'When the command runs successfully' {
+        BeforeAll {
+            Mock -CommandName New-Object -MockWith {
+                return $mockDirectoryEntry
+            }
 
-#     It 'Should throw the expected exception if Credential is incorrect' {
-#         Mock -CommandName New-Object -MockWith {
-#             Write-Error -message 'Invalid Credentials'
-#         } `
-#             -ParameterFilter {
-#             $TypeName -and
-#             $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-#         }
+            Mock -CommandName New-Object -MockWith {
+                return $mockSearcher
+            }
+        }
 
-#         {
-#             Get-ADSIComputer `
-#                 -Name 'LegalName' `
-#                 -Domain 'Contoso.com' `
-#                 -Credential $credential `
-#                 -Verbose
-#         } | Should -Throw 'Invalid Credentials'
-#         Should -Invoke -CommandName New-Object -Exactly -Times 2 -Scope It
-#     }
-# }
+        Context 'When using DirectoryEntry' {
+            It 'Returns ADSI object with ADSI path' {
+                InModuleScope -Parameters @{
+                    credential = $credential
+                } -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $mockParams = @{
+                        Name       = 'LegalName'
+                        Domain     = 'LDAP://Contoso.com'
+                        Credential = $credential
+                    }
+
+                    $obj = Get-ADSIComputer @mockParams
+
+                    $obj.path | Should -Be 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
+                }
+
+                Should -Invoke -CommandName New-Object -Exactly -Times 2 -Scope It
+            }
+        }
+
+        Context 'When using ADSI Searcher' {
+            It 'Returns ADSI object with domain name' {
+                InModuleScope -Parameters @{
+                    credential = $credential
+                } -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $mockParams = @{
+                        Name       = 'LegalName'
+                        Domain     = 'Contoso.com'
+                        Credential = $credential
+                    }
+
+                    $obj = Get-ADSIComputer @mockParams
+
+                    $obj.Path | Should -Be 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
+                }
+
+                Should -Invoke -CommandName New-Object -Exactly -Times 2 -Scope It
+            }
+        }
+    }
+
+    Context 'When Credential is incorrect' {
+        BeforeAll {
+            Mock -CommandName New-Object -MockWith {
+                Write-Error -message 'Invalid Credentials'
+            }
+        }
+
+        It 'Should throw the expected exception' {
+            InModuleScope -Parameters @{
+                credential = $credential
+            } -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $mockParams = @{
+                    Name       = 'LegalName'
+                    Domain     = 'Contoso.com'
+                    Credential = $credential
+                }
+
+                { Get-ADSIComputer @mockParams } | Should -Throw 'Invalid Credentials'
+            }
+
+            Should -Invoke -CommandName New-Object -Exactly -Times 1 -Scope It
+        }
+    }
+}
 
 Describe 'DSC_Computer\Remove-ADSIObject' -Tag 'Private' {
     Context 'When the path is correct' {
@@ -2000,7 +2030,7 @@ Describe 'DSC_Computer\Remove-ADSIObject' -Tag 'Private' {
     }
 }
 
-Describe 'DSC_Computer\Assert-ResourceProperty' {
+Describe 'DSC_Computer\Assert-ResourceProperty' -Tag 'Private' {
     Context 'When PasswordPass and UnsecuredJoin is present but credential username is not null' {
         It 'Should throw correct error' {
             InModuleScope -ScriptBlock {
