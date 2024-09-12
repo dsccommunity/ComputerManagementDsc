@@ -54,7 +54,7 @@ Describe "$($script:dscResourceName)_Integration" {
         $configurationFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configurationFile
 
-        $resourceId = "[$($script:dscResourceFriendlyName)]Integration_Test"
+        $resourceId = "[$($script:dscResourceName)]Integration_Test"
     }
 
     Context ('When using configuration <_>') -ForEach @(
@@ -282,7 +282,7 @@ Describe "$($script:dscResourceName)_Integration" {
         BeforeAll {
             $script:mockInvokeDscResourceParameters = @{
                 ModuleName = $script:dscModuleName
-                Name       = $script:dscResourceFriendlyName
+                Name       = $script:dscResourceName
                 Verbose    = $true
             }
         }
