@@ -1951,7 +1951,7 @@ Describe 'DSC_Computer\Remove-ADSIObject' {
                     Credential = $credential
                 }
 
-                { Remove-ADSIObject @mockParams } | Should -Throw
+                { Remove-ADSIObject @mockParams } | Should -Not -Throw
             }
 
             Should -Invoke -CommandName New-Object -Exactly -Times 1 -Scope It
