@@ -1927,43 +1927,36 @@ Describe 'DSC_Computer\Get-LogonServer' {
 # }
 
 Describe 'DSC_Computer\Remove-ADSIObject' {
-    # Context 'When the path is correct' {
-    #     BeforeAll {
-    #         class fake_adsi_directoryentry
-    #         {
-    #             [string] $Domain
-    #             [string] $Username
-    #             [string] $password
-    #             [void] DeleteTree()
-    #             {
-    #             }
-    #         }
+    Context 'When the path is correct' {
+        BeforeAll {
+            Mock New-Object -ParameterFilter {
+                $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
+            } -MockWith {
+                return $mockObject
+            }
 
-    #         Mock -CommandName New-Object -MockWith {
-    #             New-Object 'fake_adsi_directoryentry'
-    #         } -ParameterFilter {
-    #             $TypeName -and
-    #             $TypeName -eq 'System.DirectoryServices.DirectoryEntry'
-    #         }
-    #     }
+            $mockObject = New-MockObject -Type 'System.DirectoryServices.DirectoryEntry' -Methods @{
+                DeleteTree = { }
+            }
+        }
 
-    #     It 'Should delete the ADSI Object' {
-    #         InModuleScope -Parameters @{
-    #             credential = $credential
-    #         } -ScriptBlock {
-    #             Set-StrictMode -Version 1.0
+        It 'Should delete the ADSI Object' {
+            InModuleScope -Parameters @{
+                credential = $credential
+            } -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-    #             $mockParams = @{
-    #                 Path       = 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
-    #                 Credential = $credential
-    #             }
+                $mockParams = @{
+                    Path       = 'LDAP://contoso.com/CN=fake-computer,OU=Computers,DC=contoso,DC=com'
+                    Credential = $credential
+                }
 
-    #             { Remove-ADSIObject @mockParams } | Should -Not -Throw
-    #         }
+                { Remove-ADSIObject @mockParams } | Should -Throw
+            }
 
-    #         Should -Invoke -CommandName New-Object -Exactly -Times 1 -Scope It
-    #     }
-    # }
+            Should -Invoke -CommandName New-Object -Exactly -Times 1 -Scope It
+        }
+    }
 
     Context 'When path does not begin with LDAP://' {
         It 'Should throw correct exception' {
