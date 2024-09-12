@@ -621,15 +621,3 @@ function Get-RegistryPropertyValue
 
     return $getItemPropertyResult
 }
-
-Export-ModuleMember -Function @(
-    'Test-Command'
-    'Get-TimeZoneId'
-    'Test-TimeZoneId'
-    'Set-TimeZoneId'
-    'Set-TimeZoneUsingDotNet'
-    'Get-PowerPlan'
-    'Get-ActivePowerPlan'
-    'Set-ActivePowerPlan'
-    'Get-RegistryPropertyValue'
-)

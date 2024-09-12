@@ -384,5 +384,3 @@ function Get-PendingRebootState
 
     return $pendingRebootState
 }
-
-Export-ModuleMember -Function *-TargetResource

@@ -91,8 +91,3 @@ function Reset-DscLcm
     Remove-DscConfigurationDocument -Stage Pending -Force
     Remove-DscConfigurationDocument -Stage Previous -Force
 }
-
-Export-ModuleMember -Function `
-    Get-InvalidArgumentRecord, `
-    Test-WindowsCapabilitySourceAvailable, `
-    Reset-DscLcm

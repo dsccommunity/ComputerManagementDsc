@@ -154,5 +154,3 @@ function Test-TargetResource
 
     return $getTargetResourceResult.IsActive
 }
-
-Export-ModuleMember -Function *-TargetResource

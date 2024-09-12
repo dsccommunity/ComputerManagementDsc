@@ -994,5 +994,3 @@ function Set-WindowsEventLogRetentionDays
         New-InvalidArgumentException -Message $message -ArgumentName 'LogMode'
     }
 }
-
-Export-ModuleMember -Function *-TargetResource

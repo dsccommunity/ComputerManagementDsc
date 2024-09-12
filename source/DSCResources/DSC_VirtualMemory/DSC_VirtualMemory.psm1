@@ -526,5 +526,3 @@ function Get-DriveInfo
 
     return $driveInfo
 }
-
-Export-ModuleMember -Function *-TargetResource

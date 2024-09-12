@@ -240,5 +240,3 @@ function Get-DomainName
         $computerSystem.Domain
     }
 } # function Get-DomainName
-
-Export-ModuleMember -Function *-TargetResource

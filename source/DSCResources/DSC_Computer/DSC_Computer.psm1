@@ -876,5 +876,3 @@ function Assert-ResourceProperty
             -ArgumentName 'Credential'
     }
 }
-
-Export-ModuleMember -Function *-TargetResource

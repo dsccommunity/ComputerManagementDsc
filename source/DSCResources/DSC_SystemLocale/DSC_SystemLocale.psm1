@@ -191,5 +191,3 @@ function Test-SystemLocaleValue
 
     return ($SystemLocale -in $validCultures)
 }
-
-Export-ModuleMember -Function *-TargetResource
