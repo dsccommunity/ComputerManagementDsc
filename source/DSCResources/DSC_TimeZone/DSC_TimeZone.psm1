@@ -121,5 +121,3 @@ function Test-TargetResource
 
     return Test-TimeZoneId -TimeZoneId $TimeZone
 }
-
-Export-ModuleMember -Function *-TargetResource

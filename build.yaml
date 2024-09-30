@@ -26,17 +26,17 @@ BuildWorkflow:
     - package_module_nupkg
 
   hqrmtest:
-    - DscResource_Tests_Stop_On_Fail
+    - Invoke_HQRM_Tests_Stop_On_Fail
 
   test:
     - Pester_Tests_Stop_On_Fail
+    - Convert_Pester_Coverage
     - Pester_If_Code_Coverage_Under_Threshold
 
   publish:
-    - publish_module_to_gallery
     - Publish_Release_To_GitHub
+    - Publish_Module_To_gallery
     - Publish_GitHub_Wiki_Content
-    - Create_ChangeLog_GitHub_PR
 
 ####################################################
 #          ModuleBuilder Configuration             #
@@ -91,16 +91,6 @@ NestedModule:
 #          Pester Configuration (Sampler)          #
 ####################################################
 Pester:
-  # Pester 4 configuration
-  Script:
-    - tests/Unit
-  ExcludeTag:
-  Tag:
-  CodeCoverageOutputFile: JaCoCo_coverage.xml
-  CodeCoverageOutputFileEncoding: ascii
-  CodeCoverageThreshold: 80
-
-  # Pester 5 configuration
   Configuration:
     Run:
       Path:
@@ -110,7 +100,7 @@ Pester:
       StackTraceVerbosity: Full
       CIFormat: Auto
     CodeCoverage:
-      CoveragePercentTarget: 80
+      CoveragePercentTarget: 85
       OutputPath: JaCoCo_coverage.xml
       OutputEncoding: ascii
       UseBreakpoints: false
@@ -125,15 +115,28 @@ Pester:
 #      Pester Configuration (DscResource.Test)     #
 ####################################################
 DscTest:
-  OutputFormat: NUnitXML
-  ExcludeTag:
-    - 'Common Tests - New Error-Level Script Analyzer Rules'
-  ExcludeSourceFile:
-    - output
-  ExcludeModuleFile:
-    - Modules/DscResource.Common
-    - Modules/DscResource.Base
-  MainGitBranch: main
+  Pester:
+    Configuration:
+      Filter:
+        ExcludeTag:
+          - "Common Tests - New Error-Level Script Analyzer Rules"
+      Output:
+        Verbosity: Detailed
+        CIFormat: Auto
+      TestResult:
+        Enabled: true
+        OutputFormat: NUnitXML
+        OutputEncoding: ascii
+        OutputPath: ./output/testResults/NUnitXml_HQRM_Tests.xml
+  Script:
+    ExcludeSourceFile:
+      - output
+    ExcludeModuleFile:
+      - Modules/DscResource.Common
+      - Modules/DscResource.Base
+      # Must exclude built module file because it should not be tested like MOF-based resources
+      - ComputerManagementDsc.psm1
+    MainGitBranch: main
 
 ####################################################
 #              PSDepend Configuration              #
@@ -180,5 +183,5 @@ DscResource.DocGenerator:
       Type: CompositeResource
       Category: Resources
   Generate_Wiki_Sidebar:
-     Debug: false
-     AlwaysOverwrite: true
+    Debug: false
+    AlwaysOverwrite: true

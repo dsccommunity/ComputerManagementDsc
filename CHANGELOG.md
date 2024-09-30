@@ -5,6 +5,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `VirtualMemory` fix incorrect variable name
+- `SmbServerConfiguration` remove errant argument
+
+### Changed
+
+  - Converted tests to Pester 5
+  - Rename Delete-ADSIObject to Delete-ADSIObject to satisfy HQRM
+
+### Removed
+
+- Removed `Get-InvalidOperationRecord` to use version provided by `DscResource.Test`
+
 ## [9.2.0] - 2024-09-30
 
 ### Added

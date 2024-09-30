@@ -55,4 +55,5 @@
     "pester.pesterModulePath": "./output/RequiredModules/Pester",
     "powershell.pester.codeLens": true,
     "pester.suppressCodeLensNotice": true,
+    "yaml.format.singleQuote": true,
 }

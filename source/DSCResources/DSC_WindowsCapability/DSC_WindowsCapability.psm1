@@ -224,5 +224,3 @@ function Test-TargetResource
 
     return $inDesiredState
 }
-
-Export-ModuleMember -Function *-TargetResource

@@ -1,4 +1,5 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "Function")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DSCMachineStatus', Justification = 'GlobalDsc Variable can be ignored')]
 param
 (
 )
@@ -239,5 +240,3 @@ function Get-DomainName
         $computerSystem.Domain
     }
 } # function Get-DomainName
-
-Export-ModuleMember -Function *-TargetResource

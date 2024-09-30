@@ -545,7 +545,7 @@ function Set-TargetResource
 
         $action = New-ScheduledTaskAction @actionParameters
 
-        $scheduledTaskArguments += @{
+        $scheduledTaskArguments = @{
             Action = $action
         }
 
@@ -714,6 +714,9 @@ function Set-TargetResource
                 -Message ($script:localizedData.TriggerCreationError) `
                 -ErrorRecord $_
         }
+
+        # Add to please strict mode
+        $repetition = $null
 
         if ($RepeatInterval -gt [System.TimeSpan]::Parse('0:0:0'))
         {

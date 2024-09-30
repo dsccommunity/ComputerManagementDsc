@@ -1,7 +1,6 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope = 'Function')]
-param
-(
-)
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DSCMachineStatus', Justification = 'GlobalDsc Variable can be ignored')]
+param ()
 
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
@@ -268,7 +267,7 @@ function Set-TargetResource
 
                 if ($computerObject)
                 {
-                    Delete-ADSIObject -Path $computerObject.Path -Credential $Credential
+                    Remove-ADSIObject -Path $computerObject.Path -Credential $Credential
                     Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
                 }
 
@@ -755,7 +754,7 @@ function Get-ADSIComputer
     .PARAMETER Credential
         Credential to authenticate to the domain.
 #>
-function Delete-ADSIObject
+function Remove-ADSIObject
 {
     [CmdletBinding()]
     param
@@ -877,5 +876,3 @@ function Assert-ResourceProperty
             -ArgumentName 'Credential'
     }
 }
-
-Export-ModuleMember -Function *-TargetResource
