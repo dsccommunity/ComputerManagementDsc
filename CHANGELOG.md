@@ -5,6 +5,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `VirtualMemory` fix incorrect variable name
+- `SmbServerConfiguration` remove errant argument
+
+### Changed
+
+  - Converted tests to Pester 5
+  - Rename Delete-ADSIObject to Delete-ADSIObject to satisfy HQRM
+
+### Removed
+
+- Removed `Get-InvalidOperationRecord` to use version provided by `DscResource.Test`
+
 ## [9.2.0] - 2024-09-30
 
 ### Added
@@ -21,20 +35,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     Fixes [Issue #354](https://github.com/dsccommunity/ComputerManagementDsc/issues/354).
 - Update build process to pin GitVersion to 5.* to resolve errors
   (https://github.com/gaelcolas/Sampler/issues/477).
-- `VirtualMemory` fix incorrect variable name
-- `SmbServerConfiguration` remove errant argument
 
 ### Changed
 
 - CI Pipeline
   - Updated pipeline files to match current DSC Community patterns - fixes [Issue #427](https://github.com/dsccommunity/ComputerManagementDsc/issues/427).
   - Updated HQRM step to use windows-latest image.
-  - Converted tests to Pester 5
-  - Rename Delete-ADSIObject to Delete-ADSIObject to satisfy HQRM
-
-### Removed
-
-- Removed `Get-InvalidOperationRecord` to use version provided by `DscResource.Test`
 
 ## [9.1.0] - 2024-04-30
 
