@@ -1,4 +1,4 @@
-﻿@{
+@{
     RebootTriggers = @(
         @{
             Name        = 'ComponentBasedServicing'

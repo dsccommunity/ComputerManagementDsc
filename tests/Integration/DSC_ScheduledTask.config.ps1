@@ -168,7 +168,7 @@ Configuration ScheduledTaskLogonAdd
             TaskName           = 'Test task Logon'
             TaskPath           = '\ComputerManagementDsc\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType       = 'AtLogOn'
+            ScheduleType       = 'AtLogon'
             RepeatInterval     = '00:15:00'
             RepetitionDuration = '08:00:00'
         }
@@ -208,7 +208,7 @@ Configuration ScheduledTaskExecuteAsAdd
             TaskName            = 'Test task Logon'
             TaskPath            = '\ComputerManagementDsc\'
             ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType        = 'AtLogOn'
+            ScheduleType        = 'AtLogon'
             ExecuteAsCredential = $executeAsCredential
             LogonType           = 'Interactive'
             RunLevel            = 'Highest'
@@ -233,7 +233,7 @@ Configuration ScheduledTaskExecuteAsGroupAdd
             ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             LogonType           = 'Group'
             ExecuteAsCredential = $executeAsCredential
-            ScheduleType        = 'AtLogOn'
+            ScheduleType        = 'AtLogon'
             RunLevel            = 'Limited'
         }
     }
@@ -252,8 +252,13 @@ Configuration ScheduledTaskOnEventAdd
             Ensure            = 'Present'
             ScheduleType      = 'OnEvent'
             ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
+            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
             EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
+            EventValueQueries = @{
+                "Service" = "Event/EventData/Data[@Name='param1']"
+                "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+            }
             Delay             = '00:00:30'
         }
     }
@@ -390,7 +395,7 @@ Configuration ScheduledTaskStartupMod
             TaskName           = 'Test task Startup'
             TaskPath           = '\ComputerManagementDsc\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType       = 'AtLogOn'
+            ScheduleType       = 'AtLogon'
             RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
         }
@@ -412,7 +417,7 @@ Configuration ScheduledTaskExecuteAsMod
             TaskName            = 'Test task Logon'
             TaskPath            = '\ComputerManagementDsc\'
             ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType        = 'AtLogOn'
+            ScheduleType        = 'AtLogon'
             ExecuteAsCredential = $executeAsCredential
             LogonType           = 'Interactive'
             RunLevel            = 'Highest'
@@ -437,7 +442,7 @@ Configuration ScheduledTaskExecuteAsGroupMod
             ActionExecutable    = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             LogonType           = 'Group'
             ExecuteAsCredential = $executeAsCredential
-            ScheduleType        = 'AtLogOn'
+            ScheduleType        = 'AtLogon'
             RunLevel            = 'Limited'
         }
     }
@@ -456,8 +461,13 @@ Configuration ScheduledTaskOnEventMod
             Ensure            = 'Present'
             ScheduleType      = 'OnEvent'
             ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
+            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
             EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7002)]]</Select></Query></QueryList>'
+            EventValueQueries = @{
+                "Service" = "Event/EventData/Data[@Name='param1']"
+                "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+            }
             Delay             = '00:00:45'
         }
     }
@@ -598,7 +608,7 @@ Configuration ScheduledTaskStartupDel
             TaskName           = 'Test task Startup'
             TaskPath           = '\ComputerManagementDsc\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType       = 'AtLogOn'
+            ScheduleType       = 'AtLogon'
             RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
             Ensure             = 'Absent'
@@ -617,7 +627,7 @@ Configuration ScheduledTaskExecuteAsDel
             TaskName         = 'Test task Logon'
             TaskPath         = '\ComputerManagementDsc\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType     = 'AtLogOn'
+            ScheduleType     = 'AtLogon'
             Ensure           = 'Absent'
         }
     }
@@ -634,7 +644,7 @@ Configuration ScheduledTaskExecuteAsGroupDel
             TaskName         = 'Test task Logon with BuiltIn Group'
             TaskPath         = '\ComputerManagementDsc\'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ScheduleType     = 'AtLogOn'
+            ScheduleType     = 'AtLogon'
             Ensure           = 'Absent'
         }
     }
@@ -653,8 +663,13 @@ Configuration ScheduledTaskOnEventDel
             Ensure            = 'Absent'
             ScheduleType      = 'OnEvent'
             ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''Worked!'''
+            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
             EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
+            EventValueQueries = @{
+                "Service" = "Event/EventData/Data[@Name='param1']"
+                "DependsOnService" = "Event/EventData/Data[@Name='param2']"
+                "ErrorCode" = "Event/EventData/Data[@Name='param3']"
+            }
             Delay             = '00:00:30'
         }
     }

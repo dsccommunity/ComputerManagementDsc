@@ -1,7 +1,6 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope = 'Function')]
-param
-(
-)
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DSCMachineStatus', Justification = 'GlobalDsc Variable can be ignored')]
+param ()
 
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
@@ -45,6 +44,9 @@ $FailToRenameAfterJoinDomainErrorId = 'FailToRenameAfterJoinDomain,Microsoft.Pow
 
     .PARAMETER Server
         The Active Directory Domain Controller to use to join the domain.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
 #>
 function Get-TargetResource
 {
@@ -84,7 +86,12 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        $Server
+        $Server,
+
+        [Parameter()]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
+        [System.String[]]
+        $Options
     )
 
     Write-Verbose -Message ($script:localizedData.GettingComputerStateMessage -f $Name)
@@ -150,6 +157,9 @@ function Get-TargetResource
 
     .PARAMETER Server
         The Active Directory Domain Controller to use to join the domain.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
 #>
 function Set-TargetResource
 {
@@ -188,7 +198,12 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $Server
+        $Server,
+
+        [Parameter()]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
+        [System.String[]]
+        $Options
     )
 
     Write-Verbose -Message ($script:localizedData.SettingComputerStateMessage -f $Name)
@@ -245,6 +260,24 @@ function Set-TargetResource
                 if ($Server)
                 {
                     $addComputerParameters.Add("Server", $Server)
+                }
+
+                # Check for existing computer objecst using ADSI without ActiveDirectory module
+                $computerObject = Get-ADSIComputer -Name $Name -DomainName $DomainName -Credential $Credential
+
+                if ($computerObject)
+                {
+                    Remove-ADSIObject -Path $computerObject.Path -Credential $Credential
+                    Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
+                }
+
+                if (-not [System.String]::IsNullOrEmpty($Options))
+                {
+                    <#
+                        See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/add-computer?view=powershell-5.1#parameters for available options and their description
+                    #>
+                    Assert-ResourceProperty @PSBoundParameters
+                    $addComputerParameters.Add('Options', $Options)
                 }
 
                 # Rename the computer, and join it to the domain.
@@ -422,6 +455,9 @@ function Set-TargetResource
 
     .PARAMETER Description
         The value assigned here will be set as the local computer description.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
 #>
 function Test-TargetResource
 {
@@ -461,7 +497,12 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $Server
+        $Server,
+
+        [Parameter()]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
+        [System.String[]]
+        $Options
     )
 
     Write-Verbose -Message ($script:localizedData.TestingComputerStateMessage -f $Name)
@@ -647,4 +688,191 @@ function Get-LogonServer
     return $logonserver
 }
 
-Export-ModuleMember -Function *-TargetResource
+<#
+    .SYNOPSIS
+        Returns an ADSI Computer Object.
+
+    .PARAMETER Name
+        Name of the computer to search for in the given domain.
+
+    .PARAMETER Domain
+        Domain to search.
+
+    .PARAMETER Credential
+        Credential to search domain with.
+#>
+function Get-ADSIComputer
+{
+    [CmdletBinding()]
+    [OutputType([System.DirectoryServices.SearchResult])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateLength(1, 15)]
+        [ValidateScript( { $_ -inotmatch '[\/\\:*?"<>|]' })]
+        [System.String]
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DomainName,
+
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.PSCredential]
+        $Credential
+    )
+
+    $searcher = New-Object -TypeName System.DirectoryServices.DirectorySearcher
+    $searcher.Filter = "(&(objectCategory=computer)(objectClass=computer)(cn=$Name))"
+    if ($DomainName -notlike "LDAP://*")
+    {
+        $DomainName = "LDAP://$DomainName"
+    }
+
+    $params = @{
+        TypeName     = 'System.DirectoryServices.DirectoryEntry'
+        ArgumentList = @(
+            $DomainName,
+            $Credential.UserName,
+            $Credential.GetNetworkCredential().password
+        )
+        ErrorAction  = 'Stop'
+    }
+    $searchRoot = New-Object @params
+    $searcher.SearchRoot = $searchRoot
+
+    return $searcher.FindOne()
+}
+
+<#
+    .SYNOPSIS
+        Deletes an ADSI DirectoryEntry Object.
+
+    .PARAMETER Path
+        Path to Object to delete.
+
+    .PARAMETER Credential
+        Credential to authenticate to the domain.
+#>
+function Remove-ADSIObject
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateScript( { $_ -imatch "LDAP://*" })]
+        [System.String]
+        $Path,
+
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.PSCredential]
+        $Credential
+    )
+
+    $params = @{
+        TypeName     = 'System.DirectoryServices.DirectoryEntry'
+        ArgumentList = @(
+            $Path,
+            $Credential.UserName,
+            $Credential.GetNetworkCredential().password
+        )
+        ErrorAction  = 'Stop'
+    }
+    $adsiObj = New-Object @params
+
+    $adsiObj.DeleteTree()
+}
+
+<#
+    .SYNOPSIS
+    This function validates the parameters passed. Called by Set-Resource.
+        Will throw an error if any parameters are invalid.
+
+    .PARAMETER Name
+        The desired computer name.
+
+    .PARAMETER DomainName
+        The name of the domain to join.
+
+    .PARAMETER JoinOU
+        The distinguished name of the organizational unit that the computer
+        account will be created in.
+
+    .PARAMETER Credential
+        Credential to be used to join a domain.
+
+    .PARAMETER UnjoinCredential
+        Credential to be used to leave a domain.
+
+    .PARAMETER WorkGroupName
+        The name of the workgroup.
+
+    .PARAMETER Description
+        The value assigned here will be set as the local computer description.
+
+    .PARAMETER Options
+        Specifies advanced options for the Add-Computer join operation.
+#>
+function Assert-ResourceProperty
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateLength(1, 15)]
+        [ValidateScript( { $_ -inotmatch '[\/\\:*?"<>|]' })]
+        [System.String]
+        $Name,
+
+        [Parameter()]
+        [System.String]
+        $DomainName,
+
+        [Parameter()]
+        [System.String]
+        $JoinOU,
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $Credential,
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $UnjoinCredential,
+
+        [Parameter()]
+        [System.String]
+        $WorkGroupName,
+
+        [Parameter()]
+        [System.String]
+        $Description,
+
+        [Parameter()]
+        [System.String]
+        $Server,
+
+        [Parameter()]
+        [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
+        [System.String[]]
+        $Options
+    )
+
+    if ($options -contains 'PasswordPass' -and
+        $options -notcontains 'UnsecuredJoin')
+    {
+        New-InvalidArgumentException `
+            -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin `
+            -ArgumentName 'PasswordPass'
+    }
+
+    if ($Options -contains 'PasswordPass' -and
+        $options -contains 'UnsecuredJoin' -and
+        -not [System.String]::IsNullOrEmpty($Credential.UserName))
+    {
+
+        New-InvalidArgumentException `
+            -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername `
+            -ArgumentName 'Credential'
+    }
+}

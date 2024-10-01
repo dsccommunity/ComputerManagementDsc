@@ -1,3 +1,7 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope = 'Function')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DSCMachineStatus', Justification = 'GlobalDsc Variable can be ignored')]
+param ()
+
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 # Import the ComputerManagementDsc Common Modules
@@ -56,17 +60,17 @@ function Get-TargetResource
     $userAccountControlValues = Get-UserAccountControl
 
     $returnValue = @{
-        IsSingleInstance = 'Yes'
-        NotificationLevel = Get-NotificationLevel
-        FilterAdministratorToken = $userAccountControlValues.FilterAdministratorToken
-        ConsentPromptBehaviorAdmin = $userAccountControlValues.ConsentPromptBehaviorAdmin
-        ConsentPromptBehaviorUser = $userAccountControlValues.ConsentPromptBehaviorUser
-        EnableInstallerDetection = $userAccountControlValues.EnableInstallerDetection
+        IsSingleInstance            = 'Yes'
+        NotificationLevel           = Get-NotificationLevel
+        FilterAdministratorToken    = $userAccountControlValues.FilterAdministratorToken
+        ConsentPromptBehaviorAdmin  = $userAccountControlValues.ConsentPromptBehaviorAdmin
+        ConsentPromptBehaviorUser   = $userAccountControlValues.ConsentPromptBehaviorUser
+        EnableInstallerDetection    = $userAccountControlValues.EnableInstallerDetection
         ValidateAdminCodeSignatures = $userAccountControlValues.ValidateAdminCodeSignatures
-        EnableLua = $userAccountControlValues.EnableLua
-        PromptOnSecureDesktop = $userAccountControlValues.PromptOnSecureDesktop
-        EnableVirtualization = $userAccountControlValues.EnableVirtualization
-        SuppressRestart = $SuppressRestart
+        EnableLua                   = $userAccountControlValues.EnableLua
+        PromptOnSecureDesktop       = $userAccountControlValues.PromptOnSecureDesktop
+        EnableVirtualization        = $userAccountControlValues.EnableVirtualization
+        SuppressRestart             = $SuppressRestart
     }
 
     return $returnValue
@@ -176,7 +180,7 @@ function Set-TargetResource
     )
 
     $assertBoundParameterParameters = @{
-        BoundParameterList = $PSBoundParameters
+        BoundParameterList     = $PSBoundParameters
         MutuallyExclusiveList1 = @(
             'NotificationLevel'
         )
@@ -222,9 +226,10 @@ function Set-TargetResource
                 try
                 {
                     $setItemPropertyParameters = @{
-                        Path = $script:registryKey
-                        Name = $parameterName
-                        Value = $PSBoundParameters.$parameterName
+                        Path        = $script:registryKey
+                        Name        = $parameterName
+                        Value       = $PSBoundParameters.$parameterName
+                        Type        = 'DWord'
                         ErrorAction = 'Stop'
                     }
 
@@ -367,7 +372,7 @@ function Test-TargetResource
     Write-Verbose -Message $script:localizedData.TestingStateMessage
 
     $assertBoundParameterParameters = @{
-        BoundParameterList = $PSBoundParameters
+        BoundParameterList     = $PSBoundParameters
         MutuallyExclusiveList1 = @(
             'NotificationLevel'
         )
@@ -430,14 +435,14 @@ function Get-UserAccountControl
     param ()
 
     return @{
-        FilterAdministratorToken = Get-RegistryPropertyValue -Path $script:registryKey -Name 'FilterAdministratorToken'
-        ConsentPromptBehaviorAdmin = Get-RegistryPropertyValue -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin'
-        ConsentPromptBehaviorUser = Get-RegistryPropertyValue -Path $script:registryKey -Name 'ConsentPromptBehaviorUser'
-        EnableInstallerDetection = Get-RegistryPropertyValue -Path $script:registryKey -Name 'EnableInstallerDetection'
+        FilterAdministratorToken    = Get-RegistryPropertyValue -Path $script:registryKey -Name 'FilterAdministratorToken'
+        ConsentPromptBehaviorAdmin  = Get-RegistryPropertyValue -Path $script:registryKey -Name 'ConsentPromptBehaviorAdmin'
+        ConsentPromptBehaviorUser   = Get-RegistryPropertyValue -Path $script:registryKey -Name 'ConsentPromptBehaviorUser'
+        EnableInstallerDetection    = Get-RegistryPropertyValue -Path $script:registryKey -Name 'EnableInstallerDetection'
         ValidateAdminCodeSignatures = Get-RegistryPropertyValue -Path $script:registryKey -Name 'ValidateAdminCodeSignatures'
-        EnableLua = Get-RegistryPropertyValue -Path $script:registryKey -Name 'EnableLUA'
-        PromptOnSecureDesktop = Get-RegistryPropertyValue -Path $script:registryKey -Name 'PromptOnSecureDesktop'
-        EnableVirtualization = Get-RegistryPropertyValue -Path $script:registryKey -Name 'EnableVirtualization'
+        EnableLua                   = Get-RegistryPropertyValue -Path $script:registryKey -Name 'EnableLUA'
+        PromptOnSecureDesktop       = Get-RegistryPropertyValue -Path $script:registryKey -Name 'PromptOnSecureDesktop'
+        EnableVirtualization        = Get-RegistryPropertyValue -Path $script:registryKey -Name 'EnableVirtualization'
     }
 }
 
@@ -460,48 +465,48 @@ function Get-NotificationLevel
     $userAccountControlValues = Get-UserAccountControl
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 2 `
-        -and $userAccountControlValues.EnableLua -eq 1 `
-        -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
+            -and $userAccountControlValues.EnableLua -eq 1 `
+            -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
     )
     {
         $notificationLevelStringValue = 'AlwaysNotify'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 1 `
-        -and $userAccountControlValues.EnableLua -eq 1 `
-        -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
+            -and $userAccountControlValues.EnableLua -eq 1 `
+            -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
     )
     {
         $notificationLevelStringValue = 'AlwaysNotifyAndAskForCredentials'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 5 `
-        -and $userAccountControlValues.EnableLua -eq 1 `
-        -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
+            -and $userAccountControlValues.EnableLua -eq 1 `
+            -and $userAccountControlValues.PromptOnSecureDesktop -eq 1
     )
     {
         $notificationLevelStringValue = 'NotifyChanges'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 5 `
-        -and $userAccountControlValues.EnableLua -eq 1 `
-        -and $userAccountControlValues.PromptOnSecureDesktop -eq 0
+            -and $userAccountControlValues.EnableLua -eq 1 `
+            -and $userAccountControlValues.PromptOnSecureDesktop -eq 0
     )
     {
         $notificationLevelStringValue = 'NotifyChangesWithoutDimming'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 0 `
-        -and $userAccountControlValues.EnableLua -eq 1 `
-        -and $userAccountControlValues.PromptOnSecureDesktop -eq 0
+            -and $userAccountControlValues.EnableLua -eq 1 `
+            -and $userAccountControlValues.PromptOnSecureDesktop -eq 0
     )
     {
         $notificationLevelStringValue = 'NeverNotify'
     }
 
     if ($userAccountControlValues.ConsentPromptBehaviorAdmin -eq 0 `
-        -and $userAccountControlValues.EnableLua -eq 0 `
-        -and $userAccountControlValues.PromptOnSecureDesktop -eq 0
+            -and $userAccountControlValues.EnableLua -eq 0 `
+            -and $userAccountControlValues.PromptOnSecureDesktop -eq 0
     )
     {
         $notificationLevelStringValue = 'NeverNotifyAndDisableAll'
@@ -532,7 +537,8 @@ function Set-UserAccountControlToNotificationLevel
     try
     {
         $defaultSetItemPropertyParameters = @{
-            Path = $script:registryKey
+            Path        = $script:registryKey
+            Type        = 'DWord'
             ErrorAction = 'Stop'
         }
 

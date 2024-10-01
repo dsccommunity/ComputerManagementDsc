@@ -24,24 +24,27 @@ stages:
       - job: Package_Module
         displayName: 'Package Module'
         pool:
-          vmImage: 'ubuntu 16.04'
+          vmImage: 'windows-latest'
         steps:
-          - task: GitVersion@5
-            name: gitversion
-            displayName: 'Evaluate Next Version'
-            inputs:
-              runtime: 'core'
-              configFilePath: 'GitVersion.yml'
+          - pwsh: |
+              dotnet tool install --global GitVersion.Tool --version 5.*
+              $gitVersionObject = dotnet-gitversion | ConvertFrom-Json
+              $gitVersionObject.PSObject.Properties.ForEach{
+                  Write-Host -Object "Setting Task Variable '$($_.Name)' with value '$($_.Value)'."
+                  Write-Host -Object "##vso[task.setvariable variable=$($_.Name);]$($_.Value)"
+              }
+              Write-Host -Object "##vso[build.updatebuildnumber]$($gitVersionObject.FullSemVer)"
+            displayName: Calculate ModuleVersion (GitVersion)
 
           - task: PowerShell@2
             name: package
             displayName: 'Build & Package Module'
             inputs:
               filePath: './build.ps1'
-              arguments: '-Tasks pack -ResolveDependency'
+              arguments: '-ResolveDependency -tasks pack'
               pwsh: true
             env:
-              ModuleVersion: $(gitVersion.Informationalversion)
+              ModuleVersion: $(NuGetVersionV2)
 
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Pipeline Artifact'
@@ -57,7 +60,7 @@ stages:
       - job: Test_HQRM
         displayName: 'HQRM'
         pool:
-          vmImage: 'windows-2019'
+          vmImage: 'windows-latest'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -83,10 +86,10 @@ stages:
               testRunTitle: 'HQRM'
             condition: succeededOrFailed()
 
-      - job: Test_Unit_2016
-        displayName: 'Unit (Windows Server 2016)'
+      - job: Test_Unit_2019
+        displayName: 'Unit (Windows Server 2019)'
         pool:
-          vmImage: 'vs2017-win2016'
+          vmImage: 'windows-2019'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -109,7 +112,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit (Windows Server 2016)'
+              testRunTitle: 'Unit (Windows Server 2019)'
             condition: succeededOrFailed()
 
           - task: PublishPipelineArtifact@1
@@ -121,9 +124,9 @@ stages:
 
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
-        dependsOn: Test_Unit_2016
+        dependsOn: Test_Unit_2019
         pool:
-          vmImage: 'ubuntu 16.04'
+          vmImage: 'ubuntu-latest'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -151,10 +154,10 @@ stages:
               bash <(curl -s https://codecov.io/bash) -f "./$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml"
             displayName: 'Publish Code Coverage to Codecov.io'
 
-      - job: Test_Integration_2016
-        displayName: 'Integration (Windows Server 2016)'
+      - job: Test_Integration_2019
+        displayName: 'Integration (Windows Server 2019)'
         pool:
-          vmImage: 'vs2017-win2016'
+          vmImage: 'windows-2019'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -189,13 +192,13 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration (Windows Server 2016)'
+              testRunTitle: 'Integration (Windows Server 2019)'
             condition: succeededOrFailed()
 
-      - job: Test_Unit_2019
-        displayName: 'Unit (Windows Server 2019)'
+      - job: Test_Unit_2022
+        displayName: 'Unit (Windows Server 2022)'
         pool:
-          vmImage: 'windows-2019'
+          vmImage: 'windows-2022'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -218,13 +221,13 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit (Windows Server 2019)'
+              testRunTitle: 'Unit (Windows Server 2022)'
             condition: succeededOrFailed()
 
-      - job: Test_Integration_2019
-        displayName: 'Integration (Windows Server 2019)'
+      - job: Test_Integration_2022
+        displayName: 'Integration (Windows Server 2022)'
         pool:
-          vmImage: 'windows-2019'
+          vmImage: 'windows-2022'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -255,7 +258,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration (Windows Server 2019)'
+              testRunTitle: 'Integration (Windows Server 2022)'
             condition: succeededOrFailed()
 
   - stage: Deploy
@@ -273,7 +276,7 @@ stages:
       - job: Deploy_Module
         displayName: 'Deploy Module'
         pool:
-          vmImage: 'ubuntu 16.04'
+          vmImage: 'ubuntu-latest'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -306,4 +309,3 @@ stages:
               GitHubToken: $(GitHubToken)
               ReleaseBranch: main
               MainGitBranch: main
-

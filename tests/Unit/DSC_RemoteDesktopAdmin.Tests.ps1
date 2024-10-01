@@ -1,16 +1,39 @@
-$script:dscModuleName = 'ComputerManagementDsc'
-$script:dscResourceName = 'DSC_RemoteDesktopAdmin'
+<#
+    .SYNOPSIS
+        Unit test for DSC_RemoteDesktopAdmin DSC resource.
 
-function Invoke-TestSetup
-{
+    .NOTES
+#>
+
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
+
+BeforeDiscovery {
     try
     {
-        Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+            }
+
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
     }
     catch [System.IO.FileNotFoundException]
     {
-        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
     }
+}
+
+BeforeAll {
+    $script:dscModuleName = 'ComputerManagementDsc'
+    $script:dscResourceName = 'DSC_RemoteDesktopAdmin'
 
     $script:testEnvironment = Initialize-TestEnvironment `
         -DSCModuleName $script:dscModuleName `
@@ -19,217 +42,425 @@ function Invoke-TestSetup
         -TestType 'Unit'
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
 }
 
-function Invoke-TestCleanup
-{
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 }
 
-Invoke-TestSetup
+Describe 'DSC_RemoteDesktopAdmin\Get-TargetResource' -Tag 'Get' {
+    Context 'When Remote Desktop Admin settings exist' {
+        Context 'When Ensure is Present' {
+            BeforeAll {
+                Mock -CommandName Get-ItemProperty `
+                    -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
+                    -MockWith { @{fDenyTSConnections = 0 } }
 
-# Begin Testing
-try
-{
-    InModuleScope $script:dscResourceName {
-        $mockGetTargetResourcePresentSecure = @{
-            IsSingleInstance   = 'Yes'
-            Ensure             = 'Present'
-            UserAuthentication = 'Secure'
-        }
+                Mock -CommandName Get-ItemProperty `
+                    -ParameterFilter { $Name -eq 'UserAuthentication' } `
+                    -MockWith { @{UserAuthentication = 0 } }
+            }
 
-        $mockGetTargetResourcePresentNonSecure = @{
-            IsSingleInstance   = 'Yes'
-            Ensure             = 'Present'
-            UserAuthentication = 'NonSecure'
-        }
-
-        $mockGetTargetResourceAbsentNonSecure = @{
-            IsSingleInstance   = 'Yes'
-            Ensure             = 'Absent'
-            UserAuthentication = 'NonSecure'
-        }
-
-        Describe 'DSC_RemoteDesktopAdmin\Get-TargetResource' {
-            Context 'When Remote Desktop Admin settings exist' {
-                It 'Should return the correct values when Ensure is Present' {
-                    Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { @{fDenyTSConnections = 0 } }
-
-                    Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' } `
-                        -MockWith { @{UserAuthentication = 0 } }
+            It 'Should return the correct values' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
                     $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
                     $targetResource.Ensure | Should -Be 'Present'
                 }
+            }
+        }
 
-                It 'Should return the correct values when Ensure is Absent' {
-                    Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { @{fDenyTSConnections = 1 } }
+        Context 'When Ensure is Absent' {
+            BeforeAll {
+                Mock -CommandName Get-ItemProperty `
+                    -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
+                    -MockWith { @{fDenyTSConnections = 1 } }
 
-                    Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' } `
-                        -MockWith { @{UserAuthentication = 0 } }
+                Mock -CommandName Get-ItemProperty `
+                    -ParameterFilter { $Name -eq 'UserAuthentication' } `
+                    -MockWith { @{UserAuthentication = 0 } }
+            }
+
+            It 'Should return the correct values' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
                     $targetResource = Get-TargetResource -IsSingleInstance 'Yes'
                     $targetResource.Ensure | Should -Be 'Absent'
                 }
+            }
+        }
 
-                It 'Should return the correct values when UserAuthentication is NonSecure' {
-                    Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { @{fDenyTSConnections = 0 } }
+        Context 'When UserAuthentication is NonSecure' {
+            BeforeAll {
+                Mock -CommandName Get-ItemProperty `
+                    -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
+                    -MockWith { @{fDenyTSConnections = 0 } }
 
-                    Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' } `
-                        -MockWith { @{UserAuthentication = 0 } } `
+                Mock -CommandName Get-ItemProperty `
+                    -ParameterFilter { $Name -eq 'UserAuthentication' } `
+                    -MockWith { @{UserAuthentication = 0 } }
+            }
+
+            It 'Should return the correct values' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
                     $result = Get-TargetResource -IsSingleInstance 'Yes'
                     $result.UserAuthentication | Should -Be 'NonSecure'
                 }
+            }
+        }
 
-                It 'Should return the correct values when UserAuthentication is Secure' {
-                    Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
-                        -MockWith { @{fDenyTSConnections = 0 } }
+        Context 'When UserAuthentication is Secure' {
+            BeforeAll {
+                Mock -CommandName Get-ItemProperty `
+                    -ParameterFilter { $Name -eq 'fDenyTSConnections' } `
+                    -MockWith { @{fDenyTSConnections = 0 } }
 
-                    Mock -CommandName Get-ItemProperty `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' } `
-                        -MockWith { @{UserAuthentication = 1 } } `
+                Mock -CommandName Get-ItemProperty `
+                    -ParameterFilter { $Name -eq 'UserAuthentication' } `
+                    -MockWith { @{UserAuthentication = 1 } }
+            }
+
+            It 'Should return the correct values' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
                     $result = Get-TargetResource -IsSingleInstance 'Yes'
                     $result.UserAuthentication | Should -Be 'Secure'
                 }
             }
         }
+    }
+}
 
-        Describe 'DSC_RemoteDesktopAdmin\Test-TargetResource' {
-            Context 'When the system is in the desired state' {
-                It 'Should return true when Ensure is present' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourcePresentSecure }
-
-                    Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure 'Present' | Should Be $true
+Describe 'DSC_RemoteDesktopAdmin\Test-TargetResource' -Tag 'Test' {
+    Context 'When the system is in the desired state' {
+        Context 'When Ensure is present' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'Secure'
+                    }
                 }
+                It 'Should return true' {
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                It 'Should return true when Ensure is absent' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourceAbsentNonSecure }
+                        $testTargetResourceParameters = @{
+                            IsSingleInstance = 'Yes'
+                            Ensure           = 'Present'
+                        }
 
-                    Test-TargetResource  -IsSingleInstance 'yes' `
-                        -Ensure 'Absent' | Should Be $true
-                }
-
-                It 'Should return true when User Authentication is Secure' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourcePresentSecure }
-
-                    Test-TargetResource  -IsSingleInstance 'yes' `
-                        -Ensure 'Present' `
-                        -UserAuthentication 'Secure' | Should Be $true
-                }
-
-                It 'Should return true when User Authentication is NonSecure' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourcePresentNonSecure }
-
-                    Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure 'Present' `
-                        -UserAuthentication 'NonSecure' | Should Be $true
-                }
-            }
-
-            Context 'When the system is not in the desired state' {
-                It 'Should return false when Ensure is present' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourcePresentSecure }
-
-                    Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure 'Absent' | Should Be $false
-                }
-
-                It 'Should return false when Ensure is absent' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourceAbsenttNonSecure }
-
-                    Test-TargetResource  -IsSingleInstance 'yes' `
-                        -Ensure 'Present' | Should Be $false
-                }
-
-                It 'Should return false if User Authentication is Secure' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourcePresentSecure }
-
-                    Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure 'Present' `
-                        -UserAuthentication 'NonSecure' | Should Be $false
-                }
-
-                It 'Should return false if User Authentication is NonSecure' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourcePresentNonSecure }
-
-                    Test-TargetResource -IsSingleInstance 'yes' `
-                        -Ensure 'Present' `
-                        -UserAuthentication 'Secure' | Should Be $false
+                        Test-TargetResource @testTargetResourceParameters | Should -BeTrue
+                    }
                 }
             }
         }
 
-        Describe 'DSC_RemoteDesktopAdmin\Set-TargetResource' {
-            Context 'When the state needs to be changed' {
-                BeforeEach {
-                    Mock -CommandName Set-ItemProperty
+        Context 'When Ensure is absent' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Absent'
+                        UserAuthentication = 'NonSecure'
+                    }
                 }
+            }
 
-                It 'Should set the state to Present' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourceAbsentNonSecure }
+            It 'Should return true' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                    Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Present'
-                    Assert-MockCalled -CommandName Set-ItemProperty `
-                        -ParameterFilter { $Name -eq 'fDenyTSConnections' -and $Value -eq '0' }`
-                        -Times 1 -Exactly
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance = 'Yes'
+                        Ensure           = 'Absent'
+                    }
+
+                    Test-TargetResource @testTargetResourceParameters | Should -BeTrue
                 }
+            }
+        }
 
-                It 'Should set the state to Absent' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourcePresentNonSecure }
-
-                    Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Absent'
-                    Assert-MockCalled -CommandName Set-ItemProperty `
-                        -ParameterFilter { $Name -eq 'fDenyTSConnections' -and $Value -eq '1' }`
-                        -Times 1 -Exactly
+        Context 'When User Authentication is Secure' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'Secure'
+                    }
                 }
+            }
 
-                It 'Should set UserAuthentication to Secure' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourcePresentNonSecure }
+            It 'Should return true' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                    Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Present' -UserAuthentication 'Secure'
-                    Assert-MockCalled -CommandName Set-ItemProperty `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' -and $Value -eq '1' }`
-                        -Times 1 -Exactly
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'Secure'
+                    }
+
+                    Test-TargetResource @testTargetResourceParameters | Should -BeTrue
                 }
+            }
+        }
 
-                It 'Should set UserAuthentication to NonSecure' {
-                    Mock -CommandName Get-TargetResource `
-                        -MockWith { $mockGetTargetResourcePresentSecure }
+        Context 'When User Authentication is NonSecure' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'NonSecure'
+                    }
+                }
+            }
 
-                    Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Present' -UserAuthentication 'NonSecure'
-                    Assert-MockCalled -CommandName Set-ItemProperty `
-                        -ParameterFilter { $Name -eq 'UserAuthentication' -and $Value -eq '0' }`
-                        -Times 1 -Exactly
+            It 'Should return true' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'NonSecure'
+                    }
+
+                    Test-TargetResource @testTargetResourceParameters | Should -BeTrue
+                }
+            }
+        }
+    }
+
+    Context 'When the system is not in the desired state' {
+        Context 'When Ensure is present' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'Secure'
+                    }
+                }
+            }
+
+            It 'Should return false' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance = 'Yes'
+                        Ensure           = 'Absent'
+                    }
+
+                    Test-TargetResource @testTargetResourceParameters | Should -BeFalse
+                }
+            }
+        }
+
+        Context 'When Ensure is absent' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Absent'
+                        UserAuthentication = 'NonSecure'
+                    }
+                }
+            }
+
+            It 'Should return false' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance = 'Yes'
+                        Ensure           = 'Present'
+                    }
+
+                    Test-TargetResource @testTargetResourceParameters | Should -BeFalse
+                }
+            }
+        }
+
+        Context 'When User Authentication is Secure' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith { @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'Secure'
+                    }
+                }
+            }
+
+            It 'Should return false' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'NonSecure'
+                    }
+
+                    Test-TargetResource @testTargetResourceParameters | Should -BeFalse
+                }
+            }
+        }
+
+        Context 'When User Authentication is NonSecure' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'NonSecure'
+                    }
+                }
+            }
+
+            It 'Should return false' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'Secure'
+                    }
+
+                    Test-TargetResource @testTargetResourceParameters | Should -BeFalse
                 }
             }
         }
     }
 }
-finally
-{
-    Invoke-TestCleanup
+
+Describe 'DSC_RemoteDesktopAdmin\Set-TargetResource' -Tag 'Set' {
+    Context 'When the system is not in the desired state' {
+        BeforeEach {
+            Mock -CommandName Set-ItemProperty
+        }
+
+        Context 'When Ensure is absent' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Absent'
+                        UserAuthentication = 'NonSecure'
+                    }
+                }
+            }
+
+            It 'Should set the state to Present' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present'
+                }
+
+                Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
+                    $Name -eq 'fDenyTSConnections' -and
+                    $Value -eq '0'
+                } -Times 1 -Exactly -Scope It
+            }
+        }
+
+        Context 'When Ensure is Present' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'NonSecure'
+                    }
+                }
+            }
+            It 'Should set the state to Absent' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Absent'
+                }
+
+                Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
+                    $Name -eq 'fDenyTSConnections' -and
+                    $Value -eq '1'
+                } -Times 1 -Exactly -Scope It
+            }
+        }
+
+        Context 'When User Authentication is NonSecure' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'NonSecure'
+                    }
+                }
+            }
+
+            It 'Should set UserAuthentication to Secure' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Present' -UserAuthentication 'Secure'
+                }
+
+                Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
+                    $Name -eq 'UserAuthentication' -and
+                    $Value -eq '1'
+                } -Times 1 -Exactly -Scope It
+            }
+        }
+
+        Context 'When User Authentication is Secure' {
+            BeforeAll {
+                Mock -CommandName Get-TargetResource -MockWith {
+                    @{
+                        IsSingleInstance   = 'Yes'
+                        Ensure             = 'Present'
+                        UserAuthentication = 'Secure'
+                    }
+                }
+            }
+
+            It 'Should set UserAuthentication to NonSecure' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    Set-TargetResource -IsSingleInstance 'yes' -Ensure 'Present' -UserAuthentication 'NonSecure'
+                }
+
+                Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
+                    $Name -eq 'UserAuthentication' -and
+                    $Value -eq '0'
+                } -Times 1 -Exactly -Scope It
+            }
+        }
+    }
 }

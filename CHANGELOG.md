@@ -5,6 +5,94 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `VirtualMemory` fix incorrect variable name
+- `SmbServerConfiguration` remove errant argument
+
+### Changed
+
+  - Converted tests to Pester 5
+  - Rename Delete-ADSIObject to Delete-ADSIObject to satisfy HQRM
+
+### Removed
+
+- Removed `Get-InvalidOperationRecord` to use version provided by `DscResource.Test`
+
+## [9.2.0] - 2024-09-30
+
+### Added
+
+- ScheduledTask
+  - Added support for configuring Event ValueQueries, allowing the triggering event to be
+    parsed for values which are sent to the scheduled task script.
+    Fixes [Issue #392](https://github.com/dsccommunity/ComputerManagementDsc/issues/392).
+
+### Fixed
+
+- ScheduledTask
+  - Resolved an issue where DaysOfWeek array ordering can cause configuration drift.
+    Fixes [Issue #354](https://github.com/dsccommunity/ComputerManagementDsc/issues/354).
+- Update build process to pin GitVersion to 5.* to resolve errors
+  (https://github.com/gaelcolas/Sampler/issues/477).
+
+### Changed
+
+- CI Pipeline
+  - Updated pipeline files to match current DSC Community patterns - fixes [Issue #427](https://github.com/dsccommunity/ComputerManagementDsc/issues/427).
+  - Updated HQRM step to use windows-latest image.
+
+## [9.1.0] - 2024-04-30
+
+### Changed
+
+- ComputerManagementDsc
+  - The class-based resources are now re-using the module DscResource.Base - Fixes [Issue #404](https://github.com/dsccommunity/ComputerManagementDsc/issues/404).
+  - Removed the file `source/build.psd1` as it is no longer required for the
+    build pipeline.
+  - Fixed Delete-ADSIObject so that existing AD Computer objects will be deleted. Fixes [Issue #414](https://github.com/dsccommunity/ComputerManagementDsc/issues/414).
+- PSResourceRepository
+  - The resource now supports the read-only property `Reasons` that the
+    compliance part (audit via Azure Policy) of Azure AutoManage Machine
+    Configuration uses.
+
+### Fixed
+
+- ComputerManagementDsc
+  - AppVeyor build now sets the correct module version to be able to run tests.
+- ScheduledTask
+  - Allowed values for ScheduleType updated to accept AtLogon over AtLogOn - Fixes [Issue #420](https://github.com/dsccommunity/ComputerManagementDsc/issues/420)
+- SmbShare
+  - Allow Test-TargetResource to succeed when access entries use different order - Fixes [Issue #247](https://github.com/dsccommunity/ComputerManagementDsc/issues/247), [Issue #423](https://github.com/dsccommunity/ComputerManagementDsc/issues/423)
+- UserAccountControl
+  - Ensure registry keys are created as REG_DWORD rather than REG_SZ - Fixes [Issue #412](https://github.com/dsccommunity/ComputerManagementDsc/issues/412)
+
+## [9.0.0] - 2023-02-22
+
+### Fixed
+
+- ScheduledTask
+  - No longer conflates resource parameter `BuiltInAccount` and `*-ScheduledTask` parameter `user` - Fixes [Issue #385](https://github.com/dsccommunity/ComputerManagementDsc/issues/385)
+
+### Added
+
+- PSResourceRepository
+  - New class-based resource to manage PowerShell Resource Repositories - Fixes [Issue #393](https://github.com/dsccommunity/ComputerManagementDsc/issues/393)
+- Computer
+  - Support Options Parameter for domain join - Fixes [Issue #234](https://github.com/dsccommunity/ComputerManagementDsc/issues/234).
+  - When joining a computer to a domain, existing AD computer objects will be deleted - Fixes [Issue #55](https://github.com/dsccommunity/ComputerManagementDsc/issues/55), [Issue #58](https://github.com/dsccommunity/ComputerManagementDsc/issues/58).
+
+### Changed
+
+- BREAKING CHANGE: Windows Management Framework 5.0 is required.
+- ComputerManagementDsc
+  - The resource names were removed from the property `DscResourcesToExport`
+    in the module manifest in the source folder as the built module is
+    automatically updated with this information by the pipeline - Fixes [Issue #396](https://github.com/dsccommunity/ComputerManagementDsc/issues/396).
+  - Moved the build step of the pipeline to a Windows build worker when running in Azure DevOps.
+
+## [8.5.0] - 2021-09-13
+
 ### Added
 
 - SystemProtection
@@ -31,6 +119,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Corrected code coverage badge in `README.md`.
 - Updated build pipeline tasks and remove unused environment variables.
 - Removed duplicate code coverage badge.
+- Added Publish_GitHub_Wiki_Content task to publish stage of build
+  pipeline - Fixes [Issue #383](https://github.com/dsccommunity/ComputerManagementDsc/issues/383).
+- Updated .github issue templates to standard - Fixes [Issue #383](https://github.com/dsccommunity/ComputerManagementDsc/issues/383).
+- Added Create_ChangeLog_GitHub_PR task to publish stage of build pipeline.
+- Added SECURITY.md.
+- Updated pipeline Deploy_Module anb Code_Coverage jobs to use ubuntu-latest
+  images - Fixes [Issue #383](https://github.com/dsccommunity/ComputerManagementDsc/issues/382).
+- Updated pipeline unit tests and integration tests to use Windows Server 2019 and
+  Windows Server 2022 images - Fixes [Issue #383](https://github.com/dsccommunity/ComputerManagementDsc/issues/382).
 
 ### Fixed
 
@@ -50,6 +147,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PendingReboot
   - Fixed issue with loading localized data on non en-US operating systems -
     Fixes [Issue #350](https://github.com/dsccommunity/ComputerManagementDsc/issues/350).
+- Fixed pipeline by replacing the GitVersion task in the `azure-pipelines.yml`
+  with a script.
 
 ## [8.4.0] - 2020-08-03
 

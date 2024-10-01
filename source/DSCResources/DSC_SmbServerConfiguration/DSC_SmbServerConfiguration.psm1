@@ -35,7 +35,7 @@ function Get-TargetResource
         $IsSingleInstance
     )
 
-    Write-Verbose -Message ($script:localizedData.GetTargetResourceMessage -f $Name)
+    Write-Verbose -Message ($script:localizedData.GetTargetResourceMessage)
 
     $smbReturn = @{}
     $smbServer = Get-SmbServerConfiguration -ErrorAction 'SilentlyContinue'
@@ -704,5 +704,3 @@ function Test-TargetResource
 
     return $resourceCompliant
 }
-
-Export-ModuleMember -Function *-TargetResource

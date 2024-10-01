@@ -531,6 +531,7 @@ function Test-TargetResource
             $resourceRequiresUpdate = Test-DscParameterState `
                 -CurrentValues $currentSmbShareConfiguration `
                 -DesiredValues $PSBoundParameters `
+                -SortArrayValues `
                 -Verbose:$VerbosePreference
         }
         else

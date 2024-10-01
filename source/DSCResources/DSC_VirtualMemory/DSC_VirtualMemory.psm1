@@ -1,4 +1,5 @@
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidGlobalVars", "", Scope = "Function")]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Scope = 'Function')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DSCMachineStatus', Justification = 'GlobalDsc Variable can be ignored')]
 param ()
 
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
@@ -484,7 +485,7 @@ function New-PageFile
         $PageFileName
     )
 
-    Write-Verbose -Message ($script:localizedData.NewPageFileMessage -f $State)
+    Write-Verbose -Message ($script:localizedData.NewPageFileMessage -f $PageFileName)
 
     $null = New-CimInstance `
         -Namespace 'root\cimv2' `
@@ -525,5 +526,3 @@ function Get-DriveInfo
 
     return $driveInfo
 }
-
-Export-ModuleMember -Function *-TargetResource

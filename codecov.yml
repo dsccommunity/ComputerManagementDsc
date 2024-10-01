@@ -24,5 +24,6 @@ coverage:
         target: auto
         threshold: 5
 
+# This is not needed if the module only contain class-based resources.
 fixes:
   - '^\d+\.\d+\.\d+::source'  # move path "X.Y.Z" => "source"

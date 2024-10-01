@@ -180,5 +180,3 @@ function Set-TargetResource
         Set-ItemProperty -Path $script:winStationsRegistryKey -Name "UserAuthentication" -Value $UserAuthenticationRegistry
     }
 }
-
-Export-ModuleMember -Function *-TargetResource

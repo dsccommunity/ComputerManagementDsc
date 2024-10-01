@@ -1,16 +1,39 @@
-$script:dscModuleName = 'ComputerManagementDsc'
-$script:dscResourceName = 'DSC_PendingReboot'
+<#
+    .SYNOPSIS
+        Unit test for DSC_PendingReboot DSC resource.
 
-function Invoke-TestSetup
-{
+    .NOTES
+#>
+
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
+
+BeforeDiscovery {
     try
     {
-        Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+            }
+
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
     }
     catch [System.IO.FileNotFoundException]
     {
-        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
     }
+}
+
+BeforeAll {
+    $script:dscModuleName = 'ComputerManagementDsc'
+    $script:dscResourceName = 'DSC_PendingReboot'
 
     $script:testEnvironment = Initialize-TestEnvironment `
         -DSCModuleName $script:dscModuleName `
@@ -19,596 +42,726 @@ function Invoke-TestSetup
         -TestType 'Unit'
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
 }
 
-function Invoke-TestCleanup
-{
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 }
 
-Invoke-TestSetup
-
-# Begin Testing
-try
-{
-    InModuleScope $script:dscResourceName {
-        $script:testResourceName = 'Test'
-
-        $script:testAndSetTargetResourceParameters = @{
-            Name                        = $script:testResourceName
-            SkipComponentBasedServicing = $false
-            SkipWindowsUpdate           = $false
-            SkipPendingFileRename       = $false
-            SkipPendingComputerRename   = $false
-            SkipCcmClientSDK            = $false
-            Verbose                     = $true
+Describe 'DSC_PendingReboot\Get-TargetResource' -Tag 'Get' {
+    Context 'When all reboots are required' {
+        BeforeAll {
+            Mock -CommandName Get-PendingRebootState -MockWith {
+                @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    ComponentBasedServicing     = $true
+                    SkipWindowsUpdate           = $false
+                    WindowsUpdate               = $true
+                    SkipPendingFileRename       = $false
+                    PendingFileRename           = $true
+                    SkipPendingComputerRename   = $false
+                    PendingComputerRename       = $true
+                    SkipCcmClientSDK            = $true
+                    CcmClientSDK                = $true
+                    RebootRequired              = $true
+                }
+            } -Verifiable
         }
 
-        $getPendingRebootStateAllRebootsTrue = {
-            @{
-                Name                        = $script:testResourceName
-                SkipComponentBasedServicing = $false
-                ComponentBasedServicing     = $true
-                SkipWindowsUpdate           = $false
-                WindowsUpdate               = $true
-                SkipPendingFileRename       = $false
-                PendingFileRename           = $true
-                SkipPendingComputerRename   = $false
-                PendingComputerRename       = $true
-                SkipCcmClientSDK            = $true
-                CcmClientSDK                = $true
-                RebootRequired              = $true
+        It 'Should return expected result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $getTargetResourceResult = Get-TargetResource -Name 'Test'
+
+                { $getTargetResourceResult } | Should -Not -Throw
+
+                $getTargetResourceResult.Name | Should -Be 'Test'
+                $getTargetResourceResult.SkipComponentBasedServicing | Should -BeFalse
+                $getTargetResourceResult.ComponentBasedServicing | Should -BeTrue
+                $getTargetResourceResult.SkipWindowsUpdate | Should -BeFalse
+                $getTargetResourceResult.WindowsUpdate | Should -BeTrue
+                $getTargetResourceResult.SkipPendingFileRename | Should -BeFalse
+                $getTargetResourceResult.PendingFileRename | Should -BeTrue
+                $getTargetResourceResult.SkipPendingComputerRename | Should -BeFalse
+                $getTargetResourceResult.PendingComputerRename | Should -BeTrue
+                $getTargetResourceResult.SkipCcmClientSDK | Should -BeTrue
+                $getTargetResourceResult.CcmClientSDK | Should -BeTrue
+                $getTargetResourceResult.RebootRequired | Should -BeTrue
             }
+
+            Should -InvokeVerifiable
+        }
+    }
+
+    Context 'When no reboots are required' {
+        BeforeAll {
+            Mock -CommandName Get-PendingRebootState -MockWith {
+                @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    ComponentBasedServicing     = $false
+                    SkipWindowsUpdate           = $false
+                    WindowsUpdate               = $false
+                    SkipPendingFileRename       = $false
+                    PendingFileRename           = $false
+                    SkipPendingComputerRename   = $false
+                    PendingComputerRename       = $false
+                    SkipCcmClientSDK            = $true
+                    CcmClientSDK                = $false
+                    RebootRequired              = $false
+                }
+            } -Verifiable
         }
 
-        $getPendingRebootStateAllRebootsFalse = {
-            @{
-                Name                        = $script:testResourceName
-                SkipComponentBasedServicing = $false
-                ComponentBasedServicing     = $false
-                SkipWindowsUpdate           = $false
-                WindowsUpdate               = $false
-                SkipPendingFileRename       = $false
-                PendingFileRename           = $false
-                SkipPendingComputerRename   = $false
-                PendingComputerRename       = $false
-                SkipCcmClientSDK            = $true
-                CcmClientSDK                = $false
-                RebootRequired              = $false
+        It 'Should return expected result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $getTargetResourceResult = Get-TargetResource -Name 'Test'
+
+                { $getTargetResourceResult } | Should -Not -Throw
+
+                $getTargetResourceResult.Name | Should -Be 'Test'
+                $getTargetResourceResult.SkipComponentBasedServicing | Should -BeFalse
+                $getTargetResourceResult.ComponentBasedServicing | Should -BeFalse
+                $getTargetResourceResult.SkipWindowsUpdate | Should -BeFalse
+                $getTargetResourceResult.WindowsUpdate | Should -BeFalse
+                $getTargetResourceResult.SkipPendingFileRename | Should -BeFalse
+                $getTargetResourceResult.PendingFileRename | Should -BeFalse
+                $getTargetResourceResult.SkipPendingComputerRename | Should -BeFalse
+                $getTargetResourceResult.PendingComputerRename | Should -BeFalse
+                $getTargetResourceResult.SkipCcmClientSDK | Should -BeTrue
+                $getTargetResourceResult.CcmClientSDK | Should -BeFalse
+                $getTargetResourceResult.RebootRequired | Should -BeFalse
             }
+
+            Should -InvokeVerifiable
         }
+    }
+}
 
-        Describe 'DSC_PendingReboot\Get-TargetResource' {
-            Context 'When all reboots are required' {
-                Mock -CommandName Get-PendingRebootState `
-                    -MockWith $getPendingRebootStateAllRebootsTrue `
-                    -ModuleName 'DSC_PendingReboot' `
-                    -Verifiable
+Describe 'DSC_PendingReboot\Set-TargetResource' -Tag 'Set' {
+    Context 'When a reboot is not required' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-                It 'Should not throw an exception' {
-                    {
-                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testResourceName -Verbose
-                    } | Should -Not -Throw
-                }
-
-                It 'Should return expected result' {
-                    $script:getTargetResourceResult.Name | Should -Be $script:testResourceName
-                    $script:getTargetResourceResult.SkipComponentBasedServicing | Should -BeFalse
-                    $script:getTargetResourceResult.ComponentBasedServicing | Should -BeTrue
-                    $script:getTargetResourceResult.SkipWindowsUpdate | Should -BeFalse
-                    $script:getTargetResourceResult.WindowsUpdate | Should -BeTrue
-                    $script:getTargetResourceResult.SkipPendingFileRename | Should -BeFalse
-                    $script:getTargetResourceResult.PendingFileRename | Should -BeTrue
-                    $script:getTargetResourceResult.SkipPendingComputerRename | Should -BeFalse
-                    $script:getTargetResourceResult.PendingComputerRename | Should -BeTrue
-                    $script:getTargetResourceResult.SkipCcmClientSDK | Should -BeTrue
-                    $script:getTargetResourceResult.CcmClientSDK | Should -BeTrue
-                    $script:getTargetResourceResult.RebootRequired | Should -BeTrue
-                }
-
-                It 'Should call all verifiable mocks' {
-                    Assert-VerifiableMock
-                }
-            }
-
-            Context 'When no reboots are required' {
-                Mock -CommandName Get-PendingRebootState `
-                    -MockWith $getPendingRebootStateAllRebootsFalse `
-                    -ModuleName 'DSC_PendingReboot' `
-                    -Verifiable
-
-                It 'Should not throw an exception' {
-                    {
-                        $script:getTargetResourceResult = Get-TargetResource -Name $script:testResourceName -Verbose
-                    } | Should -Not -Throw
-                }
-
-                It 'Should return expected result' {
-                    $script:getTargetResourceResult.Name | Should -Be $script:testResourceName
-                    $script:getTargetResourceResult.SkipComponentBasedServicing | Should -BeFalse
-                    $script:getTargetResourceResult.ComponentBasedServicing | Should -BeFalse
-                    $script:getTargetResourceResult.SkipWindowsUpdate | Should -BeFalse
-                    $script:getTargetResourceResult.WindowsUpdate | Should -BeFalse
-                    $script:getTargetResourceResult.SkipPendingFileRename | Should -BeFalse
-                    $script:getTargetResourceResult.PendingFileRename | Should -BeFalse
-                    $script:getTargetResourceResult.SkipPendingComputerRename | Should -BeFalse
-                    $script:getTargetResourceResult.PendingComputerRename | Should -BeFalse
-                    $script:getTargetResourceResult.SkipCcmClientSDK | Should -BeTrue
-                    $script:getTargetResourceResult.CcmClientSDK | Should -BeFalse
-                    $script:getTargetResourceResult.RebootRequired | Should -BeFalse
-                }
-
-                It 'Should call all verifiable mocks' {
-                    Assert-VerifiableMock
-                }
-            }
-        }
-
-        Describe 'DSC_PendingReboot\Set-TargetResource' {
-            Context 'When a reboot is not required' {
                 $global:DSCMachineStatus = 0
-
-                Mock -CommandName Get-PendingRebootState `
-                    -MockWith $getPendingRebootStateAllRebootsTrue `
-                    -ModuleName 'DSC_PendingReboot' `
-                    -Verifiable
-
-                It 'Should not throw an exception' {
-                    {
-                        Set-TargetResource @script:testAndSetTargetResourceParameters
-                    } | Should -Not -Throw
-                }
-
-                It 'Should have set DSCMachineStatus to 1' {
-                    $global:DSCMachineStatus | Should -BeExactly 1
-                }
             }
 
-            Context 'When a reboot is not required' {
-                $global:DSCMachineStatus = 0
-
-                Mock -CommandName Get-PendingRebootState `
-                    -MockWith $getPendingRebootStateAllRebootsFalse `
-                    -ModuleName 'DSC_PendingReboot' `
-                    -Verifiable
-
-                It 'Should not throw an exception' {
-                    {
-                        Set-TargetResource @script:testAndSetTargetResourceParameters
-                    } | Should -Not -Throw
+            Mock -CommandName Get-PendingRebootState -MockWith {
+                @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    ComponentBasedServicing     = $true
+                    SkipWindowsUpdate           = $false
+                    WindowsUpdate               = $true
+                    SkipPendingFileRename       = $false
+                    PendingFileRename           = $true
+                    SkipPendingComputerRename   = $false
+                    PendingComputerRename       = $true
+                    SkipCcmClientSDK            = $true
+                    CcmClientSDK                = $true
+                    RebootRequired              = $true
                 }
-
-                It 'Should have not set DSCMachineStatus to 1' {
-                    $global:DSCMachineStatus | Should -BeExactly 0
-                }
-            }
+            }  -Verifiable
         }
 
-        Describe 'DSC_PendingReboot\Test-TargetResource' {
-            Context 'When a reboot is required' {
-                Mock -CommandName Get-PendingRebootState `
-                    -MockWith $getPendingRebootStateAllRebootsTrue `
-                    -ModuleName 'DSC_PendingReboot' `
-                    -Verifiable
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-                It 'Should not throw an exception' {
-                    {
-                        $script:testTargetResourceResult = Test-TargetResource $script:testAndSetTargetResourceParameters
-                    } | Should -Not -Throw
+                $setTargetResourceParameters = @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    SkipWindowsUpdate           = $false
+                    SkipPendingFileRename       = $false
+                    SkipPendingComputerRename   = $false
+                    SkipCcmClientSDK            = $false
                 }
 
-                It 'Should return false' {
-                    $script:testTargetResourceResult | Should -BeFalse
-                }
+                { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
             }
 
-            Context 'When a reboot is not required' {
-                $global:DSCMachineStatus = 0
-
-                Mock -CommandName Get-PendingRebootState `
-                    -MockWith $getPendingRebootStateAllRebootsFalse `
-                    -ModuleName 'DSC_PendingReboot' `
-                    -Verifiable
-
-                It 'Should not throw an exception' {
-                    {
-                        $script:testTargetResourceResult = Test-TargetResource $script:testAndSetTargetResourceParameters
-                    } | Should -Not -Throw
-                }
-
-                It 'Should return true' {
-                    $script:testTargetResourceResult | Should -BeTrue
-                }
-            }
+            Should -InvokeVerifiable
         }
 
-        Describe 'DSC_PendingReboot\Get-PendingRebootHashTable' {
-            BeforeAll {
-                $getChildItemComponentBasedServicingMock = {
-                    @{
-                        Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending'
-                    }
-                }
-                $getChildItemComponentBasedServicingParameterFilter = {
-                    $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\'
-                }
+        It 'Should have set DSCMachineStatus to 1' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-                $getChildItemAutoUpdateMock = {
-                    @{
-                        Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired'
-                    }
-                }
-                $getChildItemAutoUpdateParameterFilter = {
-                    $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\'
-                }
+                $global:DSCMachineStatus | Should -BeExactly 1
+            }
+        }
+    }
 
-                $getItemPropertyFileRenameMock = {
-                    @{
-                        PendingFileRenameOperations = @('File1', 'File2')
-                    }
-                }
-                $getItemPropertyFileRenameParameterFilter = {
-                    $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\'
-                }
+    Context 'When a reboot is not required' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-                $getItemPropertyActiveComputerNameMock = {
-                    @{
-                        ComputerName = 'box2'
-                    }
-                }
-                $getItemPropertyActiveComputerNameFilter = {
-                    $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName'
-                }
-
-                $getItemPropertyComputerNameMock = {
-                    @{
-                        ComputerName = 'box'
-                    }
-                }
-                $getItemPropertyComputerNameFilter = {
-                    $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName'
-                }
-
-                $invokeCimMethodRebootPendingMock = {
-                    New-Object PSObject -Property @{
-                        ReturnValue         = 0
-                        IsHardRebootPending = $false
-                        RebootPending       = $true
-                    }
-                }
-
-                $invokeCimMethodRebootNotPendingMock = {
-                    New-Object PSObject -Property @{
-                        ReturnValue         = 0
-                        IsHardRebootPending = $false
-                        RebootPending       = $false
-                    }
-                }
+                $global:DSCMachineStatus = 0
             }
 
-            Context 'When all reboots are required' {
-                BeforeAll {
-                    Mock -CommandName Get-ChildItem `
-                        -MockWith $getChildItemComponentBasedServicingMock `
-                        -ParameterFilter $getChildItemComponentBasedServicingParameterFilter `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
+            Mock -CommandName Get-PendingRebootState -MockWith {
+                @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    ComponentBasedServicing     = $false
+                    SkipWindowsUpdate           = $false
+                    WindowsUpdate               = $false
+                    SkipPendingFileRename       = $false
+                    PendingFileRename           = $false
+                    SkipPendingComputerRename   = $false
+                    PendingComputerRename       = $false
+                    SkipCcmClientSDK            = $true
+                    CcmClientSDK                = $false
+                    RebootRequired              = $false
+                }
+            }  -Verifiable
+        }
 
-                    Mock -CommandName Get-ChildItem `
-                        -MockWith $getChildItemAutoUpdateMock `
-                        -ParameterFilter $getChildItemAutoUpdateParameterFilter `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-                    Mock -CommandName Get-ItemProperty `
-                        -MockWith $getItemPropertyFileRenameMock `
-                        -ParameterFilter $getItemPropertyFileRenameParameterFilter `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
-
-                    Mock -CommandName Get-ItemProperty `
-                        -MockWith $getItemPropertyActiveComputerNameMock `
-                        -ParameterFilter $getItemPropertyActiveComputerNameFilter `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
-
-                    Mock -CommandName Get-ItemProperty `
-                        -MockWith $getItemPropertyComputerNameMock `
-                        -ParameterFilter $getItemPropertyComputerNameFilter `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
-
-                    Mock -CommandName Invoke-CimMethod `
-                        -MockWith $invokeCimMethodRebootPendingMock `
-                        -ModuleName 'DSC_PendingReboot'
+                $setTargetResourceParameters = @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    SkipWindowsUpdate           = $false
+                    SkipPendingFileRename       = $false
+                    SkipPendingComputerRename   = $false
+                    SkipCcmClientSDK            = $false
                 }
 
-                Context 'When SkipCcmClientSdk is set to False' {
-                    It 'Should not throw an exception' {
-                        {
-                            $getPendingRebootStateParameters = @{
-                                Name             = $script:testResourceName
-                                SkipCcmClientSDK = $false
-                                Verbose          = $true
-                            }
-
-                            $script:getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
-                        } | Should -Not -Throw
-                    }
-
-                    It 'Should return expected result' {
-                        $script:getPendingRebootStateResult.Name | Should -Be $script:testResourceName
-                        $script:getPendingRebootStateResult.ComponentBasedServicing | Should -BeTrue
-                        $script:getPendingRebootStateResult.WindowsUpdate | Should -BeTrue
-                        $script:getPendingRebootStateResult.PendingFileRename | Should -BeTrue
-                        $script:getPendingRebootStateResult.PendingComputerRename | Should -BeTrue
-                        $script:getPendingRebootStateResult.CcmClientSDK | Should -BeTrue
-                    }
-
-                    It 'Should call all verifiable mocks' {
-                        Assert-VerifiableMock
-                        Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 1
-                    }
-                }
-
-                Context 'When SkipCcmClientSdk is set to True' {
-                    It 'Should not throw an exception' {
-                        {
-                            $getPendingRebootStateParameters = @{
-                                Name             = $script:testResourceName
-                                SkipCcmClientSDK = $true
-                                Verbose          = $true
-                            }
-
-                            $script:getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
-                        } | Should -Not -Throw
-                    }
-
-                    It 'Should return expected result' {
-                        $script:getPendingRebootStateResult.Name | Should -Be $script:testResourceName
-                        $script:getPendingRebootStateResult.ComponentBasedServicing | Should -BeTrue
-                        $script:getPendingRebootStateResult.WindowsUpdate | Should -BeTrue
-                        $script:getPendingRebootStateResult.PendingFileRename | Should -BeTrue
-                        $script:getPendingRebootStateResult.PendingComputerRename | Should -BeTrue
-                        $script:getPendingRebootStateResult.CcmClientSDK | Should -BeFalse
-                    }
-
-                    It 'Should call all verifiable mocks' {
-                        Assert-VerifiableMock
-                        Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 0
-                    }
-                }
+                { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
             }
 
-            Context 'When no reboots are required' {
-                BeforeAll {
-                    Mock -CommandName Get-ChildItem `
-                        -ParameterFilter $getChildItemComponentBasedServicingParameterFilter `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
+            Should -InvokeVerifiable
+        }
 
-                    Mock -CommandName Get-ChildItem `
-                        -ParameterFilter $getChildItemAutoUpdateParameterFilter `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
+        It 'Should have not set DSCMachineStatus to 0' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-                    Mock -CommandName Get-ItemProperty `
-                        -MockWith {
-                        @{
-                            PendingFileRenameOperations = @()
-                        }
-                    } `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
-
-                    Mock -CommandName Get-ItemProperty `
-                        -MockWith {
-                        @{ }
-                    } `
-                        -ParameterFilter $getItemPropertyActiveComputerNameFilter `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
-
-                    Mock -CommandName Get-ItemProperty `
-                        -MockWith {
-                        @{ }
-                    } `
-                        -ParameterFilter $getItemPropertyComputerNameFilter `
-                        -ModuleName 'DSC_PendingReboot' `
-                        -Verifiable
-
-                    Mock -CommandName Invoke-CimMethod `
-                        -MockWith $invokeCimMethodRebootNotPendingMock `
-                        -ModuleName 'DSC_PendingReboot'
-                }
-
-                Context 'When SkipCcmClientSdk is set to False' {
-                    It 'Should not throw an exception' {
-                        {
-                            $getPendingRebootStateParameters = @{
-                                Name             = $script:testResourceName
-                                SkipCcmClientSDK = $false
-                                Verbose          = $true
-                            }
-
-                            $script:getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
-                        } | Should -Not -Throw
-                    }
-
-                    It 'Should return expected result' {
-                        $script:getPendingRebootStateResult.Name | Should -Be $script:testResourceName
-                        $script:getPendingRebootStateResult.ComponentBasedServicing | Should -BeFalse
-                        $script:getPendingRebootStateResult.WindowsUpdate | Should -BeFalse
-                        $script:getPendingRebootStateResult.PendingFileRename | Should -BeFalse
-                        $script:getPendingRebootStateResult.PendingComputerRename | Should -BeFalse
-                        $script:getPendingRebootStateResult.CcmClientSDK | Should -BeFalse
-                    }
-
-                    It 'Should call all verifiable mocks' {
-                        Assert-VerifiableMock
-                        Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 1
-                    }
-                }
-
-                Context 'When SkipCcmClientSdk is set to True' {
-                    It 'Should not throw an exception' {
-                        {
-                            $getPendingRebootStateParameters = @{
-                                Name             = $script:testResourceName
-                                SkipCcmClientSDK = $true
-                                Verbose          = $true
-                            }
-
-                            $script:getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
-                        } | Should -Not -Throw
-                    }
-
-                    It 'Should return expected result' {
-                        $script:getPendingRebootStateResult.Name | Should -Be $script:testResourceName
-                        $script:getPendingRebootStateResult.ComponentBasedServicing | Should -BeFalse
-                        $script:getPendingRebootStateResult.WindowsUpdate | Should -BeFalse
-                        $script:getPendingRebootStateResult.PendingFileRename | Should -BeFalse
-                        $script:getPendingRebootStateResult.PendingComputerRename | Should -BeFalse
-                        $script:getPendingRebootStateResult.CcmClientSDK | Should -BeFalse
-                    }
-
-                    It 'Should call all verifiable mocks' {
-                        Assert-VerifiableMock
-                        Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 0
-                    }
-                }
-
-                Describe 'DSC_PendingReboot\Get-PendingRebootState' {
-                    $getPendingRebootStateObject = @{
-                        Name                        = $script:testResourceName
-                        SkipComponentBasedServicing = $false
-                        ComponentBasedServicing     = $false
-                        SkipWindowsUpdate           = $false
-                        WindowsUpdate               = $false
-                        SkipPendingFileRename       = $false
-                        PendingFileRename           = $false
-                        SkipPendingComputerRename   = $false
-                        PendingComputerRename       = $false
-                        SkipCcmClientSDK            = $false
-                        CcmClientSDK                = $false
-                        RebootRequired              = $false
-                    }
-
-                    $getPendingRebootStateParameters = @{
-                        Name                        = $script:testResourceName
-                        SkipComponentBasedServicing = $true
-                        SkipWindowsUpdate           = $true
-                        SkipPendingFileRename       = $true
-                        SkipPendingComputerRename   = $true
-                        SkipCcmClientSDK            = $true
-                        Verbose                     = $true
-                    }
-
-                    Context 'When a reboot is required' {
-                        foreach ($rebootTrigger in $RebootTriggers)
-                        {
-                            Context "When $($rebootTrigger.Description) requires a reboot and is not skipped" {
-                                BeforeAll {
-                                    $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
-                                    $null = $getPendingRebootStateMock.Remove('RebootRequired')
-                                    $getPendingRebootStateMock.$($rebootTrigger.Name) = $true
-                                    $getPendingRebootStateMock."skip$($rebootTrigger.Name)" = $false
-
-                                    Mock -CommandName Get-PendingRebootHashTable `
-                                        -MockWith {
-                                        $getPendingRebootStateMock
-                                    } `
-                                        -ModuleName 'DSC_PendingReboot' `
-                                        -Verifiable
-                                }
-
-                                It 'Should not throw an exception' {
-                                    {
-                                        $getPendingRebootStateParameters = $getPendingRebootStateParameters.Clone()
-                                        $getPendingRebootStateParameters."skip$($rebootTrigger.Name)" = $false
-
-                                        $script:getPendingRebootStateResult = Get-PendingRebootState `
-                                            @getPendingRebootStateParameters
-                                    } | Should -Not -Throw
-                                }
-
-                                It 'Should return reboot required true' {
-                                    $script:getPendingRebootStateResult.RebootRequired | Should -BeTrue
-                                }
-                            }
-                        }
-
-                        foreach ($rebootTrigger in $RebootTriggers)
-                        {
-                            Context "When $($rebootTrigger.Description) requires a reboot but is skipped" {
-                                BeforeAll {
-                                    $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
-                                    $null = $getPendingRebootStateMock.Remove('RebootRequired')
-                                    $getPendingRebootStateMock.$($rebootTrigger.Name) = $true
-                                    $getPendingRebootStateMock."skip$($rebootTrigger.Name)" = $true
-
-                                    Mock -CommandName Get-PendingRebootHashTable `
-                                        -MockWith {
-                                        $getPendingRebootStateMock
-                                    } `
-                                        -ModuleName 'DSC_PendingReboot' `
-                                        -Verifiable
-                                }
-
-                                It 'Should not throw an exception' {
-                                    {
-                                        $getPendingRebootStateParameters = $getPendingRebootStateParameters.Clone()
-                                        $getPendingRebootStateParameters."skip$($rebootTrigger.Name)" = $true
-
-                                        $script:getPendingRebootStateResult = Get-PendingRebootState `
-                                            @getPendingRebootStateParameters
-                                    } | Should -Not -Throw
-                                }
-
-                                It 'Should return reboot required false' {
-                                    $script:getPendingRebootStateResult.RebootRequired | Should -BeFalse
-                                }
-                            }
-                        }
-                    }
-
-                    Context 'When a reboot is not required' {
-                        BeforeAll {
-                            $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
-                            $null = $getPendingRebootStateMock.Remove('RebootRequired')
-
-                            Mock -CommandName Get-PendingRebootHashTable `
-                                -MockWith {
-                                $getPendingRebootStateMock
-                            } `
-                                -ModuleName 'DSC_PendingReboot' `
-                                -Verifiable
-                        }
-
-                        It 'Should not throw an exception' {
-                            {
-                                $getPendingRebootStateParameters = $getPendingRebootStateParameters.Clone()
-
-                                foreach ($rebootTrigger in $RebootTriggers)
-                                {
-                                    $getPendingRebootStateParameters."skip$($rebootTrigger.Name)" = $false
-                                }
-
-                                $script:getPendingRebootStateResult = Get-PendingRebootState `
-                                    @getPendingRebootStateParameters
-                            } | Should -Not -Throw
-                        }
-
-                        It 'Should return reboot required false' {
-                            $script:getPendingRebootStateResult.RebootRequired | Should -BeFalse
-                        }
-                    }
-                }
+                $global:DSCMachineStatus | Should -BeExactly 0
             }
         }
     }
 }
-finally
-{
-    Invoke-TestCleanup
+
+Describe 'DSC_PendingReboot\Test-TargetResource' -Tag 'Test' {
+    Context 'When a reboot is required' {
+        BeforeAll {
+            Mock -CommandName Get-PendingRebootState -MockWith {
+                @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    ComponentBasedServicing     = $true
+                    SkipWindowsUpdate           = $false
+                    WindowsUpdate               = $true
+                    SkipPendingFileRename       = $false
+                    PendingFileRename           = $true
+                    SkipPendingComputerRename   = $false
+                    PendingComputerRename       = $true
+                    SkipCcmClientSDK            = $true
+                    CcmClientSDK                = $true
+                    RebootRequired              = $true
+                }
+            }  -Verifiable
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testTargetResourceParameters = @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    SkipWindowsUpdate           = $false
+                    SkipPendingFileRename       = $false
+                    SkipPendingComputerRename   = $false
+                    SkipCcmClientSDK            = $false
+                }
+
+                $testTargetResourceResult = Test-TargetResource $testTargetResourceParameters
+
+                { $testTargetResourceResult } | Should -Not -Throw
+                $testTargetResourceResult | Should -BeFalse
+            }
+            Should -InvokeVerifiable
+        }
+
+    }
+
+    Context 'When a reboot is not required' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $global:DSCMachineStatus = 0
+            }
+
+            Mock -CommandName Get-PendingRebootState -MockWith {
+                @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    ComponentBasedServicing     = $false
+                    SkipWindowsUpdate           = $false
+                    WindowsUpdate               = $false
+                    SkipPendingFileRename       = $false
+                    PendingFileRename           = $false
+                    SkipPendingComputerRename   = $false
+                    PendingComputerRename       = $false
+                    SkipCcmClientSDK            = $true
+                    CcmClientSDK                = $false
+                    RebootRequired              = $false
+                }
+            }  -Verifiable
+        }
+
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testTargetResourceParameters = @{
+                    Name                        = 'Test'
+                    SkipComponentBasedServicing = $false
+                    SkipWindowsUpdate           = $false
+                    SkipPendingFileRename       = $false
+                    SkipPendingComputerRename   = $false
+                    SkipCcmClientSDK            = $false
+                }
+
+                $testTargetResourceResult = Test-TargetResource @testTargetResourceParameters
+
+                { $testTargetResourceResult } | Should -Not -Throw
+                $testTargetResourceResult | Should -BeTrue
+            }
+
+            Should -InvokeVerifiable
+        }
+
+        It 'Should have not set DSCMachineStatus to 0' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $global:DSCMachineStatus | Should -BeExactly 0
+            }
+        }
+    }
+}
+
+Describe 'DSC_PendingReboot\Get-PendingRebootHashTable' -Tag 'Private' {
+    BeforeAll {
+        $getChildItemComponentBasedServicingMock = {
+            @{
+                Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending'
+            }
+        }
+        $getChildItemComponentBasedServicingParameterFilter = {
+            $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\'
+        }
+
+        $getChildItemAutoUpdateMock = {
+            @{
+                Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired'
+            }
+        }
+        $getChildItemAutoUpdateParameterFilter = {
+            $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\'
+        }
+
+        $getItemPropertyFileRenameMock = {
+            @{
+                PendingFileRenameOperations = @('File1', 'File2')
+            }
+        }
+        $getItemPropertyFileRenameParameterFilter = {
+            $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\'
+        }
+
+        $getItemPropertyActiveComputerNameMock = {
+            @{
+                ComputerName = 'box2'
+            }
+        }
+        $getItemPropertyActiveComputerNameFilter = {
+            $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName'
+        }
+
+        $getItemPropertyComputerNameMock = {
+            @{
+                ComputerName = 'box'
+            }
+        }
+        $getItemPropertyComputerNameFilter = {
+            $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName'
+        }
+
+        $invokeCimMethodRebootPendingMock = {
+            New-Object PSObject -Property @{
+                ReturnValue         = 0
+                IsHardRebootPending = $false
+                RebootPending       = $true
+            }
+        }
+
+        $invokeCimMethodRebootNotPendingMock = {
+            New-Object PSObject -Property @{
+                ReturnValue         = 0
+                IsHardRebootPending = $false
+                RebootPending       = $false
+            }
+        }
+    }
+
+    Context 'When all reboots are required' {
+        BeforeAll {
+            Mock -CommandName Get-ChildItem `
+                -MockWith $getChildItemComponentBasedServicingMock `
+                -ParameterFilter $getChildItemComponentBasedServicingParameterFilter `
+                -Verifiable
+
+            Mock -CommandName Get-ChildItem `
+                -MockWith $getChildItemAutoUpdateMock `
+                -ParameterFilter $getChildItemAutoUpdateParameterFilter `
+                -Verifiable
+
+            Mock -CommandName Get-ItemProperty `
+                -MockWith $getItemPropertyFileRenameMock `
+                -ParameterFilter $getItemPropertyFileRenameParameterFilter `
+                -Verifiable
+
+            Mock -CommandName Get-ItemProperty `
+                -MockWith $getItemPropertyActiveComputerNameMock `
+                -ParameterFilter $getItemPropertyActiveComputerNameFilter `
+                -Verifiable
+
+            Mock -CommandName Get-ItemProperty `
+                -MockWith $getItemPropertyComputerNameMock `
+                -ParameterFilter $getItemPropertyComputerNameFilter `
+                -Verifiable
+
+            Mock -CommandName Invoke-CimMethod `
+                -MockWith $invokeCimMethodRebootPendingMock `
+
+        }
+
+        Context 'When SkipCcmClientSdk is set to $false' {
+            It 'Should return expected result' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $getPendingRebootStateParameters = @{
+                        Name             = 'Test'
+                        SkipCcmClientSDK = $false
+                    }
+
+                    $getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
+
+                    { $getPendingRebootStateResult } | Should -Not -Throw
+
+                    $getPendingRebootStateResult.Name | Should -Be 'Test'
+                    $getPendingRebootStateResult.ComponentBasedServicing | Should -BeTrue
+                    $getPendingRebootStateResult.WindowsUpdate | Should -BeTrue
+                    $getPendingRebootStateResult.PendingFileRename | Should -BeTrue
+                    $getPendingRebootStateResult.PendingComputerRename | Should -BeTrue
+                    $getPendingRebootStateResult.CcmClientSDK | Should -BeTrue
+                }
+
+                Should -InvokeVerifiable
+                Should -Invoke -CommandName Invoke-CimMethod -Exactly -Times 1 -Scope It
+            }
+        }
+
+        Context 'When SkipCcmClientSdk is set to $true' {
+            It 'Should return expected result' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $getPendingRebootStateParameters = @{
+                        Name             = 'Test'
+                        SkipCcmClientSDK = $true
+                    }
+
+                    $getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
+
+                    { $getPendingRebootStateParameters } | Should -Not -Throw
+
+                    $getPendingRebootStateResult.Name | Should -Be 'Test'
+                    $getPendingRebootStateResult.ComponentBasedServicing | Should -BeTrue
+                    $getPendingRebootStateResult.WindowsUpdate | Should -BeTrue
+                    $getPendingRebootStateResult.PendingFileRename | Should -BeTrue
+                    $getPendingRebootStateResult.PendingComputerRename | Should -BeTrue
+                    $getPendingRebootStateResult.CcmClientSDK | Should -BeFalse
+                }
+
+                Should -InvokeVerifiable
+                Should -Invoke -CommandName Invoke-CimMethod -Exactly -Times 0 -Scope It
+            }
+        }
+    }
+
+    Context 'When no reboots are required' {
+        BeforeAll {
+            Mock -CommandName Get-ChildItem `
+                -ParameterFilter $getChildItemComponentBasedServicingParameterFilter `
+                -Verifiable
+
+            Mock -CommandName Get-ChildItem `
+                -ParameterFilter $getChildItemAutoUpdateParameterFilter `
+                -Verifiable
+
+            Mock -CommandName Get-ItemProperty `
+                -MockWith {
+                @{
+                    PendingFileRenameOperations = @()
+                }
+            } -Verifiable
+
+            Mock -CommandName Get-ItemProperty `
+                -MockWith {
+                @{ }
+            } `
+                -ParameterFilter $getItemPropertyActiveComputerNameFilter `
+                -Verifiable
+
+            Mock -CommandName Get-ItemProperty `
+                -MockWith {
+                @{ }
+            } `
+                -ParameterFilter $getItemPropertyComputerNameFilter `
+                -Verifiable
+
+            Mock -CommandName Invoke-CimMethod `
+                -MockWith $invokeCimMethodRebootNotPendingMock `
+
+        }
+
+        Context 'When SkipCcmClientSdk is set to $false' {
+            It 'Should return expected result' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $getPendingRebootStateParameters = @{
+                        Name             = 'Test'
+                        SkipCcmClientSDK = $false
+                    }
+
+                    $getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
+
+                    { $getPendingRebootStateResult } | Should -Not -Throw
+
+                    $getPendingRebootStateResult.Name | Should -Be 'Test'
+                    $getPendingRebootStateResult.ComponentBasedServicing | Should -BeFalse
+                    $getPendingRebootStateResult.WindowsUpdate | Should -BeFalse
+                    $getPendingRebootStateResult.PendingFileRename | Should -BeFalse
+                    $getPendingRebootStateResult.PendingComputerRename | Should -BeFalse
+                    $getPendingRebootStateResult.CcmClientSDK | Should -BeFalse
+                }
+
+                Should -InvokeVerifiable
+                Should -Invoke -CommandName Invoke-CimMethod -Exactly -Times 1
+            }
+        }
+
+        Context 'When SkipCcmClientSdk is set to $true' {
+            It 'Should return expected result' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $getPendingRebootStateParameters = @{
+                        Name             = 'Test'
+                        SkipCcmClientSDK = $true
+                    }
+
+                    $getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
+
+                    { $getPendingRebootStateResult } | Should -Not -Throw
+
+                    $getPendingRebootStateResult.Name | Should -Be 'Test'
+                    $getPendingRebootStateResult.ComponentBasedServicing | Should -BeFalse
+                    $getPendingRebootStateResult.WindowsUpdate | Should -BeFalse
+                    $getPendingRebootStateResult.PendingFileRename | Should -BeFalse
+                    $getPendingRebootStateResult.PendingComputerRename | Should -BeFalse
+                    $getPendingRebootStateResult.CcmClientSDK | Should -BeFalse
+                }
+
+                Should -InvokeVerifiable
+                Should -Invoke -CommandName Invoke-CimMethod -Exactly -Times 0 -Scope It
+            }
+        }
+    }
+}
+
+Describe 'DSC_PendingReboot\Get-PendingRebootState' -Tag 'Private' {
+    BeforeDiscovery {
+        $RebootTriggers = @(
+            @{
+                Name        = 'ComponentBasedServicing'
+                Description = 'Component based servicing'
+            },
+            @{
+                Name        = 'WindowsUpdate'
+                Description = 'Windows Update'
+            },
+            @{
+                Name        = 'PendingFileRename'
+                Description = 'Pending file rename'
+            },
+            @{
+                Name        = 'PendingComputerRename'
+                Description = 'Pending computer rename'
+            },
+            @{
+                Name        = 'CcmClientSDK'
+                Description = 'ConfigMgr'
+            }
+        )
+    }
+
+    BeforeAll {
+        $getPendingRebootStateObject = @{
+            Name                        = 'Test'
+            SkipComponentBasedServicing = $false
+            ComponentBasedServicing     = $false
+            SkipWindowsUpdate           = $false
+            WindowsUpdate               = $false
+            SkipPendingFileRename       = $false
+            PendingFileRename           = $false
+            SkipPendingComputerRename   = $false
+            PendingComputerRename       = $false
+            SkipCcmClientSDK            = $false
+            CcmClientSDK                = $false
+            RebootRequired              = $false
+        }
+
+        InModuleScope -ScriptBlock {
+            Set-StrictMode -Version 1.0
+
+            $script:getPendingRebootStateParameters = @{
+                Name                        = 'Test'
+                SkipComponentBasedServicing = $true
+                SkipWindowsUpdate           = $true
+                SkipPendingFileRename       = $true
+                SkipPendingComputerRename   = $true
+                SkipCcmClientSDK            = $true
+            }
+        }
+    }
+
+    Context 'When a reboot is required' {
+        Context 'When <Description> requires a reboot and is not skipped' -ForEach $RebootTriggers {
+            BeforeAll {
+                $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
+                $null = $getPendingRebootStateMock.Remove('RebootRequired')
+
+                $getPendingRebootStateMock.$Name = $true
+                $getPendingRebootStateMock."skip$Name" = $false
+
+                Mock -CommandName Get-PendingRebootHashTable -MockWith {
+                    $getPendingRebootStateMock
+                }  -Verifiable
+            }
+
+            It 'Should return the correct result' {
+                InModuleScope -Parameters $_ -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $getPendingRebootStateParameters = $getPendingRebootStateParameters.Clone()
+                    $getPendingRebootStateParameters."skip$Name" = $false
+
+                    $getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
+
+                    { $getPendingRebootStateResult } | Should -Not -Throw
+                    $getPendingRebootStateResult.RebootRequired | Should -BeTrue
+                }
+
+                Should -InvokeVerifiable
+            }
+        }
+
+        Context 'When <Description> requires a reboot but is skipped' -ForEach $RebootTriggers {
+            BeforeAll {
+                $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
+                $null = $getPendingRebootStateMock.Remove('RebootRequired')
+
+                $getPendingRebootStateMock.$Name = $true
+                $getPendingRebootStateMock."skip$Name" = $true
+
+                Mock -CommandName Get-PendingRebootHashTable -MockWith {
+                    $getPendingRebootStateMock
+                }  -Verifiable
+            }
+
+            It 'Should return the correct result' {
+                InModuleScope -Parameters $_ -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $getPendingRebootStateParameters = $getPendingRebootStateParameters.Clone()
+                    $getPendingRebootStateParameters."skip$Name" = $true
+
+                    $getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
+
+                    { $getPendingRebootStateResult } | Should -Not -Throw
+
+                    $getPendingRebootStateResult.RebootRequired | Should -BeFalse
+                }
+
+                Should -InvokeVerifiable
+            }
+        }
+    }
+
+    Context 'When a reboot is not required' {
+        BeforeAll {
+            $getPendingRebootStateMock = $getPendingRebootStateObject.Clone()
+            $null = $getPendingRebootStateMock.Remove('RebootRequired')
+
+            Mock -CommandName Get-PendingRebootHashTable -MockWith {
+                $getPendingRebootStateMock
+            }  -Verifiable
+        }
+
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $getPendingRebootStateParameters = $getPendingRebootStateParameters.Clone()
+            }
+        }
+
+        It 'Should return $false for <Name>' -ForEach $RebootTriggers {
+            InModuleScope -Parameters $_ -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $getPendingRebootStateParameters."skip$Name" = $false
+
+                $getPendingRebootStateResult = Get-PendingRebootState @getPendingRebootStateParameters
+
+                { $getPendingRebootStateResult } | Should -Not -Throw
+
+                $getPendingRebootStateResult.RebootRequired | Should -BeFalse
+            }
+
+            Should -InvokeVerifiable
+        }
+    }
 }

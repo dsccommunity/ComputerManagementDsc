@@ -829,7 +829,7 @@ function Register-WindowsEventLogSource
     }
     catch
     {
-        $message = $script:localizedData.RegisterWindowsEventLogSourceFailure -f $LogName, $RegisteredSource
+        $message = $script:localizedData.RegisterWindowsEventLogSourceFailure -f $LogName, $SourceName
         New-InvalidOperationException -Message $message -ErrorRecord $_
     }
 }
@@ -994,5 +994,3 @@ function Set-WindowsEventLogRetentionDays
         New-InvalidArgumentException -Message $message -ArgumentName 'LogMode'
     }
 }
-
-Export-ModuleMember -Function *-TargetResource
