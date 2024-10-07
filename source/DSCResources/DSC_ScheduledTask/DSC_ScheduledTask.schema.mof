@@ -7,9 +7,9 @@ class DSC_ScheduledTask : OMI_BaseResource
     [Write, Description("The path to the .exe for this task.")] string ActionExecutable;
     [Write, Description("The arguments to pass the executable.")] string ActionArguments;
     [Write, Description("The working path to specify for the executable.")] string ActionWorkingPath;
-    [Write, Description("When should the task be executed."), ValueMap{"Once", "Daily", "Weekly", "AtStartup", "AtLogon", "OnEvent"}, Values{"Once", "Daily", "Weekly", "AtStartup", "AtLogon", "OnEvent"}] string ScheduleType;
+    [Write, Description("When should the task be executed."), ValueMap{"Once", "Daily", "Weekly", "AtStartup", "AtLogon", "OnIdle", "OnEvent", "AtCreation", "OnSessionState"}, Values{"Once", "Daily", "Weekly", "AtStartup", "AtLogon", "OnIdle", "OnEvent", "AtCreation", "OnSessionState"}] string ScheduleType;
     [Write, Description("How many units (minutes, hours, days) between each run of this task?")] String RepeatInterval;
-    [Write, Description("The time of day this task should start at - defaults to 12:00 AM. Not valid for AtLogon and AtStartup tasks.")] DateTime StartTime;
+    [Write, Description("The time of day this task should start at, or activate on - defaults to 12:00 AM.")] DateTime StartTime;
     [Write, Description("Enable the scheduled task option to synchronize across time zones. This is enabled by including the timezone offset in the scheduled task trigger. Defaults to false which does not include the timezone offset.")] boolean SynchronizeAcrossTimeZone;
     [Write, Description("Present if the task should exist, Absent if it should be removed."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
     [Write, Description("True if the task should be enabled, false if it should be disabled.")] boolean Enable;
@@ -17,11 +17,12 @@ class DSC_ScheduledTask : OMI_BaseResource
     [Write, Description("The credential this task should execute as. If not specified defaults to running as the local system account."), EmbeddedInstance("MSFT_Credential")] string ExecuteAsCredential;
     [Write, Description("The gMSA (Group Managed Service Account) this task should execute as. Cannot be used in combination with ExecuteAsCredential or BuiltInAccount.")] string ExecuteAsGMSA;
     [Write, Description("Specifies the interval between the days in the schedule. An interval of 1 produces a daily schedule. An interval of 2 produces an every-other day schedule.")] Uint32 DaysInterval;
-    [Write, Description("Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting.")] String RandomDelay;
+    [Write, Description("Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting. Can only be used in combination with ScheduleType Once, Daily and Weekly.")] String RandomDelay;
     [Write, Description("Specifies how long the repetition pattern repeats after the task starts. May be set to `Indefinitely` to specify an indefinite duration.")] String RepetitionDuration;
+    [Write, Description("Indicates that Task Scheduler stops all running tasks at the end of the repetition duration. Defaults to $false.")] Boolean StopAtDurationEnd;
     [Write, Description("Specifies an array of the days of the week on which Task Scheduler runs the task.")] String DaysOfWeek[];
     [Write, Description("Specifies the interval between the weeks in the schedule. An interval of 1 produces a weekly schedule. An interval of 2 produces an every-other week schedule.")] Uint32 WeeksInterval;
-    [Write, Description("Specifies the identifier of the user for a trigger that starts a task when a user logs on.")] String User;
+    [Write, Description("Specifies the identifier of the user for a trigger that starts a task when a user logs on or a session state changes.")] String User;
     [Write, Description("Indicates whether the task is prohibited to run on demand or not. Defaults to $false.")] Boolean DisallowDemandStart;
     [Write, Description("Indicates whether the task is prohibited to be terminated or not. Defaults to $false.")] Boolean DisallowHardTerminate;
     [Write, Description("The task compatibility level. Defaults to Vista."), ValueMap{"AT","V1","Vista","Win7","Win8"}, Values{"AT","V1","Vista","Win7","Win8"}] String Compatibility;
@@ -47,5 +48,6 @@ class DSC_ScheduledTask : OMI_BaseResource
     [Write, Description("Specifies the security logon method that Task Scheduler uses to run the tasks that are associated with the principal."), ValueMap{"Group","Interactive","InteractiveOrPassword","None","Password","S4U","ServiceAccount"}, Values{"Group","Interactive","InteractiveOrPassword","None","Password","S4U","ServiceAccount"}] String LogonType;
     [Write, Description("Specifies the EventSubscription in XML. This can be easily generated using the Windows Eventlog Viewer. For the query schema please check: https://docs.microsoft.com/en-us/windows/desktop/WES/queryschema-schema. Can only be used in combination with ScheduleType OnEvent.")] String EventSubscription;
     [Write, Description("Specifies the EventValueQueries. Receives a hashtable where the key is a property value for an event and the value is an XPath event query. For more detailed syntax check: https://learn.microsoft.com/en-us/windows/win32/taskschd/eventtrigger-valuequeries."), EmbeddedInstance("MSFT_KeyValuePair")] String EventValueQueries[];
-    [Write, Description("Specifies a delay to the start of the trigger. The delay is a static delay before the task is executed. Can only be used in combination with ScheduleType OnEvent.")] String Delay;
+    [Write, Description("Specifies a delay to the start of the trigger. The delay is a static delay before the task is executed. Can only be used in combination with ScheduleType AtLogon, AtStartup, OnEvent, AtCreation and OnSessionState.")] String Delay;
+    [Write, Description("Specifies the kind of session state change that would trigger a task launch. Can only be used in combination with ScheduleType OnSessionState."), ValueMap{"OnConnectionFromLocalComputer", "OnDisconnectFromLocalComputer", "OnConnectionFromRemoteComputer", "OnDisconnectFromRemoteComputer", "OnWorkstationLock", "OnWorkstationUnlock"}, Values{"OnConnectionFromLocalComputer", "OnDisconnectFromLocalComputer", "OnConnectionFromRemoteComputer", "OnDisconnectFromRemoteComputer", "OnWorkstationLock", "OnWorkstationUnlock"}] string StateChange;
 };
