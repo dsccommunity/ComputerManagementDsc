@@ -550,7 +550,7 @@ function Set-TargetResource
                 -ArgumentName EventSubscription
         }
 
-        if ($ScheduleType -eq 'OnSessionState' -and $StateChange -eq 'Undefined')
+        if ($ScheduleType -eq 'OnSessionState' -and [System.String]::IsNullOrEmpty($StateChange))
         {
             New-InvalidArgumentException `
                 -Message ($script:localizedData.OnSessionStateChangeError) `
@@ -776,7 +776,7 @@ function Set-TargetResource
                 $cimTriggerClass = Get-CimClass -ClassName MSFT_TaskSessionStateChangeTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskSessionStateChangeTrigger
                 $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
                 $trigger.Enabled = $true
-                $trigger.StateChange = $StateChange
+                $trigger.StateChange = [UInt32][ScheduledTask.StateChange] $StateChange
                 if (-not [System.String]::IsNullOrWhiteSpace($User))
                 {
                     $trigger.UserId = $User
@@ -2115,7 +2115,7 @@ function Get-CurrentResource
             EventSubscription               = $trigger.Subscription
             EventValueQueries               = ConvertTo-HashtableFromTaskNamedValuePairCollection -Array $trigger.ValueQueries
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
-            StateChange                     = [System.String][ScheduledTask.StateChange] $trigger.StateChange
+            StateChange                     = [System.String][ScheduledTask.StateChange][UInt32] $trigger.StateChange
         }
 
         if (
