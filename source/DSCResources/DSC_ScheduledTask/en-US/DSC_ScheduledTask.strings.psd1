@@ -28,7 +28,7 @@ ConvertFrom-StringData @'
     ConfigureTaskCreationTrigger = Setting up a creation/modification trigger on task {0}.
     ConfigureTaskSessionStateTrigger = Setting up a session state trigger on task {0}.
     IgnoreRandomDelayWithUnsupportedTriggerType = The parameter RandomDelay in task {0} is ignored. A random delay is only supported when the trigger type is set to Once, Daily or Weekly.
-    IgnoreDelayWithUnsupportedTriggerType = The parameter Delay in task {0} is ignored. A random delay is only supported when the trigger type is set to AtLogon, AtStartup, OnEvent, AtCreation or OnSessionState.
+    IgnoreDelayWithUnsupportedTriggerType = The parameter Delay in task {0} is ignored. A delay is only supported when the trigger type is set to AtLogon, AtStartup, OnEvent, AtCreation or OnSessionState.
     SetRepetitionTriggerMessage = Setting repetition trigger settings on task '{0}' in '{1}'.
     RetrieveScheduledTaskMessage = Retrieving the scheduled task '{0}' from '{1}'.
     RemoveScheduledTaskMessage = Removing scheduled task '{0}' from '{1}'.
