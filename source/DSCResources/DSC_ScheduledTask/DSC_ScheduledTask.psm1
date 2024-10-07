@@ -257,7 +257,7 @@ function Get-TargetResource
 
     .PARAMETER StateChange
         The kind of session state change that would trigger a task launch. This parameter is
-        only valid in combination with the OnSessionState Scheduled Type.
+        only valid in combination with the OnSessionState Schedule Type.
 #>
 function Set-TargetResource
 {
@@ -1256,7 +1256,7 @@ function Set-TargetResource
 
     .PARAMETER StateChange
         The kind of session state change that would trigger a task launch. This parameter is
-        only valid in combination with the OnSessionState Scheduled Type.
+        only valid in combination with the OnSessionState Schedule Type.
 #>
 function Test-TargetResource
 {
