@@ -485,6 +485,7 @@ function Set-TargetResource
     [System.TimeSpan] $IdleDuration = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $IdleDuration
     [System.TimeSpan] $ExecutionTimeLimit = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $ExecutionTimeLimit
     [System.TimeSpan] $RestartInterval = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval
+    [System.TimeSpan] $Delay = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $Delay
 
     $currentValues = Get-CurrentResource -TaskName $TaskName -TaskPath $TaskPath
 
@@ -888,7 +889,7 @@ function Set-TargetResource
 
             if ($ScheduleType -in $triggerSupportsDelayProperty)
             {
-                $trigger.Delay = [System.Xml.XmlConvert]::ToString([System.TimeSpan]$Delay)
+                $trigger.Delay = [System.Xml.XmlConvert]::ToString($Delay)
             }
         }
 
