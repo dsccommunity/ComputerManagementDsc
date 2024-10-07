@@ -874,12 +874,12 @@ function Set-TargetResource
                         -Message ($script:localizedData.TriggerUnexpectedTypeError -f $trigger.GetType().FullName)
                 }
             }
-        }
 
-        # If we have some repetition settings, set StopAtDurationEnd to supplied value (not supported in PowerShell cmdlets)
-        if ($repetition)
-        {
-            $repetition.StopAtDurationEnd = $StopAtDurationEnd
+            # If we have some repetition settings, set StopAtDurationEnd to supplied value (not supported in PowerShell cmdlets)
+            if ($repetition)
+            {
+                $repetition.StopAtDurationEnd = $StopAtDurationEnd
+            }
         }
 
         if ($trigger.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance')
