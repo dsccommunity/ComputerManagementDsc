@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ScheduledTask
   - Fixed User parameter to return correct value instead of the current Credential user value.
   - Fixed User parameter to permit use even if LogonType = Group.
-  - Updated RandomDelay login from a blacklist to a whitelist.
+  - Updated RandomDelay logic from a blacklist to a whitelist.
   - Updated Delay parameter logic to reflect other TimeSpan based values.
 - `VirtualMemory` fix incorrect variable name
 - `SmbServerConfiguration` remove errant argument
