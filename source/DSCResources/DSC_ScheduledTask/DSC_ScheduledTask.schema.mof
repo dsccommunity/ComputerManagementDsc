@@ -20,6 +20,7 @@ class DSC_ScheduledTask : OMI_BaseResource
     [Write, Description("Specifies a random amount of time to delay the start time of the trigger. The delay time is a random time between the time the task triggers and the time that you specify in this setting. Can only be used in combination with ScheduleType Once, Daily and Weekly.")] String RandomDelay;
     [Write, Description("Specifies how long the repetition pattern repeats after the task starts. May be set to `Indefinitely` to specify an indefinite duration.")] String RepetitionDuration;
     [Write, Description("Indicates that Task Scheduler stops all running tasks at the end of the repetition duration. Defaults to $false.")] Boolean StopAtDurationEnd;
+    [Write, Description("Specifies the amount of time for the trigger that Task Scheduler is allowed to complete the task.")] String TriggerExecutionTimeLimit;
     [Write, Description("Specifies an array of the days of the week on which Task Scheduler runs the task.")] String DaysOfWeek[];
     [Write, Description("Specifies the interval between the weeks in the schedule. An interval of 1 produces a weekly schedule. An interval of 2 produces an every-other week schedule.")] Uint32 WeeksInterval;
     [Write, Description("Specifies the identifier of the user for a trigger that starts a task when a user logs on or a session state changes.")] String User;

@@ -13,12 +13,13 @@ namespace ScheduledTask
     }
     public enum StateChange
     {
-        OnConnectionFromLocalComputer = 1,
-        OnDisconnectFromLocalComputer = 2,
-        OnConnectionFromRemoteComputer = 3,
-        OnDisconnectFromRemoteComputer = 4,
-        OnWorkstationLock = 5,
-        OnWorkstationUnlock = 6
+        Undefined,
+        OnConnectionFromLocalComputer,
+        OnDisconnectFromLocalComputer,
+        OnConnectionFromRemoteComputer,
+        OnDisconnectFromRemoteComputer,
+        OnWorkstationLock,
+        OnWorkstationUnlock
     }
 }
 '@
@@ -549,11 +550,11 @@ function Set-TargetResource
                 -ArgumentName EventSubscription
         }
 
-        if ($ScheduleType -eq 'OnSessionState' -and [System.String]::IsNullOrEmpty($StateChange))
+        if ($ScheduleType -eq 'OnSessionState' -and $StateChange -eq 'Undefined')
         {
             New-InvalidArgumentException `
                 -Message ($script:localizedData.OnSessionStateChangeError) `
-                -ArgumentName StateChange
+                -ArgumentName $
         }
 
         if ($ExecuteAsGMSA -and ($ExecuteAsCredential -or $BuiltInAccount))
