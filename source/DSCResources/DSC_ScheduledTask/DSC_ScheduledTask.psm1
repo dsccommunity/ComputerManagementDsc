@@ -2109,7 +2109,7 @@ function Get-CurrentResource
             EventSubscription               = $trigger.Subscription
             EventValueQueries               = ConvertTo-HashtableFromTaskNamedValuePairCollection -Array $trigger.ValueQueries
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
-            StateChange                     = [System.String][ScheduledTask.StateChange][UInt32] $trigger.StateChange
+            StateChange                     = [System.String][ScheduledTask.StateChange][UInt32] $trigger.StateChange # Cast to integer first to allow casting to enum with null
         }
 
         if (
