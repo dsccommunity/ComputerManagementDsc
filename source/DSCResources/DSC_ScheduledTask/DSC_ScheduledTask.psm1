@@ -795,7 +795,7 @@ function Set-TargetResource
         {
             if ($PSBoundParameters.ContainsKey('StartTime'))
             {
-                $trigger.StartBoundary = $StartTime
+                $trigger.StartBoundary = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
             }
         }
 
