@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     trigger the task (with ScheduleType = OnSessionState).
   - Added support for StopAtDurationEnd permitting control over the 'Stop all running tasks
     at the end of the repetition duration' feature.
+    Fixes [Issue #168](https://github.com/dsccommunity/ComputerManagementDsc/issues/168).
   - Added support for TriggerExecutionTimeLimit permitting control over per-trigger 'Stop task
     if it runs longer than...' feature.
 
