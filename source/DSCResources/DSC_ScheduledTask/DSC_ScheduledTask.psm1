@@ -802,7 +802,7 @@ function Set-TargetResource
 
         if ($PSBoundParameters.ContainsKey('TriggerExecutionTimeLimit'))
         {
-            $trigger.ExecutionTimeLimit = $TriggerExecutionTimeLimit
+            $trigger.ExecutionTimeLimit = [System.Xml.XmlConvert]::ToString($TriggerExecutionTimeLimit)
         }
 
         if (-not $trigger)
