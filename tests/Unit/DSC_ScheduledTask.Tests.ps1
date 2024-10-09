@@ -1209,12 +1209,13 @@ Describe 'DSC_ScheduledTask' {
     Context 'A scheduled task is enabled without an execution time limit and but has an execution time limit set' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                ScheduleType       = 'Once'
-                RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
-                RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                ExecutionTimeLimit = (New-TimeSpan -Seconds 0).ToString()
-                Enable             = $true
+                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType              = 'Once'
+                RepeatInterval            = (New-TimeSpan -Minutes 15).ToString()
+                RepetitionDuration        = (New-TimeSpan -Hours 8).ToString()
+                ExecutionTimeLimit        = (New-TimeSpan -Seconds 0).ToString()
+                TriggerExecutionTimeLimit = (New-TimeSpan -Seconds 0).ToString()
+                Enable                    = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1229,6 +1230,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers  = @(
                         [pscustomobject] @{
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalSeconds + 60)S"
                             Repetition = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
@@ -1281,15 +1283,16 @@ Describe 'DSC_ScheduledTask' {
     Context 'A scheduled task is enabled and has the correct settings' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                ScheduleType       = 'Once'
-                RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
-                RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                RandomDelay        = (New-TimeSpan -Minutes 4).ToString()
-                IdleWaitTimeout    = (New-TimeSpan -Minutes 5).ToString()
-                IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
-                ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
-                RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
+                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType              = 'Once'
+                RepeatInterval            = (New-TimeSpan -Minutes 15).ToString()
+                RepetitionDuration        = (New-TimeSpan -Hours 8).ToString()
+                RandomDelay               = (New-TimeSpan -Minutes 4).ToString()
+                IdleWaitTimeout           = (New-TimeSpan -Minutes 5).ToString()
+                IdleDuration              = (New-TimeSpan -Minutes 6).ToString()
+                ExecutionTimeLimit        = (New-TimeSpan -Minutes 7).ToString()
+                RestartInterval           = (New-TimeSpan -Minutes 8).ToString()
+                TriggerExecutionTimeLimit = (New-TimeSpan -Minutes 9).ToString()
                 Enable             = $true
             }
 
@@ -1305,6 +1308,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers  = @(
                         [pscustomobject] @{
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.TriggerExecutionTimeLimit).TotalMinutes)M"
                             Repetition  = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
@@ -1542,15 +1546,16 @@ Describe 'DSC_ScheduledTask' {
     Context 'A scheduled task exists and is configured with the wrong interval, duration & random delay parameters' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                ScheduleType       = 'Once'
-                RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
-                RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                RandomDelay        = (New-TimeSpan -Minutes 4).ToString()
-                IdleWaitTimeout    = (New-TimeSpan -Minutes 5).ToString()
-                IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
-                ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
-                RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
+                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType              = 'Once'
+                RepeatInterval            = (New-TimeSpan -Minutes 20).ToString()
+                RepetitionDuration        = (New-TimeSpan -Hours 9).ToString()
+                RandomDelay               = (New-TimeSpan -Minutes 4).ToString()
+                IdleWaitTimeout           = (New-TimeSpan -Minutes 5).ToString()
+                IdleDuration              = (New-TimeSpan -Minutes 6).ToString()
+                ExecutionTimeLimit        = (New-TimeSpan -Minutes 7).ToString()
+                RestartInterval           = (New-TimeSpan -Minutes 8).ToString()
+                TriggerExecutionTimeLimit = (New-TimeSpan -Minutes 9).ToString()
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1565,6 +1570,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers  = @(
                         [pscustomobject] @{
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.TriggerExecutionTimeLimit).TotalMinutes)M"
                             Repetition  = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours + 1)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes + 1)M"
@@ -1622,15 +1628,16 @@ Describe 'DSC_ScheduledTask' {
     Context 'A scheduled task exists and is configured with the wrong idle timeout & idle duration parameters' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                ScheduleType       = 'Once'
-                RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
-                RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                RandomDelay        = (New-TimeSpan -Minutes 4).ToString()
-                IdleWaitTimeout    = (New-TimeSpan -Minutes 5).ToString()
-                IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
-                ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
-                RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
+                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType              = 'Once'
+                RepeatInterval            = (New-TimeSpan -Minutes 20).ToString()
+                RepetitionDuration        = (New-TimeSpan -Hours 9).ToString()
+                RandomDelay               = (New-TimeSpan -Minutes 4).ToString()
+                IdleWaitTimeout           = (New-TimeSpan -Minutes 5).ToString()
+                IdleDuration              = (New-TimeSpan -Minutes 6).ToString()
+                ExecutionTimeLimit        = (New-TimeSpan -Minutes 7).ToString()
+                RestartInterval           = (New-TimeSpan -Minutes 8).ToString()
+                TriggerExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1645,6 +1652,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers  = @(
                         [pscustomobject] @{
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.TriggerExecutionTimeLimit).TotalMinutes)M"
                             Repetition  = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
@@ -2846,6 +2854,119 @@ Describe 'DSC_ScheduledTask' {
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
                 $result.ScheduleType | Should -Be 'AtStartup'
+                $result.Delay | Should -Be $testParameters.Delay
+            }
+        }
+
+        It 'Should return true from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType OnIdle and is in desired state' {
+        BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'OnIdle'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask -MockWith {
+                @{
+                    TaskName = $testParameters.TaskName
+                    TaskPath = $testParameters.TaskPath
+                    Actions  = @(
+                        [pscustomobject] @{
+                            Execute = $testParameters.ActionExecutable
+                        }
+                    )
+                    Triggers = @(
+                        [pscustomobject] @{
+                            StartBoundary = $startTimeString
+                            CimClass      = @{
+                                CimClassName = 'MSFT_TaskIdleTrigger'
+                            }
+                        }
+                    )
+                    Settings = [pscustomobject] @{
+                        Enabled           = $testParameters.Enable
+                    }
+                }
+            }
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Enable | Should -Be $testParameters.Enable
+                $result.Ensure | Should -Be 'Present'
+                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.ScheduleType | Should -BeExactly 'OnIdle'
+            }
+        }
+
+        It 'Should return true from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType AtCreation and is in desired state' {
+        BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'AtCreation'
+                Delay             = '00:01:00'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask -MockWith {
+                @{
+                    TaskName = $testParameters.TaskName
+                    TaskPath = $testParameters.TaskPath
+                    Actions  = @(
+                        [pscustomobject] @{
+                            Execute = $testParameters.ActionExecutable
+                        }
+                    )
+                    Triggers = @(
+                        [pscustomobject] @{
+                            Delay        = 'PT1M'
+                            StartBoundary = $startTimeString
+                            CimClass      = @{
+                                CimClassName = 'MSFT_TaskRegistrationTrigger'
+                            }
+                        }
+                    )
+                    Settings = [pscustomobject] @{
+                        Enabled           = $testParameters.Enable
+                    }
+                }
+            }
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Enable | Should -Be $testParameters.Enable
+                $result.Ensure | Should -Be 'Present'
+                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.ScheduleType | Should -BeExactly 'OnIdle'
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }
