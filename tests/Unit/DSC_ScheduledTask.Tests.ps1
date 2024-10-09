@@ -2875,6 +2875,7 @@ Describe 'DSC_ScheduledTask' {
                 StartTime         = Get-Date -Date $startTimeString
                 ScheduleType      = 'OnIdle'
                 Enable            = $true
+                MultipleInstances = 'StopExisting'
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2896,6 +2897,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Settings = [pscustomobject] @{
                         Enabled           = $testParameters.Enable
+                        MultipleInstances = $testParameters.MultipleInstances
                     }
                 }
             }
@@ -2931,6 +2933,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType      = 'AtCreation'
                 Delay             = '00:01:00'
                 Enable            = $true
+                MultipleInstances = 'StopExisting'
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2953,6 +2956,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Settings = [pscustomobject] @{
                         Enabled           = $testParameters.Enable
+                        MultipleInstances = $testParameters.MultipleInstances
                     }
                 }
             }
