@@ -1637,7 +1637,7 @@ Describe 'DSC_ScheduledTask' {
                 IdleDuration              = (New-TimeSpan -Minutes 6).ToString()
                 ExecutionTimeLimit        = (New-TimeSpan -Minutes 7).ToString()
                 RestartInterval           = (New-TimeSpan -Minutes 8).ToString()
-                TriggerExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
+                TriggerExecutionTimeLimit = (New-TimeSpan -Minutes 9).ToString()
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
