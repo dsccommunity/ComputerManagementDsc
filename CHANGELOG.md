@@ -35,7 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     other than 'Once', 'Daily' and 'Weekly'.
   - Updated Delay parameter to support ScheduleType AtLogon, AtStartup, AtCreation, OnSessionState.
     Fixes [Issue #345](https://github.com/dsccommunity/ComputerManagementDsc/issues/345).
-  - Updated User parameter for use with ScheduleType OnSessionState in addition to OnLogon.
+  - Updated User parameter for use with ScheduleType OnSessionState in addition to AtLogon.
+  - Updated integration tests to ensure resource and configuration names are matching.
 - Converted tests to Pester 5
 - Rename Delete-ADSIObject to Delete-ADSIObject to satisfy HQRM
 
