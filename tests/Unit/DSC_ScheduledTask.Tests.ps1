@@ -3113,6 +3113,7 @@ Describe 'DSC_ScheduledTask' {
                 StartTime         = Get-Date -Date $startTimeString
                 ScheduleType      = 'OnSessionState'
                 StateChange       = 'OnConnectionFromLocalComputer'
+                User              = 'MockedUser'
                 Delay             = '00:01:00'
                 Enable            = $true
                 MultipleInstances = 'StopExisting'
@@ -3130,7 +3131,8 @@ Describe 'DSC_ScheduledTask' {
                     Triggers = @(
                         [pscustomobject] @{
                             Delay        = 'PT1M'
-                            ScheduleType = $testParameters.StateChange
+                            StateChange = $testParameters.StateChange
+                            User        = $testParameters.User
                             StartBoundary = $startTimeString
                             CimClass      = @{
                                 CimClassName = 'MSFT_TaskRegistrationTrigger'
@@ -3154,6 +3156,7 @@ Describe 'DSC_ScheduledTask' {
                 $result.Ensure | Should -Be 'Present'
                 $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
                 $result.ScheduleType | Should -BeExactly 'OnIdle'
+                $result.User | Should -Be $testParameters.User
                 $result.StateChange | Should -Be $testParameters.StateChange
                 $result.Delay | Should -Be $testParameters.Delay
             }
@@ -3175,6 +3178,7 @@ Describe 'DSC_ScheduledTask' {
                 StartTime         = Get-Date -Date $startTimeString
                 ScheduleType      = 'OnSessionState'
                 StateChange       = 'OnConnectionFromLocalComputer'
+                User              = 'MockedUser'
                 Delay             = '00:01:00'
                 Enable            = $true
             }
