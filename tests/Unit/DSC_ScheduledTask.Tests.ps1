@@ -416,6 +416,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType       = 'Once'
                 RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                 RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
+                StopAtDurationEnd  = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -432,6 +433,7 @@ Describe 'DSC_ScheduledTask' {
                             Repetition = @{
                                 Duration = ''
                                 Interval = "PT$(([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes) + 1)M"
+                                StopAtDurationEnd = -not $testParameters.StopAtDurationEnd
                             }
                             CimClass   = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
@@ -484,6 +486,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType       = 'Once'
                 RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                 RepetitionDuration = (New-TimeSpan -Minutes 30).ToString()
+                StopAtDurationEnd  = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -500,6 +503,7 @@ Describe 'DSC_ScheduledTask' {
                             Repetition = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalMinutes)M"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
+                                StopAtDurationEnd = $testParameters.StopAtDurationEnd
                             }
                             CimClass   = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
@@ -542,6 +546,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType       = 'Once'
                 RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
                 RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                StopAtDurationEnd  = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -558,6 +563,7 @@ Describe 'DSC_ScheduledTask' {
                             Repetition = @{
                                 Duration = "PT$(([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours))H"
                                 Interval = "PT$(([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalHours) + 1)H"
+                                StopAtDurationEnd = -not $testParameters.StopAtDurationEnd
                             }
                             CimClass   = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
@@ -610,6 +616,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType       = 'Once'
                 RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
                 RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                StopAtDurationEnd  = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -626,6 +633,7 @@ Describe 'DSC_ScheduledTask' {
                             Repetition = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalHours)H"
+                                StopAtDurationEnd = $testParameters.StopAtDurationEnd
                             }
                             CimClass   = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
@@ -2966,6 +2974,7 @@ Describe 'DSC_ScheduledTask' {
 
     Context 'When a scheduled task is configured with the ScheduleType OnIdle and needs to be created' {
         BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 StartTime         = Get-Date -Date $startTimeString
@@ -3066,6 +3075,7 @@ Describe 'DSC_ScheduledTask' {
 
     Context 'When a scheduled task is configured with the ScheduleType AtCreation and needs to be created' {
         BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 StartTime         = Get-Date -Date $startTimeString
@@ -3130,9 +3140,9 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers = @(
                         [pscustomobject] @{
-                            Delay        = 'PT1M'
-                            StateChange = $testParameters.StateChange
-                            User        = $testParameters.User
+                            Delay         = 'PT1M'
+                            StateChange   = [ScheduledTask.StateChange]$testParameters.StateChange
+                            User          = $testParameters.User
                             StartBoundary = $startTimeString
                             CimClass      = @{
                                 CimClassName = 'MSFT_TaskRegistrationTrigger'
@@ -3173,6 +3183,7 @@ Describe 'DSC_ScheduledTask' {
 
     Context 'When a scheduled task is configured with the ScheduleType OnSessionState and needs to be created' {
         BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 StartTime         = Get-Date -Date $startTimeString
