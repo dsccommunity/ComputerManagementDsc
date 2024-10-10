@@ -2008,6 +2008,12 @@ function Get-CurrentResource
                 $returnScheduleType = 'OnSessionState'
                 break
             }
+
+            default
+            {
+                $returnScheduleType = ''
+                Write-Verbose -Message ($script:localizedData.TriggerTypeUnknown -f $trigger.CimClass.CimClassName)
+            }
         }
 
         Write-Verbose -Message ($script:localizedData.DetectedScheduleTypeMessage -f $returnScheduleType)

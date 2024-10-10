@@ -1912,6 +1912,73 @@ Describe 'DSC_ScheduledTask' {
         }
     }
 
+    Context 'When a built-in scheduled task exists and is enabled, but it should be disabled and the trigger type is not recognized' {
+        BeforeAll {
+            $testParameters = $getTargetResourceParameters + @{
+                Enable = $false
+            }
+
+            Mock -CommandName Get-ScheduledTask -MockWith {
+                @{
+                    TaskName = $testParameters.TaskName
+                    TaskPath = $testParameters.TaskPath
+                    Actions  = [pscustomobject] @{
+                        Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    }
+                    Triggers = [pscustomobject] @{
+                        Repetition = @{
+                            Duration = 'PT15M'
+                            Interval = 'PT15M'
+                        }
+                        CimClass   = @{
+                            CimClassName = 'MSFT_TaskUnknownFutureTrigger'
+                        }
+                    }
+                    Settings = [pscustomobject] @{
+                        Enabled           = $true
+                        MultipleInstances = 'StopExisting'
+                    }
+                }
+            }
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Enable | Should -BeTrue
+                $result.Ensure | Should -Be 'Present'
+                $result.ScheduleType | Should -BeNullOrEmpty
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should disable the scheduled task in the set method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            if ($PSVersionTable.PSEdition -gt [System.Version]'5.0.0.0')
+            {
+                Assert-MockCalled Disable-ScheduledTask -Exactly -Times 1
+            }
+            else
+            {
+                Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
+            }
+        }
+    }
+
     Context 'When a scheduled task with an OnEvent scheduletype is in desired state' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
@@ -1969,7 +2036,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -BeTrue
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'OnEvent'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.EventSubscription | Should -Be $testParameters.EventSubscription
                 Test-DscParameterState -CurrentValues $result.EventValueQueries -DesiredValues $testParameters.EventValueQueries | Should -BeTrue
                 $result.Delay | Should -Be $testParameters.Delay
@@ -2090,7 +2157,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -BeTrue
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'OnEvent'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
             }
         }
 
@@ -2163,7 +2230,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -BeTrue
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'OnEvent'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.RandomDelay | Should -Be '00:00:00'
             }
         }
@@ -2749,7 +2816,7 @@ Describe 'DSC_ScheduledTask' {
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
                 $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
-                $result.ScheduleType | Should -BeExactly 'AtLogon'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }
@@ -2860,7 +2927,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'AtStartup'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }
@@ -2957,7 +3024,7 @@ Describe 'DSC_ScheduledTask' {
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
                 $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
-                $result.ScheduleType | Should -BeExactly 'OnIdle'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
             }
         }
 
@@ -3048,7 +3115,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -BeTrue
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'OnIdle'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
             }
         }
 
@@ -3106,7 +3173,7 @@ Describe 'DSC_ScheduledTask' {
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
                 $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
-                $result.ScheduleType | Should -BeExactly 'AtCreation'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }
@@ -3211,7 +3278,7 @@ Describe 'DSC_ScheduledTask' {
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
                 $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
-                $result.ScheduleType | Should -BeExactly 'OnIdle'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.User | Should -Be $testParameters.User
                 $result.StateChange | Should -Be $testParameters.StateChange
                 $result.Delay | Should -Be $testParameters.Delay
@@ -3320,7 +3387,7 @@ Describe 'DSC_ScheduledTask' {
                 $result.Description | Should -Be 'test description'
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'AtStartup'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }

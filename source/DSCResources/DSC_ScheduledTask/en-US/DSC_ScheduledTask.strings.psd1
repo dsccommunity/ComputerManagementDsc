@@ -2,6 +2,7 @@ ConvertFrom-StringData @'
     GetScheduledTaskMessage = Getting scheduled task '{0}' in '{1}'.
     TaskNotFoundMessage = Task '{0}' not found in '{1}'. Returning an empty task with Ensure = "Absent".
     TaskFoundMessage = Task '{0}' found in '{1}'. Retrieving settings, first action, first trigger and repetition settings.
+    TriggerTypeUnknown = Trigger type '{0}' not recognized.
     DetectedScheduleTypeMessage = Detected schedule type '{0}' for first trigger.
     SetScheduledTaskMessage = Setting scheduled task '{0}' in '{1}'.
     DisablingExistingScheduledTask = Disabling existing scheduled task '{0}' in '{1}'.
