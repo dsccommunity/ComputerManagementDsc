@@ -2781,6 +2781,7 @@ Describe 'DSC_ScheduledTask' {
                 User              = 'MockedUser'
                 Delay             = '00:01:00'
                 Enable            = $true
+                MultipleInstances = 'StopExisting'
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2804,7 +2805,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Settings = [pscustomobject] @{
                         Enabled           = $testParameters.Enable
-                        MultipleInstances = 'StopExisting'
+                        MultipleInstances = $testParameters.MultipleInstances
                     }
                 }
             }
