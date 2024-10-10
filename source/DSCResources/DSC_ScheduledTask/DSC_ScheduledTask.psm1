@@ -554,7 +554,7 @@ function Set-TargetResource
         {
             New-InvalidArgumentException `
                 -Message ($script:localizedData.OnSessionStateChangeError) `
-                -ArgumentName $
+                -ArgumentName StateChange
         }
 
         if ($ExecuteAsGMSA -and ($ExecuteAsCredential -or $BuiltInAccount))
