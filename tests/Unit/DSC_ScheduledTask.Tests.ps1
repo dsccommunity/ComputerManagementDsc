@@ -2778,6 +2778,7 @@ Describe 'DSC_ScheduledTask' {
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 StartTime         = Get-Date -Date $startTimeString
                 ScheduleType      = 'AtLogon'
+                User              = 'MockedUser'
                 Delay             = '00:01:00'
                 Enable            = $true
             }
@@ -2793,6 +2794,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers = @(
                         [pscustomobject] @{
+                            UserId        = $testParameters.User
                             Delay         = 'PT1M'
                             StartBoundary = $startTimeString
                             CimClass      = @{
@@ -2878,7 +2880,7 @@ Describe 'DSC_ScheduledTask' {
             }
 
             Assert-MockCalled -CommandName New-ScheduledTaskTrigger -ParameterFilter {
-                $AtLogon -eq $true -and $User -eq 'MockedUser'
+                $AtLogon -eq $true -and $User -eq $testParameters.User
             } -Exactly -Times 1 -Scope It
 
             Assert-MockCalled -CommandName New-ScheduledTask -Exactly -Times 1 -Scope It
@@ -3255,7 +3257,7 @@ Describe 'DSC_ScheduledTask' {
                         [pscustomobject] @{
                             Delay         = 'PT1M'
                             StateChange   = [ScheduledTask.StateChange]$testParameters.StateChange
-                            User          = $testParameters.User
+                            UserId        = $testParameters.User
                             StartBoundary = $startTimeString
                             CimClass      = @{
                                 CimClassName = 'MSFT_TaskSessionStateChangeTrigger'
