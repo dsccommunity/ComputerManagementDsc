@@ -2867,6 +2867,46 @@ Describe 'DSC_ScheduledTask' {
         }
     }
 
+    Context 'When a scheduled task is configured with the ScheduleType AtStartup and needs to be created' {
+        BeforeAll {
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType     = 'AtStartup'
+                Delay            = '00:01:00'
+                Enable           = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should register the new scheduled task' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+    }
+
     Context 'When a scheduled task is configured with the ScheduleType OnIdle and is in desired state' {
         BeforeAll {
             $startTimeString = '2018-10-01T01:00:00'
@@ -2921,6 +2961,46 @@ Describe 'DSC_ScheduledTask' {
 
                 Test-TargetResource @testParameters | Should -BeTrue
             }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType OnIdle and needs to be created' {
+        BeforeAll {
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'OnIdle'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should register the new scheduled task' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -2981,6 +3061,152 @@ Describe 'DSC_ScheduledTask' {
 
                 Test-TargetResource @testParameters | Should -BeTrue
             }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType AtCreation and needs to be created' {
+        BeforeAll {
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'AtCreation'
+                Delay             = '00:01:00'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should register the new scheduled task' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType OnSessionState and is in desired state' {
+        BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'OnSessionState'
+                StateChange       = 'OnConnectionFromLocalComputer'
+                Delay             = '00:01:00'
+                Enable            = $true
+                MultipleInstances = 'StopExisting'
+            }
+
+            Mock -CommandName Get-ScheduledTask -MockWith {
+                @{
+                    TaskName = $testParameters.TaskName
+                    TaskPath = $testParameters.TaskPath
+                    Actions  = @(
+                        [pscustomobject] @{
+                            Execute = $testParameters.ActionExecutable
+                        }
+                    )
+                    Triggers = @(
+                        [pscustomobject] @{
+                            Delay        = 'PT1M'
+                            ScheduleType = $testParameters.StateChange
+                            StartBoundary = $startTimeString
+                            CimClass      = @{
+                                CimClassName = 'MSFT_TaskRegistrationTrigger'
+                            }
+                        }
+                    )
+                    Settings = [pscustomobject] @{
+                        Enabled           = $testParameters.Enable
+                        MultipleInstances = $testParameters.MultipleInstances
+                    }
+                }
+            }
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Enable | Should -Be $testParameters.Enable
+                $result.Ensure | Should -Be 'Present'
+                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.ScheduleType | Should -BeExactly 'OnIdle'
+                $result.StateChange | Should -Be $testParameters.StateChange
+                $result.Delay | Should -Be $testParameters.Delay
+            }
+        }
+
+        It 'Should return true from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType OnSessionState and needs to be created' {
+        BeforeAll {
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'OnSessionState'
+                StateChange       = 'OnConnectionFromLocalComputer'
+                Delay             = '00:01:00'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should register the new scheduled task' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
