@@ -2735,7 +2735,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Settings = [pscustomobject] @{
                         Enabled           = $testParameters.Enable
-                        MultipleInstances = $testParameters.MultipleInstances
+                        MultipleInstances = 'StopExisting'
                     }
                 }
             }
@@ -2943,7 +2943,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Settings = [pscustomobject] @{
                         Enabled           = $testParameters.Enable
-                        MultipleInstances = $testParameters.MultipleInstances
+                        MultipleInstances = 'StopExisting'
                     }
                 }
             }
@@ -3092,7 +3092,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Settings = [pscustomobject] @{
                         Enabled           = $testParameters.Enable
-                        MultipleInstances = $testParameters.MultipleInstances
+                        MultipleInstances = 'StopExisting'
                     }
                 }
             }
@@ -3197,7 +3197,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Settings = [pscustomobject] @{
                         Enabled           = $testParameters.Enable
-                        MultipleInstances = $testParameters.MultipleInstances
+                        MultipleInstances = 'StopExisting'
                     }
                 }
             }
