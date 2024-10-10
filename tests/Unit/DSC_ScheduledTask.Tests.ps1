@@ -3050,7 +3050,7 @@ Describe 'DSC_ScheduledTask' {
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
                 $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
-                $result.ScheduleType | Should -BeExactly 'OnIdle'
+                $result.ScheduleType | Should -BeExactly 'AtCreation'
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }
