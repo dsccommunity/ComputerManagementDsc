@@ -2713,7 +2713,6 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType      = 'AtLogon'
                 Delay             = '00:01:00'
                 Enable            = $true
-                MultipleInstances = 'StopExisting'
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2923,7 +2922,6 @@ Describe 'DSC_ScheduledTask' {
                 StartTime         = Get-Date -Date $startTimeString
                 ScheduleType      = 'OnIdle'
                 Enable            = $true
-                MultipleInstances = 'StopExisting'
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -3013,6 +3011,56 @@ Describe 'DSC_ScheduledTask' {
         }
     }
 
+    Context 'When a scheduled task with an OnIdle scheduletype is used on combination with unsupported parameters for this scheduletype' {
+        BeforeAll {
+            $testParameters = $getTargetResourceParameters + @{
+                ScheduleType      = 'OnIdle'
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                RandomDelay       = '01:00:00'
+                Delay             = '00:01:00'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask -MockWith {
+                @{
+                    TaskName = $testParameters.TaskName
+                    TaskPath = $testParameters.TaskPath
+                    Actions  = [pscustomobject] @{
+                        Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    }
+                    Triggers = [pscustomobject] @{
+                        CimClass     = @{
+                            CimClassName = 'MSFT_TaskIdleTrigger'
+                        }
+                    }
+                    Settings = [pscustomobject] @{
+                        Enabled           = $true
+                        MultipleInstances = 'StopExisting'
+                    }
+                }
+            }
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Enable | Should -BeTrue
+                $result.Ensure | Should -Be 'Present'
+                $result.ScheduleType | Should -Be 'OnIdle'
+            }
+        }
+
+        It 'Should return true from the test method - ignoring the RandomDelay and Delay parameters' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeTrue
+            }
+        }
+    }
+
     Context 'When a scheduled task is configured with the ScheduleType AtCreation and is in desired state' {
         BeforeAll {
             $startTimeString = '2018-10-01T01:00:00'
@@ -3022,7 +3070,6 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType      = 'AtCreation'
                 Delay             = '00:01:00'
                 Enable            = $true
-                MultipleInstances = 'StopExisting'
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -3126,7 +3173,6 @@ Describe 'DSC_ScheduledTask' {
                 User              = 'MockedUser'
                 Delay             = '00:01:00'
                 Enable            = $true
-                MultipleInstances = 'StopExisting'
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -3145,7 +3191,7 @@ Describe 'DSC_ScheduledTask' {
                             User          = $testParameters.User
                             StartBoundary = $startTimeString
                             CimClass      = @{
-                                CimClassName = 'MSFT_TaskRegistrationTrigger'
+                                CimClassName = 'MSFT_TaskSessionStateChangeTrigger'
                             }
                         }
                     )
