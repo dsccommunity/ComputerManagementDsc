@@ -468,6 +468,16 @@ Describe 'DSC_ScheduledTask' {
             }
         }
 
+        It 'Should update the scheduled task in the set method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+
         It 'Should throw expected exception if repeat duration is less than interval' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
@@ -477,16 +487,6 @@ Describe 'DSC_ScheduledTask' {
                 $testParameters.RepetitionDuration = (New-TimeSpan -Minutes 10).ToString()
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
-        }
-
-        It 'Should update the scheduled task in the set method' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                Set-TargetResource @testParameters
-            }
-
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -609,6 +609,16 @@ Describe 'DSC_ScheduledTask' {
             }
         }
 
+        It 'Should update the scheduled task in the set method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+
         It 'Should throw expected exception if repeat duration is less than interval' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
@@ -618,16 +628,6 @@ Describe 'DSC_ScheduledTask' {
                 $testParameters.RepetitionDuration = (New-TimeSpan -Hours 2).ToString()
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
-        }
-
-        It 'Should update the scheduled task in the set method' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                Set-TargetResource @testParameters
-            }
-
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -747,6 +747,16 @@ Describe 'DSC_ScheduledTask' {
             }
         }
 
+        It 'Should update the scheduled task in the set method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+
         It 'Should throw expected exception if days interval is not defined' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
@@ -756,16 +766,6 @@ Describe 'DSC_ScheduledTask' {
                 $testParameters.Remove('DaysInterval')
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
-        }
-
-        It 'Should update the scheduled task in the set method' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                Set-TargetResource @testParameters
-            }
-
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -3366,6 +3366,16 @@ Describe 'DSC_ScheduledTask' {
             }
         }
 
+        It 'Should register the new scheduled task' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+
         It 'Should throw expected exception if session state change is not defined' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
@@ -3375,16 +3385,6 @@ Describe 'DSC_ScheduledTask' {
                 $testParameters.Remove('StateChange')
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
-        }
-
-        It 'Should register the new scheduled task' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                Set-TargetResource @testParameters
-            }
-
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
