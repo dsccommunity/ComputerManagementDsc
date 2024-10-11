@@ -472,7 +472,9 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.RepetitionDurationLessThanIntervalError -ArgumentName 'RepeatInterval'
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($LocalizedData.RepetitionDurationLessThanIntervalError -f $testParameters.RepetitionDuration, $testParameters.RepeatInterval) `
+                    -ArgumentName 'RepeatInterval'
 
                 $testParameters.RepetitionDuration = (New-TimeSpan -Minutes 10).ToString()
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
@@ -613,7 +615,9 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.RepetitionDurationLessThanIntervalError -ArgumentName 'RepeatInterval'
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($LocalizedData.RepetitionDurationLessThanIntervalError -f $testParameters.RepetitionDuration, $testParameters.RepeatInterval) `
+                    -ArgumentName 'RepeatInterval'
 
                 $testParameters.RepetitionDuration = (New-TimeSpan -Hours 2).ToString()
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
@@ -751,7 +755,9 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.DaysIntervalError -ArgumentName 'DaysInterval'
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($LocalizedData.DaysIntervalError -f $testParameters.DaysInterval) `
+                    -ArgumentName 'DaysInterval'
 
                 $testParameters.Remove('DaysInterval')
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord

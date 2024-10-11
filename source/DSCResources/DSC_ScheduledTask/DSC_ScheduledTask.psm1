@@ -545,9 +545,15 @@ function Set-TargetResource
 
         if ($ScheduleType -eq 'OnEvent' -and -not ([xml]$EventSubscription))
         {
-            New-InvalidArgumentException `
-                -Message ($script:localizedData.OnEventSubscriptionError) `
-                -ArgumentName EventSubscription
+            try
+            {
+                $null = [xml]$EventSubscription
+            }
+            catch {
+                New-InvalidArgumentException `
+                    -Message ($script:localizedData.OnEventSubscriptionError) `
+                    -ArgumentName EventSubscription
+            }
         }
 
         if ($ScheduleType -eq 'OnSessionState' -and [System.String]::IsNullOrEmpty($StateChange))
