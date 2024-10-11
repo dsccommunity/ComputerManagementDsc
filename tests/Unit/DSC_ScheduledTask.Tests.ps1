@@ -3196,7 +3196,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers = @(
                         [pscustomobject] @{
-                            Delay        = 'PT1M'
+                            Delay         = 'PT1M'
                             StartBoundary = $startTimeString
                             CimClass      = @{
                                 CimClassName = 'MSFT_TaskRegistrationTrigger'
