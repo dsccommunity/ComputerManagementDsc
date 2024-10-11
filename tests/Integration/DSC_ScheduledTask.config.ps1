@@ -286,23 +286,23 @@ Configuration ScheduledTaskOnEventAdd
     {
         ScheduledTask ScheduledTaskOnEventAdd
         {
-            TaskName          = 'Test task OnEvent'
-            TaskPath          = '\ComputerManagementDsc\'
-            Ensure            = 'Present'
-            ScheduleType      = 'OnEvent'
-            StartTime         = '2018-10-01T01:00:00'
+            TaskName           = 'Test task OnEvent'
+            TaskPath           = '\ComputerManagementDsc\'
+            Ensure             = 'Present'
+            ScheduleType       = 'OnEvent'
+            StartTime          = '2018-10-01T01:00:00'
             RepeatInterval     = '00:15:00'
             RepetitionDuration = '08:00:00'
             StopAtDurationEnd  = $false
-            ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
-            EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
-            EventValueQueries = @{
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ActionArguments    = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
+            EventSubscription  = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
+            EventValueQueries  = @{
                 "Service" = "Event/EventData/Data[@Name='param1']"
                 "DependsOnService" = "Event/EventData/Data[@Name='param2']"
                 "ErrorCode" = "Event/EventData/Data[@Name='param3']"
             }
-            Delay             = '00:00:30'
+            Delay              = '00:00:30'
         }
     }
 }
@@ -583,23 +583,23 @@ Configuration ScheduledTaskOnEventMod
     {
         ScheduledTask ScheduledTaskOnEventMod
         {
-            TaskName          = 'Test task OnEvent'
-            TaskPath          = '\ComputerManagementDsc\'
-            Ensure            = 'Present'
-            ScheduleType      = 'OnEvent'
-            StartTime         = '2018-10-01T02:00:00'
+            TaskName           = 'Test task OnEvent'
+            TaskPath           = '\ComputerManagementDsc\'
+            Ensure             = 'Present'
+            ScheduleType       = 'OnEvent'
+            StartTime          = '2018-10-01T02:00:00'
             RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
             StopAtDurationEnd  = $true
-            ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
-            EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7002)]]</Select></Query></QueryList>'
-            EventValueQueries = @{
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ActionArguments    = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
+            EventSubscription  = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7002)]]</Select></Query></QueryList>'
+            EventValueQueries  = @{
                 "Service" = "Event/EventData/Data[@Name='param1']"
                 "DependsOnService" = "Event/EventData/Data[@Name='param2']"
                 "ErrorCode" = "Event/EventData/Data[@Name='param3']"
             }
-            Delay             = '00:00:45'
+            Delay              = '00:00:45'
         }
     }
 }
@@ -873,23 +873,23 @@ Configuration ScheduledTaskOnEventDel
     {
         ScheduledTask ScheduledTaskOnEventDel
         {
-            TaskName          = 'Test task OnEvent'
-            TaskPath          = '\ComputerManagementDsc\'
-            Ensure            = 'Absent'
-            ScheduleType      = 'OnEvent'
-            StartTime         = '2018-10-01T02:00:00'
+            TaskName           = 'Test task OnEvent'
+            TaskPath           = '\ComputerManagementDsc\'
+            Ensure             = 'Absent'
+            ScheduleType       = 'OnEvent'
+            StartTime          = '2018-10-01T02:00:00'
             RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
             StopAtDurationEnd  = $true
-            ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments   = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
-            EventSubscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
-            EventValueQueries = @{
+            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ActionArguments    = '-Command Set-Content -Path c:\temp\seeme.txt -Value ''$(Service) $(DependsOnService) $(ErrorCode) Worked!'''
+            EventSubscription  = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''Service Control Manager''] and (Level=2) and (EventID=7001)]]</Select></Query></QueryList>'
+            EventValueQueries  = @{
                 "Service" = "Event/EventData/Data[@Name='param1']"
                 "DependsOnService" = "Event/EventData/Data[@Name='param2']"
                 "ErrorCode" = "Event/EventData/Data[@Name='param3']"
             }
-            Delay             = '00:00:45'
+            Delay              = '00:00:45'
         }
     }
 }
