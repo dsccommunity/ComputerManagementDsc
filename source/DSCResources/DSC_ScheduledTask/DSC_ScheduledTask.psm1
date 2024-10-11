@@ -543,7 +543,7 @@ function Set-TargetResource
                 -ArgumentName DaysOfWeek
         }
 
-        if ($ScheduleType -eq 'OnEvent' -and -not ([xml]$EventSubscription))
+        if ($ScheduleType -eq 'OnEvent')
         {
             try
             {
