@@ -2862,6 +2862,7 @@ Describe 'DSC_ScheduledTask' {
                 $result.Ensure | Should -Be 'Present'
                 $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
                 $result.ScheduleType | Should -Be $testParameters.ScheduleType
+                $result.User | Should -Be $testParameters.User
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }
