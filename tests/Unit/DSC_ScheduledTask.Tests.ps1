@@ -1340,7 +1340,7 @@ Describe 'DSC_ScheduledTask' {
                 ExecutionTimeLimit        = (New-TimeSpan -Minutes 7).ToString()
                 RestartInterval           = (New-TimeSpan -Minutes 8).ToString()
                 TriggerExecutionTimeLimit = (New-TimeSpan -Minutes 9).ToString()
-                Enable             = $true
+                Enable                    = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
