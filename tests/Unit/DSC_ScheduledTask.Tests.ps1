@@ -482,11 +482,11 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
+                $testParameters.RepetitionDuration = (New-TimeSpan -Minutes 10).ToString()
                 $errorRecord = Get-InvalidArgumentRecord `
                     -Message ($LocalizedData.RepetitionDurationLessThanIntervalError -f $testParameters.RepetitionDuration, $testParameters.RepeatInterval) `
                     -ArgumentName 'RepeatInterval'
 
-                $testParameters.RepetitionDuration = (New-TimeSpan -Minutes 10).ToString()
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
@@ -625,11 +625,11 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
+                $testParameters.RepetitionDuration = (New-TimeSpan -Hours 2).ToString()
                 $errorRecord = Get-InvalidArgumentRecord `
                     -Message ($LocalizedData.RepetitionDurationLessThanIntervalError -f $testParameters.RepetitionDuration, $testParameters.RepeatInterval) `
                     -ArgumentName 'RepeatInterval'
 
-                $testParameters.RepetitionDuration = (New-TimeSpan -Hours 2).ToString()
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
@@ -761,15 +761,15 @@ Describe 'DSC_ScheduledTask' {
             Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
 
-        It 'Should throw expected exception if days interval is not defined' {
+        It 'Should throw expected exception if days interval is not greater than zero' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
+                $testParameters.DaysInterval = 0
                 $errorRecord = Get-InvalidArgumentRecord `
                     -Message ($LocalizedData.DaysIntervalError -f $testParameters.DaysInterval) `
                     -ArgumentName 'DaysInterval'
 
-                $testParameters.Remove('DaysInterval')
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
@@ -2287,9 +2287,9 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
+                $testParameters.EventSubscription = 'InvalidXML'
                 $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.OnEventSubscriptionError -ArgumentName 'EventSubscription'
 
-                $testParameters.EventSubscription = 'InvalidXML'
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
@@ -3387,9 +3387,9 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
+                $testParameters.Remove('StateChange')
                 $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.OnSessionStateChangeError -ArgumentName 'StateChange'
 
-                $testParameters.Remove('StateChange')
                 { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }

@@ -549,7 +549,8 @@ function Set-TargetResource
             {
                 $null = [xml]$EventSubscription
             }
-            catch {
+            catch
+            {
                 New-InvalidArgumentException `
                     -Message ($script:localizedData.OnEventSubscriptionError) `
                     -ArgumentName EventSubscription
