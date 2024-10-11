@@ -21,8 +21,8 @@
     .DESCRIPTION
         This example creates a scheduled task called 'Test task Startup' in the folder
         task folder 'MyTasks' that starts a new powershell process when the machine
-        is started up repeating every 15 minutes for 8 hours.
-        The initial task trigger will be delayed for 15 minutes.
+        is started up repeating every 15 minutes for 8 hours. The initial task trigger
+        will be delayed for 15 minutes.
 #>
 Configuration ScheduledTask_CreateScheduledTasksAtStartup_Config
 {
