@@ -482,7 +482,7 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $testParameters.RepetitionDuration = (New-TimeSpan -Minutes 10).ToString()
+                $testParameters.RepetitionDuration = [System.TimeSpan]::Parse($testParameters.RepeatInterval).Subtract((New-TimeSpan -Minutes 1)).ToString()
                 $errorRecord = Get-InvalidArgumentRecord `
                     -Message ($LocalizedData.RepetitionDurationLessThanIntervalError -f $testParameters.RepetitionDuration, $testParameters.RepeatInterval) `
                     -ArgumentName 'RepeatInterval'
@@ -625,7 +625,7 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $testParameters.RepetitionDuration = (New-TimeSpan -Hours 2).ToString()
+                $testParameters.RepetitionDuration = [System.TimeSpan]::Parse($testParameters.RepeatInterval).Subtract((New-TimeSpan -Minutes 1)).ToString()
                 $errorRecord = Get-InvalidArgumentRecord `
                     -Message ($LocalizedData.RepetitionDurationLessThanIntervalError -f $testParameters.RepetitionDuration, $testParameters.RepeatInterval) `
                     -ArgumentName 'RepeatInterval'
