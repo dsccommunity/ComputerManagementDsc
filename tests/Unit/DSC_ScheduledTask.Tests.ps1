@@ -181,7 +181,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -246,7 +246,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Unregister-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Unregister-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -307,11 +307,11 @@ Describe 'DSC_ScheduledTask' {
 
             if ($PSVersionTable.PSVersion -gt [System.Version]'5.0.0.0')
             {
-                Assert-MockCalled Disable-ScheduledTask -Exactly -Times 1
+                Should -Invoke Disable-ScheduledTask -Exactly -Times 1
             }
             else
             {
-                Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
+                Should -Invoke Register-ScheduledTask -Exactly -Times 1
             }
 
         }
@@ -376,7 +376,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Unregister-ScheduledTask -Exactly -Times 1
+            Should -Invoke Unregister-ScheduledTask -Exactly -Times 1
         }
     }
 
@@ -475,7 +475,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
 
         It 'Should throw expected exception if repeat duration is less than interval' {
@@ -618,7 +618,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
 
         It 'Should throw expected exception if repeat duration is less than interval' {
@@ -758,7 +758,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
 
         It 'Should throw expected exception if days interval is not greater than zero' {
@@ -894,7 +894,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -966,7 +966,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1038,7 +1038,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1108,7 +1108,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1178,7 +1178,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1248,7 +1248,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
 
     }
@@ -1323,7 +1323,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1527,7 +1527,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1668,7 +1668,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1750,7 +1750,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1819,7 +1819,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1888,7 +1888,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -2009,11 +2009,11 @@ Describe 'DSC_ScheduledTask' {
 
             if ($PSVersionTable.PSEdition -gt [System.Version]'5.0.0.0')
             {
-                Assert-MockCalled Disable-ScheduledTask -Exactly -Times 1
+                Should -Invoke Disable-ScheduledTask -Exactly -Times 1
             }
             else
             {
-                Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
+                Should -Invoke Register-ScheduledTask -Exactly -Times 1
             }
         }
     }
@@ -2135,7 +2135,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -2215,7 +2215,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 0 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 0 -Scope It
         }
 
         It 'Should call Set-ScheduledTask to update the scheduled task with the new values' {
@@ -2225,7 +2225,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -2314,7 +2314,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
             }
         }
@@ -2327,7 +2327,7 @@ Describe 'DSC_ScheduledTask' {
                 $testParameters.Add('User', 'WrongUser')
 
                 Set-TargetResource @testParameters
-                Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                Should -Invoke -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
                     $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
                 }
             }
@@ -2341,7 +2341,7 @@ Describe 'DSC_ScheduledTask' {
                 $testParameters.Add('LogonType', 'Password')
 
                 Set-TargetResource @testParameters
-                Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                Should -Invoke -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
                     $Inputobject.Principal.LogonType -ieq 'ServiceAccount'
                 }
             }
@@ -2429,7 +2429,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $User -eq $null -and $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
             }
         }
@@ -2441,7 +2441,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Inputobject.Principal.Logontype -eq 'Password'
             }
         }
@@ -2555,7 +2555,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
             }
         }
@@ -2567,7 +2567,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Inputobject.Principal.Logontype -eq 'Password'
             }
         }
@@ -2671,7 +2671,7 @@ Describe 'DSC_ScheduledTask' {
                     Set-TargetResource @testParameters
                 }
 
-                Assert-MockCalled -CommandName Set-ScheduledTask -ParameterFilter {
+                Should -Invoke -CommandName Set-ScheduledTask -ParameterFilter {
                     $InputObject.Triggers[0].StartBoundary -eq $startTimeString
                 }
             }
@@ -2784,7 +2784,7 @@ Describe 'DSC_ScheduledTask' {
                     Set-TargetResource @testParameters
                 }
 
-                Assert-MockCalled -CommandName Set-ScheduledTask -ParameterFilter {
+                Should -Invoke -CommandName Set-ScheduledTask -ParameterFilter {
                     $InputObject.Triggers[0].StartBoundary -eq $startTimeStringWithOffset
                 }
             }
@@ -2923,11 +2923,11 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName New-ScheduledTaskTrigger -ParameterFilter {
+            Should -Invoke -CommandName New-ScheduledTaskTrigger -ParameterFilter {
                 $AtLogon -eq $true -and $User -eq $testParameters.User
             } -Exactly -Times 1 -Scope It
 
-            Assert-MockCalled -CommandName New-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName New-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -3023,7 +3023,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -3120,7 +3120,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -3271,7 +3271,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -3380,7 +3380,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
 
         It 'Should throw expected exception if session state change is not defined' {
