@@ -783,7 +783,7 @@ function Set-TargetResource
                 $cimTriggerClass = Get-CimClass -ClassName MSFT_TaskSessionStateChangeTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskSessionStateChangeTrigger
                 $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
                 $trigger.Enabled = $true
-                $trigger.StateChange = [UInt32][ScheduledTask.StateChange] $StateChange
+                $trigger.StateChange = [ScheduledTask.StateChange] $StateChange
                 if (-not [System.String]::IsNullOrWhiteSpace($User))
                 {
                     $trigger.UserId = $User
