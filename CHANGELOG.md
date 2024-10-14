@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed User parameter to permit use even if LogonType = Group.
   - Updated RandomDelay logic from a blacklist to a whitelist.
   - Updated Delay parameter logic to reflect other TimeSpan based values.
+  - Updated unit tests to use Should -Invoke for Pester 5 compatibility.
 - `VirtualMemory` fix incorrect variable name
 - `SmbServerConfiguration` remove errant argument
 
