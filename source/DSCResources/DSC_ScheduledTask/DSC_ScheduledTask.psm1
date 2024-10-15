@@ -1,7 +1,7 @@
 Add-Type -TypeDefinition @'
 namespace ScheduledTask
 {
-    public enum DaysOfWeek
+    public enum DaysOfWeek : System.UInt16
     {
         Sunday = 1,
         Monday = 2,
@@ -11,15 +11,15 @@ namespace ScheduledTask
         Friday = 32,
         Saturday = 64
     }
-    public enum StateChange
+    public enum StateChange: System.UInt32
     {
-        Undefined,
-        OnConnectionFromLocalComputer,
-        OnDisconnectFromLocalComputer,
-        OnConnectionFromRemoteComputer,
-        OnDisconnectFromRemoteComputer,
-        OnWorkstationLock,
-        OnWorkstationUnlock
+        Undefined = 0,
+        OnConnectionFromLocalComputer = 1,
+        OnDisconnectFromLocalComputer = 2,
+        OnConnectionFromRemoteComputer = 3,
+        OnDisconnectFromRemoteComputer = 4,
+        OnWorkstationLock = 7,
+        OnWorkstationUnlock = 8
     }
 }
 '@
@@ -2122,7 +2122,7 @@ function Get-CurrentResource
             EventSubscription               = $trigger.Subscription
             EventValueQueries               = ConvertTo-HashtableFromTaskNamedValuePairCollection -Array $trigger.ValueQueries
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
-            StateChange                     = [System.String][ScheduledTask.StateChange][UInt32] $trigger.StateChange # Cast to integer first to allow casting to enum with null
+            StateChange                     = [ScheduledTask.StateChange][System.UInt32] $trigger.StateChange # Cast to integer first to allow casting to enum with null
         }
 
         if (
