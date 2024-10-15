@@ -11,7 +11,7 @@ namespace ScheduledTask
         Friday = 32,
         Saturday = 64
     }
-    public enum StateChange: uint
+    public enum StateChange : uint
     {
         Undefined = 0,
         OnConnectionFromLocalComputer = 1,
