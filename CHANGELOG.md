@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- ScheduledTask
+- BREAKING CHANGE: ScheduledTask
   - Fixed User parameter to return correct value instead of the current Credential user value.
   - Fixed User parameter to permit use even if LogonType = Group.
   - Updated RandomDelay logic from a blacklist to a whitelist.
@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- ScheduledTask
+- BREAKING CHANGE: ScheduledTask
   - Allow StartTime to be used to set the 'Activate' setting when adding ScheduleType triggers
     other than 'Once', 'Daily' and 'Weekly'.
   - Updated Delay parameter to support ScheduleType AtLogon, AtStartup, AtCreation, OnSessionState.
