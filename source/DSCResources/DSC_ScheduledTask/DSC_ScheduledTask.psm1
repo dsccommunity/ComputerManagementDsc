@@ -1,7 +1,7 @@
 Add-Type -TypeDefinition @'
 namespace ScheduledTask
 {
-    public enum DaysOfWeek : System.UInt16
+    public enum DaysOfWeek : ushort
     {
         Sunday = 1,
         Monday = 2,
@@ -11,7 +11,7 @@ namespace ScheduledTask
         Friday = 32,
         Saturday = 64
     }
-    public enum StateChange: System.UInt32
+    public enum StateChange: uint
     {
         Undefined = 0,
         OnConnectionFromLocalComputer = 1,
