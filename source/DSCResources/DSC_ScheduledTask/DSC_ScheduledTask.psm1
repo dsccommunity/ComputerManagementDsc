@@ -150,8 +150,8 @@ function Get-TargetResource
         a weekly schedule. An interval of 2 produces an every-other week schedule.
 
     .PARAMETER User
-        Specifies the identifier of the user for a trigger that starts a task when a
-        user logs on or a session state changes.
+        Specifies the identifier of a user that will trigger the task to start. This
+        parameter is only valid in combination with the AtLogon and OnSessionState Schedule Types.
 
     .PARAMETER DisallowDemandStart
         Indicates whether the task is prohibited to run on demand or not. Defaults
@@ -1156,8 +1156,8 @@ function Set-TargetResource
         a weekly schedule. An interval of 2 produces an every-other week schedule.
 
     .PARAMETER User
-        Specifies the identifier of the user for a trigger that starts a task when a
-        user logs on or a session state changes.
+        Specifies the identifier of a user that will trigger the task to start. This
+        parameter is only valid in combination with the AtLogon and OnSessionState Schedule Types.
 
     .PARAMETER DisallowDemandStart
         Indicates whether the task is prohibited to run on demand or not. Defaults
@@ -1599,10 +1599,6 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
     {
-        $user = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
-        $PSBoundParameters.User = $user
-        $currentValues.User = $user
-
         $PSBoundParameters.ExecuteAsCredential = $BuiltInAccount
         $currentValues.ExecuteAsCredential = $BuiltInAccount
 
@@ -1641,10 +1637,6 @@ function Test-TargetResource
     }
     else
     {
-        $user = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
-        $PSBoundParameters.User = $user
-        $currentValues.User = $user
-
         $PSBoundParameters.ExecuteAsCredential = 'SYSTEM'
         $currentValues.ExecuteAsCredential = 'SYSTEM'
 
@@ -2130,9 +2122,6 @@ function Get-CurrentResource
             $result.Principal.UserID -in @('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')
             )
         {
-            $result.User = Set-DomainNameInAccountName `
-                -AccountName $task.Principal.UserId `
-                -DomainName 'NT AUTHORITY'
             $builtInAccount = $task.Principal.UserId
             $result.Add('BuiltInAccount', $builtInAccount)
         }
