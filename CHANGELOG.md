@@ -21,7 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - BREAKING CHANGE: ScheduledTask
-  - Fixed User parameter to return correct value instead of the current Credential user value.
+  - Fixed User parameter to correctly return the user that triggers an AtLogon or OnSessionState
+    Schedule Type, instead of the current value of ExecuteAsCredential. This parameter
+    is only valid when using the AtLogon and OnSessionState Schedule Types.
   - Fixed User parameter to permit use even if LogonType = Group.
   - Updated RandomDelay logic from a blacklist to a whitelist.
   - Updated Delay parameter logic to reflect other TimeSpan based values.
