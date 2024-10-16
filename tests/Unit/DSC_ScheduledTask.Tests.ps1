@@ -181,7 +181,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -246,7 +246,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Unregister-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Unregister-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -307,11 +307,11 @@ Describe 'DSC_ScheduledTask' {
 
             if ($PSVersionTable.PSVersion -gt [System.Version]'5.0.0.0')
             {
-                Assert-MockCalled Disable-ScheduledTask -Exactly -Times 1
+                Should -Invoke Disable-ScheduledTask -Exactly -Times 1
             }
             else
             {
-                Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
+                Should -Invoke Register-ScheduledTask -Exactly -Times 1
             }
 
         }
@@ -376,7 +376,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Unregister-ScheduledTask -Exactly -Times 1
+            Should -Invoke Unregister-ScheduledTask -Exactly -Times 1
         }
     }
 
@@ -416,6 +416,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType       = 'Once'
                 RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                 RepetitionDuration = (New-TimeSpan -Minutes 150).ToString()
+                StopAtDurationEnd  = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -432,6 +433,7 @@ Describe 'DSC_ScheduledTask' {
                             Repetition = @{
                                 Duration = ''
                                 Interval = "PT$(([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes) + 1)M"
+                                StopAtDurationEnd = -not $testParameters.StopAtDurationEnd
                             }
                             CimClass   = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
@@ -473,7 +475,20 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+
+        It 'Should throw expected exception if repeat duration is less than interval' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParameters.RepetitionDuration = [System.TimeSpan]::Parse($testParameters.RepeatInterval).Subtract((New-TimeSpan -Minutes 1)).ToString()
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($LocalizedData.RepetitionDurationLessThanIntervalError -f $testParameters.RepetitionDuration, $testParameters.RepeatInterval) `
+                    -ArgumentName 'RepeatInterval'
+
+                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
+            }
         }
     }
 
@@ -484,6 +499,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType       = 'Once'
                 RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
                 RepetitionDuration = (New-TimeSpan -Minutes 30).ToString()
+                StopAtDurationEnd  = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -500,6 +516,7 @@ Describe 'DSC_ScheduledTask' {
                             Repetition = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalMinutes)M"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
+                                StopAtDurationEnd = $testParameters.StopAtDurationEnd
                             }
                             CimClass   = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
@@ -542,6 +559,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType       = 'Once'
                 RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
                 RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                StopAtDurationEnd  = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -558,6 +576,7 @@ Describe 'DSC_ScheduledTask' {
                             Repetition = @{
                                 Duration = "PT$(([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours))H"
                                 Interval = "PT$(([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalHours) + 1)H"
+                                StopAtDurationEnd = -not $testParameters.StopAtDurationEnd
                             }
                             CimClass   = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
@@ -599,7 +618,20 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+
+        It 'Should throw expected exception if repeat duration is less than interval' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParameters.RepetitionDuration = [System.TimeSpan]::Parse($testParameters.RepeatInterval).Subtract((New-TimeSpan -Minutes 1)).ToString()
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($LocalizedData.RepetitionDurationLessThanIntervalError -f $testParameters.RepetitionDuration, $testParameters.RepeatInterval) `
+                    -ArgumentName 'RepeatInterval'
+
+                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
+            }
         }
     }
 
@@ -610,6 +642,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType       = 'Once'
                 RepeatInterval     = (New-TimeSpan -Hours 4).ToString()
                 RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
+                StopAtDurationEnd  = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -626,6 +659,7 @@ Describe 'DSC_ScheduledTask' {
                             Repetition = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalHours)H"
+                                StopAtDurationEnd = $testParameters.StopAtDurationEnd
                             }
                             CimClass   = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
@@ -724,7 +758,20 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+
+        It 'Should throw expected exception if days interval is not greater than zero' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParameters.DaysInterval = 0
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($LocalizedData.DaysIntervalError -f $testParameters.DaysInterval) `
+                    -ArgumentName 'DaysInterval'
+
+                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
+            }
         }
     }
 
@@ -847,7 +894,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -919,7 +966,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -991,7 +1038,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1061,7 +1108,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1131,7 +1178,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1201,7 +1248,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
 
     }
@@ -1209,12 +1256,13 @@ Describe 'DSC_ScheduledTask' {
     Context 'A scheduled task is enabled without an execution time limit and but has an execution time limit set' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                ScheduleType       = 'Once'
-                RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
-                RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                ExecutionTimeLimit = (New-TimeSpan -Seconds 0).ToString()
-                Enable             = $true
+                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType              = 'Once'
+                RepeatInterval            = (New-TimeSpan -Minutes 15).ToString()
+                RepetitionDuration        = (New-TimeSpan -Hours 8).ToString()
+                ExecutionTimeLimit        = (New-TimeSpan -Seconds 0).ToString()
+                TriggerExecutionTimeLimit = (New-TimeSpan -Seconds 0).ToString()
+                Enable                    = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1229,6 +1277,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers  = @(
                         [pscustomobject] @{
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalSeconds + 60)S"
                             Repetition = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
@@ -1274,23 +1323,24 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
     Context 'A scheduled task is enabled and has the correct settings' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                ScheduleType       = 'Once'
-                RepeatInterval     = (New-TimeSpan -Minutes 15).ToString()
-                RepetitionDuration = (New-TimeSpan -Hours 8).ToString()
-                RandomDelay        = (New-TimeSpan -Minutes 4).ToString()
-                IdleWaitTimeout    = (New-TimeSpan -Minutes 5).ToString()
-                IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
-                ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
-                RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
-                Enable             = $true
+                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType              = 'Once'
+                RepeatInterval            = (New-TimeSpan -Minutes 15).ToString()
+                RepetitionDuration        = (New-TimeSpan -Hours 8).ToString()
+                RandomDelay               = (New-TimeSpan -Minutes 4).ToString()
+                IdleWaitTimeout           = (New-TimeSpan -Minutes 5).ToString()
+                IdleDuration              = (New-TimeSpan -Minutes 6).ToString()
+                ExecutionTimeLimit        = (New-TimeSpan -Minutes 7).ToString()
+                RestartInterval           = (New-TimeSpan -Minutes 8).ToString()
+                TriggerExecutionTimeLimit = (New-TimeSpan -Minutes 9).ToString()
+                Enable                    = $true
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1305,6 +1355,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers  = @(
                         [pscustomobject] @{
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.TriggerExecutionTimeLimit).TotalMinutes)M"
                             Repetition  = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
@@ -1476,7 +1527,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1542,15 +1593,16 @@ Describe 'DSC_ScheduledTask' {
     Context 'A scheduled task exists and is configured with the wrong interval, duration & random delay parameters' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                ScheduleType       = 'Once'
-                RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
-                RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                RandomDelay        = (New-TimeSpan -Minutes 4).ToString()
-                IdleWaitTimeout    = (New-TimeSpan -Minutes 5).ToString()
-                IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
-                ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
-                RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
+                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType              = 'Once'
+                RepeatInterval            = (New-TimeSpan -Minutes 20).ToString()
+                RepetitionDuration        = (New-TimeSpan -Hours 9).ToString()
+                RandomDelay               = (New-TimeSpan -Minutes 4).ToString()
+                IdleWaitTimeout           = (New-TimeSpan -Minutes 5).ToString()
+                IdleDuration              = (New-TimeSpan -Minutes 6).ToString()
+                ExecutionTimeLimit        = (New-TimeSpan -Minutes 7).ToString()
+                RestartInterval           = (New-TimeSpan -Minutes 8).ToString()
+                TriggerExecutionTimeLimit = (New-TimeSpan -Minutes 9).ToString()
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1565,6 +1617,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers  = @(
                         [pscustomobject] @{
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.TriggerExecutionTimeLimit).TotalMinutes)M"
                             Repetition  = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours + 1)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes + 1)M"
@@ -1615,22 +1668,23 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
     Context 'A scheduled task exists and is configured with the wrong idle timeout & idle duration parameters' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                ScheduleType       = 'Once'
-                RepeatInterval     = (New-TimeSpan -Minutes 20).ToString()
-                RepetitionDuration = (New-TimeSpan -Hours 9).ToString()
-                RandomDelay        = (New-TimeSpan -Minutes 4).ToString()
-                IdleWaitTimeout    = (New-TimeSpan -Minutes 5).ToString()
-                IdleDuration       = (New-TimeSpan -Minutes 6).ToString()
-                ExecutionTimeLimit = (New-TimeSpan -Minutes 7).ToString()
-                RestartInterval    = (New-TimeSpan -Minutes 8).ToString()
+                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType              = 'Once'
+                RepeatInterval            = (New-TimeSpan -Minutes 20).ToString()
+                RepetitionDuration        = (New-TimeSpan -Hours 9).ToString()
+                RandomDelay               = (New-TimeSpan -Minutes 4).ToString()
+                IdleWaitTimeout           = (New-TimeSpan -Minutes 5).ToString()
+                IdleDuration              = (New-TimeSpan -Minutes 6).ToString()
+                ExecutionTimeLimit        = (New-TimeSpan -Minutes 7).ToString()
+                RestartInterval           = (New-TimeSpan -Minutes 8).ToString()
+                TriggerExecutionTimeLimit = (New-TimeSpan -Minutes 9).ToString()
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -1645,6 +1699,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers  = @(
                         [pscustomobject] @{
+                            ExecutionTimeLimit = "PT$([System.TimeSpan]::Parse($testParameters.TriggerExecutionTimeLimit).TotalMinutes)M"
                             Repetition  = @{
                                 Duration = "PT$([System.TimeSpan]::Parse($testParameters.RepetitionDuration).TotalHours)H"
                                 Interval = "PT$([System.TimeSpan]::Parse($testParameters.RepeatInterval).TotalMinutes)M"
@@ -1695,7 +1750,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1764,7 +1819,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1833,7 +1888,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -1915,7 +1970,7 @@ Describe 'DSC_ScheduledTask' {
                             Interval = 'PT15M'
                         }
                         CimClass   = @{
-                            CimClassName = 'MSFT_TaskSessionStateChangeTrigger'
+                            CimClassName = 'MSFT_TaskUnknownFutureTrigger'
                         }
                     }
                     Settings = [pscustomobject] @{
@@ -1954,11 +2009,11 @@ Describe 'DSC_ScheduledTask' {
 
             if ($PSVersionTable.PSEdition -gt [System.Version]'5.0.0.0')
             {
-                Assert-MockCalled Disable-ScheduledTask -Exactly -Times 1
+                Should -Invoke Disable-ScheduledTask -Exactly -Times 1
             }
             else
             {
-                Assert-MockCalled Register-ScheduledTask -Exactly -Times 1
+                Should -Invoke Register-ScheduledTask -Exactly -Times 1
             }
         }
     }
@@ -2020,7 +2075,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -BeTrue
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'OnEvent'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.EventSubscription | Should -Be $testParameters.EventSubscription
                 Test-DscParameterState -CurrentValues $result.EventValueQueries -DesiredValues $testParameters.EventValueQueries | Should -BeTrue
                 $result.Delay | Should -Be $testParameters.Delay
@@ -2080,7 +2135,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -2141,7 +2196,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -BeTrue
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'OnEvent'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
             }
         }
 
@@ -2160,7 +2215,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Register-ScheduledTask -Exactly -Times 0 -Scope It
+            Should -Invoke Register-ScheduledTask -Exactly -Times 0 -Scope It
         }
 
         It 'Should call Set-ScheduledTask to update the scheduled task with the new values' {
@@ -2170,7 +2225,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled Set-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke Set-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -2214,7 +2269,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -BeTrue
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'OnEvent'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.RandomDelay | Should -Be '00:00:00'
             }
         }
@@ -2233,8 +2288,9 @@ Describe 'DSC_ScheduledTask' {
                 Set-StrictMode -Version 1.0
 
                 $testParameters.EventSubscription = 'InvalidXML'
+                $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.OnEventSubscriptionError -ArgumentName 'EventSubscription'
 
-                { Set-TargetResource @testParameters } | Should -Throw
+                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
     }
@@ -2258,25 +2314,10 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
             }
         }
-
-
-        It 'Should Disregard User and Set User to the BuiltInAccount' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $testParameters.Add('User', 'WrongUser')
-
-                Set-TargetResource @testParameters
-                Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
-                    $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
-                }
-            }
-        }
-
 
         It 'Should overwrite LogonType to "ServiceAccount"' {
             InModuleScope -ScriptBlock {
@@ -2285,7 +2326,7 @@ Describe 'DSC_ScheduledTask' {
                 $testParameters.Add('LogonType', 'Password')
 
                 Set-TargetResource @testParameters
-                Assert-MockCalled -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
+                Should -Invoke -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
                     $Inputobject.Principal.LogonType -ieq 'ServiceAccount'
                 }
             }
@@ -2373,7 +2414,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $User -eq $null -and $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
             }
         }
@@ -2385,7 +2426,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Register-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Inputobject.Principal.Logontype -eq 'Password'
             }
         }
@@ -2499,7 +2540,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Inputobject.Principal.UserId -eq $testParameters.ExecuteAsGMSA
             }
         }
@@ -2511,7 +2552,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Set-ScheduledTask -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Inputobject.Principal.Logontype -eq 'Password'
             }
         }
@@ -2615,7 +2656,7 @@ Describe 'DSC_ScheduledTask' {
                     Set-TargetResource @testParameters
                 }
 
-                Assert-MockCalled -CommandName Set-ScheduledTask -ParameterFilter {
+                Should -Invoke -CommandName Set-ScheduledTask -ParameterFilter {
                     $InputObject.Triggers[0].StartBoundary -eq $startTimeString
                 }
             }
@@ -2728,7 +2769,7 @@ Describe 'DSC_ScheduledTask' {
                     Set-TargetResource @testParameters
                 }
 
-                Assert-MockCalled -CommandName Set-ScheduledTask -ParameterFilter {
+                Should -Invoke -CommandName Set-ScheduledTask -ParameterFilter {
                     $InputObject.Triggers[0].StartBoundary -eq $startTimeStringWithOffset
                 }
             }
@@ -2750,7 +2791,9 @@ Describe 'DSC_ScheduledTask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                { Set-TargetResource @testParamers } | Should -Throw
+                $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.SynchronizeAcrossTimeZoneInvalidScheduleType -ArgumentName 'SynchronizeAcrossTimeZone'
+
+                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
     }
@@ -2762,6 +2805,7 @@ Describe 'DSC_ScheduledTask' {
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 StartTime         = Get-Date -Date $startTimeString
                 ScheduleType      = 'AtLogon'
+                User              = 'MockedDomain\MockedUser'
                 Delay             = '00:01:00'
                 Enable            = $true
                 MultipleInstances = 'StopExisting'
@@ -2778,6 +2822,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers = @(
                         [pscustomobject] @{
+                            UserId        = $testParameters.User
                             Delay         = 'PT1M'
                             StartBoundary = $startTimeString
                             CimClass      = @{
@@ -2801,7 +2846,8 @@ Describe 'DSC_ScheduledTask' {
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
                 $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
-                $result.ScheduleType | Should -BeExactly 'AtLogon'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
+                $result.User | Should -Be $testParameters.User
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }
@@ -2819,7 +2865,7 @@ Describe 'DSC_ScheduledTask' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
                 ScheduleType     = 'AtLogon'
-                User             = 'MockedUser'
+                User             = 'MockedDomain\MockedUser'
                 ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 LogonType        = 'Password'
             }
@@ -2862,11 +2908,11 @@ Describe 'DSC_ScheduledTask' {
                 Set-TargetResource @testParameters
             }
 
-            Assert-MockCalled -CommandName New-ScheduledTaskTrigger -ParameterFilter {
-                $AtLogon -eq $true -and $User -eq 'MockedUser'
+            Should -Invoke -CommandName New-ScheduledTaskTrigger -ParameterFilter {
+                $AtLogon -eq $true -and $User -eq $testParameters.User
             } -Exactly -Times 1 -Scope It
 
-            Assert-MockCalled -CommandName New-ScheduledTask -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName New-ScheduledTask -Exactly -Times 1 -Scope It
         }
     }
 
@@ -2912,7 +2958,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'AtStartup'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }
@@ -2922,6 +2968,414 @@ Describe 'DSC_ScheduledTask' {
                 Set-StrictMode -Version 1.0
 
                 Test-TargetResource @testParameters | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType AtStartup and needs to be created' {
+        BeforeAll {
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                ScheduleType     = 'AtStartup'
+                Delay            = '00:01:00'
+                Enable           = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should register the new scheduled task' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType OnIdle and is in desired state' {
+        BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'OnIdle'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask -MockWith {
+                @{
+                    TaskName = $testParameters.TaskName
+                    TaskPath = $testParameters.TaskPath
+                    Actions  = @(
+                        [pscustomobject] @{
+                            Execute = $testParameters.ActionExecutable
+                        }
+                    )
+                    Triggers = @(
+                        [pscustomobject] @{
+                            StartBoundary = $startTimeString
+                            CimClass      = @{
+                                CimClassName = 'MSFT_TaskIdleTrigger'
+                            }
+                        }
+                    )
+                    Settings = [pscustomobject] @{
+                        Enabled           = $testParameters.Enable
+                        MultipleInstances = 'StopExisting'
+                    }
+                }
+            }
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Enable | Should -Be $testParameters.Enable
+                $result.Ensure | Should -Be 'Present'
+                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
+            }
+        }
+
+        It 'Should return true from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType OnIdle and needs to be created' {
+        BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'OnIdle'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should register the new scheduled task' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When a scheduled task with an OnIdle scheduletype is used on combination with unsupported parameters for this scheduletype' {
+        BeforeAll {
+            $testParameters = $getTargetResourceParameters + @{
+                ScheduleType      = 'OnIdle'
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                RandomDelay       = '01:00:00'
+                Delay             = '00:01:00'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask -MockWith {
+                @{
+                    TaskName = $testParameters.TaskName
+                    TaskPath = $testParameters.TaskPath
+                    Actions  = [pscustomobject] @{
+                        Execute = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                    }
+                    Triggers = [pscustomobject] @{
+                        CimClass     = @{
+                            CimClassName = 'MSFT_TaskIdleTrigger'
+                        }
+                    }
+                    Settings = [pscustomobject] @{
+                        Enabled           = $true
+                        MultipleInstances = 'StopExisting'
+                    }
+                }
+            }
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Enable | Should -BeTrue
+                $result.Ensure | Should -Be 'Present'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
+            }
+        }
+
+        It 'Should return true from the test method - ignoring the RandomDelay and Delay parameters' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType AtCreation and is in desired state' {
+        BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'AtCreation'
+                Delay             = '00:01:00'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask -MockWith {
+                @{
+                    TaskName = $testParameters.TaskName
+                    TaskPath = $testParameters.TaskPath
+                    Actions  = @(
+                        [pscustomobject] @{
+                            Execute = $testParameters.ActionExecutable
+                        }
+                    )
+                    Triggers = @(
+                        [pscustomobject] @{
+                            Delay         = 'PT1M'
+                            StartBoundary = $startTimeString
+                            CimClass      = @{
+                                CimClassName = 'MSFT_TaskRegistrationTrigger'
+                            }
+                        }
+                    )
+                    Settings = [pscustomobject] @{
+                        Enabled           = $testParameters.Enable
+                        MultipleInstances = 'StopExisting'
+                    }
+                }
+            }
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Enable | Should -Be $testParameters.Enable
+                $result.Ensure | Should -Be 'Present'
+                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
+                $result.Delay | Should -Be $testParameters.Delay
+            }
+        }
+
+        It 'Should return true from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType AtCreation and needs to be created' {
+        BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'AtCreation'
+                Delay             = '00:01:00'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should register the new scheduled task' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType OnSessionState and is in desired state' {
+        BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'OnSessionState'
+                StateChange       = 'OnConnectionFromLocalComputer'
+                User              = 'MockedDomain\MockedUser'
+                Delay             = '00:01:00'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask -MockWith {
+                @{
+                    TaskName = $testParameters.TaskName
+                    TaskPath = $testParameters.TaskPath
+                    Actions  = @(
+                        [pscustomobject] @{
+                            Execute = $testParameters.ActionExecutable
+                        }
+                    )
+                    Triggers = @(
+                        [pscustomobject] @{
+                            Delay         = 'PT1M'
+                            StateChange   = [ScheduledTask.StateChange]$testParameters.StateChange
+                            UserId        = $testParameters.User
+                            StartBoundary = $startTimeString
+                            CimClass      = @{
+                                CimClassName = 'MSFT_TaskSessionStateChangeTrigger'
+                            }
+                        }
+                    )
+                    Settings = [pscustomobject] @{
+                        Enabled           = $testParameters.Enable
+                        MultipleInstances = 'StopExisting'
+                    }
+                }
+            }
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Enable | Should -Be $testParameters.Enable
+                $result.Ensure | Should -Be 'Present'
+                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
+                $result.User | Should -Be $testParameters.User
+                $result.StateChange | Should -Be $testParameters.StateChange
+                $result.Delay | Should -Be $testParameters.Delay
+            }
+        }
+
+        It 'Should return true from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a scheduled task is configured with the ScheduleType OnSessionState and needs to be created' {
+        BeforeAll {
+            $startTimeString = '2018-10-01T01:00:00'
+            $testParameters = $getTargetResourceParameters + @{
+                ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+                StartTime         = Get-Date -Date $startTimeString
+                ScheduleType      = 'OnSessionState'
+                StateChange       = 'OnConnectionFromLocalComputer'
+                User              = 'MockedDomain\MockedUser'
+                Delay             = '00:01:00'
+                Enable            = $true
+            }
+
+            Mock -CommandName Get-ScheduledTask
+        }
+
+        It 'Should return the correct values from Get-TargetResource' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $result = Get-TargetResource @getTargetResourceParameters
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-TargetResource @testParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should register the new scheduled task' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Set-TargetResource @testParameters
+            }
+
+            Should -Invoke Register-ScheduledTask -Exactly -Times 1 -Scope It
+        }
+
+        It 'Should throw expected exception if session state change is not defined' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParameters.Remove('StateChange')
+                $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.OnSessionStateChangeError -ArgumentName 'StateChange'
+
+                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
     }
@@ -2975,7 +3429,7 @@ Describe 'DSC_ScheduledTask' {
                 $result.Description | Should -Be 'test description'
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
-                $result.ScheduleType | Should -Be 'AtStartup'
+                $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.Delay | Should -Be $testParameters.Delay
             }
         }

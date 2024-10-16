@@ -23,7 +23,7 @@
         root folder. The task is delayed by exactly 30 seconds each time. The task will run when
         an error event 7001 of source Service Control Manager is generated in the system log.
         When a service crashes, it waits for 30 seconds and then starts a new PowerShell instance,
-        in which the file c:\temp\seeme.txt get's created with the value 'Worked!'
+        in which the file c:\temp\seeme.txt gets created with the value 'Worked!'
 #>
 Configuration ScheduledTask_CreateScheduledTasksOnEvent_Config
 {

@@ -95,8 +95,20 @@ Describe "$($script:dscResourceName)_Integration" {
                 Value = 'ScheduledTaskExecuteAsGroup'
             }
             @{
+                Name  = 'OnIdle'
+                Value = 'ScheduledTaskOnIdle'
+            }
+            @{
                 Name  = 'OnEvent'
                 Value = 'ScheduledTaskOnEvent'
+            }
+            @{
+                Name  = 'AtCreation'
+                Value = 'ScheduledTaskAtCreation'
+            }
+            @{
+                Name  = 'OnSessionState'
+                Value = 'ScheduledTaskOnSessionState'
             }
             @{
                 Name  = 'BuiltInAccount'
