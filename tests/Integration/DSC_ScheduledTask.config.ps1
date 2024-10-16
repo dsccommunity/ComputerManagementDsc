@@ -185,7 +185,7 @@ Configuration ScheduledTaskLogonAdd
             RepeatInterval     = '00:15:00'
             RepetitionDuration = '08:00:00'
             StopAtDurationEnd  = $false
-            User               = "$ENV:USERNAME"
+            User               = "$ENV:COMPUTERNAME\$ENV:USERNAME"
             Delay              = '00:00:30'
         }
     }
@@ -344,7 +344,7 @@ Configuration ScheduledTaskOnSessionStateAdd
             RepeatInterval     = '00:15:00'
             RepetitionDuration = '08:00:00'
             StopAtDurationEnd  = $false
-            User               = "$ENV:USERNAME"
+            User               = "$ENV:COMPUTERNAME\$ENV:USERNAME"
             StateChange        = 'OnConnectionFromLocalComputer'
             Delay              = '00:00:30'
         }
@@ -499,7 +499,7 @@ Configuration ScheduledTaskStartupMod
             TaskPath           = '\ComputerManagementDsc\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType       = 'AtLogon'
-            User               = "$ENV:USERNAME"
+            User               = "$ENV:COMPUTERNAME\$ENV:USERNAME"
             StartTime          = '2018-10-01T02:00:00'
             RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
@@ -641,7 +641,7 @@ Configuration ScheduledTaskOnSessionStateMod
             RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
             StopAtDurationEnd  = $true
-            User               = "$ENV:USERNAME"
+            User               = "$ENV:COMPUTERNAME\$ENV:USERNAME"
             StateChange        = 'OnDisconnectFromLocalComputer'
             Delay              = '00:00:45'
         }
@@ -799,7 +799,7 @@ Configuration ScheduledTaskStartupDel
             TaskPath           = '\ComputerManagementDsc\'
             ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType       = 'AtLogon'
-            User               = "$ENV:USERNAME"
+            User               = "$ENV:COMPUTERNAME\$ENV:USERNAME"
             RepeatInterval     = '00:10:00'
             StartTime          = '2018-10-01T02:00:00'
             RepetitionDuration = '08:00:00'
@@ -932,7 +932,7 @@ Configuration ScheduledTaskOnSessionStateDel
             RepeatInterval     = '00:10:00'
             RepetitionDuration = '08:00:00'
             StopAtDurationEnd  = $true
-            User               = "$ENV:USERNAME"
+            User               = "$ENV:COMPUTERNAME\$ENV:USERNAME"
             StateChange        = 'OnDisconnectFromLocalComputer'
             Delay              = '00:00:45'
             Ensure             = 'Absent'

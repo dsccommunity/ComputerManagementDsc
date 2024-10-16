@@ -22,7 +22,8 @@
         This example creates a scheduled task called 'Test task Session State' in
         the folder task folder 'MyTasks' that starts a new powershell process when the
         session state changes. The task triggers only on connection by the specific user
-        'UserName' to the local computer. The initial task trigger will be delayed for 10 minutes.
+        'Domain\UserName' to the local computer. The initial task trigger will be delayed
+        for 10 minutes.
 #>
 Configuration ScheduledTask_CreateScheduledTasksOnSessionState_Config
 {
@@ -37,7 +38,7 @@ Configuration ScheduledTask_CreateScheduledTasksOnSessionState_Config
             Ensure = 'Present'
             ScheduleType = 'OnSessionState'
             ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            User = 'UserName'
+            User = 'Domain\UserName'
             StateChange = 'OnConnectionFromLocalComputer'
             Delay = '00:10:00'
         }

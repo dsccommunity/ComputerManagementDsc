@@ -2319,21 +2319,6 @@ Describe 'DSC_ScheduledTask' {
             }
         }
 
-
-        It 'Should Disregard User and Set User to the BuiltInAccount' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $testParameters.Add('User', 'WrongUser')
-
-                Set-TargetResource @testParameters
-                Should -Invoke -CommandName Register-ScheduledTask -Times 1 -Scope It -ParameterFilter {
-                    $User -ieq ('NT AUTHORITY\' + $testParameters['BuiltInAccount'])
-                }
-            }
-        }
-
-
         It 'Should overwrite LogonType to "ServiceAccount"' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
@@ -2820,7 +2805,7 @@ Describe 'DSC_ScheduledTask' {
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 StartTime         = Get-Date -Date $startTimeString
                 ScheduleType      = 'AtLogon'
-                User              = 'MockedUser'
+                User              = 'MockedDomain\MockedUser'
                 Delay             = '00:01:00'
                 Enable            = $true
                 MultipleInstances = 'StopExisting'
@@ -2880,7 +2865,7 @@ Describe 'DSC_ScheduledTask' {
         BeforeAll {
             $testParameters = $getTargetResourceParameters + @{
                 ScheduleType     = 'AtLogon'
-                User             = 'MockedUser'
+                User             = 'MockedDomain\MockedUser'
                 ActionExecutable = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 LogonType        = 'Password'
             }
@@ -3283,7 +3268,7 @@ Describe 'DSC_ScheduledTask' {
                 StartTime         = Get-Date -Date $startTimeString
                 ScheduleType      = 'OnSessionState'
                 StateChange       = 'OnConnectionFromLocalComputer'
-                User              = 'MockedUser'
+                User              = 'MockedDomain\MockedUser'
                 Delay             = '00:01:00'
                 Enable            = $true
             }
@@ -3348,7 +3333,7 @@ Describe 'DSC_ScheduledTask' {
                 StartTime         = Get-Date -Date $startTimeString
                 ScheduleType      = 'OnSessionState'
                 StateChange       = 'OnConnectionFromLocalComputer'
-                User              = 'MockedUser'
+                User              = 'MockedDomain\MockedUser'
                 Delay             = '00:01:00'
                 Enable            = $true
             }

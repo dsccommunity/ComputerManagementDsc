@@ -21,8 +21,8 @@
     .DESCRIPTION
         This example creates a scheduled task called 'Test task Logon' in the folder
         task folder 'MyTasks' that starts a new powershell process when the specific
-        user 'UserName' logs on, activating at 2018-10-01 01:00 and repeating every 15
-        minutes for 8 hours. All running tasks will be stopped at the end of the
+        user 'Domain\UserName' logs on, activating at 2018-10-01 01:00 and repeating every
+        15 minutes for 8 hours. All running tasks will be stopped at the end of the
         repetition duration. The initial task trigger will be delayed for 15 minutes.
 #>
 Configuration ScheduledTask_CreateScheduledTasksAtLogon_Config
@@ -41,7 +41,7 @@ Configuration ScheduledTask_CreateScheduledTasksAtLogon_Config
             RepeatInterval     = '00:15:00'
             RepetitionDuration = '08:00:00'
             StopAtDurationEnd  = $true
-            User               = 'UserName'
+            User               = 'Domain\UserName'
             Delay              = '00:15:00'
         }
     }
