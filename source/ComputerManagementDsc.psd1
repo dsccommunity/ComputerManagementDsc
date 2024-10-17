@@ -39,7 +39,26 @@
     AliasesToExport      = @()
 
     # DSC resources to export from this module
-    DscResourcesToExport = @()
+    DscResourcesToExport = @(
+        'Computer'
+        'OfflineDomainJoin'
+        'PendingReboot'
+        'PowerPlan'
+        'PowerShellExecutionPolicy'
+        'RemoteDesktopAdmin'
+        'ScheduledTask'
+        'SmbServerConfiguration'
+        'SmbShare'
+        'SystemLocale'
+        'SystemProtection'
+        'SystemRestorePoint'
+        'TimeZone'
+        'VirtualMemory'
+        'WindowsEventLog'
+        'WindowsCapability'
+        'IEEnhancedSecurityConfiguration'
+        'UserAccountControl'
+    )
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData          = @{
