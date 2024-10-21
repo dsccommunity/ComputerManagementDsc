@@ -134,11 +134,10 @@ function Set-TargetResource
                 Path = $registryKey
                 Name = $script:registryKey_Property
                 Value = $Enabled
-                Type = DWord
                 ErrorAction = 'Stop'
             }
 
-            Set-ItemProperty @setItemPropertyParameters
+            Set-ItemProperty @setItemPropertyParameters -Type DWord
         }
         catch
         {
