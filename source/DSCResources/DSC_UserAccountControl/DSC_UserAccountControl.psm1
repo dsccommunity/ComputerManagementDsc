@@ -229,10 +229,11 @@ function Set-TargetResource
                         Path        = $script:registryKey
                         Name        = $parameterName
                         Value       = $PSBoundParameters.$parameterName
+                        Type        = 'DWord'
                         ErrorAction = 'Stop'
                     }
 
-                    Set-ItemProperty @setItemPropertyParameters -Type DWord
+                    Set-ItemProperty @setItemPropertyParameters
                 }
                 catch
                 {
@@ -537,6 +538,7 @@ function Set-UserAccountControlToNotificationLevel
     {
         $defaultSetItemPropertyParameters = @{
             Path        = $script:registryKey
+            Type        = 'DWord'
             ErrorAction = 'Stop'
         }
 
@@ -544,45 +546,45 @@ function Set-UserAccountControlToNotificationLevel
         {
             'AlwaysNotify'
             {
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 2 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 1 -Type DWord
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 2
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 1
             }
 
             'AlwaysNotifyAndAskForCredentials'
             {
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 1 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 1 -Type DWord
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 1
             }
 
 
             'NotifyChanges'
             {
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 5 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 1 -Type DWord
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 5
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 1
             }
 
             'NotifyChangesWithoutDimming'
             {
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 5 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 0 -Type DWord
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 5
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 0
             }
 
             'NeverNotify'
             {
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 0 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 0 -Type DWord
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 0
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 1
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 0
             }
 
             'NeverNotifyAndDisableAll'
             {
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 0 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 0 -Type DWord
-                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 0 -Type DWord
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'ConsentPromptBehaviorAdmin' -Value 0
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'EnableLUA' -Value 0
+                Set-ItemProperty @defaultSetItemPropertyParameters -Name 'PromptOnSecureDesktop' -Value 0
             }
         }
     }
