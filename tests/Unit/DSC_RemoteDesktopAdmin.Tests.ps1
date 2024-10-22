@@ -384,7 +384,8 @@ Describe 'DSC_RemoteDesktopAdmin\Set-TargetResource' -Tag 'Set' {
 
                 Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
                     $Name -eq 'fDenyTSConnections' -and
-                    $Value -eq '0'
+                    $Value -eq '0' -and
+                    $Type -eq 'DWord'
                 } -Times 1 -Exactly -Scope It
             }
         }
@@ -408,7 +409,8 @@ Describe 'DSC_RemoteDesktopAdmin\Set-TargetResource' -Tag 'Set' {
 
                 Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
                     $Name -eq 'fDenyTSConnections' -and
-                    $Value -eq '1'
+                    $Value -eq '1' -and
+                    $Type -eq 'DWord'
                 } -Times 1 -Exactly -Scope It
             }
         }
@@ -433,7 +435,8 @@ Describe 'DSC_RemoteDesktopAdmin\Set-TargetResource' -Tag 'Set' {
 
                 Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
                     $Name -eq 'UserAuthentication' -and
-                    $Value -eq '1'
+                    $Value -eq '1' -and
+                    $Type -eq 'DWord'
                 } -Times 1 -Exactly -Scope It
             }
         }
@@ -458,7 +461,8 @@ Describe 'DSC_RemoteDesktopAdmin\Set-TargetResource' -Tag 'Set' {
 
                 Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
                     $Name -eq 'UserAuthentication' -and
-                    $Value -eq '0'
+                    $Value -eq '0' -and
+                    $Type -eq 'DWord'
                 } -Times 1 -Exactly -Scope It
             }
         }

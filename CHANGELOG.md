@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated unit tests to use Should -Invoke for Pester 5 compatibility.
 - `VirtualMemory` fix incorrect variable name
 - `SmbServerConfiguration` remove errant argument
+- Update all calls to edit the registry so that the value Type is explicitly set.
+  Fixes [Issue #433](https://github.com/dsccommunity/ComputerManagementDsc/issues/433).
 
 ### Changed
 

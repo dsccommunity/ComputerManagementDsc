@@ -467,17 +467,20 @@ Describe 'UserAccountControl\Set-UserAccountControlToNotificationLevel' -Tag 'Pr
 
         Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
             $Name -eq 'ConsentPromptBehaviorAdmin' -and
-            $Value -eq $ConsentPromptBehaviorAdmin
+            $Value -eq $ConsentPromptBehaviorAdmin -and
+            $Type -eq 'DWord'
         } -Exactly -Times 1 -Scope It
 
         Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
             $Name -eq 'EnableLUA' -and
-            $Value -eq $EnableLua
+            $Value -eq $EnableLua -and
+            $Type -eq 'DWord'
         } -Exactly -Times 1 -Scope It
 
         Should -Invoke -CommandName Set-ItemProperty -ParameterFilter {
             $Name -eq 'PromptOnSecureDesktop' -and
-            $Value -eq $PromptOnSecureDesktop
+            $Value -eq $PromptOnSecureDesktop -and
+            $Type -eq 'DWord'
         } -Exactly -Times 1 -Scope It
     }
 
