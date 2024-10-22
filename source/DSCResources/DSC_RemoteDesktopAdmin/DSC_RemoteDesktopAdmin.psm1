@@ -171,12 +171,28 @@ function Set-TargetResource
     if ($Ensure -ne $targetResource.Ensure)
     {
         Write-Verbose -Message ($script:localizedData.SettingRemoteDesktopAdminMessage -f $Ensure)
-        Set-ItemProperty -Path $script:tSRegistryKey -Name "fDenyTSConnections" -Value $fDenyTSConnectionsRegistry -Type DWord
+
+        $setItemPropertyParameters = @{
+            Path = $script:tSRegistryKey
+            Name = "fDenyTSConnections"
+            Value = $fDenyTSConnectionsRegistry
+            Type = 'DWord'
+        }
+
+        Set-ItemProperty @setItemPropertyParameters
     }
 
     if ($UserAuthentication -ne $targetResource.UserAuthentication)
     {
         Write-Verbose -Message ($script:localizedData.SettingUserAuthenticationMessage -f $UserAuthentication)
-        Set-ItemProperty -Path $script:winStationsRegistryKey -Name "UserAuthentication" -Value $UserAuthenticationRegistry -Type DWord
+
+        $setItemPropertyParameters = @{
+            Path = $script:winStationsRegistryKey
+            Name = "UserAuthentication"
+            Value = $UserAuthenticationRegistry
+            Type = 'DWord'
+        }
+
+        Set-ItemProperty @setItemPropertyParameters
     }
 }
