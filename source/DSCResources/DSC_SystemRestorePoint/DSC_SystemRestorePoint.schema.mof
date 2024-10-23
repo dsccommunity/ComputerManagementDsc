@@ -1,0 +1,7 @@
+[ClassVersion("1.0.0.0"), FriendlyName("SystemRestorePoint")]
+class DSC_SystemRestorePoint : OMI_BaseResource
+{
+    [Required, Description("Indicates that the computer restore is enabled or is disabled."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Key, Description("Specifies a descriptive name for the restore point.")] String Description;
+    [Write, Description("Specifies the restore point type. Defaults to APPLICATION_INSTALL."), ValueMap{"APPLICATION_INSTALL","APPLICATION_UNINSTALL","DEVICE_DRIVER_INSTALL","MODIFY_SETTINGS","CANCELLED_OPERATION"}, Values{"APPLICATION_INSTALL","APPLICATION_UNINSTALL","DEVICE_DRIVER_INSTALL","MODIFY_SETTINGS","CANCELLED_OPERATION"}] String RestorePointType;
+};
