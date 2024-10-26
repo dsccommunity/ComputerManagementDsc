@@ -899,8 +899,15 @@ function Set-WindowsEventLogRestrictGuestAccess
 
     try
     {
-        Set-ItemProperty -Path $logRegistryPath `
-            -Name 'RestrictGuestAccess' -Value $RestrictGuestAccess -ErrorAction Stop
+        $setItemPropertyParameters = @{
+            Path = $logRegistryPath
+            Name = 'RestrictGuestAccess'
+            Value = $RestrictGuestAccess
+            Type = 'DWord'
+            ErrorAction = 'Stop'
+        }
+
+        Set-ItemProperty @setItemPropertyParameters
     }
     catch
     {

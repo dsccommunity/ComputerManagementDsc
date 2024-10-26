@@ -21,7 +21,8 @@
     .DESCRIPTION
         This example will create a scheduled task that will call PowerShell.exe every 15
         minutes indefinitely to run a script saved locally. The task will start immediately.
-        The script will be called as the local system account.
+        The script will be called as the local system account. The execution time limit on
+        the task trigger is set to 15 minutes.
 #>
 Configuration ScheduledTask_RunPowerShellTaskEvery15MinutesIndefinitely_Config
 {
@@ -31,12 +32,13 @@ Configuration ScheduledTask_RunPowerShellTaskEvery15MinutesIndefinitely_Config
     {
         ScheduledTask MaintenanceScriptExample
         {
-          TaskName           = "Custom maintenance tasks"
-          ActionExecutable   = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-          ActionArguments    = "-File `"C:\scripts\my custom script.ps1`""
-          ScheduleType       = 'Once'
-          RepeatInterval     = '00:15:00'
-          RepetitionDuration = 'Indefinitely'
+          TaskName                  = "Custom maintenance tasks"
+          ActionExecutable          = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+          ActionArguments           = "-File `"C:\scripts\my custom script.ps1`""
+          ScheduleType              = 'Once'
+          RepeatInterval            = '00:15:00'
+          RepetitionDuration        = 'Indefinitely'
+          TriggerExecutionTimeLimit = '00:15:00'
         }
     }
 }

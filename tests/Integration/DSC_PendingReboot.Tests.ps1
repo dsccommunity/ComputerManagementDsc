@@ -59,10 +59,14 @@ AfterAll {
 
     if ($script:currentPendingFileRenameState)
     {
-        $null = Set-ItemProperty `
-            -Path $script:rebootRegistryKeys.PendingFileRename `
-            -Name PendingFileRenameOperations `
-            -Value $script:currentPendingFileRenameState
+        $setItemPropertyParameters = @{
+            Path = $script:rebootRegistryKeys.PendingFileRename
+            Name = 'PendingFileRenameOperations'
+            Value = $script:currentPendingFileRenameState
+            Type = 'MultiString'
+        }
+
+        $null = Set-ItemProperty @setItemPropertyParameters
     }
 }
 

@@ -1,7 +1,7 @@
 Add-Type -TypeDefinition @'
 namespace ScheduledTask
 {
-    public enum DaysOfWeek
+    public enum DaysOfWeek : ushort
     {
         Sunday = 1,
         Monday = 2,
@@ -10,6 +10,16 @@ namespace ScheduledTask
         Thursday = 16,
         Friday = 32,
         Saturday = 64
+    }
+    public enum StateChange : uint
+    {
+        Undefined = 0,
+        OnConnectionFromLocalComputer = 1,
+        OnDisconnectFromLocalComputer = 2,
+        OnConnectionFromRemoteComputer = 3,
+        OnDisconnectFromRemoteComputer = 4,
+        OnWorkstationLock = 7,
+        OnWorkstationUnlock = 8
     }
 }
 '@
@@ -87,8 +97,7 @@ function Get-TargetResource
         How many units (minutes, hours, days) between each run of this task?
 
     .PARAMETER StartTime
-        The time of day this task should start at - defaults to 12:00 AM. Not valid for
-        AtLogon and AtStartup tasks.
+        The time of day this task should start at, or activate on - defaults to 12:00 AM.
 
     .PARAMETER SynchronizeAcrossTimeZone
         Enable the scheduled task option to synchronize across time zones. This is enabled
@@ -103,7 +112,7 @@ function Get-TargetResource
 
     .PARAMETER BuiltInAccount
         Run the task as one of the built in service accounts.
-        When set ExecuteAsCredential will be ignored and LogonType will be set to 'ServiceAccount'
+        When set ExecuteAsCredential will be ignored and LogonType will be set to 'ServiceAccount'.
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
@@ -120,10 +129,18 @@ function Get-TargetResource
     .PARAMETER RandomDelay
         Specifies a random amount of time to delay the start time of the trigger. The
         delay time is a random time between the time the task triggers and the time that
-        you specify in this setting.
+        you specify in this setting. This parameter is only valid in combination with the
+        Once, Daily and Weekly Schedule Types.
 
     .PARAMETER RepetitionDuration
         Specifies how long the repetition pattern repeats after the task starts.
+
+    .PARAMETER StopAtDurationEnd
+        Indicates that Task Scheduler stops all running tasks at the end of the repetition
+        duration. Defaults to $false.
+
+    .PARAMETER TriggerExecutionTimeLimit
+        Specifies the amount of time for the trigger that Task Scheduler is allowed to complete the task.
 
     .PARAMETER DaysOfWeek
         Specifies an array of the days of the week on which Task Scheduler runs the task.
@@ -133,8 +150,8 @@ function Get-TargetResource
         a weekly schedule. An interval of 2 produces an every-other week schedule.
 
     .PARAMETER User
-        Specifies the identifier of the user for a trigger that starts a task when a
-        user logs on.
+        Specifies the identifier of a user that will trigger the task to start. This
+        parameter is only valid in combination with the AtLogon and OnSessionState Schedule Types.
 
     .PARAMETER DisallowDemandStart
         Indicates whether the task is prohibited to run on demand or not. Defaults
@@ -213,7 +230,7 @@ function Get-TargetResource
     .PARAMETER RunOnlyIfNetworkAvailable
         Indicates that Task Scheduler runs the task only when a network is available. Task
         Scheduler uses the NetworkID parameter and NetworkName parameter that you specify
-        in this cmdlet to determine if the network is available.\
+        in this cmdlet to determine if the network is available.
 
     .PARAMETER RunLevel
         Specifies the level of user rights that Task Scheduler uses to run the tasks that
@@ -235,8 +252,12 @@ function Get-TargetResource
         https://learn.microsoft.com/en-us/windows/win32/taskschd/eventtrigger-valuequeries.
 
     .PARAMETER Delay
-        The time to wait after an event based trigger was triggered. This parameter is only
-        valid in combination with the OnEvent Schedule Type.
+        Specifies a delay to the start of the trigger. This parameter is only valid in combination
+        with the AtLogon, AtStartup, OnEvent, AtCreation and OnSessionState Schedule Types.
+
+    .PARAMETER StateChange
+        The kind of session state change that would trigger a task launch. This parameter is
+        only valid in combination with the OnSessionState Schedule Type.
 #>
 function Set-TargetResource
 {
@@ -269,7 +290,7 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogon', 'OnEvent')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogon', 'OnIdle', 'OnEvent', 'AtCreation', 'OnSessionState')]
         $ScheduleType,
 
         [Parameter()]
@@ -317,6 +338,14 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         $RepetitionDuration = '00:00:00',
+
+        [Parameter()]
+        [System.Boolean]
+        $StopAtDurationEnd = $false,
+
+        [Parameter()]
+        [System.String]
+        $TriggerExecutionTimeLimit = '00:00:00',
 
         [Parameter()]
         [System.String[]]
@@ -436,7 +465,12 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $Delay = '00:00:00'
+        $Delay = '00:00:00',
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('OnConnectionFromLocalComputer', 'OnDisconnectFromLocalComputer', 'OnConnectionFromRemoteComputer', 'OnDisconnectFromRemoteComputer', 'OnWorkstationLock', 'OnWorkstationUnlock')]
+        $StateChange
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
@@ -447,10 +481,12 @@ function Set-TargetResource
     [System.TimeSpan] $RepeatInterval = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RepeatInterval
     [System.TimeSpan] $RandomDelay = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RandomDelay
     [System.TimeSpan] $RepetitionDuration = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RepetitionDuration -AllowIndefinitely
+    [System.TimeSpan] $TriggerExecutionTimeLimit = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $TriggerExecutionTimeLimit
     [System.TimeSpan] $IdleWaitTimeout = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $IdleWaitTimeout
     [System.TimeSpan] $IdleDuration = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $IdleDuration
     [System.TimeSpan] $ExecutionTimeLimit = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $ExecutionTimeLimit
     [System.TimeSpan] $RestartInterval = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval
+    [System.TimeSpan] $Delay = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $Delay
 
     $currentValues = Get-CurrentResource -TaskName $TaskName -TaskPath $TaskPath
 
@@ -507,11 +543,25 @@ function Set-TargetResource
                 -ArgumentName DaysOfWeek
         }
 
-        if ($ScheduleType -eq 'OnEvent' -and -not ([xml]$EventSubscription))
+        if ($ScheduleType -eq 'OnEvent')
+        {
+            try
+            {
+                $null = [xml]$EventSubscription
+            }
+            catch
+            {
+                New-InvalidArgumentException `
+                    -Message ($script:localizedData.OnEventSubscriptionError) `
+                    -ArgumentName EventSubscription
+            }
+        }
+
+        if ($ScheduleType -eq 'OnSessionState' -and [System.String]::IsNullOrEmpty($StateChange))
         {
             New-InvalidArgumentException `
-                -Message ($script:localizedData.OnEventSubscriptionError) `
-                -ArgumentName EventSubscription
+                -Message ($script:localizedData.OnSessionStateChangeError) `
+                -ArgumentName StateChange
         }
 
         if ($ExecuteAsGMSA -and ($ExecuteAsCredential -or $BuiltInAccount))
@@ -629,8 +679,8 @@ function Set-TargetResource
         # Configure the trigger
         $triggerParameters = @{}
 
-        # A random delay is not supported when the scheduleType is set to OnEvent
-        if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0) -and $ScheduleType -ne 'OnEvent')
+        # A random delay is only supported when the scheduleType is set to Once, Daily or Weekly
+        if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0) -and $ScheduleType -in @('Once', 'Daily', 'Weekly'))
         {
             $triggerParameters.Add('RandomDelay', $RandomDelay)
         }
@@ -683,10 +733,21 @@ function Set-TargetResource
             {
                 $triggerParameters.Add('AtLogon', $true)
 
-                if (-not [System.String]::IsNullOrWhiteSpace($User) -and $LogonType -ne 'Group')
+                if (-not [System.String]::IsNullOrWhiteSpace($User))
                 {
                     $triggerParameters.Add('User', $User)
                 }
+
+                break
+            }
+
+            'OnIdle'
+            {
+                Write-Verbose -Message ($script:localizedData.ConfigureTaskIdleTrigger -f $TaskName)
+
+                $cimTriggerClass = Get-CimClass -ClassName MSFT_TaskIdleTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskIdleTrigger
+                $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
+                $trigger.Enabled = $true
 
                 break
             }
@@ -700,12 +761,55 @@ function Set-TargetResource
                 $trigger.Enabled = $true
                 $trigger.Subscription = $EventSubscription
                 $trigger.ValueQueries = ConvertTo-TaskNamedValuePairCollectionFromKeyValuePairArray -Array $EventValueQueries
+
+                break
+            }
+
+            'AtCreation'
+            {
+                Write-Verbose -Message ($script:localizedData.ConfigureTaskCreationTrigger -f $TaskName)
+
+                $cimTriggerClass = Get-CimClass -ClassName MSFT_TaskRegistrationTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskRegistrationTrigger
+                $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
+                $trigger.Enabled = $true
+
+                break
+            }
+
+            'OnSessionState'
+            {
+                Write-Verbose -Message ($script:localizedData.ConfigureTaskSessionStateTrigger -f $TaskName)
+
+                $cimTriggerClass = Get-CimClass -ClassName MSFT_TaskSessionStateChangeTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskSessionStateChangeTrigger
+                $trigger = New-CimInstance -CimClass $cimTriggerClass -ClientOnly
+                $trigger.Enabled = $true
+                $trigger.StateChange = [ScheduledTask.StateChange] $StateChange
+                if (-not [System.String]::IsNullOrWhiteSpace($User))
+                {
+                    $trigger.UserId = $User
+                }
+
+                break
             }
         }
 
-        if ($ScheduleType -ne 'OnEvent')
+        if ($ScheduleType -notin @('OnIdle', 'OnEvent', 'AtCreation', 'OnSessionState'))
         {
             $trigger = New-ScheduledTaskTrigger @triggerParameters -ErrorAction SilentlyContinue
+        }
+
+        # If there is no -At parameter in a PowerShell cmdlet for this trigger type, but we have a StartTime, supply it (used as time to Activate)
+        if ($ScheduleType -notin @('Once', 'Daily', 'Weekly'))
+        {
+            if ($PSBoundParameters.ContainsKey('StartTime'))
+            {
+                $trigger.StartBoundary = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
+            }
+        }
+
+        if ($PSBoundParameters.ContainsKey('TriggerExecutionTimeLimit'))
+        {
+            $trigger.ExecutionTimeLimit = [System.Xml.XmlConvert]::ToString($TriggerExecutionTimeLimit)
         }
 
         if (-not $trigger)
@@ -778,16 +882,22 @@ function Set-TargetResource
                         -Message ($script:localizedData.TriggerUnexpectedTypeError -f $trigger.GetType().FullName)
                 }
             }
+
+            # If we have some repetition settings, set StopAtDurationEnd to supplied value (not supported in PowerShell cmdlets)
+            if ($repetition)
+            {
+                $repetition.StopAtDurationEnd = $StopAtDurationEnd
+            }
         }
 
         if ($trigger.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance')
         {
-            # On W2016+ / W10+ the Delay property is supported on the AtLogon, AtStartup and OnEvent trigger types
-            $triggerSupportsDelayProperty = @('AtLogon', 'AtStartup', 'OnEvent')
+            # On W2016+ / W10+ the Delay property is supported on the AtLogon, AtStartup, OnEvent, AtCreation and OnSessionState trigger types
+            $triggerSupportsDelayProperty = @('AtLogon', 'AtStartup', 'OnEvent', 'AtCreation', 'OnSessionState')
 
             if ($ScheduleType -in $triggerSupportsDelayProperty)
             {
-                $trigger.Delay = [System.Xml.XmlConvert]::ToString([System.TimeSpan]$Delay)
+                $trigger.Delay = [System.Xml.XmlConvert]::ToString($Delay)
             }
         }
 
@@ -993,8 +1103,7 @@ function Set-TargetResource
         How many units (minutes, hours, days) between each run of this task?
 
     .PARAMETER StartTime
-        The time of day this task should start at - defaults to 12:00 AM. Not valid for
-        AtLogon and AtStartup tasks.
+        The time of day this task should start at, or activate on - defaults to 12:00 AM.
 
     .PARAMETER SynchronizeAcrossTimeZone
         Enable the scheduled task option to synchronize across time zones. This is enabled
@@ -1009,7 +1118,7 @@ function Set-TargetResource
 
     .PARAMETER BuiltInAccount
         Run the task as one of the built in service accounts.
-        When set ExecuteAsCredential will be ignored and LogonType will be set to 'ServiceAccount'
+        When set ExecuteAsCredential will be ignored and LogonType will be set to 'ServiceAccount'.
 
     .PARAMETER ExecuteAsCredential
         The credential this task should execute as. If not specified defaults to running
@@ -1026,10 +1135,18 @@ function Set-TargetResource
     .PARAMETER RandomDelay
         Specifies a random amount of time to delay the start time of the trigger. The
         delay time is a random time between the time the task triggers and the time that
-        you specify in this setting.
+        you specify in this setting. This parameter is only valid in combination with the
+        Once, Daily and Weekly Schedule Types.
 
     .PARAMETER RepetitionDuration
         Specifies how long the repetition pattern repeats after the task starts.
+
+    .PARAMETER StopAtDurationEnd
+        Indicates that Task Scheduler stops all running tasks at the end of the repetition
+        duration. Defaults to $false.
+
+    .PARAMETER TriggerExecutionTimeLimit
+        Specifies the amount of time for the trigger that Task Scheduler is allowed to complete the task.
 
     .PARAMETER DaysOfWeek
         Specifies an array of the days of the week on which Task Scheduler runs the task.
@@ -1039,8 +1156,8 @@ function Set-TargetResource
         a weekly schedule. An interval of 2 produces an every-other week schedule.
 
     .PARAMETER User
-        Specifies the identifier of the user for a trigger that starts a task when a
-        user logs on.
+        Specifies the identifier of a user that will trigger the task to start. This
+        parameter is only valid in combination with the AtLogon and OnSessionState Schedule Types.
 
     .PARAMETER DisallowDemandStart
         Indicates whether the task is prohibited to run on demand or not. Defaults
@@ -1141,8 +1258,12 @@ function Set-TargetResource
         https://learn.microsoft.com/en-us/windows/win32/taskschd/eventtrigger-valuequeries.
 
     .PARAMETER Delay
-        The time to wait after an event based trigger was triggered. This parameter is only
-        valid in combination with the OnEvent Schedule Type.
+        Specifies a delay to the start of the trigger. This parameter is only valid in combination
+        with the AtLogon, AtStartup, OnEvent, AtCreation and OnSessionState Schedule Types.
+
+    .PARAMETER StateChange
+        The kind of session state change that would trigger a task launch. This parameter is
+        only valid in combination with the OnSessionState Schedule Type.
 #>
 function Test-TargetResource
 {
@@ -1176,7 +1297,7 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogon', 'OnEvent')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogon', 'OnIdle', 'OnEvent', 'AtCreation', 'OnSessionState')]
         $ScheduleType,
 
         [Parameter()]
@@ -1224,6 +1345,14 @@ function Test-TargetResource
         [Parameter()]
         [System.String]
         $RepetitionDuration = '00:00:00',
+
+        [Parameter()]
+        [System.Boolean]
+        $StopAtDurationEnd = $false,
+
+        [Parameter()]
+        [System.String]
+        $TriggerExecutionTimeLimit = '00:00:00',
 
         [Parameter()]
         [System.String[]]
@@ -1343,7 +1472,12 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $Delay = '00:00:00'
+        $Delay = '00:00:00',
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('OnConnectionFromLocalComputer', 'OnDisconnectFromLocalComputer', 'OnConnectionFromRemoteComputer', 'OnDisconnectFromRemoteComputer', 'OnWorkstationLock', 'OnWorkstationUnlock')]
+        $StateChange
     )
 
     $TaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
@@ -1360,10 +1494,10 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('RandomDelay'))
     {
-        if ($ScheduleType -eq 'OnEvent')
+        if ($ScheduleType -notin @('Once', 'Daily', 'Weekly'))
         {
-            # A random delay is not supported when the ScheduleType is set to OnEvent.
-            Write-Verbose -Message ($script:localizedData.IgnoreRandomDelayWithTriggerTypeOnEvent -f $TaskName)
+            # A random delay is only supported when the ScheduleType is set to Once, Daily or Weekly.
+            Write-Verbose -Message ($script:localizedData.IgnoreRandomDelayWithUnsupportedTriggerType -f $TaskName)
             $null = $PSBoundParameters.Remove('RandomDelay')
         }
         else
@@ -1383,6 +1517,11 @@ function Test-TargetResource
         {
             $PSBoundParameters['RepetitionDuration'] = $RepetitionDuration.ToString()
         }
+    }
+
+    if ($PSBoundParameters.ContainsKey('TriggerExecutionTimeLimit'))
+    {
+        $PSBoundParameters['TriggerExecutionTimeLimit'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $TriggerExecutionTimeLimit).ToString()
     }
 
     if ($PSBoundParameters.ContainsKey('IdleWaitTimeout'))
@@ -1405,7 +1544,21 @@ function Test-TargetResource
         $PSBoundParameters['RestartInterval'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RestartInterval).ToString()
     }
 
-    if ($ScheduleType -in @('Once', 'Daily', 'Weekly') -and $PSBoundParameters.ContainsKey('StartTime'))
+    if ($PSBoundParameters.ContainsKey('Delay'))
+    {
+        if ($ScheduleType -notin @('AtLogon', 'AtStartup', 'OnEvent', 'AtCreation', 'OnSessionState'))
+        {
+            # A delay is only supported on the AtLogon, AtStartup, OnEvent, AtCreation and OnSessionState trigger types
+            Write-Verbose -Message ($script:localizedData.IgnoreDelayWithUnsupportedTriggerType -f $TaskName)
+            $null = $PSBoundParameters.Remove('Delay')
+        }
+        else
+        {
+            $PSBoundParameters['Delay'] = (ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $Delay).ToString()
+        }
+    }
+
+    if ($PSBoundParameters.ContainsKey('StartTime'))
     {
         $PSBoundParameters['StartTime'] = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
         <#
@@ -1446,10 +1599,6 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('BuiltInAccount'))
     {
-        $user = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
-        $PSBoundParameters.User = $user
-        $currentValues.User = $user
-
         $PSBoundParameters.ExecuteAsCredential = $BuiltInAccount
         $currentValues.ExecuteAsCredential = $BuiltInAccount
 
@@ -1488,10 +1637,6 @@ function Test-TargetResource
     }
     else
     {
-        $user = Set-DomainNameInAccountName -AccountName 'SYSTEM' -DomainName 'NT AUTHORITY'
-        $PSBoundParameters.User = $user
-        $currentValues.User = $user
-
         $PSBoundParameters.ExecuteAsCredential = 'SYSTEM'
         $currentValues.ExecuteAsCredential = 'SYSTEM'
 
@@ -1839,9 +1984,27 @@ function Get-CurrentResource
                 break
             }
 
+            'MSFT_TaskIdleTrigger'
+            {
+                $returnScheduleType = 'OnIdle'
+                break
+            }
+
             'MSFT_TaskEventTrigger'
             {
                 $returnScheduleType = 'OnEvent'
+                break
+            }
+
+            'MSFT_TaskRegistrationTrigger'
+            {
+                $returnScheduleType = 'AtCreation'
+                break
+            }
+
+            'MSFT_TaskSessionStateChangeTrigger'
+            {
+                $returnScheduleType = 'OnSessionState'
                 break
             }
 
@@ -1920,9 +2083,11 @@ function Get-CurrentResource
             DaysInterval                    = [System.Uint32] $trigger.DaysInterval
             RandomDelay                     = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.RandomDelay
             RepetitionDuration              = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Repetition.Duration -AllowIndefinitely
+            StopAtDurationEnd               = $trigger.Repetition.StopAtDurationEnd
+            TriggerExecutionTimeLimit       = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.ExecutionTimeLimit
             DaysOfWeek                      = [System.String[]] $daysOfWeek
             WeeksInterval                   = [System.Uint32] $trigger.WeeksInterval
-            User                            = $task.Principal.UserId
+            User                            = $trigger.UserId
             DisallowDemandStart             = -not $settings.AllowDemandStart
             DisallowHardTerminate           = -not $settings.AllowHardTerminate
             Compatibility                   = [System.String] $settings.Compatibility
@@ -1949,6 +2114,7 @@ function Get-CurrentResource
             EventSubscription               = $trigger.Subscription
             EventValueQueries               = ConvertTo-HashtableFromTaskNamedValuePairCollection -Array $trigger.ValueQueries
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
+            StateChange                     = [System.String][ScheduledTask.StateChange][System.UInt32] $trigger.StateChange # Cast to integer first to allow casting to enum with null
         }
 
         if (
@@ -1956,9 +2122,6 @@ function Get-CurrentResource
             $result.Principal.UserID -in @('SYSTEM', 'LOCAL SERVICE', 'NETWORK SERVICE')
             )
         {
-            $result.User = Set-DomainNameInAccountName `
-                -AccountName $task.Principal.UserId `
-                -DomainName 'NT AUTHORITY'
             $builtInAccount = $task.Principal.UserId
             $result.Add('BuiltInAccount', $builtInAccount)
         }

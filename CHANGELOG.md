@@ -5,15 +5,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- ScheduledTask
+  - Added support for ScheduleType 'OnIdle', 'AtCreation', 'OnSessionState'.
+    Fixes [Issue #282](https://github.com/dsccommunity/ComputerManagementDsc/issues/282).
+  - Added support for StateChange to allow specifying which session state changes should
+    trigger the task (with ScheduleType = OnSessionState).
+  - Added support for StopAtDurationEnd permitting control over the 'Stop all running tasks
+    at the end of the repetition duration' feature.
+    Fixes [Issue #168](https://github.com/dsccommunity/ComputerManagementDsc/issues/168).
+  - Added support for TriggerExecutionTimeLimit permitting control over per-trigger 'Stop task
+    if it runs longer than...' feature.
+
 ### Fixed
 
+- BREAKING CHANGE: ScheduledTask
+  - Fixed User parameter to correctly return the user that triggers an AtLogon or OnSessionState
+    Schedule Type, instead of the current value of ExecuteAsCredential. This parameter
+    is only valid when using the AtLogon and OnSessionState Schedule Types.
+  - Fixed User parameter to permit use even if LogonType = Group.
+  - Updated RandomDelay logic from a blacklist to a whitelist.
+  - Updated Delay parameter logic to reflect other TimeSpan based values.
+  - Updated unit tests to use Should -Invoke for Pester 5 compatibility.
 - `VirtualMemory` fix incorrect variable name
 - `SmbServerConfiguration` remove errant argument
+- Update all calls to edit the registry so that the value Type is explicitly set.
+  Fixes [Issue #433](https://github.com/dsccommunity/ComputerManagementDsc/issues/433).
 
 ### Changed
 
-  - Converted tests to Pester 5
-  - Rename Delete-ADSIObject to Delete-ADSIObject to satisfy HQRM
+- BREAKING CHANGE: ScheduledTask
+  - Allow StartTime to be used to set the 'Activate' setting when adding ScheduleType triggers
+    other than 'Once', 'Daily' and 'Weekly'.
+  - Updated Delay parameter to support ScheduleType AtLogon, AtStartup, AtCreation, OnSessionState.
+    Fixes [Issue #345](https://github.com/dsccommunity/ComputerManagementDsc/issues/345).
+  - Updated User parameter for use with ScheduleType OnSessionState in addition to AtLogon.
+  - Updated integration tests to ensure resource and configuration names are matching.
+- Converted tests to Pester 5
+- Rename Delete-ADSIObject to Delete-ADSIObject to satisfy HQRM
 
 ### Removed
 

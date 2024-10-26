@@ -21,7 +21,8 @@
     .DESCRIPTION
         This example will create a scheduled task that will call PowerShell.exe every 15
         minutes for 4 days to run a script saved locally. The task will start immediately.
-        The script will be called as the local system account.
+        The script will be called as the local system account. All running tasks will be
+        stopped at the end of the repetition duration.
 #>
 Configuration ScheduledTask_RunPowerShellTaskEvery15Minutes_Config
 {
@@ -37,6 +38,7 @@ Configuration ScheduledTask_RunPowerShellTaskEvery15Minutes_Config
           ScheduleType       = 'Once'
           RepeatInterval     = '00:15:00'
           RepetitionDuration = '4.00:00:00'
+          StopAtDurationEnd  = $true
         }
     }
 }
