@@ -1,0 +1,8 @@
+[ClassVersion("1.0.0.0"), FriendlyName("SystemProtection")]
+class DSC_SystemProtection : OMI_BaseResource
+{
+    [Required, Description("Indicates that the computer restore is enabled or is disabled."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Key, Description("Specifies the drive letter to enable or disable protection on.")] String DriveLetter;
+    [Write, Description("Specifies the maximum disk space to use for protection as a percentage.")] Sint32 DiskUsage;
+    [Write, Description("Forces desired state to be applied regardless of data loss. Defaults to False.")] Boolean Force;
+};

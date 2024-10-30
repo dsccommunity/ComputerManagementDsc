@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- SystemProtection
+  - New resource to configure System Protection settings (formerly xWindowsRestore) - Fixes [Issue #364](https://github.com/dsccommunity/ComputerManagementDsc/issues/364).
+- SystemRestorePoint
+  - New resource to create and delete restore points (formerly xSystemRestorePoint) - Fixes [Issue #364](https://github.com/dsccommunity/ComputerManagementDsc/issues/364).
 - ScheduledTask
   - Added support for ScheduleType 'OnIdle', 'AtCreation', 'OnSessionState'.
     Fixes [Issue #282](https://github.com/dsccommunity/ComputerManagementDsc/issues/282).
