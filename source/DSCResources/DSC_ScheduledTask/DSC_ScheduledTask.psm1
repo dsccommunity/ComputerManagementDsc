@@ -124,7 +124,8 @@ function Get-TargetResource
 
     .PARAMETER DaysInterval
         Specifies the interval between the days in the schedule. An interval of 1 produces
-        a daily schedule. An interval of 2 produces an every-other day schedule.
+        a daily schedule. An interval of 2 produces an every-other day schedule. This
+        parameter is only valid in combination with the Daily Schedule Type.
 
     .PARAMETER RandomDelay
         Specifies a random amount of time to delay the start time of the trigger. The
@@ -143,11 +144,13 @@ function Get-TargetResource
         Specifies the amount of time for the trigger that Task Scheduler is allowed to complete the task.
 
     .PARAMETER DaysOfWeek
-        Specifies an array of the days of the week on which Task Scheduler runs the task.
+        Specifies an array of the days of the week on which Task Scheduler runs the task. This
+        parameter is only valid in combination with the Weekly Schedule Type.
 
     .PARAMETER WeeksInterval
         Specifies the interval between the weeks in the schedule. An interval of 1 produces
-        a weekly schedule. An interval of 2 produces an every-other week schedule.
+        a weekly schedule. An interval of 2 produces an every-other week schedule. This
+        parameter is only valid in combination with the Weekly Schedule Type.
 
     .PARAMETER User
         Specifies the identifier of a user that will trigger the task to start. This
@@ -1130,7 +1133,8 @@ function Set-TargetResource
 
     .PARAMETER DaysInterval
         Specifies the interval between the days in the schedule. An interval of 1 produces
-        a daily schedule. An interval of 2 produces an every-other day schedule.
+        a daily schedule. An interval of 2 produces an every-other day schedule. This
+        parameter is only valid in combination with the Daily Schedule Type.
 
     .PARAMETER RandomDelay
         Specifies a random amount of time to delay the start time of the trigger. The
@@ -1149,11 +1153,13 @@ function Set-TargetResource
         Specifies the amount of time for the trigger that Task Scheduler is allowed to complete the task.
 
     .PARAMETER DaysOfWeek
-        Specifies an array of the days of the week on which Task Scheduler runs the task.
+        Specifies an array of the days of the week on which Task Scheduler runs the task. This
+        parameter is only valid in combination with the Weekly Schedule Type.
 
     .PARAMETER WeeksInterval
         Specifies the interval between the weeks in the schedule. An interval of 1 produces
-        a weekly schedule. An interval of 2 produces an every-other week schedule.
+        a weekly schedule. An interval of 2 produces an every-other week schedule. This
+        parameter is only valid in combination with the Weekly Schedule Type.
 
     .PARAMETER User
         Specifies the identifier of a user that will trigger the task to start. This
