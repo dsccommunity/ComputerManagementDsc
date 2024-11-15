@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated RandomDelay logic from a blacklist to a whitelist.
   - Updated Delay parameter logic to reflect other TimeSpan based values.
   - Updated unit tests to use Should -Invoke for Pester 5 compatibility.
+  - Updated various parameters with requirements in documentation.
 - `VirtualMemory` fix incorrect variable name
 - `SmbServerConfiguration` remove errant argument
 - Update all calls to edit the registry so that the value Type is explicitly set.
