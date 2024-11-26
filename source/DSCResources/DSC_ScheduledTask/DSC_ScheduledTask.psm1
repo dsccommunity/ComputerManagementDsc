@@ -303,7 +303,7 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $StartTime = [System.DateTime]::Parse("1980-01-01T00:00:00").ToString('s'),
+        $StartTime = '1980-01-01T00:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -1313,7 +1313,7 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $StartTime = [System.DateTime]::Parse("1980-01-01T00:00:00").ToString('s'),
+        $StartTime = '1980-01-01T00:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -2233,7 +2233,7 @@ function Test-DateStringContainsTimeZone
         $DateString
     )
 
-    return $DateString -match 'Z|\+'
+    return $DateString -match '\+|-|Z'
 }
 
 <#
