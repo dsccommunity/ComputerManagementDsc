@@ -3443,7 +3443,7 @@ Describe 'DSC_ScheduledTask\Test-DateStringContainsTimeZone'  -Tag 'Private' {
         }
     }
 
-    Context 'When the date string contains a date with Zulu timezone' {
+    Context 'When the date string contains a date with Zulu timezone offset' {
         It 'Should return $true' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
