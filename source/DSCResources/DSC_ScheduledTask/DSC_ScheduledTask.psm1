@@ -2233,8 +2233,9 @@ function Test-DateStringContainsTimeZone
         $DateString
     )
 
-    # String ends +HH:MM (ahead of UTC), or -HH:MM (behind UTC), or +00:00 (UTC), or Z (UTC)
-    return $DateString -match '((\+|-)\d\d:\d\d|Z)$'
+    # When parsing a DateTime, Kind will be 'Unspecified' unless parsed string includes time zone information
+    # See https://learn.microsoft.com/en-us/dotnet/api/system.datetime.parse?view=netframework-4.5#the-return-value-and-datetimekind
+    return [DateTime]::Parse($DateString).Kind -ne 'Unspecified'
 }
 
 <#
