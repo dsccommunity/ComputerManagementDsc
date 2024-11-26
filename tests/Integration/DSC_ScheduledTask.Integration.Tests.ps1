@@ -349,7 +349,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
-            $expectedStartTime = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+            $expectedStartTime = '2018-10-01T01:00:00-08:00'
         }
 
         AfterAll {

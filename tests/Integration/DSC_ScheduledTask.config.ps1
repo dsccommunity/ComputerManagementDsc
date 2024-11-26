@@ -55,7 +55,7 @@ Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled
             TaskPath                  = '\ComputerManagementDsc\'
             ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType              = 'Once'
-            StartTime                 = '2018-10-01T01:00:00'
+            StartTime                 = '2018-10-01T01:00:00-08:00'
             SynchronizeAcrossTimeZone = $true
             ActionWorkingPath         = (Get-Location).Path
             Enable                    = $true

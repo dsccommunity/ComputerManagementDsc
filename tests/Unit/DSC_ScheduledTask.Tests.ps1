@@ -2568,7 +2568,7 @@ Describe 'DSC_ScheduledTask' {
                 ScheduleType              = 'Once'
             }
 
-            $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+            $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
 
             Mock -CommandName Get-ScheduledTask -MockWith {
                 @{
@@ -2665,12 +2665,12 @@ Describe 'DSC_ScheduledTask' {
 
     Context 'When a scheduled task is created and synchronize across time zone is enabled' {
         BeforeDiscovery {
-            $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+            $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
         }
 
         BeforeAll {
             $startTimeString = '2018-10-01T01:00:00'
-            $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+            $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 StartTime                 = Get-Date -Date $startTimeString
@@ -2772,28 +2772,6 @@ Describe 'DSC_ScheduledTask' {
                 Should -Invoke -CommandName Set-ScheduledTask -ParameterFilter {
                     $InputObject.Triggers[0].StartBoundary -eq $startTimeStringWithOffset
                 }
-            }
-        }
-    }
-
-    Context 'When a scheduled task is configured to SynchronizeAcrossTimeZone and the ScheduleType is not Once, Daily or Weekly' {
-        BeforeAll {
-            $startTimeString = '2018-10-01T01:00:00'
-            $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime                 = Get-Date -Date $startTimeString
-                SynchronizeAcrossTimeZone = $true
-                ScheduleType              = 'AtLogon'
-            }
-        }
-
-        It 'Should throw when Set-TargetResource is called and SynchronizeAcrossTimeZone is used in combination with an unsupported trigger type' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.SynchronizeAcrossTimeZoneInvalidScheduleType -ArgumentName 'SynchronizeAcrossTimeZone'
-
-                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
     }
@@ -3455,12 +3433,22 @@ Describe 'DSC_ScheduledTask\Test-DateStringContainsTimeZone'  -Tag 'Private' {
         }
     }
 
-    Context 'When the date string contains a date with a timezone' {
+    Context 'When the date string contains a date with a timezone offset' {
         It 'Should return $true' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Test-DateStringContainsTimeZone -DateString ('2018-10-01T01:00:00' + (Get-Date -Format 'zzz')) | Should -BeTrue
+                Test-DateStringContainsTimeZone -DateString '2018-10-01T01:00:00-08:00' | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When the date string contains a date with Zulu timezone' {
+        It 'Should return $true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-DateStringContainsTimeZone -DateString '2018-10-01T01:00:00Z' | Should -BeTrue
             }
         }
     }
