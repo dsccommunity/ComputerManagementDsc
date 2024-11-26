@@ -2664,6 +2664,10 @@ Describe 'DSC_ScheduledTask' {
     }
 
     Context 'When a scheduled task is created and synchronize across time zone is enabled' {
+        BeforeDiscovery {
+            $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
+        }
+
         BeforeAll {
             $startTimeString = '2018-10-01T01:00:00'
             $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
