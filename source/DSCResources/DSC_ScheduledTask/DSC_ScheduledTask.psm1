@@ -2233,7 +2233,8 @@ function Test-DateStringContainsTimeZone
         $DateString
     )
 
-    return $DateString -match '\+|-|Z'
+    # String ends +HH:MM (ahead of UTC), or -HH:MM (behind UTC), or +00:00 (UTC), or Z (UTC)
+    return $DateString -match '((\+|-)\d\d:\d\d|Z)$'
 }
 
 <#
