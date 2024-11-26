@@ -331,7 +331,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.TaskPath | Should -Be '\ComputerManagementDsc\'
             $current.ActionExecutable | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             $current.ScheduleType | Should -Be 'Once'
-            $current.StartTime | Should -Be (Get-Date -Date $expectedStartTime)
+            $current.StartTime | Should -Be $expectedStartTime
             $current.SynchronizeAcrossTimeZone | Should -BeFalse
             $current.ActionWorkingPath | Should -Be (Get-Location).Path
             $current.Enable | Should -BeTrue
@@ -384,7 +384,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.TaskPath | Should -Be '\ComputerManagementDsc\'
             $current.ActionExecutable | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             $current.ScheduleType | Should -Be 'Once'
-            $current.StartTime | Should -Be (Get-Date -Date $expectedStartTime)
+            $current.StartTime | Should -Be $expectedStartTime
             $current.SynchronizeAcrossTimeZone | Should -BeTrue
             $current.ActionWorkingPath | Should -Be (Get-Location).Path
             $current.Enable | Should -BeTrue
@@ -437,7 +437,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.TaskPath | Should -Be '\ComputerManagementDsc\'
             $current.ActionExecutable | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             $current.ScheduleType | Should -Be 'Once'
-            $current.StartTime | Should -Be (Get-Date -Date $expectedStartTime)
+            $current.StartTime | Should -Be $expectedStartTime
             $current.SynchronizeAcrossTimeZone | Should -BeTrue
             $current.ActionWorkingPath | Should -Be (Get-Location).Path
             $current.Enable | Should -BeTrue
@@ -490,7 +490,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.TaskPath | Should -Be '\ComputerManagementDsc\'
             $current.ActionExecutable | Should -Be 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             $current.ScheduleType | Should -Be 'Once'
-            $current.StartTime | Should -Be (Get-Date -Date $expectedStartTime)
+            $current.StartTime | Should -Be $expectedStartTime
             $current.SynchronizeAcrossTimeZone | Should -BeTrue
             $current.ActionWorkingPath | Should -Be (Get-Location).Path
             $current.Enable | Should -BeTrue
