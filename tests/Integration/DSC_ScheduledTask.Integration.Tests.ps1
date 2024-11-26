@@ -390,7 +390,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Enable | Should -BeTrue
         }
 
-        It 'Should have the trigger startBoundary set to ''2018-10-01T01:HH:MM''' {
+        It 'Should have the trigger startBoundary set to ''2018-10-01T01:00:00+08:00''' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone enabled positive')
             $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
@@ -443,7 +443,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Enable | Should -BeTrue
         }
 
-        It 'Should have the trigger startBoundary set to ''2018-10-01T01:HH:MM''' {
+        It 'Should have the trigger startBoundary set to ''2018-10-01T01:00:00-08:00''' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone enabled negative')
             $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
@@ -496,7 +496,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Enable | Should -BeTrue
         }
 
-        It 'Should have the trigger startBoundary set to ''2018-10-01T01:HH:MM''' {
+        It 'Should have the trigger startBoundary set to ''2018-10-01T01:00:00+00:00''' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone enabled zulu')
             $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
