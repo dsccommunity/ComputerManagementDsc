@@ -2661,6 +2661,7 @@ Describe 'DSC_ScheduledTask' {
                 }
             }
         }
+    }
 
     Context 'When a scheduled task is created and synchronize across time zone is enabled' {
         BeforeDiscovery {
