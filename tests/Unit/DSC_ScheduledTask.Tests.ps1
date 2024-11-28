@@ -2696,7 +2696,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers = @(
                         [pscustomobject] @{
-                            StartBoundary = $startTimeStringWithOffset
+                            StartBoundary = $expectedStartTimeStringWithOffset
                             CimClass      = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
                             }
@@ -2715,7 +2715,7 @@ Describe 'DSC_ScheduledTask' {
                 Set-StrictMode -Version 1.0
 
                 $result = Get-TargetResource @getTargetResourceParameters
-                $result.StartTime | Should -Be $startTimeStringWithOffset
+                $result.StartTime | Should -Be $expectedStartTimeStringWithOffset
                 $result.SynchronizeAcrossTimeZone | Should -BeTrue
             }
         }
@@ -2763,7 +2763,7 @@ Describe 'DSC_ScheduledTask' {
                 }
             }
 
-            It "Should set task trigger StartBoundary to $startTimeStringWithOffset" {
+            It "Should set task trigger StartBoundary to $expectedStartTimeStringWithOffset" {
                 InModuleScope -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
