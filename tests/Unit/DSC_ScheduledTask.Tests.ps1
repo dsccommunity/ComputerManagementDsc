@@ -2673,7 +2673,7 @@ Describe 'DSC_ScheduledTask' {
             $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime                 = $startTimeString
+                StartTime                 = $startTimeStringWithOffset
                 SynchronizeAcrossTimeZone = $true
                 ScheduleType              = 'Once'
             }
