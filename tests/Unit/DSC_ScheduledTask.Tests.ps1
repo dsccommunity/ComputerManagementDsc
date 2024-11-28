@@ -2626,7 +2626,7 @@ Describe 'DSC_ScheduledTask' {
                         )
                         Triggers = @(
                             [pscustomobject] @{
-                                StartBoundary = $startTimeStringWithOffsetPositive
+                                StartBoundary = $startTimeStringWithOffset
                                 CimClass      = @{
                                     CimClassName = 'MSFT_TaskTimeTrigger'
                                 }
@@ -2672,7 +2672,7 @@ Describe 'DSC_ScheduledTask' {
             $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime                 = $startTimeStringWithOffset
+                StartTime                 = $startTimeString
                 SynchronizeAcrossTimeZone = $true
                 ScheduleType              = 'Once'
             }
@@ -3432,12 +3432,22 @@ Describe 'DSC_ScheduledTask\Test-DateStringContainsTimeZone'  -Tag 'Private' {
         }
     }
 
-    Context 'When the date string contains a date with a timezone offset' {
+    Context 'When the date string contains a date with a negative timezone offset' {
         It 'Should return $true' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 Test-DateStringContainsTimeZone -DateString '2018-10-01T01:00:00-08:00' | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When the date string contains a date with a positive timezone offset' {
+        It 'Should return $true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-DateStringContainsTimeZone -DateString '2018-10-01T01:00:00+08:00' | Should -BeTrue
             }
         }
     }
