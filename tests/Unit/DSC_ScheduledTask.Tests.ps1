@@ -2671,6 +2671,7 @@ Describe 'DSC_ScheduledTask' {
         BeforeAll {
             $startTimeString = '2018-10-01T01:00:00'
             $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
+            $expectedStartTimeStringWithOffset = (Get-Date -Date $startTimeStringWithOffset).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
                 StartTime                 = $startTimeStringWithOffset
@@ -2770,7 +2771,7 @@ Describe 'DSC_ScheduledTask' {
                 }
 
                 Should -Invoke -CommandName Set-ScheduledTask -ParameterFilter {
-                    $InputObject.Triggers[0].StartBoundary -eq $startTimeStringWithOffset
+                    $InputObject.Triggers[0].StartBoundary -eq $expectedStartTimeStringWithOffset
                 }
             }
         }

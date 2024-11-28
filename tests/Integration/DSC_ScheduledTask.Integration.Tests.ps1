@@ -349,7 +349,8 @@ Describe "$($script:dscResourceName)_Integration" {
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
-            $expectedStartTime = '2018-10-01T01:00:00+08:00'
+            $configuredStartTime = '2018-10-01T01:00:00+08:00'
+            $expectedStartTime = (Get-Date -Date $configuredStartTime).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
         }
 
         AfterAll {
@@ -402,7 +403,8 @@ Describe "$($script:dscResourceName)_Integration" {
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
-            $expectedStartTime = '2018-10-01T01:00:00-08:00'
+            $configuredStartTime = '2018-10-01T01:00:00-08:00'
+            $expectedStartTime = (Get-Date -Date $configuredStartTime).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
         }
 
         AfterAll {
@@ -455,7 +457,8 @@ Describe "$($script:dscResourceName)_Integration" {
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
-            $expectedStartTime = '2018-10-01T01:00:00Z'
+            $configuredStartTime = '2018-10-01T01:00:00Z'
+            $expectedStartTime = (Get-Date -Date $configuredStartTime).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
         }
 
         AfterAll {
