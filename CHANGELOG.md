@@ -27,7 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - BREAKING CHANGE: ScheduledTask
   - Fixed SynchronizeAcrossTimeZone issue where Test always throws False when a date & time is used
     where Daylight Savings Time is in operation. Fixes [Issue #374](https://github.com/dsccommunity/ComputerManagementDsc/issues/374).
-  - Fixed Test-DateStringContainsTimeZone to process date strings behind UTC and UTC Zulu 'Z' strings.
+  - Fixed Test-DateStringContainsTimeZone to correctly process date strings behind UTC (-), as well
+    as UTC Zulu 'Z' strings.
   - Fixed User parameter to correctly return the user that triggers an AtLogon or OnSessionState
     Schedule Type, instead of the current value of ExecuteAsCredential. This parameter
     is only valid when using the AtLogon and OnSessionState Schedule Types.
