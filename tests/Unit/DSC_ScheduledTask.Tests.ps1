@@ -2681,9 +2681,9 @@ Describe 'DSC_ScheduledTask' {
             }
 
             InModuleScope -Parameters @{
-                startTimeStringWithOffset = $startTimeStringWithOffset
+                expectedStartTimeStringWithOffset = $expectedStartTimeStringWithOffset
             } -ScriptBlock {
-                $script:startTimeStringWithOffset = $startTimeStringWithOffset
+                $script:expectedStartTimeStringWithOffset = $expectedStartTimeStringWithOffset
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
