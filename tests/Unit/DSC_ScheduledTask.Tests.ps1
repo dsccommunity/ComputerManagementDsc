@@ -2559,6 +2559,10 @@ Describe 'DSC_ScheduledTask' {
     }
 
     Context 'When a scheduled task is created and synchronize across time zone is disabled' {
+        BeforeDiscovery {
+            $startTimeString = '2018-10-01T01:00:00'
+        }
+
         BeforeAll {
             $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
@@ -2569,6 +2573,12 @@ Describe 'DSC_ScheduledTask' {
             }
 
             $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
+
+            InModuleScope -Parameters @{
+                startTimeString = $startTimeString
+            } -ScriptBlock {
+                $script:startTimeString = $startTimeString
+            }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
                 @{
@@ -2649,7 +2659,7 @@ Describe 'DSC_ScheduledTask' {
             }
 
 
-            It "Should set task trigger StartBoundary to $startTimeString" {
+            It "Should set task trigger StartBoundary to '$startTimeString'" {
                 InModuleScope -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
@@ -2764,7 +2774,7 @@ Describe 'DSC_ScheduledTask' {
                 }
             }
 
-            It "Should set task trigger StartBoundary to $expectedStartTimeStringWithOffset" {
+            It "Should set task trigger StartBoundary to '$expectedStartTimeStringWithOffset'" {
                 InModuleScope -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
