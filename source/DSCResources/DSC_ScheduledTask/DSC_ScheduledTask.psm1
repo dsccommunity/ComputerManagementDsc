@@ -1903,10 +1903,8 @@ function Get-DateTimeString
 
     if ($SynchronizeAcrossTimeZone)
     {
-        # Synchronize across times zones internally ends up storing the date in UTC (Zulu) form
-        # https://www.thecliguy.co.uk/2020/02/09/scheduled-task-trigger-synchronize-across-time-zones/
-        $format = (Get-Culture).DateTimeFormat.UniversalSortableDateTimePattern
-        $returnDate = Get-Date -Date $Date.ToUniversalTime() -Format $format
+        $format = (Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz'
+        $returnDate = Get-Date -Date $Date.ToLocalTime() -Format $format
     }
     else
     {
