@@ -20,8 +20,8 @@
 <#
     .DESCRIPTION
         This example creates a scheduled task called 'Test task sync across time zone enabled'
-        in the folder 'MyTasks' that starts a new powershell process once at 2018-10-01 01:00.
-        The task will have the option Synchronize across time zone enabled.
+        in the folder 'MyTasks' that starts a new powershell process once at 2018-10-01 01:00
+        in the -08:00 timezone. The task will have the option Synchronize across time zone enabled.
 #>
 Configuration ScheduledTask_CreateScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled_Config
 {
@@ -35,7 +35,7 @@ Configuration ScheduledTask_CreateScheduledTaskOnceSynchronizeAcrossTimeZoneEnab
             TaskPath                  = '\MyTasks\'
             ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType              = 'Once'
-            StartTime                 = '2018-10-01T01:00:00'
+            StartTime                 = '2018-10-01T01:00:00-08:00'
             SynchronizeAcrossTimeZone = $true
             ActionWorkingPath         = (Get-Location).Path
             Enable                    = $true

@@ -13,7 +13,6 @@ ConvertFrom-StringData @'
     OnEventSubscriptionError = No (valid) XML Event Subscription was provided. This is required when the scheduletype is OnEvent.
     OnSessionStateChangeError = No kind of session state change was provided. This is required when the scheduletype is OnSessionState.
     gMSAandCredentialError = Both ExecuteAsGMSA and (ExecuteAsCredential or BuiltInAccount) parameters have been specified. A task can run as a gMSA (Group Managed Service Account), a builtin service account or as a custom credential. Please modify your configuration to include just one of the three options.
-    SynchronizeAcrossTimeZoneInvalidScheduleType = Setting SynchronizeAcrossTimeZone to true when the ScheduleType is not Once, Daily or Weekly is not a valid configuration. Please keep the default value of false when using other schedule types.
     TriggerCreationError = Error creating new scheduled task trigger.
     ConfigureTriggerRepetitionMessage = Configuring trigger repetition.
     RepetitionIntervalError = Repetition interval is set to '{0}' but repetition duration is '{1}'.

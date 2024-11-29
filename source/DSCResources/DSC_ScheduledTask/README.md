@@ -6,6 +6,14 @@ scheduled tasks.
 
 ## Known Issues
 
+When creating a scheduled task with a StartTime, you should always specify both
+a date and a time, with the SortableDateTimePattern format (e.g. 1980-01-01T00:00:00).
+Not providing a date may result in 'flip flopping' if the remote server enters daylight
+savings time. The date and time specified will be set based on the time zone that has been
+configured on the device. If you want to synchronize a scheduled task across timezones,
+use the SynchronizeAcrossTimeZone parameter, and specify the timezone offset that is needed
+(e.g. 1980-01-01T00:00:00-08:00).
+
 One of the values needed for the `MultipleInstances` parameter is missing from the
 `Microsoft.PowerShell.Cmdletization.GeneratedTypes.ScheduledTask.MultipleInstancesEnum`
 enumerator. There are four valid values defined for the `MultipleInstances` property of the

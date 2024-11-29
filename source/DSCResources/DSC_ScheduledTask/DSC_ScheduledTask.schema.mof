@@ -9,7 +9,7 @@ class DSC_ScheduledTask : OMI_BaseResource
     [Write, Description("The working path to specify for the executable.")] string ActionWorkingPath;
     [Write, Description("When should the task be executed."), ValueMap{"Once", "Daily", "Weekly", "AtStartup", "AtLogon", "OnIdle", "OnEvent", "AtCreation", "OnSessionState"}, Values{"Once", "Daily", "Weekly", "AtStartup", "AtLogon", "OnIdle", "OnEvent", "AtCreation", "OnSessionState"}] string ScheduleType;
     [Write, Description("How many units (minutes, hours, days) between each run of this task?")] String RepeatInterval;
-    [Write, Description("The time of day this task should start at, or activate on - defaults to 12:00 AM.")] DateTime StartTime;
+    [Write, Description("The date and time of day this task should start at, or activate on, represented as a string for local conversion to DateTime format - defaults to 1st January 1980 at 12:00 AM.")] String StartTime;
     [Write, Description("Enable the scheduled task option to synchronize across time zones. This is enabled by including the timezone offset in the scheduled task trigger. Defaults to false which does not include the timezone offset.")] boolean SynchronizeAcrossTimeZone;
     [Write, Description("Present if the task should exist, Absent if it should be removed."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
     [Write, Description("True if the task should be enabled, false if it should be disabled.")] boolean Enable;

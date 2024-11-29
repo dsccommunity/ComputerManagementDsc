@@ -2559,16 +2559,26 @@ Describe 'DSC_ScheduledTask' {
     }
 
     Context 'When a scheduled task is created and synchronize across time zone is disabled' {
+        BeforeDiscovery {
+            $startTimeString = '2018-10-01T01:00:00'
+        }
+
         BeforeAll {
             $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime                 = Get-Date -Date $startTimeString
+                StartTime                 = $startTimeString
                 SynchronizeAcrossTimeZone = $false
                 ScheduleType              = 'Once'
             }
 
-            $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+            $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
+
+            InModuleScope -Parameters @{
+                startTimeString = $startTimeString
+            } -ScriptBlock {
+                $script:startTimeString = $startTimeString
+            }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
                 @{
@@ -2595,12 +2605,12 @@ Describe 'DSC_ScheduledTask' {
             }
         }
 
-        It 'Should return the start time in DateTime format and SynchronizeAcrossTimeZone with value false' {
+        It 'Should return the start time and SynchronizeAcrossTimeZone with value false' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 $result = Get-TargetResource @getTargetResourceParameters
-                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.StartTime | Should -Be $testParameters.StartTime
                 $result.SynchronizeAcrossTimeZone | Should -BeFalse
             }
         }
@@ -2649,7 +2659,7 @@ Describe 'DSC_ScheduledTask' {
             }
 
 
-            It "Should set task trigger StartBoundary to $startTimeString" {
+            It "Should set task trigger StartBoundary to '$startTimeString'" {
                 InModuleScope -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
@@ -2665,23 +2675,25 @@ Describe 'DSC_ScheduledTask' {
 
     Context 'When a scheduled task is created and synchronize across time zone is enabled' {
         BeforeDiscovery {
-            $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+            $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
+            $expectedStartTimeStringWithOffset = (Get-Date -Date $startTimeStringWithOffset).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
         }
 
         BeforeAll {
             $startTimeString = '2018-10-01T01:00:00'
-            $startTimeStringWithOffset = '2018-10-01T01:00:00' + (Get-Date -Format 'zzz')
+            $startTimeStringWithOffset = '2018-10-01T01:00:00-08:00'
+            $expectedStartTimeStringWithOffset = (Get-Date -Date $startTimeStringWithOffset).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime                 = Get-Date -Date $startTimeString
+                StartTime                 = $startTimeStringWithOffset
                 SynchronizeAcrossTimeZone = $true
                 ScheduleType              = 'Once'
             }
 
             InModuleScope -Parameters @{
-                startTimeStringWithOffset = $startTimeStringWithOffset
+                expectedStartTimeStringWithOffset = $expectedStartTimeStringWithOffset
             } -ScriptBlock {
-                $script:startTimeStringWithOffset = $startTimeStringWithOffset
+                $script:expectedStartTimeStringWithOffset = $expectedStartTimeStringWithOffset
             }
 
             Mock -CommandName Get-ScheduledTask -MockWith {
@@ -2695,7 +2707,7 @@ Describe 'DSC_ScheduledTask' {
                     )
                     Triggers = @(
                         [pscustomobject] @{
-                            StartBoundary = $startTimeStringWithOffset
+                            StartBoundary = $expectedStartTimeStringWithOffset
                             CimClass      = @{
                                 CimClassName = 'MSFT_TaskTimeTrigger'
                             }
@@ -2709,12 +2721,12 @@ Describe 'DSC_ScheduledTask' {
             }
         }
 
-        It 'Should return the start time in DateTime format and SynchronizeAcrossTimeZone with value true' {
+        It 'Should return the start time and SynchronizeAcrossTimeZone with value true' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 $result = Get-TargetResource @getTargetResourceParameters
-                $result.StartTime | Should -Be (Get-Date -Date $startTimeStringWithOffset)
+                $result.StartTime | Should -Be $expectedStartTimeStringWithOffset
                 $result.SynchronizeAcrossTimeZone | Should -BeTrue
             }
         }
@@ -2762,7 +2774,7 @@ Describe 'DSC_ScheduledTask' {
                 }
             }
 
-            It "Should set task trigger StartBoundary to $startTimeStringWithOffset" {
+            It "Should set task trigger StartBoundary to '$expectedStartTimeStringWithOffset'" {
                 InModuleScope -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
@@ -2770,30 +2782,8 @@ Describe 'DSC_ScheduledTask' {
                 }
 
                 Should -Invoke -CommandName Set-ScheduledTask -ParameterFilter {
-                    $InputObject.Triggers[0].StartBoundary -eq $startTimeStringWithOffset
+                    $InputObject.Triggers[0].StartBoundary -eq $expectedStartTimeStringWithOffset
                 }
-            }
-        }
-    }
-
-    Context 'When a scheduled task is configured to SynchronizeAcrossTimeZone and the ScheduleType is not Once, Daily or Weekly' {
-        BeforeAll {
-            $startTimeString = '2018-10-01T01:00:00'
-            $testParameters = $getTargetResourceParameters + @{
-                ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime                 = Get-Date -Date $startTimeString
-                SynchronizeAcrossTimeZone = $true
-                ScheduleType              = 'AtLogon'
-            }
-        }
-
-        It 'Should throw when Set-TargetResource is called and SynchronizeAcrossTimeZone is used in combination with an unsupported trigger type' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $errorRecord = Get-InvalidArgumentRecord -Message $LocalizedData.SynchronizeAcrossTimeZoneInvalidScheduleType -ArgumentName 'SynchronizeAcrossTimeZone'
-
-                { Set-TargetResource @testParameters } | Should -Throw $errorRecord
             }
         }
     }
@@ -2803,7 +2793,7 @@ Describe 'DSC_ScheduledTask' {
             $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime         = Get-Date -Date $startTimeString
+                StartTime         = $startTimeString
                 ScheduleType      = 'AtLogon'
                 User              = 'MockedDomain\MockedUser'
                 Delay             = '00:01:00'
@@ -2845,7 +2835,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
-                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.StartTime | Should -Be $testParameters.StartTime
                 $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.User | Should -Be $testParameters.User
                 $result.Delay | Should -Be $testParameters.Delay
@@ -3017,7 +3007,7 @@ Describe 'DSC_ScheduledTask' {
             $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime         = Get-Date -Date $startTimeString
+                StartTime         = $startTimeString
                 ScheduleType      = 'OnIdle'
                 Enable            = $true
             }
@@ -3054,7 +3044,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
-                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.StartTime | Should -Be $testParameters.StartTime
                 $result.ScheduleType | Should -Be $testParameters.ScheduleType
             }
         }
@@ -3073,7 +3063,7 @@ Describe 'DSC_ScheduledTask' {
             $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime         = Get-Date -Date $startTimeString
+                StartTime         = $startTimeString
                 ScheduleType      = 'OnIdle'
                 Enable            = $true
             }
@@ -3164,7 +3154,7 @@ Describe 'DSC_ScheduledTask' {
             $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime         = Get-Date -Date $startTimeString
+                StartTime         = $startTimeString
                 ScheduleType      = 'AtCreation'
                 Delay             = '00:01:00'
                 Enable            = $true
@@ -3203,7 +3193,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
-                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.StartTime | Should -Be $testParameters.StartTime
                 $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.Delay | Should -Be $testParameters.Delay
             }
@@ -3223,7 +3213,7 @@ Describe 'DSC_ScheduledTask' {
             $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime         = Get-Date -Date $startTimeString
+                StartTime         = $startTimeString
                 ScheduleType      = 'AtCreation'
                 Delay             = '00:01:00'
                 Enable            = $true
@@ -3265,7 +3255,7 @@ Describe 'DSC_ScheduledTask' {
             $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime         = Get-Date -Date $startTimeString
+                StartTime         = $startTimeString
                 ScheduleType      = 'OnSessionState'
                 StateChange       = 'OnConnectionFromLocalComputer'
                 User              = 'MockedDomain\MockedUser'
@@ -3308,7 +3298,7 @@ Describe 'DSC_ScheduledTask' {
                 $result = Get-TargetResource @getTargetResourceParameters
                 $result.Enable | Should -Be $testParameters.Enable
                 $result.Ensure | Should -Be 'Present'
-                $result.StartTime | Should -Be (Get-Date -Date $testParameters.StartTime)
+                $result.StartTime | Should -Be $testParameters.StartTime
                 $result.ScheduleType | Should -Be $testParameters.ScheduleType
                 $result.User | Should -Be $testParameters.User
                 $result.StateChange | Should -Be $testParameters.StateChange
@@ -3330,7 +3320,7 @@ Describe 'DSC_ScheduledTask' {
             $startTimeString = '2018-10-01T01:00:00'
             $testParameters = $getTargetResourceParameters + @{
                 ActionExecutable  = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-                StartTime         = Get-Date -Date $startTimeString
+                StartTime         = $startTimeString
                 ScheduleType      = 'OnSessionState'
                 StateChange       = 'OnConnectionFromLocalComputer'
                 User              = 'MockedDomain\MockedUser'
@@ -3455,12 +3445,32 @@ Describe 'DSC_ScheduledTask\Test-DateStringContainsTimeZone'  -Tag 'Private' {
         }
     }
 
-    Context 'When the date string contains a date with a timezone' {
+    Context 'When the date string contains a date with a negative timezone offset' {
         It 'Should return $true' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Test-DateStringContainsTimeZone -DateString ('2018-10-01T01:00:00' + (Get-Date -Format 'zzz')) | Should -BeTrue
+                Test-DateStringContainsTimeZone -DateString '2018-10-01T01:00:00-08:00' | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When the date string contains a date with a positive timezone offset' {
+        It 'Should return $true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-DateStringContainsTimeZone -DateString '2018-10-01T01:00:00+08:00' | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When the date string contains a date with Zulu timezone offset' {
+        It 'Should return $true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Test-DateStringContainsTimeZone -DateString '2018-10-01T01:00:00Z' | Should -BeTrue
             }
         }
     }
