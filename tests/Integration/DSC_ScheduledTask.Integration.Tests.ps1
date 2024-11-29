@@ -291,22 +291,12 @@ Describe "$($script:dscResourceName)_Integration" {
     }
 
     Context 'When a scheduled task is created and synchronize across time zone is disabled' {
-        BeforeDiscovery {
-            $expectedStartTime = '2018-10-01T01:00:00'
-        }
-
         BeforeAll {
             $currentConfig = 'ScheduledTaskOnceSynchronizeAcrossTimeZoneDisabled'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
             $configMof = (Join-Path -Path $configDir -ChildPath 'localhost.mof')
 
             $expectedStartTime = '2018-10-01T01:00:00'
-
-            InModuleScope -Parameters @{
-                expectedStartTime = $expectedStartTime
-            } -ScriptBlock {
-                $script:expectedStartTime = $expectedStartTime
-            }
         }
 
         AfterAll {
@@ -347,18 +337,13 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Enable | Should -BeTrue
         }
 
-        It "Should have the trigger startBoundary set to '$expectedStartTime'" {
+        It 'Should have the trigger startBoundary set to ''2018-10-01T01:00:00''' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone disabled')
             $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
     }
 
     Context 'When a scheduled task is created and synchronize across time zone is enabled positive' {
-        BeforeDiscovery {
-            $configuredStartTime = '2018-10-01T01:00:00+08:00'
-            $expectedStartTime = (Get-Date -Date $configuredStartTime).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
-        }
-
         BeforeAll {
             $currentConfig = 'ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabledPositive'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
@@ -366,12 +351,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
             $configuredStartTime = '2018-10-01T01:00:00+08:00'
             $expectedStartTime = (Get-Date -Date $configuredStartTime).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
-
-            InModuleScope -Parameters @{
-                expectedStartTime = $expectedStartTime
-            } -ScriptBlock {
-                $script:expectedStartTime = $expectedStartTime
-            }
         }
 
         AfterAll {
@@ -412,18 +391,13 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Enable | Should -BeTrue
         }
 
-        It "Should have the trigger startBoundary set to '$expectedStartTime'" {
+        It 'Should have the trigger startBoundary set to ''2018-09-30T17:00:00+00:00''' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone enabled positive')
             $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
     }
 
     Context 'When a scheduled task is created and synchronize across time zone is enabled negative' {
-        BeforeDiscovery {
-            $configuredStartTime = '2018-10-01T01:00:00-08:00'
-            $expectedStartTime = (Get-Date -Date $configuredStartTime).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
-        }
-
         BeforeAll {
             $currentConfig = 'ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabledNegative'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
@@ -431,12 +405,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
             $configuredStartTime = '2018-10-01T01:00:00-08:00'
             $expectedStartTime = (Get-Date -Date $configuredStartTime).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
-
-            InModuleScope -Parameters @{
-                expectedStartTime = $expectedStartTime
-            } -ScriptBlock {
-                $script:expectedStartTime = $expectedStartTime
-            }
         }
 
         AfterAll {
@@ -477,18 +445,13 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Enable | Should -BeTrue
         }
 
-        It "Should have the trigger startBoundary set to '$expectedStartTime'" {
+        It 'Should have the trigger startBoundary set to ''2018-10-01T09:00:00+00:00''' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone enabled negative')
             $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
     }
 
     Context 'When a scheduled task is created and synchronize across time zone is enabled zulu' {
-        BeforeDiscovery {
-            $configuredStartTime = '2018-10-01T01:00:00Z'
-            $expectedStartTime = (Get-Date -Date $configuredStartTime).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
-        }
-
         BeforeAll {
             $currentConfig = 'ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabledZulu'
             $configDir = (Join-Path -Path $TestDrive -ChildPath $currentConfig)
@@ -496,12 +459,6 @@ Describe "$($script:dscResourceName)_Integration" {
 
             $configuredStartTime = '2018-10-01T01:00:00Z'
             $expectedStartTime = (Get-Date -Date $configuredStartTime).ToUniversalTime().ToString((Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz')
-
-            InModuleScope -Parameters @{
-                expectedStartTime = $expectedStartTime
-            } -ScriptBlock {
-                $script:expectedStartTime = $expectedStartTime
-            }
         }
 
         AfterAll {
@@ -542,7 +499,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.Enable | Should -BeTrue
         }
 
-        It "Should have the trigger startBoundary set to '$expectedStartTime'" {
+        It 'Should have the trigger startBoundary set to ''2018-10-01T01:00:00+00:00''' {
             $task = (Get-ScheduledTask -TaskName 'Test task sync across time zone enabled zulu')
             $task.Triggers[0].StartBoundary | Should -Be $expectedStartTime
         }
