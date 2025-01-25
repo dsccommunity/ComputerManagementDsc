@@ -520,28 +520,28 @@ function Set-TargetResource
 
         if ($RepetitionDuration -lt $RepeatInterval)
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.RepetitionDurationLessThanIntervalError -f $RepetitionDuration, $RepeatInterval) `
                 -ArgumentName RepeatInterval
         }
 
         if ($ScheduleType -eq 'Daily' -and $DaysInterval -eq 0)
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.DaysIntervalError -f $DaysInterval) `
                 -ArgumentName DaysInterval
         }
 
         if ($ScheduleType -eq 'Weekly' -and $WeeksInterval -eq 0)
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.WeeksIntervalError -f $WeeksInterval) `
                 -ArgumentName WeeksInterval
         }
 
         if ($ScheduleType -eq 'Weekly' -and $DaysOfWeek.Count -eq 0)
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.WeekDayMissingError) `
                 -ArgumentName DaysOfWeek
         }
@@ -554,7 +554,7 @@ function Set-TargetResource
             }
             catch
             {
-                New-InvalidArgumentException `
+                New-ArgumentException `
                     -Message ($script:localizedData.OnEventSubscriptionError) `
                     -ArgumentName EventSubscription
             }
@@ -562,21 +562,21 @@ function Set-TargetResource
 
         if ($ScheduleType -eq 'OnSessionState' -and [System.String]::IsNullOrEmpty($StateChange))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.OnSessionStateChangeError) `
                 -ArgumentName StateChange
         }
 
         if ($ExecuteAsGMSA -and ($ExecuteAsCredential -or $BuiltInAccount))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.gMSAandCredentialError) `
                 -ArgumentName ExecuteAsGMSA
         }
 
         if ($SynchronizeAcrossTimeZone -and ($ScheduleType -notin @('Once', 'Daily', 'Weekly')))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.SynchronizeAcrossTimeZoneInvalidScheduleType) `
                 -ArgumentName SynchronizeAcrossTimeZone
         }
@@ -832,7 +832,7 @@ function Set-TargetResource
 
             if ($RepetitionDuration -le $RepeatInterval)
             {
-                New-InvalidArgumentException `
+                New-ArgumentException `
                     -Message ($script:localizedData.RepetitionIntervalError -f $RepeatInterval, $RepetitionDuration) `
                     -ArgumentName RepetitionDuration
             }
