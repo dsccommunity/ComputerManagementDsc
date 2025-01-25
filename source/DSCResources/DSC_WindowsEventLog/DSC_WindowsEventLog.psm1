@@ -720,7 +720,7 @@ function Get-WindowsEventLogRetentionDays
     if ($null -eq $matchingEventLog.MinimumRetentionDays)
     {
         $message = $script:localizedData.GetWindowsEventLogRetentionDaysFailure -f $LogName
-        New-InvalidArgumentException -Message $message -ArgumentName 'LogName'
+        New-ArgumentException -Message $message -ArgumentName 'LogName'
     }
 
     return $matchingEventLog.MinimumRetentionDays
@@ -783,7 +783,7 @@ function Register-WindowsEventLogSource
         {
             $message = $script:localizedData.RegisterWindowsEventLogSourceInvalidPath `
                 -f $SourceName, $CategoryResourceFile
-            New-InvalidArgumentException -Message $message -ArgumentName 'CategoryResourceFile'
+            New-ArgumentException -Message $message -ArgumentName 'CategoryResourceFile'
         }
 
         $arguments.CategoryResourceFile = $CategoryResourceFile
@@ -796,7 +796,7 @@ function Register-WindowsEventLogSource
         {
             $message = $script:localizedData.RegisterWindowsEventLogSourceInvalidPath `
                 -f $SourceName, $MessageResourceFile
-            New-InvalidArgumentException -Message $message -ArgumentName 'MessageResourceFile'
+            New-ArgumentException -Message $message -ArgumentName 'MessageResourceFile'
         }
 
         $arguments.MessageResourceFile = $MessageResourceFile
@@ -809,7 +809,7 @@ function Register-WindowsEventLogSource
         {
             $message = $script:localizedData.RegisterWindowsEventLogSourceInvalidPath `
                 -f $SourceName, $ParameterResourceFile
-            New-InvalidArgumentException -Message $message -ArgumentName 'ParameterResourceFile'
+            New-ArgumentException -Message $message -ArgumentName 'ParameterResourceFile'
         }
 
         $arguments.ParameterResourceFile = $ParameterResourceFile
@@ -998,6 +998,6 @@ function Set-WindowsEventLogRetentionDays
     else
     {
         $message = $script:localizedData.SetWindowsEventLogRetentionDaysWrongMode -f $LogName
-        New-InvalidArgumentException -Message $message -ArgumentName 'LogMode'
+        New-ArgumentException -Message $message -ArgumentName 'LogMode'
     }
 }

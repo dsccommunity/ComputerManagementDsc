@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated integration tests to ensure resource and configuration names are matching.
 - Converted tests to Pester 5
 - Rename Delete-ADSIObject to Delete-ADSIObject to satisfy HQRM
+- No longer uses alias `New-InvalidArgumentException` but instead `New-ArgumentException`
 
 ### Removed
 

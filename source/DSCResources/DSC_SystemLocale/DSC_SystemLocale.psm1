@@ -145,7 +145,7 @@ function Test-TargetResource
 
     if (-not (Test-SystemLocaleValue -SystemLocale $SystemLocale))
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message ($script:localizedData.InvalidSystemLocaleError -f $SystemLocale) `
             -ArgumentName 'SystemLocale'
     } # if

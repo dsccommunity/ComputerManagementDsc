@@ -848,7 +848,7 @@ function Assert-AccessPermissionParameters
         #>
         if ($fullAccessIsEmpty -and $changeAccessIsEmpty -and $noAccessIsEmpty)
         {
-            New-InvalidArgumentException -Message $script:localizedData.InvalidAccessParametersCombination -ArgumentName 'FullAccess, ChangeAccess, ReadAccess, NoAccess'
+            New-ArgumentException -Message $script:localizedData.InvalidAccessParametersCombination -ArgumentName 'FullAccess, ChangeAccess, ReadAccess, NoAccess'
         }
     }
 }
