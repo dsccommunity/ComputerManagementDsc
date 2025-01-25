@@ -94,7 +94,7 @@ function Set-TargetResource
     # Check the ODJ Request file exists
     if (-not (Test-Path -Path $RequestFile))
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message ($script:localizedData.RequestFileNotFoundError -f $RequestFile) `
             -ArgumentName 'RequestFile'
     } # if
@@ -144,7 +144,7 @@ function Test-TargetResource
     # Check the ODJ Request file exists
     if (-not (Test-Path -Path $RequestFile))
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message ($script:localizedData.RequestFileNotFoundError -f $RequestFile) `
             -ArgumentName 'RequestFile'
     } # if

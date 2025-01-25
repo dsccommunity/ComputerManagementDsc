@@ -50,7 +50,7 @@ build_script:
     $env:ModuleVersion = $gitVersionObject.NuGetVersionV2
 
     # Build the module
-    ./build.ps1 -ResolveDependency -tasks build
+    ./build.ps1 -ResolveDependency -tasks build -UseModuleFast
 
 # DEBUG: If running on own AppVeyor project, comment the if-block below to run on all branches.
 test_script:

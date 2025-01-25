@@ -193,7 +193,7 @@ class PSResourceRepository : ResourceBase
                 {
                     $errorMessage = $this.LocalizedData.SourceLocationRequiredForRegistration
 
-                    New-InvalidArgumentException -ArgumentName 'SourceLocation' -Message $errorMessage
+                    New-ArgumentException -ArgumentName 'SourceLocation' -Message $errorMessage
                 }
 
                 if ($params.Keys -notcontains 'SourceLocation')
@@ -277,7 +277,7 @@ class PSResourceRepository : ResourceBase
             {
                 $errorMessage = $this.localizedData.NoDefaultSettingsPSGallery
 
-                New-InvalidArgumentException -ArgumentName 'Default' -Message $errorMessage
+                New-ArgumentException -ArgumentName 'Default' -Message $errorMessage
             }
         }
         else
@@ -286,7 +286,7 @@ class PSResourceRepository : ResourceBase
             {
                 $errorMessage = $this.localizedData.DefaultSettingsNoPSGallery
 
-                New-InvalidArgumentException -ArgumentName 'Default' -Message $errorMessage
+                New-ArgumentException -ArgumentName 'Default' -Message $errorMessage
             }
         }
 
@@ -294,7 +294,7 @@ class PSResourceRepository : ResourceBase
         {
             $errorMessage = $this.localizedData.ProxyCredentialPassedWithoutProxyUri
 
-            New-InvalidArgumentException -ArgumentName 'ProxyCredential' -Message $errorMessage
+            New-ArgumentException -ArgumentName 'ProxyCredential' -Message $errorMessage
         }
     }
 }

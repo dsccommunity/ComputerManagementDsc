@@ -378,7 +378,7 @@ function Set-TargetResource
     {
         if ($DomainName)
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.CredentialsNotSpecifiedError) `
                 -ArgumentName 'Credentials'
         }
@@ -528,7 +528,7 @@ function Test-TargetResource
     {
         if (-not ($Credential))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.CredentialsNotSpecifiedError) `
                 -ArgumentName 'Credentials'
         }
@@ -861,7 +861,7 @@ function Assert-ResourceProperty
     if ($options -contains 'PasswordPass' -and
         $options -notcontains 'UnsecuredJoin')
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $script:localizedData.InvalidOptionPasswordPassUnsecuredJoin `
             -ArgumentName 'PasswordPass'
     }
@@ -871,7 +871,7 @@ function Assert-ResourceProperty
         -not [System.String]::IsNullOrEmpty($Credential.UserName))
     {
 
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $script:localizedData.InvalidOptionCredentialUnsecuredJoinNullUsername `
             -ArgumentName 'Credential'
     }
