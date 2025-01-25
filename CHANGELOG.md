@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - BREAKING CHANGE: ScheduledTask
+  - StartTime has chnage the type from DateTime to String.
   - StartTime is now processed on the device, rather than at compile time. This makes it possible
     to configure start times based on each device's timezone, rather than being fixed to the time zone
     configured on the device where the Desired State Configuration compilation was run.
