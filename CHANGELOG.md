@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - BREAKING CHANGE: ScheduledTask
+  - Fixed SynchronizeAcrossTimeZone issue where Test always throws False when a date & time is used
+    where Daylight Savings Time is in operation. Fixes [Issue #374](https://github.com/dsccommunity/ComputerManagementDsc/issues/374).
+  - Fixed Test-DateStringContainsTimeZone to correctly process date strings behind UTC (-), as well
+    as UTC Zulu 'Z' strings.
   - Fixed User parameter to correctly return the user that triggers an AtLogon or OnSessionState
     Schedule Type, instead of the current value of ExecuteAsCredential. This parameter
     is only valid when using the AtLogon and OnSessionState Schedule Types.
@@ -42,8 +46,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - BREAKING CHANGE: ScheduledTask
+  - StartTime has chnage the type from DateTime to String.
+  - StartTime is now processed on the device, rather than at compile time. This makes it possible
+    to configure start times based on each device's timezone, rather than being fixed to the time zone
+    configured on the device where the Desired State Configuration compilation was run.
   - Allow StartTime to be used to set the 'Activate' setting when adding ScheduleType triggers
     other than 'Once', 'Daily' and 'Weekly'.
+  - Changed the default StartTime date from today to 1st January 1980 to prevent configuration flip flopping,
+    and added note to configuration README to advise always supplying a date, and not just a time.
+    Fixes [Issue #148](https://github.com/dsccommunity/ComputerManagementDsc/issues/148).
+    Fixes [Issue #411](https://github.com/dsccommunity/ComputerManagementDsc/issues/411).
+  - Added examples & note to configuration README to supply a timezone when using SynchronizeAcrossTimeZone.
+  - Allow SynchronizeAcrossTimeZone to be used when adding ScheduleType triggers other than 'Once',
+    'Daily' and 'Weekly'.
   - Updated Delay parameter to support ScheduleType AtLogon, AtStartup, AtCreation, OnSessionState.
     Fixes [Issue #345](https://github.com/dsccommunity/ComputerManagementDsc/issues/345).
   - Updated User parameter for use with ScheduleType OnSessionState in addition to AtLogon.

@@ -43,19 +43,59 @@ Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneDisabled
     }
 }
 
-Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled
+Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabledPositive
 {
     Import-DscResource -ModuleName ComputerManagementDsc
 
     node 'localhost'
     {
-        ScheduledTask ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabled
+        ScheduledTask ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabledPositive
         {
-            TaskName                  = 'Test task sync across time zone enabled'
+            TaskName                  = 'Test task sync across time zone enabled positive'
             TaskPath                  = '\ComputerManagementDsc\'
             ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
             ScheduleType              = 'Once'
-            StartTime                 = '2018-10-01T01:00:00'
+            StartTime                 = '2018-10-01T01:00:00+08:00'
+            SynchronizeAcrossTimeZone = $true
+            ActionWorkingPath         = (Get-Location).Path
+            Enable                    = $true
+        }
+    }
+}
+
+Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabledNegative
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabledNegative
+        {
+            TaskName                  = 'Test task sync across time zone enabled negative'
+            TaskPath                  = '\ComputerManagementDsc\'
+            ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType              = 'Once'
+            StartTime                 = '2018-10-01T01:00:00-08:00'
+            SynchronizeAcrossTimeZone = $true
+            ActionWorkingPath         = (Get-Location).Path
+            Enable                    = $true
+        }
+    }
+}
+
+Configuration ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabledZulu
+{
+    Import-DscResource -ModuleName ComputerManagementDsc
+
+    node 'localhost'
+    {
+        ScheduledTask ScheduledTaskOnceSynchronizeAcrossTimeZoneEnabledZulu
+        {
+            TaskName                  = 'Test task sync across time zone enabled zulu'
+            TaskPath                  = '\ComputerManagementDsc\'
+            ActionExecutable          = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+            ScheduleType              = 'Once'
+            StartTime                 = '2018-10-01T01:00:00Z'
             SynchronizeAcrossTimeZone = $true
             ActionWorkingPath         = (Get-Location).Path
             Enable                    = $true

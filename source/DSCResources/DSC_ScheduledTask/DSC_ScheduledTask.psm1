@@ -97,7 +97,8 @@ function Get-TargetResource
         How many units (minutes, hours, days) between each run of this task?
 
     .PARAMETER StartTime
-        The time of day this task should start at, or activate on - defaults to 12:00 AM.
+        The date and time of day this task should start at, or activate on, represented
+        as a string for local conversion to DateTime format - defaults to 1st January 1980 at 12:00 AM.
 
     .PARAMETER SynchronizeAcrossTimeZone
         Enable the scheduled task option to synchronize across time zones. This is enabled
@@ -301,8 +302,8 @@ function Set-TargetResource
         $RepeatInterval = '00:00:00',
 
         [Parameter()]
-        [System.DateTime]
-        $StartTime = [System.DateTime]::Today,
+        [System.String]
+        $StartTime = '1980-01-01T00:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -480,6 +481,9 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SetScheduledTaskMessage -f $TaskName, $TaskPath)
 
+    # Convert the strings containing dates & times to DateTime objects
+    [System.DateTime] $StartTime = [System.DateTime]::Parse($StartTime)
+
     # Convert the strings containing time spans to TimeSpan Objects
     [System.TimeSpan] $RepeatInterval = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RepeatInterval
     [System.TimeSpan] $RandomDelay = ConvertTo-TimeSpanFromTimeSpanString -TimeSpanString $RandomDelay
@@ -572,13 +576,6 @@ function Set-TargetResource
             New-ArgumentException `
                 -Message ($script:localizedData.gMSAandCredentialError) `
                 -ArgumentName ExecuteAsGMSA
-        }
-
-        if ($SynchronizeAcrossTimeZone -and ($ScheduleType -notin @('Once', 'Daily', 'Weekly')))
-        {
-            New-ArgumentException `
-                -Message ($script:localizedData.SynchronizeAcrossTimeZoneInvalidScheduleType) `
-                -ArgumentName SynchronizeAcrossTimeZone
         }
 
         # Configure the action
@@ -1038,8 +1035,11 @@ function Set-TargetResource
 
                 2018-09-27T18:45:08
 
-                The problem in New-ScheduledTaskTrigger is that it always writes the time the format that
-                includes the full timezone offset (W2016 behaviour, W2012R2 does it the other way around).
+                The problem in New-ScheduledTaskTrigger is that it always writes the time in the UTC format, which
+                includes the full timezone offset: (W2016+ behaviour, W2012R2 does it the other way around)
+
+                2018-09-27 16:45:08Z
+
                 Which means "Synchronize across time zones" is enabled by default on W2016 and disabled by
                 default on W2012R2. To prevent that, we are overwriting the StartBoundary here to insert
                 the time in the format we want it, so we can enable or disable "Synchronize across time zones".
@@ -1106,7 +1106,8 @@ function Set-TargetResource
         How many units (minutes, hours, days) between each run of this task?
 
     .PARAMETER StartTime
-        The time of day this task should start at, or activate on - defaults to 12:00 AM.
+        The date and time of day this task should start at, or activate on, represented
+        as a string for local conversion to DateTime format - defaults to 1st January 1980 at 12:00 AM.
 
     .PARAMETER SynchronizeAcrossTimeZone
         Enable the scheduled task option to synchronize across time zones. This is enabled
@@ -1311,8 +1312,8 @@ function Test-TargetResource
         $RepeatInterval = '00:00:00',
 
         [Parameter()]
-        [System.DateTime]
-        $StartTime = [System.DateTime]::Today,
+        [System.String]
+        $StartTime = '1980-01-01T00:00:00',
 
         [Parameter()]
         [System.Boolean]
@@ -1492,6 +1493,12 @@ function Test-TargetResource
 
     $currentValues = Get-CurrentResource -TaskName $TaskName -TaskPath $TaskPath
 
+    # Convert the strings containing dates & times to DateTime objects
+    if ($PSBoundParameters.ContainsKey('StartTime'))
+    {
+        $PSBoundParameters['StartTime'] = [System.DateTime]::Parse($StartTime)
+    }
+
     # Convert the strings containing time spans to TimeSpan Objects
     if ($PSBoundParameters.ContainsKey('RepeatInterval'))
     {
@@ -1569,7 +1576,7 @@ function Test-TargetResource
         $PSBoundParameters['StartTime'] = Get-DateTimeString -Date $StartTime -SynchronizeAcrossTimeZone $SynchronizeAcrossTimeZone
         <#
             If the current StartTime is null then we need to set it to
-            the desired StartTime (which defaults to Today if not passed)
+            the desired StartTime (which defaults to 1st January 1980 at 12:00 AM if not passed)
             so that the test does not fail.
         #>
         if ($currentValues['StartTime'])
@@ -1877,7 +1884,7 @@ function Disable-ScheduledTaskEx
         The date to format.
 
     .PARAMETER SynchronizeAcrossTimeZone
-        Boolean to specifiy if the returned string is formatted in synchronize
+        Boolean to specify if the returned string is formatted in synchronize
         across time zone format.
 #>
 function Get-DateTimeString
@@ -1894,14 +1901,14 @@ function Get-DateTimeString
         $SynchronizeAcrossTimeZone
     )
 
-    $format = (Get-Culture).DateTimeFormat.SortableDateTimePattern
-
     if ($SynchronizeAcrossTimeZone)
     {
-        $returnDate = (Get-Date -Date $Date -Format $format) + (Get-Date -Format 'zzz')
+        $format = (Get-Culture).DateTimeFormat.SortableDateTimePattern + 'zzz'
+        $returnDate = Get-Date -Date $Date.ToLocalTime() -Format $format
     }
     else
     {
+        $format = (Get-Culture).DateTimeFormat.SortableDateTimePattern
         $returnDate = Get-Date -Date $Date -Format $format
     }
 
@@ -2040,7 +2047,7 @@ function Get-CurrentResource
         if ($startAt)
         {
             $synchronizeAcrossTimeZone = Test-DateStringContainsTimeZone -DateString $startAt
-            $startTime = [System.DateTime] $startAt
+            $startTime = $startAt
         }
         else
         {
@@ -2228,7 +2235,9 @@ function Test-DateStringContainsTimeZone
         $DateString
     )
 
-    return $DateString.Contains('+')
+    # When parsing a DateTime, Kind will be 'Unspecified' unless parsed string includes time zone information
+    # See https://learn.microsoft.com/en-us/dotnet/api/system.datetime.parse?view=netframework-4.5#the-return-value-and-datetimekind
+    return [DateTime]::Parse($DateString).Kind -ne 'Unspecified'
 }
 
 <#
