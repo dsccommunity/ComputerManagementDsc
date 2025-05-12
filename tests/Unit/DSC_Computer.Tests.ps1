@@ -1707,17 +1707,17 @@ Describe 'DSC_Computer\Get-ComputerDomain' -Tag 'Private' {
                 }
             }
 
-            Mock -CommandName Get-Item -ParameterFilter { $Path -eq 'Env:\USERDOMAIN' } -MockWith {
+            Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_NTDomain' } -MockWith {
                 [PSCustomObject] @{
-                    Value = 'CONTOSO'
+                    DomainName    = 'CONTOSO'
                 }
             }
         }
 
         BeforeDiscovery {
             $testCases = @(
-                @{ value = $true; result = 'CONTOSO'; GetItemCount = 1 }
-                @{ value = $false; result = 'contoso.com'; GetItemCount = 0 }
+                @{ value = $true; result = 'CONTOSO'; GetCimInstanceCount = 2 }
+                @{ value = $false; result = 'contoso.com'; GetCimInstanceCount = 1 }
             )
         }
 
@@ -1733,8 +1733,7 @@ Describe 'DSC_Computer\Get-ComputerDomain' -Tag 'Private' {
                     Get-ComputerDomain @getComputerDomainParameters | Should -Be $result
                 }
 
-                Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
-                Should -Invoke -CommandName Get-Item -Exactly -Times $GetItemCount -Scope It
+                Should -Invoke -CommandName Get-CimInstance -Exactly -Times $GetCimInstanceCount -Scope It
             }
         }
 
@@ -1747,9 +1746,9 @@ Describe 'DSC_Computer\Get-ComputerDomain' -Tag 'Private' {
                     }
                 }
 
-                Mock -CommandName Get-Item -ParameterFilter { $Path -eq 'Env:\USERDOMAIN' } -MockWith {
+                Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_NTDomain' } -MockWith {
                     [PSCustomObject] @{
-                        Value = 'CONTOSO'
+                        DomainName = 'CONTOSO'
                     }
                 }
             }
@@ -1761,7 +1760,6 @@ Describe 'DSC_Computer\Get-ComputerDomain' -Tag 'Private' {
                 }
 
                 Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
-                Should -Invoke -CommandName Get-Item -Exactly -Times 0 -Scope It
             }
         }
 
@@ -1782,9 +1780,9 @@ Describe 'DSC_Computer\Get-ComputerDomain' -Tag 'Private' {
                         }
                     }
 
-                    Mock -CommandName Get-Item -ParameterFilter { $Path -eq 'Env:\USERDOMAIN' } -MockWith {
+                    Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_NTDomain' } -MockWith {
                         [PSCustomObject] @{
-                            Value = 'Computer1'
+                            DomainName = $null
                         }
                     }
                 }
@@ -1801,7 +1799,6 @@ Describe 'DSC_Computer\Get-ComputerDomain' -Tag 'Private' {
                     }
 
                     Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
-                    Should -Invoke -CommandName Get-Item -Exactly -Times 0 -Scope It
                 }
             }
         }
