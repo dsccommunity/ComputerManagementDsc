@@ -111,6 +111,12 @@ Describe 'UserAccountControl\Set-TargetResource' -Tag 'Set' {
         Mock -CommandName Assert-BoundParameter
         Mock -CommandName Set-ItemProperty
         Mock -CommandName Set-UserAccountControlToNotificationLevel
+
+        InModuleScope -ScriptBlock {
+            function script:Assert-BoundParameter {
+                param ()
+            }
+        }
     }
 
     BeforeEach {

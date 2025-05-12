@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `UserAccountControl`
+  - Add dummy `Assert-BoundParameter` function to please Pester.
+
 ## [10.0.0] - 2025-01-25
 
 ### Added
