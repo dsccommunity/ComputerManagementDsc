@@ -1709,7 +1709,7 @@ Describe 'DSC_Computer\Get-ComputerDomain' -Tag 'Private' {
 
             Mock -CommandName Get-CimInstance -ParameterFilter { $ClassName -eq 'Win32_NTDomain' } -MockWith {
                 [PSCustomObject] @{
-                    DomainName    = 'CONTOSO'
+                    DomainName = 'CONTOSO'
                 }
             }
         }
