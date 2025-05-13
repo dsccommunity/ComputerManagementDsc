@@ -108,7 +108,7 @@ Describe 'UserAccountControl\Get-TargetResource' -Tag 'Get' {
 
 Describe 'UserAccountControl\Set-TargetResource' -Tag 'Set' {
     BeforeAll {
-        Mock -CommandName Assert-BoundParameter
+        Mock -CommandName Assert-BoundParameter -RemoveParameterType RequiredBehavior
         Mock -CommandName Set-ItemProperty
         Mock -CommandName Set-UserAccountControlToNotificationLevel
     }
