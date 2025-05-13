@@ -630,7 +630,7 @@ function Get-ComputerDomain
         {
             if ($NetBios)
             {
-                $domainName = (Get-Item -Path Env:\USERDOMAIN).Value
+                $domainName = (Get-CimInstance -ClassName Win32_NTDomain -Filter "DnsForestName='$($domainInfo.Domain)'").DomainName
             }
             else
             {

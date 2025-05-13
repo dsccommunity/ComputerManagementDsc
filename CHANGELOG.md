@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Computer
+  - Fix Get-ComputerDomain function to retrieve the computer NETBIOS domain name instead of the user.
 - `UserAccountControl`
   - Tests remove parameter type on `Assert-BoundParameter` mocks.
 
