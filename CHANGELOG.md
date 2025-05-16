@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Remove deletion of computer object when PasswordPass and UnsecuredJoin options are used in DSC_Computer.
+- Computer
+  - Fix Get-ComputerDomain function to retrieve the computer NETBIOS domain name instead of the user.
+  - Remove deletion of computer object when PasswordPass and UnsecuredJoin options are used in DSC_Computer.
   Fixes [Issue #446](https://github.com/dsccommunity/ComputerManagementDsc/issues/446).
+- `UserAccountControl`
+  - Tests remove parameter type on `Assert-BoundParameter` mocks.
 
 ## [10.0.0] - 2025-01-25
 
