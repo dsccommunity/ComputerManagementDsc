@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Remove deletion of computer object when PasswordPass and UnsecuredJoin options are used in DSC_Computer.
+  Fixes [Issue #446](https://github.com/dsccommunity/ComputerManagementDsc/issues/446).
+
 ## [10.0.0] - 2025-01-25
 
 ### Added
