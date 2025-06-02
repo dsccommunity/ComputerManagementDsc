@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `azure-pipelines.yml`
+  - Remove `windows-2019` images fixes [#451](https://github.com/dsccommunity/ComputerManagementDsc/issues/451).
+
 ### Fixed
 
 - Computer

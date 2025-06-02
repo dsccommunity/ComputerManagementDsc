@@ -61,7 +61,7 @@ stages:
         displayName: 'HQRM'
         pool:
           vmImage: 'windows-latest'
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -86,11 +86,11 @@ stages:
               testRunTitle: 'HQRM'
             condition: succeededOrFailed()
 
-      - job: Test_Unit_2019
-        displayName: 'Unit (Windows Server 2019)'
+      - job: Test_Unit_2022
+        displayName: 'Unit (Windows Server 2022)'
         pool:
-          vmImage: 'windows-2019'
-        timeoutInMinutes: 0
+          vmImage: 'windows-2022'
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -112,7 +112,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit (Windows Server 2019)'
+              testRunTitle: 'Unit (Windows Server 2022)'
             condition: succeededOrFailed()
 
           - task: PublishPipelineArtifact@1
@@ -120,11 +120,10 @@ stages:
             inputs:
               targetPath: '$(buildFolderName)/$(testResultFolderName)/'
               artifactName: $(testArtifactName)
-              parallel: true
 
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
-        dependsOn: Test_Unit_2019
+        dependsOn: Test_Unit_2022
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 0
@@ -154,11 +153,11 @@ stages:
               bash <(curl -s https://codecov.io/bash) -f "./$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml"
             displayName: 'Publish Code Coverage to Codecov.io'
 
-      - job: Test_Integration_2019
-        displayName: 'Integration (Windows Server 2019)'
+      - job: Test_Integration_2022
+        displayName: 'Integration (Windows Server 2022)'
         pool:
-          vmImage: 'windows-2019'
-        timeoutInMinutes: 0
+          vmImage: 'windows-2022'
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -192,14 +191,14 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration (Windows Server 2019)'
+              testRunTitle: 'Integration (Windows Server 2022)'
             condition: succeededOrFailed()
 
-      - job: Test_Unit_2022
-        displayName: 'Unit (Windows Server 2022)'
+      - job: Test_Unit_2025
+        displayName: 'Unit (Windows Server 2025)'
         pool:
-          vmImage: 'windows-2022'
-        timeoutInMinutes: 0
+          vmImage: 'windows-2025'
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -221,14 +220,14 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit (Windows Server 2022)'
+              testRunTitle: 'Unit (Windows Server 2025)'
             condition: succeededOrFailed()
 
-      - job: Test_Integration_2022
-        displayName: 'Integration (Windows Server 2022)'
+      - job: Test_Integration_2025
+        displayName: 'Integration (Windows Server 2025)'
         pool:
-          vmImage: 'windows-2022'
-        timeoutInMinutes: 0
+          vmImage: 'windows-2025'
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -258,7 +257,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration (Windows Server 2022)'
+              testRunTitle: 'Integration (Windows Server 2025)'
             condition: succeededOrFailed()
 
   - stage: Deploy
