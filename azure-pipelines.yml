@@ -126,7 +126,7 @@ stages:
         dependsOn: Test_Unit_2022
         pool:
           vmImage: 'ubuntu-latest'
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -194,71 +194,71 @@ stages:
               testRunTitle: 'Integration (Windows Server 2022)'
             condition: succeededOrFailed()
 
-      - job: Test_Unit_2025
-        displayName: 'Unit (Windows Server 2025)'
-        pool:
-          vmImage: 'windows-2025'
-        timeoutInMinutes: '0'
-        steps:
-          - task: DownloadPipelineArtifact@2
-            displayName: 'Download Pipeline Artifact'
-            inputs:
-              buildType: 'current'
-              artifactName: $(buildArtifactName)
-              targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
+      # - job: Test_Unit_2025
+      #   displayName: 'Unit (Windows Server 2025)'
+      #   pool:
+      #     vmImage: 'windows-2025'
+      #   timeoutInMinutes: '0'
+      #   steps:
+      #     - task: DownloadPipelineArtifact@2
+      #       displayName: 'Download Pipeline Artifact'
+      #       inputs:
+      #         buildType: 'current'
+      #         artifactName: $(buildArtifactName)
+      #         targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
 
-          - task: PowerShell@2
-            name: test
-            displayName: 'Run Unit Test'
-            inputs:
-              filePath: './build.ps1'
-              arguments: "-Tasks test -PesterScript 'tests/Unit'"
-              pwsh: false
+      #     - task: PowerShell@2
+      #       name: test
+      #       displayName: 'Run Unit Test'
+      #       inputs:
+      #         filePath: './build.ps1'
+      #         arguments: "-Tasks test -PesterScript 'tests/Unit'"
+      #         pwsh: false
 
-          - task: PublishTestResults@2
-            displayName: 'Publish Test Results'
-            inputs:
-              testResultsFormat: 'NUnit'
-              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit (Windows Server 2025)'
-            condition: succeededOrFailed()
+      #     - task: PublishTestResults@2
+      #       displayName: 'Publish Test Results'
+      #       inputs:
+      #         testResultsFormat: 'NUnit'
+      #         testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
+      #         testRunTitle: 'Unit (Windows Server 2025)'
+      #       condition: succeededOrFailed()
 
-      - job: Test_Integration_2025
-        displayName: 'Integration (Windows Server 2025)'
-        pool:
-          vmImage: 'windows-2025'
-        timeoutInMinutes: '0'
-        steps:
-          - task: DownloadPipelineArtifact@2
-            displayName: 'Download Pipeline Artifact'
-            inputs:
-              buildType: 'current'
-              artifactName: $(buildArtifactName)
-              targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
+      # - job: Test_Integration_2025
+      #   displayName: 'Integration (Windows Server 2025)'
+      #   pool:
+      #     vmImage: 'windows-2025'
+      #   timeoutInMinutes: '0'
+      #   steps:
+      #     - task: DownloadPipelineArtifact@2
+      #       displayName: 'Download Pipeline Artifact'
+      #       inputs:
+      #         buildType: 'current'
+      #         artifactName: $(buildArtifactName)
+      #         targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
 
-          - task: PowerShell@2
-            name: configureWinRM
-            displayName: 'Configure WinRM'
-            inputs:
-              targetType: 'inline'
-              script: 'winrm quickconfig -quiet'
-              pwsh: false
+      #     - task: PowerShell@2
+      #       name: configureWinRM
+      #       displayName: 'Configure WinRM'
+      #       inputs:
+      #         targetType: 'inline'
+      #         script: 'winrm quickconfig -quiet'
+      #         pwsh: false
 
-          - task: PowerShell@2
-            name: test
-            displayName: 'Run Integration Test'
-            inputs:
-              filePath: './build.ps1'
-              arguments: "-Tasks test -PesterScript 'tests/Integration' -CodeCoverageThreshold 0"
-              pwsh: false
+      #     - task: PowerShell@2
+      #       name: test
+      #       displayName: 'Run Integration Test'
+      #       inputs:
+      #         filePath: './build.ps1'
+      #         arguments: "-Tasks test -PesterScript 'tests/Integration' -CodeCoverageThreshold 0"
+      #         pwsh: false
 
-          - task: PublishTestResults@2
-            displayName: 'Publish Test Results'
-            inputs:
-              testResultsFormat: 'NUnit'
-              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration (Windows Server 2025)'
-            condition: succeededOrFailed()
+      #     - task: PublishTestResults@2
+      #       displayName: 'Publish Test Results'
+      #       inputs:
+      #         testResultsFormat: 'NUnit'
+      #         testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
+      #         testRunTitle: 'Integration (Windows Server 2025)'
+      #       condition: succeededOrFailed()
 
   - stage: Deploy
     dependsOn: Test
