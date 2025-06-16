@@ -262,17 +262,23 @@ function Set-TargetResource
                     $addComputerParameters.Add("Server", $Server)
                 }
 
-                # When using the UnsecuredJoin and PasswordPass options means the computer object
-                # has been precreated in the domain and should not be deleted before joining the domain.
-                if ( -not ($Options -contains 'PasswordPass' -and
-                $options -contains 'UnsecuredJoin')) {
-                    # Check for existing computer objecst using ADSI without ActiveDirectory module
-                    $computerObject = Get-ADSIComputer -Name $Name -DomainName $DomainName -Credential $Credential
-
-                    if ($computerObject)
-                    {
+                # Check for existing computer objecst using ADSI without ActiveDirectory module
+                $computerObject = Get-ADSIComputer -Name $Name -DomainName $DomainName -Credential $Credential
+                if ($computerObject)
+                {
+                    # UnsecuredJoin and PasswordPass options or JoinReadOnly option uses an existing machine account
+                    # to join the computer to the domain and should not be deleted before.
+                    if ( -not (($Options -contains 'PasswordPass' -and $options -contains 'UnsecuredJoin') -or ($Options -contains 'JoinReadOnly'))) {
                         Remove-ADSIObject -Path $computerObject.Path -Credential $Credential
                         Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
+                    }
+                }
+                else
+                {
+                    # Check if the computer object exists in the domain when using UnsecuredJoin and PasswordPass options or JoinReadOnly option 
+                    if (($Options -contains 'PasswordPass' -and $options -contains 'UnsecuredJoin') -or ($Options -contains 'JoinReadOnly')) {
+                        $errorMessage = $script:localizedData.ComputerObjectNotFound -f $Name,$DomainName
+                        New-ObjectNotFoundException -Message $errorMessage
                     }
                 }
 
