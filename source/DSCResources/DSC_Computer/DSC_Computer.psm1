@@ -268,7 +268,8 @@ function Set-TargetResource
                 {
                     # UnsecuredJoin and PasswordPass options or JoinReadOnly option uses an existing machine account
                     # to join the computer to the domain and should not be deleted before.
-                    if ( -not (($Options -contains 'PasswordPass' -and $options -contains 'UnsecuredJoin') -or ($Options -contains 'JoinReadOnly'))) {
+                    if ( -not (($Options -contains 'PasswordPass' -and $options -contains 'UnsecuredJoin') -or ($Options -contains 'JoinReadOnly')))
+                    {
                         Remove-ADSIObject -Path $computerObject.Path -Credential $Credential
                         Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
                     }
@@ -276,7 +277,8 @@ function Set-TargetResource
                 else
                 {
                     # Check if the computer object exists in the domain when using UnsecuredJoin and PasswordPass options or JoinReadOnly option 
-                    if (($Options -contains 'PasswordPass' -and $options -contains 'UnsecuredJoin') -or ($Options -contains 'JoinReadOnly')) {
+                    if (($Options -contains 'PasswordPass' -and $options -contains 'UnsecuredJoin') -or ($Options -contains 'JoinReadOnly'))
+                    {
                         $errorMessage = $script:localizedData.ComputerObjectNotFound -f $Name,$DomainName
                         New-ObjectNotFoundException -Message $errorMessage
                     }
