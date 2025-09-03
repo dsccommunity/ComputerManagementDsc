@@ -262,7 +262,7 @@ function Set-TargetResource
                     $addComputerParameters.Add("Server", $Server)
                 }
 
-                # Check for existing computer objecst using ADSI without ActiveDirectory module
+                # Check for existing computer object using ADSI without ActiveDirectory module
                 $computerObject = Get-ADSIComputer -Name $Name -DomainName $DomainName -Credential $Credential
                 if ($computerObject)
                 {
