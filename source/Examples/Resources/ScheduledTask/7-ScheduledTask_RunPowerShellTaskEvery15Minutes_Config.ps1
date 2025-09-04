@@ -32,13 +32,13 @@ Configuration ScheduledTask_RunPowerShellTaskEvery15Minutes_Config
     {
         ScheduledTask MaintenanceScriptExample
         {
-          TaskName           = "Custom maintenance tasks"
-          ActionExecutable   = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
-          ActionArguments    = "-File `"C:\scripts\my custom script.ps1`""
-          ScheduleType       = 'Once'
-          RepeatInterval     = '00:15:00'
-          RepetitionDuration = '4.00:00:00'
-          StopAtDurationEnd  = $true
+            TaskName           = "Custom maintenance tasks"
+            ActionExecutable   = "C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
+            ActionArguments    = "-File `"C:\scripts\my custom script.ps1`""
+            ScheduleType       = 'Once'
+            RepeatInterval     = '00:15:00'
+            RepetitionDuration = '4.00:00:00'
+            StopAtDurationEnd  = $true
         }
     }
 }
