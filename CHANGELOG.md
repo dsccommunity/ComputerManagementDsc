@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `azure-pipelines.yml`
   - Remove `windows-2019` images fixes [#451](https://github.com/dsccommunity/ComputerManagementDsc/issues/451).
-- Module manifest was chnage to have the value `'*'` for the property `CmdletsToExport` to meet the QA tests.
+- Module manifest: Set `CmdletsToExport` to `'*'` to satisfy HQRM tests.
 
 ### Fixed
 
