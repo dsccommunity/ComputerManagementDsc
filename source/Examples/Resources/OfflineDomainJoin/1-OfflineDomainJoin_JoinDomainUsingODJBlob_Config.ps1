@@ -30,8 +30,8 @@ Configuration OfflineDomainJoin_JoinDomainUsingODJBlob_Config
     {
         OfflineDomainJoin ODJ
         {
-          IsSingleInstance = 'Yes'
-          RequestFile      = 'C:\ODJ\ODJBlob.txt'
+            IsSingleInstance = 'Yes'
+            RequestFile      = 'C:\ODJ\ODJBlob.txt'
         }
     }
 }
