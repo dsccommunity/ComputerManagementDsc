@@ -13,7 +13,6 @@ namespace ScheduledTask
     }
     public enum StateChange : uint
     {
-        Undefined = 0,
         OnConnectionFromLocalComputer = 1,
         OnDisconnectFromLocalComputer = 2,
         OnConnectionFromRemoteComputer = 3,
@@ -2127,7 +2126,11 @@ function Get-CurrentResource
             EventSubscription               = $trigger.Subscription
             EventValueQueries               = ConvertTo-HashtableFromTaskNamedValuePairCollection -Array $trigger.ValueQueries
             Delay                           = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.Delay
-            StateChange                     = [System.String][ScheduledTask.StateChange][System.UInt32] $trigger.StateChange # Cast to integer first to allow casting to enum with null
+        }
+
+        if ($trigger.StateChange)
+        {
+            $result.Add('StateChange', [System.String][ScheduledTask.StateChange][System.UInt32] $trigger.StateChange)
         }
 
         if (
