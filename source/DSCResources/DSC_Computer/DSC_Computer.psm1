@@ -262,13 +262,26 @@ function Set-TargetResource
                     $addComputerParameters.Add("Server", $Server)
                 }
 
-                # Check for existing computer objecst using ADSI without ActiveDirectory module
+                # Check for existing computer object using ADSI without ActiveDirectory module
                 $computerObject = Get-ADSIComputer -Name $Name -DomainName $DomainName -Credential $Credential
+                # True when a pre-created computer object is required
+                $requiresPrecreated = ('JoinReadOnly' -in $Options) -or (('PasswordPass' -in $Options) -and ('UnsecuredJoin' -in $Options))
 
                 if ($computerObject)
                 {
-                    Remove-ADSIObject -Path $computerObject.Path -Credential $Credential
-                    Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
+                    if (-not $requiresPrecreated)
+                    {
+                        Remove-ADSIObject -Path $computerObject.Path -Credential $Credential
+                        Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
+                    }
+                }
+                else
+                {
+                    if ($requiresPrecreated)
+                    {
+                        $errorMessage = $script:localizedData.ComputerObjectNotFound -f $Name, $DomainName
+                        New-ObjectNotFoundException -Message $errorMessage
+                    }
                 }
 
                 if (-not [System.String]::IsNullOrEmpty($Options))
