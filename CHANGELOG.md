@@ -146,6 +146,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- PSResource
+  - New class-based resource to manage PowerShell resources. - Fixes [Issue #393](https://github.com/dsccommunity/ComputerManagementDsc/issues/393), [Issue #398](https://github.com/dsccommunity/ComputerManagementDsc/issues/398)
 - PSResourceRepository
   - New class-based resource to manage PowerShell Resource Repositories - Fixes [Issue #393](https://github.com/dsccommunity/ComputerManagementDsc/issues/393)
 - Computer

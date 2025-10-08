@@ -1,0 +1,2235 @@
+<#
+    .SYNOPSIS
+        Unit test for PSResource DSC resource.
+#>
+
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
+
+try
+{
+    if (-not (Get-Module -Name 'DscResource.Test'))
+    {
+        # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+        if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+        {
+            # Redirect all streams to $null, except the error stream (stream 2)
+            & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+        }
+
+        # If the dependencies has not been resolved, this will throw an error.
+        Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+    }
+}
+catch [System.IO.FileNotFoundException]
+{
+    throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+}
+
+try
+{
+    $script:dscModuleName = 'ComputerManagementDsc'
+
+    Import-Module -Name $script:dscModuleName
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+
+    Describe 'PSResource' {
+        Context 'When class is instantiated' {
+            It 'Should not throw an exception' {
+                InModuleScope -ScriptBlock {
+                    { [PSResource]::new() } | Should -Not -Throw
+                }
+            }
+
+            It 'Should have a default or empty constructor' {
+                InModuleScope -ScriptBlock {
+                    $instance = [PSResource]::new()
+                    $instance | Should -Not -BeNullOrEmpty
+                }
+            }
+
+            It 'Should be the correct type' {
+                InModuleScope -ScriptBlock {
+                    $instance = [PSResource]::new()
+                    $instance.GetType().Name | Should -Be 'PSResource'
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\Get()' -Tag 'Get' {
+
+        Context 'When the system is in the desired state' {
+        }
+
+        Context 'When the system is not in the desired state' {
+        }
+    }
+
+    Describe 'PSResource\Set()' -Tag 'Set' {
+    }
+
+    Describe 'PSResource\Test()' -Tag 'Test' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name       = 'ComputerManagementDsc'
+                    Repository = 'PSGallery'
+                }
+            }
+        }
+
+        Context 'When the system is in the desired state' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+
+                }
+            }
+
+            It 'Should return $true' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Test() | Should -BeTrue
+                }
+            }
+        }
+
+        Context 'When the system is not in the desired state' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance |
+                        # Mock method Compare() which is called by the base method Test ()
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'Compare' -Value {
+                            return @{
+                                Property      = 'Version'
+                                ExpectedValue = '8.6.0'
+                                ActualValue   = '8.5.0'
+                            }
+                        }
+                }
+            }
+
+            It 'Should return $false' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Test() | Should -BeFalse
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetCurrentState()' -Tag 'GetCurrentState' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name       = 'ComputerManagementDsc'
+                    Repository = 'PSGallery'
+                }
+            }
+        }
+        Context 'When Ensure is present' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Ensure = [Ensure]::Present
+                }
+            }
+
+            Context 'When OnlySingleVersion is set' {
+                BeforeAll {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceInstance.OnlySingleVersion = $true
+                    }
+                }
+
+                It 'Should return the correct current state when OnlySingleVersion is true' {
+                    InModuleScope -ScriptBlock {
+                        {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @{
+                                        Name = 'ComputerManagementDsc'
+                                    }
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestOnlySingleVersion' -Value {
+                                    return $true
+                                }
+
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name           | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure         | Should -Be [Ensure]::Present
+                            $currentState.OnlySingleVersion | Should -BeTrue
+                        }
+                    }
+                }
+
+                It 'Should return the correct current state when OnlySingleVersion is false because no resources are installed' {
+                    InModuleScope -ScriptBlock {
+                        {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestOnlySingleVersion' -Value {
+                                    return $false
+                                }
+
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name           | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure         | Should -Be [Ensure]::Absent
+                            $currentState.OnlySingleVersion | Should -BeFalse
+                        }
+                    }
+                }
+
+                It 'Should return the correct current state when OnlySingleVersion is false because multiple resources are installed' {
+                    InModuleScope -ScriptBlock {
+                        {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestOnlySingleVersion' -Value {
+                                    return $false
+                                }
+
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name           | Should -Be 'ComputerManagementDsc'
+                            $currentState.Ensure         | Should -Be [Ensure]::Present
+                            $currentState.OnlySingleVersion | Should -BeFalse
+                        }
+                    }
+                }
+            }
+
+            Context 'When VersionRequirement is set' {
+
+                Context 'When Latest is true' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.Latest = $true
+                        }
+                    }
+
+                    It 'Should return the correct state when Latest is true' {
+
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestLatestVersion' -Value {
+                                    return $true
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name   | Should -Be 'ComputerManagement'
+                                $currentState.Ensure | Should -Be [Ensure]::Present
+                                $currentState.Latest | Should -BeTrue
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when Latest is false and multiple resources are installed' {
+
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestLatestVersion' -Value {
+                                    return $false
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name   | Should -Be 'ComputerManagement'
+                                $currentState.Ensure | Should -Be [Ensure]::Present
+                                $currentState.Latest | Should -BeFalse
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when Latest is false and no resources are installed' {
+
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'TestLatestVersion' -Value {
+                                    return $false
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name   | Should -Be 'ComputerManagement'
+                                $currentState.Ensure | Should -Be [Ensure]::Absent
+                                $currentState.Latest | Should -BeFalse
+                            }
+                        }
+                    }
+                }
+
+                Context 'When MinimumVersion is true' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.MinimumVersion     = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement = 'MinimumVersion'
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion requirement is met exactly' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name           | Should -Be 'ComputerManagement'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
+                                $currentState.MinimumVersion | Should -Be '9.0.0'
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion requirement is met but not exactly' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '10.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name           | Should -Be 'ComputerManagement'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
+                                $currentState.MinimumVersion | Should -Be '9.0.0'
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion requirement is not met and multiple resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '8.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '7.0.0'
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name           | Should -Be 'ComputerManagement'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
+                                $currentState.MinimumVersion | Should -Be '7.0.0'
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion requirement is not met and no resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return $null
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name           | Should -Be 'ComputerManagement'
+                                $currentState.Ensure         | Should -Be [Ensure]::Absent
+                                $currentState.MinimumVersion | Should -BeNullOrEmpty
+                            }
+                        }
+                    }
+                }
+
+                Context 'When MaximumVersion is true' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.MaximumVersion     = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement = 'MaximumVersion'
+                        }
+                    }
+
+                    It 'Should return the correct state when MaximumVersion requirement is met exactly' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name           | Should -Be 'ComputerManagement'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
+                                $currentState.MaximumVersion | Should -Be '9.0.0'
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when MaximumVersion requirement is met but not exactly' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '10.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name           | Should -Be 'ComputerManagement'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
+                                $currentState.MaximumVersion | Should -Be '9.0.0'
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when MaximumVersion requirement is not met and multiple resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '10.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '11.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '11.0.0'
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name           | Should -Be 'ComputerManagement'
+                                $currentState.Ensure         | Should -Be [Ensure]::Present
+                                $currentState.MaximumVersion | Should -Be '11.0.0'
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when MaximumVersion requirement is not met and no resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return $null
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name           | Should -Be 'ComputerManagement'
+                                $currentState.Ensure         | Should -Be [Ensure]::Absent
+                                $currentState.MaximumVersion | Should -BeNullOrEmpty
+                            }
+                        }
+                    }
+                }
+
+                Context 'When RequiredVersion is true' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.RequiredVersion    = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement = 'RequiredVersion'
+                        }
+                    }
+
+                    It 'Should return the correct state when RequiredVersion requirement is met exactly' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '7.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name            | Should -Be 'ComputerManagement'
+                                $currentState.Ensure          | Should -Be [Ensure]::Present
+                                $currentState.RequiredVersion | Should -Be '9.0.0'
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when RequiredVersion requirement is not met and multiple resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '10.0.0'
+                                        },
+                                        @{
+                                            Name    = 'ComputerManagementDsc'
+                                            Version = '11.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return $null
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name            | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure          | Should -Be [Ensure]::Present
+                                $currentState.RequiredVersion | Should -BeNullOrEmpty
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when RequiredVersion requirement is not met and no resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return $null
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name            | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure          | Should -Be [Ensure]::Absent
+                                $currentState.RequiredVersion | Should -BeNullOrEmpty
+                            }
+                        }
+                    }
+                }
+
+                Context 'When RemoveNonCompliantVersions is true and MinimumVersion is set' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.MinimumVersion             = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement         = 'MinimumVersion'
+                            $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion and RemoveNonCompliantVersions is met' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @{
+                                        Version = '9.0.0'
+                                    }
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                } -PassThru |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
+                                    return $true
+                                }
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure                     | Should -Be [Ensure]::Present
+                                $currentState.MinimumVersion             | Should -Be '9.0.0'
+                                $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                                $currentState.RemoveNonCompliantVersions | Should -BeTrue
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion is met and RemoveNonCompliantVersions is not' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Version = '9.0.0'
+                                        },
+                                        @{
+                                            Version = '10.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '9.0.0'
+                                } -PassThru |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
+                                    return $false
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure                     | Should -Be [Ensure]::Present
+                                $currentState.MinimumVersion             | Should -Be '9.0.0'
+                                $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                                $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion and RemoveNonCompliantVersions are not met and resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return @(
+                                        @{
+                                            Version = '7.0.0'
+                                        },
+                                        @{
+                                            Version = '8.0.0'
+                                        }
+                                    )
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return '7.0.0'
+                                } -PassThru |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
+                                    return $false
+                                }
+
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure                     | Should -Be [Ensure]::Present
+                                $currentState.MinimumVersion             | Should -Be '7.0.0'
+                                $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                                $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                            }
+                        }
+                    }
+
+                    It 'Should return the correct state when MinimumVersion and RemoveNonCompliantVersions are not met because no resources are installed' {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                    return $null
+                                } -PassThru |
+                                Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestVersionRequirement' -Value {
+                                    return $false
+                                }
+                            {
+                                $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                                $currentState.Name                       | Should -Be 'ComputerManagementDsc'
+                                $currentState.Ensure                     | Should -Be [Ensure]::Absent
+                                $currentState.MinimumVersion             | Should -BeNullOrEmpty
+                                $currentState.VersionRequirement         | Should -Be 'MinimumVersion'
+                                $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                            }
+                        }
+                    }
+                }
+
+                Context 'When RemoveNonCompliantVersions is true and MaximumVersion is set' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.MaximumVersion             = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement         = 'MaximumVersion'
+                            $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                        }
+                    }
+
+                    It 'Should return the correct state when MaximumVersion and RemoveNonCompliantVersions is met' {
+
+                    }
+
+                    It 'Should return the correct state when MaximumVersion is met and RemoveNonCompliantVersions is not' {
+
+                    }
+
+                    It 'Should return the correct state when MaximumVersion and RemoveNonCompliantVersions are not met and resources are installed' {
+
+                    }
+
+                    It 'Should return the correct state when MaximumVersion and RemoveNonCompliantVersions are not met because no resources are installed' {
+
+                    }
+                }
+
+                Context 'When RemoveNonCompliantVersions is true and RequiredVersion is set' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.RequiredVersion            = '9.0.0'
+                            $script:mockPSResourceInstance.VersionRequirement         = 'RequiredVersion'
+                            $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                        }
+                    }
+
+                    It 'Should return the correct state when RequiredVersion and RemoveNonCompliantVersions is met' {
+
+                    }
+
+                    It 'Should return the correct state when RequiredVersion is met and RemoveNonCompliantVersions is not' {
+
+                    }
+
+                    It 'Should return the correct state when RequiredVersion and RemoveNonCompliantVersions are not met and resources are installed' {
+
+                    }
+
+                    It 'Should return the correct state when RequiredVersion and RemoveNonCompliantVersions are not met because no resources are installed' {
+
+                    }
+                }
+
+                Context 'When RemoveNonCompliantVersions is true and Latest is set' {
+                    BeforeAll {
+                        InModuleScope -ScriptBlock {
+                            $script:mockPSResourceInstance.Latest                     = $true
+                            $script:mockPSResourceInstance.VersionRequirement         = 'Latest'
+                            $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                        }
+                    }
+
+                    It 'Should return the correct state when Latest and RemoveNonCompliantVersions is met' {
+
+                    }
+
+                    It 'Should return the correct state when Latest is met and RemoveNonCompliantVersions is not' {
+
+                    }
+
+                    It 'Should return the correct state when Latest and RemoveNonCompliantVersions are not met and resources are installed' {
+
+                    }
+
+                    It 'Should return the correct state when Latest and RemoveNonCompliantVersions are not met because no resources are installed' {
+
+                    }
+                }
+            }
+
+            Context 'When VersionRequirement is not set' {
+                BeforeAll {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceInstance.RequiredVersion            = '9.0.0'
+                        $script:mockPSResourceInstance.VersionRequirement         = 'RequiredVersion'
+                        $script:mockPSResourceInstance.RemoveNonCompliantVersions = $true
+                    }
+                }
+
+                It 'Should return the current state when RemoveNonCompliantVersions requirement is met' {
+
+                }
+
+                It 'Should return the current state when RemoveNonCompliantVersions requirement is not met and resource are installed' {
+
+                }
+
+                It 'Should return the current state when RemoveNonCompliantVersions requirement is not met and resources are not installed' {
+                    InModuleScope -ScriptBlock {
+                        $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetInstalledResource' -Value {
+                                return $null
+                            } -PassThru |
+                            Add-member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredVersionFromVersionRequirement' -Value {
+                                return $null
+                            }
+
+                        {
+                            $currentState = $script:mockPSResourceInstance.GetCurrentState(@{Name = 'ComputerManagementDsc'})
+                            $currentState.Name                       | Should -Be 'ComputerManagement'
+                            $currentState.Ensure                     | Should -Be [Ensure]::Absent
+                            $currentState.RequiredVersion            | Should -BeNullOrEmpty
+                            $currentState.RemoveNonCompliantVersions | Should -BeFalse
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    Describe 'PSResource\Modify()' -Tag 'Modify' {
+    }
+
+    Describe 'PSResource\AssertProperties()' -Tag 'AssertProperties' {
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{}
+            }
+        }
+        Context 'When PowerShellGet version is too low for AllowPrerelease' {
+            InModuleScope -ScriptBlock {
+                Mock -CommandName Get-Module -MockWith {
+                    return @{
+                        Name   = 'PowerShellGet'
+                        Version = '1.5.0'
+                    }
+                }
+            }
+            It 'Should throw the correct error' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AllowPrerelease = $true
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{AllowPrerelease = $true}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.PowerShellGetVersionTooLowForAllowPrerelease
+                    }
+                }
+            }
+        }
+
+        Context 'When passing dependant parameters' {
+            It 'Should throw when RemoveNonCompliantVersions and OnlySingleVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                RemoveNonCompliantVersions = $true
+                                OnlySingleVersion             = $true
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
+                }
+            }
+
+            It 'Should throw when Latest and MinimumVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                Latest         = $true
+                                MinimumVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
+                }
+            }
+
+            It 'Should throw when Latest and RequiredVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                Latest         = $true
+                                RequiredVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
+                }
+            }
+
+            It 'Should throw when Latest and MaximumVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                Latest         = $true
+                                MaximumVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
+                }
+            }
+
+            It 'Should throw when MinimumVersion and MaximumVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                MinimumVersion = '1.0.0'
+                                MaximumVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
+                }
+            }
+
+            It 'Should throw when MinimumVersion and RequiredVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                MinimumVersion  = '1.0.0'
+                                RequiredVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
+                }
+            }
+
+            It 'Should throw when RequiredVersion and MaximumVersion are passed together' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{
+                                MaximumVersion  = '1.0.0'
+                                RequiredVersion = '1.0.0'
+                            }
+                        ) | Should -Throw -ExpectedMessage 'DRC0010'
+                    }
+                }
+            }
+        }
+
+        Context 'When ensure is Absent' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Ensure = [Ensure]::Absent
+                }
+            }
+
+            It 'Should throw when ensure is Absent and MinimumVersion is passed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MinimumVersion = '1.0.0'}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                    }
+                }
+            }
+
+            It 'Should throw when ensure is Absent and MaximumVersion is passed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MaximumVersion = '1.0.0'}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                    }
+                }
+            }
+
+            It 'Should throw when ensure is Absent and Latest is passed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Latest = $true}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.EnsureAbsentWithVersioning
+                    }
+                }
+            }
+        }
+
+        Context 'When ProxyCredential is passed without Proxy' {
+            It 'Should throw when ProxyCredential is passed without Proxy' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $securePassword = New-Object -Type SecureString
+                        $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
+
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{ProxyCredential = $credential}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.ProxyCredentialPassedWithoutProxyUri
+                    }
+                }
+            }
+        }
+
+        Context 'When Credential or Proxy are passed without Repository' {
+            It 'Should throw when Credential is passed without Repository' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $securePassword = New-Object -Type SecureString
+                        $credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'USER', $securePassword
+
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Credential = $credential}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.ProxyorCredentialWithoutRepository
+                    }
+                }
+            }
+
+            It 'Should throw when Proxy is passed without Repository' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Proxy = 'http://psgallery.com/'}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.ProxyorCredentialWithoutRepository
+                    }
+                }
+            }
+        }
+
+        Context 'When RemoveNonCompliantVersions is passed without a versioning parameter' {
+            It 'Should throw when RemoveNonCompliantVersions is passed without a versioning parameter' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{RemoveNonCompliantVersions = $true}
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.RemoveNonCompliantVersionsWithoutVersioning
+                    }
+                }
+            }
+        }
+
+        Context 'When Latest is passed' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance |
+                        Add-Member 'ScriptMethod' -Name 'GetLatestVersion' -Value {
+                            return '1.5.0'
+                        } -Force
+                }
+            }
+            It 'Should correctly set read only LatestVersion property' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Latest = $true}
+                        )
+                        $script:mockPSResourceInstance.LatestVersion | Should -Be '1.5.0'
+                    }
+                }
+            }
+        }
+
+        Context 'When a versioning parameter is passed' {
+            It 'Should correctly set read only VersionRequirement property when MinimumVersion is passed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance |
+                            Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
+                                return 'MinimumVersion'
+                            }
+
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MinimumVersion = '1.1.0'}
+                        )
+                        $script:mockPSResourceInstance.VersionRequirement | Should -Be 'MinimumVersion'
+                    }
+                }
+            }
+
+            It 'Should correctly set read only VersionRequirement property when MaximumVersion is passed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance |
+                            Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
+                                return 'MaximumVersion'
+                            }
+
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MaximumVersion = '1.1.0'}
+                        )
+                        $script:mockPSResourceInstance.VersionRequirement | Should -Be 'MaximumVersion'
+                    }
+                }
+            }
+
+            It 'Should correctly set read only VersionRequirement property when RequiredVersion is passed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance |
+                            Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
+                                return 'RequiredVersion'
+                            }
+
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{MaximumVersion = '1.1.0'}
+                        )
+                        $script:mockPSResourceInstance.VersionRequirement | Should -Be 'RequiredVersion'
+                    }
+                }
+            }
+
+            It 'Should correctly set read only VersionRequirement property when Latest is passed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance |
+                            Add-Member 'ScriptMethod' -Name 'GetVersionRequirement' -Value {
+                                return 'Latest'
+                            }
+
+                        $script:mockPSResourceInstance.AssertProperties(
+                            @{Latest = $true}
+                        )
+                        $script:mockPSResourceInstance.VersionRequirement | Should -Be 'Latest'
+                    }
+                }
+            }
+        }
+    }
+
+    # Describe 'PSResource\TestOnlySingleVersion()' -Tag 'TestOnlySingleVersion' {
+    #     InModuleScope -ScriptBlock {
+    #         $script:mockPSResourceInstance = [PSResource] @{
+    #             Name           = 'ComputerManagementDsc'
+    #             Ensure         = [Ensure]::Present
+    #             OnlySingleVersion = $True
+    #         }
+    #     }
+
+    #     It 'Should not throw and return True when one resource is present' {
+    #         InModuleScope -ScriptBlock {
+    #             $script:mockPSResourceInstance.TestOnlySingleVersion(
+    #                 @(
+    #                     @{
+    #                         Name    = 'ComputerManagementDsc'
+    #                         Version = '8.6.0'
+    #                     }
+    #                 )
+    #             ) | Should -BeTrue
+    #         }
+    #     }
+
+    #     It 'Should not throw and return False when zero resources are present' {
+    #         InModuleScope -ScriptBlock {
+    #             $script:mockPSResourceInstance.TestOnlySingleVersion(
+    #                 @()
+    #             ) | Should -BeFalse
+    #         }
+    #     }
+
+    #     It 'Should not throw and return False when more than one resource is present' {
+    #         InModuleScope -ScriptBlock {
+    #             $script:mockPSResourceInstance.TestOnlySingleVersion(
+    #                 @(
+    #                     @{
+    #                         Name    = 'ComputerManagementDsc'
+    #                         Version = '8.6.0'
+    #                     },
+    #                     @{
+    #                         Name    = 'ComputerManagementDsc'
+    #                         Version = '8.5.0'
+    #                     }
+    #                 )
+    #             ) | Should -BeFalse
+    #         }
+    #     }
+    # }
+
+    Describe 'PSResource\TestOnlySingleVersion()' -Tag 'TestOnlySingleVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name           = 'ComputerManagementDsc'
+                    Ensure         = [Ensure]::Present
+                    OnlySingleVersion = $True
+                }
+            }
+        }
+
+        Context 'When there are zero resources installed' {
+            It 'Should Correctly return False when Zero Resources are Installed' {
+
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.TestOnlySingleVersion($null) | Should -BeFalse
+                }
+            }
+        }
+
+        Context 'When there is one resource installed' {
+            It 'Should Correctly return True when One Resource is Installed' {
+                InModuleScope -ScriptBlock {
+                    $script:mockResources = @{Name = 'ComputerManagementDsc'}
+                    $script:mockPSResourceInstance.TestOnlySingleVersion($script:mockResources) | Should -BeTrue
+                }
+            }
+        }
+
+        Context 'When there are multiple resources installed' {
+            It 'Should Correctly return False' {
+                InModuleScope -ScriptBlock {
+                    $script:mockResources = @{
+                        Name    = 'ComputerManagementDsc'
+                        Version = '8.5.0'
+                    },
+                    @{
+                        Name    = 'ComputerManagementDsc'
+                        Version = '8.6.0'
+                    }
+                    $script:mockPSResourceInstance.TestOnlySingleVersion($script:mockResources) | Should -BeFalse
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetLatestVersion()' -Tag 'GetLatestVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name       = 'ComputerManagementDsc'
+                    Ensure     = [Ensure]::Present
+                }
+            }
+        }
+
+        Context 'When there FindResource finds a resourse' {
+            # BeforeEach {
+            #     Mock -CommandName Find-Module -MockWith {
+            #         return $(New-MockObject -Type 'Version' | Add-Member -MemberType NoteProperty -Name 'Version' -Value '8.6.0')
+            #     }
+            # }
+
+            It 'Should return the correct version' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                        return [System.Collections.Hashtable] @{
+                            Version = '8.6.0'
+                        }
+                    }
+
+                    $script:mockPSResourceInstance.GetLatestVersion() | Should -Be '8.6.0'
+                }
+            }
+        }
+
+        Context 'When there FindResource does not find a resourse' {
+            It 'Should return null or empty' {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                        return $null
+                    }
+
+                    $script:mockPSResourceInstance.GetLatestVersion() | Should -BeNullOrEmpty
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetInstalledResource()' -Tag 'GetInstalledResource' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name       = 'ComputerManagementDsc'
+                    Ensure     = [Ensure]::Present
+                }
+            }
+        }
+
+        It 'Should return nothing' {
+            InModuleScope -ScriptBlock {
+                Mock -CommandName Get-Module
+                { $script:mockPSResourceInstance.GetInstalledResource() | Should -BeNullOrEmpty }
+            }
+        }
+
+        It 'Should return one object' {
+            InModuleScope -ScriptBlock {
+                Mock -CommandName Get-Module -MockWith {
+                    return @{
+                        Name    = 'PowerShellGet'
+                        Version = '3.0.17'
+                    }
+                }
+                {
+                    $resources = $script:mockPSResourceInstance.GetInstalledResource().Count
+                    $resources.Count  | Should -Be 1
+                    $resource.Name    | Should -Be 'PowerShellGet'
+                    $resource.Version | Should -Be '3.0.17'
+                }
+            }
+        }
+
+        It 'Should return two objects' {
+            InModuleScope -ScriptBlock {
+                Mock -CommandName Get-Module -MockWith {
+                    return @(
+                        @{
+                            Name    = 'PowerShellGet'
+                            Version = '3.0.17'
+                        },
+                        @{
+                            Name    = 'PowerShellGet'
+                            Version = '2.2.5'
+                        }
+                    )
+                }
+                {
+                    $resources = $script:mockPSResourceInstance.GetInstalledResource().Count
+                    $resources.Count  | Should -Be 2
+                    $resource[0].Name    | Should -Be 'PowerShellGet'
+                    $resource[0].Version | Should -Be '3.0.17'
+                    $resource[1].Name    | Should -Be 'PowerShellGet'
+                    $resource[1].Version | Should -Be '2.2.5'
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetFullVersion()' -Tag 'GetFullVersion' {
+    }
+
+    Describe 'PSResource\TestPrerelease()' -Tag 'TestPrerelease' {
+
+    }
+
+    Describe 'PSResource\TestLatestVersion()' -Tag 'TestLatestVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource] @{
+                    Name          = 'ComputerManagementDsc'
+                    LatestVersion = '8.6.0'
+                    Ensure        = [Ensure]::Present
+                }
+            }
+        }
+
+        It 'Should return true when only one resource is installed and it is the latest version' {
+            InModuleScope -ScriptBlock {
+                $script:mockInstalledResources = @{
+                    Name    = 'PowerShellGet'
+                    Version = '8.6.0'
+                }
+                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeTrue
+            }
+        }
+
+        It 'Should return true when multiple resources are installed, including the latest version' {
+            InModuleScope -ScriptBlock {
+
+                $script:mockInstalledResources = @(
+                    @{
+                        Name    = 'PowerShellGet'
+                        Version = '8.1.0'
+                    },
+                    @{
+                        Name    = 'PowerShellGet'
+                        Version = '8.6.0'
+                    },
+                    @{
+                        Name    = 'PowerShellGet'
+                        Version = '8.7.0'
+                    }
+                )
+
+                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeTrue
+            }
+        }
+
+        It 'Should return false when only one resource is installed and it is not the latest version' {
+            InModuleScope -ScriptBlock {
+                $script:mockInstalledResources = @{
+                    Name    = 'PowerShellGet'
+                    Version = '8.5.0'
+                }
+                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeFalse
+            }
+        }
+
+        It 'Should return false when multiple resources are installed, not including the latest version' {
+            InModuleScope -ScriptBlock {
+                $script:mockInstalledResources = @(
+                    @{
+                        Name    = 'PowerShellGet'
+                        Version = '8.1.0'
+                    },
+                    @{
+                        Name    = 'PowerShellGet'
+                        Version = '8.5.0'
+                    },
+                    @{
+                        Name    = 'PowerShellGet'
+                        Version = '8.7.0'
+                    }
+                )
+
+                $script:mockPSResourceInstance.TestLatestVersion($script:mockInstalledResources) | Should -BeFalse
+            }
+        }
+    }
+
+    Describe 'PSResource\TestRepository()' -Tag 'TestRepository' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+            }
+        }
+
+        Context 'When the repository is untrusted' {
+            It 'Should throw when the repository is untrusted and force is not set' {
+                InModuleScope -ScriptBlock {
+                    {
+                        Mock -CommandName Get-PSRepository -MockWith {
+                            return @{
+                                Name               = 'PSGallery'
+                                InstallationPolicy = 'Untrusted'
+                            }
+                        }
+                        $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                                return @{
+                                    Name       = 'PowerShellGet'
+                                    Version    = '1.5.0'
+                                    Repository = 'PSGallery'
+                                }
+                            } -Force
+
+                        $script:mockPSResourceInstance.TestRepository() | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.UntrustedRepositoryWithoutForce
+                    }
+                }
+            }
+
+            It 'Should not throw when the repository is untrusted and force is set' {
+                InModuleScope -ScriptBlock {
+                    {
+                        Mock -CommandName Get-PSRepository -MockWith {
+                            return @{
+                                Name               = 'PSGallery'
+                                InstallationPolicy = 'Untrusted'
+                            }
+                        }
+                        $script:mockPSResourceInstance.Force = $true
+                        $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                                return @{
+                                    Name       = 'PowerShellGet'
+                                    Version    = '1.5.0'
+                                    Repository = 'PSGallery'
+                                }
+                            } -Force
+
+                        $script:mockPSResourceInstance.TestRepository() | Should -Not -Throw
+                    }
+                }
+            }
+        }
+
+        Context 'When the repository is trusted' {
+            It 'Should not throw when the repository is trusted' {
+                InModuleScope -ScriptBlock {
+                    {
+                        Mock -CommandName Get-PSRepository -MockWith {
+                            return @{
+                                Name               = 'InternalRepo'
+                                InstallationPolicy = 'Trusted'
+                            }
+                        }
+                        $script:mockPSResourceInstance.Force = $true
+                        $script:mockPSResourceInstance |
+                            Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                                return @{
+                                    Name       = 'PowerShellGet'
+                                    Version    = '1.5.0'
+                                    Repository = 'InternalRepo'
+                                }
+                            } -Force
+
+                        $script:mockPSResourceInstance.TestRepository() | Should -Not -Throw
+                    }
+                }
+            }
+        }
+
+    }
+
+    Describe 'PSResource\FindResource' -Tag 'FindResource' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+            }
+        }
+
+        Context 'When FindResource is called' {
+            It 'Should not throw and return properties correctly' {
+                InModuleScope -ScriptBlock {
+                    Mock -CommandName Find-Module -MockWith {
+                        return @{
+                            Name       = 'ComputerManagementDsc'
+                            Version    = '9.0.0'
+                            Repository = 'PSGallery'
+                        }
+                    }
+
+                    {
+                        $findResourceResult = $script:mockPSResourceInstance.FindResource()
+                        $findResourceResult.Name       | Should -Be 'ComputerManagementDsc'
+                        $findResourceResult.Version    | Should -Be '9.0.0'
+                        $findResourceResult.Repository | Should -Be 'PSGallery'
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\InstallResource' -Tag 'InstallResource' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{} |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'TestRepository' -Value {
+                        return $null #! Do I even need a -Value {} here?
+                    }
+
+                Mock -CommandName Install-Module
+            }
+        }
+
+        Context 'When InstallResource is called' {
+            It 'Should not throw when InstallResource is called' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.InstallResource() | Should -Not -Throw
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\UninstallResource' -Tag 'UninstallResource' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+
+                Mock -CommandName Uninstall-Module
+            }
+        }
+
+        Context 'When UninstallResource is called' {
+            It 'Should not throw when UninstallResource is called' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.UninstallResource(
+                            @{
+                                Name    = 'ComputerManagementDsc'
+                                Version = '1.6.0'
+                            }
+                        ) | Should -Not -Throw
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\TestVersionRequirement()' -Tag 'TestVersionRequirement' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+
+                Mock -CommandName Uninstall-Module
+            }
+        }
+
+        Context 'When versionrequirement is MinimumVersion' {
+            It 'Should return true when MinimumVersion requirement is met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.MinimumVersion = '8.6.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.6.0'
+                            },
+                            'MinimumVersion'
+                        ) | Should -BeTrue
+                    }
+                }
+            }
+
+            It 'Should return false when MinimumVersion requirement is not met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.MinimumVersion = '8.7.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.6.0'
+                            },
+                            'MinimumVersion'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+        }
+
+        Context 'When versionrequirement is MaximumVersion' {
+            It 'Should return true when MaximumVersion requirement is met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.MaximumVersion = '8.7.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.6.0'
+                            },
+                            'MaximumVersion'
+                        ) | Should -BeTrue
+                    }
+                }
+            }
+
+            It 'Should return false when MaximumVersion requirement is not met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.MaximumVersion = '8.7.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '9.0.0'
+                            },
+                            'MaximumVersion'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+        }
+
+        Context 'When versionrequirement is RequiredVersion' {
+            It 'Should return true when RequiredVersion requirement is met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '9.0.0'
+                            },
+                            'RequiredVersion'
+                        ) | Should -BeTrue
+                    }
+                }
+            }
+
+            It 'Should return false when RequiredVersion requirement is not met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.0.0'
+                            },
+                            'RequiredVersion'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+        }
+
+        Context 'When versionrequirement is Latest' {
+            It 'Should return true when Latest requirement is met' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.LatestVersion = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '9.0.0'
+                            },
+                            'Latest'
+                        ) | Should -BeTrue
+                    }
+                }
+            }
+
+            It 'Should return false when Latest requirement is not met with a single resource' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.Latest = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @{
+                                Version = '8.0.0'
+                            },
+                            'Latest'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+
+            It 'Should return false when Latest requirement is not met with a multiple resources, including latest' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.Latest = '9.0.0'
+                        $script:mockPSResourceInstance.TestVersionRequirement(
+                            @(
+                                @{
+                                    Version = '8.0.0'
+                                },
+                                @{
+                                    Version = '9.0.0'
+                                }
+                            ),
+                            'Latest'
+                        ) | Should -BeFalse
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetMinimumInstalledVersion()' -Tag 'GetMinimumInstalledVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{
+                    MinimumVersion = '7.0.0'
+                }
+            }
+        }
+
+        Context 'When calling GetMinimumInstalledVersion()' {
+            It 'Should return the correct minimum version when an installed resource matches given MinimumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetMinimumInstalledVersion(
+                            @(
+                                @{
+                                    Version = '6.0.0'
+                                },
+                                @{
+                                    Version = '7.0.0'
+                                }
+                            )
+                        ) | Should -Be '7.0.0'
+                    }
+                }
+            }
+
+            It 'Should return the correct minimum version when an installed resource does not match the given MinimumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetMinimumInstalledVersion(
+                            @(
+                                @{
+                                    Version = '6.0.0'
+                                },
+                                @{
+                                    Version = '5.0.0'
+                                },
+                                @{
+                                    Version = '4.2.0'
+                                }
+                            )
+                        ) | Should -Be '4.2.0'
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetMaximumInstalledVersion()' -Tag 'GetMaximumInstalledVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{
+                    MaximumVersion = '7.0.0'
+                }
+            }
+        }
+
+        Context 'When calling GetMaximumInstalledVersion()' {
+            It 'Should return the correct maximum version when an installed resource matches given MaximumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetMaximumInstalledVersion(
+                            @(
+                                @{
+                                    Version = '6.0.0'
+                                },
+                                @{
+                                    Version = '7.0.0'
+                                }
+                            )
+                        ) | Should -Be '7.0.0'
+                    }
+                }
+            }
+
+            It 'Should return the correct maximum version when an installed resource does not match the given MaximumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetMaximumInstalledVersion(
+                            @(
+                                @{
+                                    Version = '6.0.0'
+                                },
+                                @{
+                                    Version = '7.0.0'
+                                },
+                                @{
+                                    Version = '4.2.0'
+                                }
+                            )
+                        ) | Should -Be '7.0.0'
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetRequiredInstalledVersion()' -Tag 'GetRequiredInstalledVersion' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{
+                    RequiredVersion = '7.0.0'
+                }
+            }
+        }
+
+        Context 'When calling GetRequiredInstalledVersion()' {
+            It 'Should return the RequiredVersion when the required version is installed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetRequiredInstalledVersion(
+                            @(
+                                @{
+                                    Version = '5.0.0'
+                                },
+                                @{
+                                    Version = '7.0.0'
+                                },
+                                @{
+                                    Version = '6.0.0'
+                                }
+                            )
+                        ) | Should -Be '7.0.0'
+                    }
+                }
+            }
+
+            It 'Should return null when the required version is not installed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetRequiredInstalledVersion(
+                            @(
+                                @{
+                                    Version = '5.0.0'
+                                },
+                                @{
+                                    Version = '8.0.0'
+                                },
+                                @{
+                                    Version = '6.0.0'
+                                }
+                            )
+                        ) | Should -BeNullOrEmpty
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetVersionRequirement()' -Tag 'GetVersionRequirement' {
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+            }
+        }
+
+        Context 'When Latest is set' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Latest = $true
+                }
+            }
+            It 'Should return Latest' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'Latest'
+                    }
+                }
+            }
+        }
+
+        Context 'When MinimumVersion is set' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.MinimumVersion = '9.0.0'
+                }
+            }
+            It 'Should return MinimumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'MinimumVersion'
+                    }
+                }
+            }
+        }
+
+        Context 'When MaximumVersion is set' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.MaximumVersion = '9.0.0'
+                }
+            }
+            It 'Should return MaximumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'MaximumVersion'
+                    }
+                }
+            }
+        }
+
+        Context 'When RequiredVersion is set' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
+                }
+            }
+            It 'Should return MaximumVersion' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -Be 'RequiredVersion'
+                    }
+                }
+            }
+        }
+
+        Context 'When no version requirement is set' {
+            It 'Should return null' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetVersionRequirement() | Should -BeNullOrEmpty
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetRequiredVersionFromVersionRequirement' {
+        BeforeAll {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+            }
+        }
+
+        Context 'When version requirement is MinimumVersion' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetMinimumInstalledVersion' -Value {
+                            return '9.0.0'
+                        }
+                }
+            }
+
+            It 'Should return the correct version' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetRequiredVersionFromVersionRequirement(
+                            @{Version = '9.0.0'},
+                            'MinimumVersion'
+                        ) | Should -Be '9.0.0'
+                    }
+                }
+            }
+        }
+
+        Context 'When version requirement is MaximumVersion' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetMaximumInstalledVersion' -Value {
+                            return '9.0.0'
+                        }
+                }
+            }
+
+            It 'Should return the correct version' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetRequiredVersionFromVersionRequirement(
+                            @{Version = '9.0.0'},
+                            'MaximumVersion'
+                        ) | Should -Be '9.0.0'
+                    }
+                }
+            }
+        }
+
+        Context 'When version requirement is RequiredVersion' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance |
+                        Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetRequiredInstalledVersion' -Value {
+                            return '9.0.0'
+                        }
+                }
+            }
+
+            It 'Should return the correct version' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetRequiredVersionFromVersionRequirement(
+                            @{Version = '9.0.0'},
+                            'RequiredVersion'
+                        ) | Should -Be '9.0.0'
+                    }
+                }
+            }
+        }
+
+        Context 'When version requirement is Latest' {
+            It 'Should return the throw correctly' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.GetRequiredVersionFromVersionRequirement(
+                            @{Version = '9.0.0'},
+                            'Latest'
+                        ) | Should -Throw -ExpectedMessage $script:mockPSResourceInstance.localizedData.GetRequiredVersionFromVersionRequirementError
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\GetNonCompliantResources()' -Tag 'GetNonCompliantVersions' {
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+
+                $script:resources = @(
+                    @{Version = '9.0.0'},
+                    @{Version = '5.0.0'},
+                    @{Version = '3.0.0'},
+                    @{Version = '6.1.0'}
+                )
+            }
+        }
+
+        Context 'When version requirement is MinimumVersion' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.MinimumVersion = '9.0.0'
+                }
+            }
+
+            It 'Should return the correct resources' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantResources($script:resources)
+                        $nonCompliantResources.Count | Should -Be 3
+                    }
+                }
+            }
+        }
+
+        Context 'When version requirement is MaximumVersion' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.MaximumVersion = '9.0.0'
+                }
+            }
+
+            It 'Should return the correct resources' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantResources($script:resources)
+                        $nonCompliantResources.Count | Should -Be 0
+                    }
+                }
+            }
+        }
+
+        Context 'When version requirement is RequiredVersion' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.RequiredVersion = '9.0.0'
+                }
+            }
+
+            It 'Should return the correct resources' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantResources($script:resources)
+                        $nonCompliantResources.Count | Should -Be 3
+                    }
+                }
+            }
+        }
+
+        Context 'When version requirement is Latest' {
+            BeforeAll {
+                InModuleScope -ScriptBlock {
+                    $script:mockPSResourceInstance.Latest = $true
+                    $script:mockPSResourceInstance.LatestVersion = '9.0.0'
+                }
+            }
+
+            It 'Should return the correct resources' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $nonCompliantResources = $script:mockPSResourceInstance.GetNonCompliantResources($script:resources)
+                        $nonCompliantResources.Count | Should -Be 3
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\UninstallNonCompliantResources()' -Tag 'UninstallNonCompliantResources' {
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+                $script:mockPSResourceInstance |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'UninstallResource' -Value {
+                        return $null
+                    } -PassThru |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'GetNonCompliantResources' -Value {
+                        return $null
+                    }
+            }
+        }
+
+        Context 'When UninstallNonCompliantVerisons() is called' {
+            It 'Should not throw' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.UninstallNonCompliantResources(@{Version = '9.0.0'}) | Should -Not -Throw
+                    }
+                }
+            }
+        }
+    }
+
+    Describe 'PSResource\ResolveOnlySingleVersion' -Tag 'ResolveOnlySingleVersion' {
+        BeforeEach {
+            InModuleScope -ScriptBlock {
+                $script:mockPSResourceInstance = [PSResource]@{}
+                $script:mockPSResourceInstance |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'FindResource' -Value {
+                        return @{
+                            Name   = 'ComputerManagementDsc'
+                            Verson = '9.0.0'
+                        }
+                    } -PassThru |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'InstallResource' -Value {
+                        return $null
+                    } -PassThru |
+                    Add-Member -Force -MemberType 'ScriptMethod' -Name 'UninstallResource' -Value {
+                        return $null
+                    }
+            }
+        }
+
+        Context 'When ResolveSingeInstance() is called' {
+            It 'Should not throw when no resources are passed' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.ResolveOnlySingleVersion(@()) | Should -Not -Throw
+                    }
+                }
+            }
+
+            It 'Should not throw when resources are passed and none match the resourceToKeep' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.ResolveOnlySingleVersion(
+                            @(
+                                @{Version = '8.0.0'},
+                                @{Version = '7.0.0'}
+                            )
+                        ) | Should -Not -Throw
+                    }
+                }
+            }
+
+            It 'Should not throw when resources are passed and one matches the resourceToKeep' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.ResolveOnlySingleVersion(
+                            @(
+                                @{Version = '8.0.0'},
+                                @{Version = '9.0.0'}
+                            )
+                        ) | Should -Not -Throw
+                    }
+                }
+            }
+
+            It 'Should not throw when a single resource is passed that matches the resourceToKeep' {
+                InModuleScope -ScriptBlock {
+                    {
+                        $script:mockPSResourceInstance.ResolveOnlySingleVersion(
+                            @(
+                                @{Version = '9.0.0'}
+                            )
+                        ) | Should -Not -Throw
+                    }
+                }
+            }
+        }
+    }
+}
+finally
+{
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+}
