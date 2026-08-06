@@ -5,6 +5,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `AGENTS.md` at repository root with build/test workflow, resource type overview,
+  and key conventions for AI agents - Fixes [Issue #464](https://github.com/dsccommunity/ComputerManagementDsc/issues/464).
+- Added `tests/AGENTS.md` with Pester v5 guidance, test location map, and required setup
+  block templates for MOF and class-based resource tests.
+- Added `.github/copilot-instructions.md` with workspace-level GitHub Copilot instructions.
+- Added `.github/instructions/` directory with instruction files covering PowerShell style,
+  Pester, unit tests, integration tests, MOF resources, class-based resources,
+  localization, changelog, and markdown guidelines.
+
 ### Changed
 
 - `ComputerManagementDsc`
