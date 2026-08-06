@@ -10,6 +10,7 @@ class DSC_Computer : OMI_BaseResource
     [Write, Description("The value assigned here will be set as the local computer description.")] String Description;
     [Write, Description("The Active Directory Domain Controller to use to join the domain")] String Server;
     [Write, Description("Specifies advanced options for the Add-Computer join operation"), ValueMap{"AccountCreate","Win9XUpgrade","UnsecuredJoin","PasswordPass","JoinWithNewName","JoinReadOnly","InstallInvoke"}, Values{"AccountCreate","Win9XUpgrade","UnsecuredJoin","PasswordPass","JoinWithNewName","JoinReadOnly","InstallInvoke"}] String Options[];
+    [Write, Description("If true, the existing computer account in the domain will be reused instead of being deleted and recreated. This preserves the machine SID, group memberships, and GPO links. Default is false.")] Boolean ReuseExistingComputerAccount;
     [Read, Description("A read-only property that specifies the organizational unit that the computer account is currently in.")] String CurrentOU;
 };
 

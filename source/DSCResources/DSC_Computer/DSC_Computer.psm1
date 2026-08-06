@@ -47,6 +47,12 @@ $FailToRenameAfterJoinDomainErrorId = 'FailToRenameAfterJoinDomain,Microsoft.Pow
 
     .PARAMETER Options
         Specifies advanced options for the Add-Computer join operation.
+
+    .PARAMETER ReuseExistingComputerAccount
+        If $true, the existing computer account in the domain will be reused
+        instead of being deleted and recreated. This preserves the machine
+        SID, group memberships, and GPO links. If not specified or $false,
+        the existing account is deleted and recreated.
 #>
 function Get-TargetResource
 {
@@ -91,7 +97,11 @@ function Get-TargetResource
         [Parameter()]
         [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
         [System.String[]]
-        $Options
+        $Options,
+
+        [Parameter()]
+        [System.Boolean]
+        $ReuseExistingComputerAccount
     )
 
     Write-Verbose -Message ($script:localizedData.GettingComputerStateMessage -f $Name)
@@ -115,15 +125,16 @@ function Get-TargetResource
         -ClientOnly
 
     $returnValue = @{
-        Name             = $env:COMPUTERNAME
-        DomainName       = Get-ComputerDomain
-        JoinOU           = $JoinOU
-        CurrentOU        = Get-ComputerOU
-        Credential       = [ciminstance] $convertToCimCredential
-        UnjoinCredential = [ciminstance] $convertToCimUnjoinCredential
-        WorkGroupName    = (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup
-        Description      = (Get-CimInstance -Class 'Win32_OperatingSystem').Description
-        Server           = Get-LogonServer
+        Name                         = $env:COMPUTERNAME
+        DomainName                   = Get-ComputerDomain
+        JoinOU                       = $JoinOU
+        CurrentOU                    = Get-ComputerOU
+        Credential                   = [ciminstance] $convertToCimCredential
+        UnjoinCredential             = [ciminstance] $convertToCimUnjoinCredential
+        WorkGroupName                = (Get-CimInstance -Class 'Win32_ComputerSystem').Workgroup
+        Description                  = (Get-CimInstance -Class 'Win32_OperatingSystem').Description
+        Server                       = Get-LogonServer
+        ReuseExistingComputerAccount = $ReuseExistingComputerAccount
     }
 
     return $returnValue
@@ -160,6 +171,12 @@ function Get-TargetResource
 
     .PARAMETER Options
         Specifies advanced options for the Add-Computer join operation.
+
+    .PARAMETER ReuseExistingComputerAccount
+        If $true, the existing computer account in the domain will be reused
+        instead of being deleted and recreated. This preserves the machine
+        SID, group memberships, and GPO links. If not specified or $false,
+        the existing account is deleted and recreated.
 #>
 function Set-TargetResource
 {
@@ -203,7 +220,11 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
         [System.String[]]
-        $Options
+        $Options,
+
+        [Parameter()]
+        [System.Boolean]
+        $ReuseExistingComputerAccount
     )
 
     Write-Verbose -Message ($script:localizedData.SettingComputerStateMessage -f $Name)
@@ -262,13 +283,27 @@ function Set-TargetResource
                     $addComputerParameters.Add("Server", $Server)
                 }
 
-                # Check for existing computer objecst using ADSI without ActiveDirectory module
+                # Check for existing computer objects using ADSI without ActiveDirectory module
                 $computerObject = Get-ADSIComputer -Name $Name -DomainName $DomainName -Credential $Credential
 
-                if ($computerObject)
+                if ($ReuseExistingComputerAccount)
                 {
-                    Remove-ADSIObject -Path $computerObject.Path -Credential $Credential
-                    Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
+                    if ($computerObject)
+                    {
+                        Write-Verbose -Message ($script:localizedData.ReusingExistingComputerAccount -f $Name, $computerObject.Path)
+                    }
+                    else
+                    {
+                        Write-Verbose -Message ($script:localizedData.NoExistingComputerAccountFound -f $Name)
+                    }
+                }
+                else
+                {
+                    if ($computerObject)
+                    {
+                        Remove-ADSIObject -Path $computerObject.Path -Credential $Credential
+                        Write-Verbose -Message ($script:localizedData.DeletedExistingComputerObject -f $Name, $computerObject.Path)
+                    }
                 }
 
                 if (-not [System.String]::IsNullOrEmpty($Options))
@@ -458,6 +493,12 @@ function Set-TargetResource
 
     .PARAMETER Options
         Specifies advanced options for the Add-Computer join operation.
+
+    .PARAMETER ReuseExistingComputerAccount
+        If $true, the existing computer account in the domain will be reused
+        instead of being deleted and recreated. This preserves the machine
+        SID, group memberships, and GPO links. If not specified or $false,
+        the existing account is deleted and recreated.
 #>
 function Test-TargetResource
 {
@@ -502,7 +543,11 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
         [System.String[]]
-        $Options
+        $Options,
+
+        [Parameter()]
+        [System.Boolean]
+        $ReuseExistingComputerAccount
     )
 
     Write-Verbose -Message ($script:localizedData.TestingComputerStateMessage -f $Name)
@@ -812,6 +857,12 @@ function Remove-ADSIObject
 
     .PARAMETER Options
         Specifies advanced options for the Add-Computer join operation.
+
+    .PARAMETER ReuseExistingComputerAccount
+        If $true, the existing computer account in the domain will be reused
+        instead of being deleted and recreated. This preserves the machine
+        SID, group memberships, and GPO links. If not specified or $false,
+        the existing account is deleted and recreated.
 #>
 function Assert-ResourceProperty
 {
@@ -855,7 +906,11 @@ function Assert-ResourceProperty
         [Parameter()]
         [ValidateSet('AccountCreate', 'Win9XUpgrade', 'UnsecuredJoin', 'PasswordPass', 'JoinWithNewName', 'JoinReadOnly', 'InstallInvoke')]
         [System.String[]]
-        $Options
+        $Options,
+
+        [Parameter()]
+        [System.Boolean]
+        $ReuseExistingComputerAccount
     )
 
     if ($options -contains 'PasswordPass' -and
